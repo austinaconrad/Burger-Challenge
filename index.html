@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍔 100 Burger Challenge</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0d0a;
+    --surface: #1a1710;
+    --surface2: #242018;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --accent: #f5a623;
+    --accent2: #e8520a;
+    --text: #f0ead8;
+    --muted: #7a7060;
+    --muted2: #a09070;
+    --red: #e84040;
+    --green: #4cba6a;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(ellipse at 20% 20%, rgba(245,166,35,0.06) 0%, transparent 60%),
+                      radial-gradient(ellipse at 80% 80%, rgba(232,82,10,0.05) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .wrapper { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; padding: 0 16px 80px; }
+
+  /* SETUP SCREEN */
+  #setup-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    text-align: center;
+    gap: 0;
+  }
+  #setup-screen .header-emoji { font-size: 52px; animation: float 3s ease-in-out infinite; margin-bottom: 12px; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+  #setup-screen h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(42px, 10vw, 64px);
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 8px;
+  }
+  #setup-screen .subtitle { font-size: 14px; color: var(--muted2); margin-bottom: 32px; }
+
+  .setup-card {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 28px;
+    width: 100%;
+    max-width: 440px;
+    text-align: left;
+  }
+  .setup-card h2 { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+  .setup-card p { font-size: 13px; color: var(--muted2); margin-bottom: 20px; line-height: 1.6; }
+  .setup-card label { font-size: 12px; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 6px; margin-top: 16px; }
+  .setup-card label:first-of-type { margin-top: 0; }
+  .setup-card input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    padding: 11px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .setup-card input:focus { border-color: rgba(245,166,35,0.5); }
+  .setup-card input::placeholder { color: var(--muted); }
+  .setup-card .btn-row { display: flex; gap: 8px; margin-top: 20px; }
+  .btn-primary {
+    flex: 1;
+    background: var(--accent);
+    color: #0f0d0a;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:active { transform: scale(0.97); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .divider { display: flex; align-items: center; gap: 12px; margin: 24px 0; color: var(--muted); font-size: 12px; }
+  .divider::before,.divider::after { content:''; flex:1; height:1px; background: var(--border); }
+
+  /* CONFIG BANNER */
+  #config-banner {
+    background: rgba(232,82,10,0.12);
+    border: 1px solid rgba(232,82,10,0.35);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    font-size: 13px;
+    color: #f0997b;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    display: none;
+  }
+  #config-banner strong { color: var(--accent); }
+  #config-banner code {
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 12px;
+    font-family: monospace;
+  }
+  #config-banner ol { padding-left: 18px; margin: 8px 0; }
+  #config-banner li { margin: 4px 0; }
+  #config-banner a { color: var(--accent); }
+
+  /* LIVE DOT */
+  .live-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--green);
+    background: rgba(76,186,106,0.1);
+    border: 1px solid rgba(76,186,106,0.25);
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+  .live-dot::before {
+    content: '';
+    width: 7px; height: 7px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+  .offline-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted2);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+
+  header {
+    padding: 28px 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+  }
+  .header-top { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 4px; }
+  .leave-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted2);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .leave-btn:hover { border-color: var(--border2); color: var(--text); }
+  .header-emoji { font-size: 44px; line-height: 1; animation: float 3s ease-in-out infinite; }
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(38px, 9vw, 60px);
+    letter-spacing: 2px;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .room-pill {
+    font-size: 12px;
+    color: var(--muted2);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    padding: 4px 12px;
+    border-radius: 999px;
+    letter-spacing: 0.04em;
+  }
+  .room-pill span { color: var(--accent); font-weight: 500; }
+  .days-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(245,166,35,0.12); border: 1px solid rgba(245,166,35,0.3);
+    color: var(--accent); font-size: 13px; font-weight: 500;
+    padding: 5px 14px; border-radius: 999px;
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex; gap: 4px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 4px; margin-bottom: 20px;
+  }
+  .tab-btn {
+    flex: 1; padding: 10px; border: none; background: transparent;
+    color: var(--muted2); font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500; border-radius: calc(var(--radius) - 4px);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .tab-btn.active { background: var(--surface2); color: var(--text); border: 1px solid var(--border2); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* STAT GRID */
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 12px; text-align: center; }
+  .stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 32px; line-height: 1; color: var(--accent); }
+  .stat-lbl { font-size: 11px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* LEADERBOARD */
+  .leaderboard { display: flex; flex-direction: column; gap: 10px; }
+  .lb-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px;
+    display: flex; align-items: center; gap: 14px;
+    transition: border-color 0.3s;
+    animation: slideIn 0.3s ease both;
+  }
+  @keyframes slideIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .lb-card.first-place { border-color: rgba(245,166,35,0.4); }
+  .lb-card.complete { border-color: rgba(76,186,106,0.4); }
+  .lb-card.is-me { box-shadow: 0 0 0 2px rgba(245,166,35,0.25); }
+  .rank-badge { font-family: 'Bebas Neue', sans-serif; font-size: 22px; width: 32px; text-align: center; flex-shrink: 0; color: var(--muted); }
+  .lb-card.first-place .rank-badge { color: var(--accent); }
+  .avatar {
+    width: 46px; height: 46px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 600; flex-shrink: 0; border: 2px solid transparent;
+  }
+  .player-info { flex: 1; min-width: 0; }
+  .player-name { font-size: 16px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 8px; }
+  .me-badge { font-size: 10px; font-weight: 600; background: rgba(245,166,35,0.15); color: var(--accent); border: 1px solid rgba(245,166,35,0.3); padding: 2px 7px; border-radius: 999px; }
+  .done-badge { font-size: 10px; font-weight: 600; background: rgba(76,186,106,0.15); color: var(--green); border: 1px solid rgba(76,186,106,0.3); padding: 2px 7px; border-radius: 999px; text-transform: uppercase; }
+  .player-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .mini-bar-wrap { height: 4px; background: rgba(255,255,255,0.06); border-radius: 999px; margin-top: 8px; overflow: hidden; }
+  .mini-bar-fill { height: 100%; border-radius: 999px; transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+  .lb-count { font-family: 'Bebas Neue', sans-serif; font-size: 34px; line-height: 1; min-width: 48px; text-align: right; flex-shrink: 0; }
+
+  /* TALLY */
+  .tally-grid { display: flex; flex-direction: column; gap: 12px; }
+  .my-tally-card {
+    background: var(--surface); border: 1px solid var(--border2);
+    border-radius: var(--radius); overflow: hidden;
+  }
+  .my-tally-card.complete { border-color: rgba(76,186,106,0.4); }
+  .tally-top { display: flex; align-items: center; gap: 14px; padding: 16px 16px 12px; }
+  .tally-info { flex: 1; }
+  .tally-name { font-size: 17px; font-weight: 600; }
+  .tally-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .tally-count { font-family: 'Bebas Neue', sans-serif; font-size: 52px; line-height: 1; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1); }
+  .tally-count.pop { transform: scale(1.3); }
+  .progress-track { height: 6px; background: rgba(255,255,255,0.05); margin: 0 16px; }
+  .progress-fill { height: 100%; transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+  .tally-controls { display: grid; grid-template-columns: 60px 1fr 60px; margin-top: 12px; border-top: 1px solid var(--border); }
+  .ctrl-btn { background: none; border: none; color: var(--muted2); font-size: 24px; cursor: pointer; padding: 14px; transition: color 0.15s, background 0.15s; display: flex; align-items: center; justify-content: center; }
+  .ctrl-btn:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .ate-btn { background: none; border: none; border-left: 1px solid var(--border); border-right: 1px solid var(--border); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; padding: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.15s; }
+  .ate-btn:hover { background: rgba(255,255,255,0.05); }
+  .ate-btn:active { background: rgba(255,255,255,0.1); }
+  .ate-btn .bicon { font-size: 18px; transition: transform 0.2s; }
+  .ate-btn:active .bicon { transform: scale(1.4) rotate(-10deg); }
+  .complete-strip { padding: 8px 16px; background: rgba(76,186,106,0.08); color: var(--green); font-size: 13px; font-weight: 500; text-align: center; border-top: 1px solid rgba(76,186,106,0.15); display: none; }
+
+  /* PLAYERS TAB */
+  .players-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .player-row { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; display: flex; align-items: center; gap: 12px; animation: slideIn 0.25s ease both; }
+  .player-row .avatar { width: 38px; height: 38px; font-size: 13px; }
+  .player-row-info { flex: 1; }
+  .player-row-name { font-size: 15px; font-weight: 500; }
+  .player-row-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .delete-btn { background: none; border: none; color: var(--muted); font-size: 16px; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: color 0.15s, background 0.15s; }
+  .delete-btn:hover { color: var(--red); background: rgba(232,64,64,0.1); }
+  .add-form { display: flex; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; }
+  .add-form input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 10px 14px; outline: none; transition: border-color 0.2s; }
+  .add-form input::placeholder { color: var(--muted); }
+  .add-form input:focus { border-color: rgba(245,166,35,0.5); }
+  .add-form button { background: var(--accent); color: #0f0d0a; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; padding: 10px 18px; cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
+  .add-form button:hover { opacity: 0.9; }
+
+  .winner-banner { background: linear-gradient(135deg, rgba(76,186,106,0.12), rgba(76,186,106,0.06)); border: 1px solid rgba(76,186,106,0.3); border-radius: var(--radius-sm); padding: 12px 16px; text-align: center; font-size: 14px; font-weight: 500; color: var(--green); margin-bottom: 16px; display: none; }
+
+  .empty { text-align: center; padding: 48px 20px; color: var(--muted); }
+  .empty .e-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty p { font-size: 14px; }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--surface2); border: 1px solid var(--border2); color: var(--text); font-size: 13px; padding: 10px 20px; border-radius: 999px; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s; opacity: 0; z-index: 999; white-space: nowrap; }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  /* COLORS */
+  .c0{--av-bg:rgba(127,119,221,0.18);--av-text:#b4aff0;--bar:#7F77DD}
+  .c1{--av-bg:rgba(29,158,117,0.18);--av-text:#5dcaa5;--bar:#1D9E75}
+  .c2{--av-bg:rgba(216,90,48,0.18);--av-text:#f0997b;--bar:#D85A30}
+  .c3{--av-bg:rgba(212,83,126,0.18);--av-text:#ed93b1;--bar:#D4537E}
+  .c4{--av-bg:rgba(55,138,221,0.18);--av-text:#85b7eb;--bar:#378ADD}
+  .c5{--av-bg:rgba(99,153,34,0.18);--av-text:#97c459;--bar:#639922}
+  .c6{--av-bg:rgba(186,117,23,0.18);--av-text:#ef9f27;--bar:#BA7517}
+  .avatar{background:var(--av-bg);color:var(--av-text);border-color:var(--av-text)}
+  .mini-bar-fill,.progress-fill{background:var(--bar)}
+  .lb-count{color:var(--av-text)}
+  .tally-count{color:var(--av-text)}
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div id="setup-screen">
+  <div class="header-emoji">🍔</div>
+  <h1>100 Burger Challenge</h1>
+  <p class="subtitle">Real-time leaderboard — every burger counts</p>
+
+  <div id="config-banner"></div>
+
+  <div class="setup-card" id="setup-card">
+    <h2>Join or create a challenge</h2>
+    <p>Create a new challenge and share the room code with your friends, or enter a code to join an existing one.</p>
+
+    <label>Your name</label>
+    <input type="text" id="setup-name" placeholder="Enter your name…" maxlength="22" />
+
+    <div class="btn-row" style="margin-top:20px">
+      <button class="btn-primary" onclick="createRoom()" id="btn-create">🍔 Create new challenge</button>
+    </div>
+
+    <div class="divider">or join existing</div>
+
+    <label>Room code</label>
+    <input type="text" id="setup-room" placeholder="e.g. BURGER42" maxlength="12" style="text-transform:uppercase;letter-spacing:0.1em" />
+    <div class="btn-row">
+      <button class="btn-primary" onclick="joinRoom()" id="btn-join" style="background:var(--surface2);color:var(--text);border:1px solid var(--border2)">Join challenge →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app-screen" style="display:none">
+  <div class="wrapper">
+    <header>
+      <div class="header-top">
+        <div id="conn-status" class="offline-dot">connecting…</div>
+        <button class="leave-btn" onclick="leaveRoom()">Leave room</button>
+      </div>
+      <div class="header-emoji">🍔</div>
+      <h1>100 Burger Challenge</h1>
+      <div class="room-pill">Room: <span id="room-display">—</span></div>
+      <div class="days-pill">🗓 <span id="days-left">--</span> days until Labor Day</div>
+    </header>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('leaderboard',this)">🏆 Leaderboard</button>
+      <button class="tab-btn" onclick="switchTab('tally',this)">🍔 My Tally</button>
+      <button class="tab-btn" onclick="switchTab('players',this)">👥 Players</button>
+    </div>
+
+    <!-- LEADERBOARD -->
+    <div class="tab-panel active" id="tab-leaderboard">
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-val" id="stat-days">--</div><div class="stat-lbl">Days left</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-finished">0</div><div class="stat-lbl">Finished</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-top">0</div><div class="stat-lbl">Leader's #</div></div>
+      </div>
+      <div id="winner-banner" class="winner-banner"></div>
+      <div class="leaderboard" id="leaderboard"></div>
+      <div id="lb-empty" class="empty" style="display:none"><div class="e-icon">🍔</div><p>No players yet!</p></div>
+    </div>
+
+    <!-- TALLY -->
+    <div class="tab-panel" id="tab-tally">
+      <div id="my-tally-area"></div>
+    </div>
+
+    <!-- PLAYERS -->
+    <div class="tab-panel" id="tab-players">
+      <div class="players-list" id="players-list"></div>
+      <div id="players-empty" class="empty" style="display:none"><div class="e-icon">👤</div><p>No players yet.</p></div>
+      <div class="add-form" id="add-player-form" style="display:none">
+        <input type="text" id="new-player-name" placeholder="Add another player…" maxlength="22" />
+        <button onclick="addExtraPlayer()">Add +</button>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-top:12px;text-align:center">Share the room code so friends can join on their own devices</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, doc, collection, getDoc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+// ─────────────────────────────────────────────────────────────────
+// 🔧 PASTE YOUR FIREBASE CONFIG HERE
+// ─────────────────────────────────────────────────────────────────
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyCqqA4XLxrRNQLAEcLSuszvpsJIhZLWqcQ",
+  authDomain:        "burger-challenge.firebaseapp.com",
+  projectId:         "burger-challenge",
+  storageBucket:     "burger-challenge.firebasestorage.app",
+  messagingSenderId: "245243594858",
+  appId:             "1:245243594858:web:5281332310b1b78a382213"
+};
+// ─────────────────────────────────────────────────────────────────
+
+const COLORS = ['c0','c1','c2','c3','c4','c5','c6'];
+const IS_CONFIGURED = !FIREBASE_CONFIG.apiKey.startsWith('YOUR_');
+
+let app, db, unsubscribe;
+let myPlayerId = null;
+let myName = '';
+let roomId = '';
+let players = [];
+
+// ── SETUP DETECT ─────────────────────────────────────────────────
+function showConfigBanner() {
+  const b = document.getElementById('config-banner');
+  b.style.display = 'block';
+  b.innerHTML = `
+    <strong>⚙️ Firebase setup needed — 3 quick steps:</strong>
+    <ol>
+      <li>Go to <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> → create a free project</li>
+      <li>Click <strong>Firestore Database</strong> → Create database → Start in <strong>test mode</strong></li>
+      <li>Go to <strong>Project Settings → Your apps → Web app</strong>, copy your config, and replace the <code>FIREBASE_CONFIG</code> object near the top of this HTML file</li>
+    </ol>
+    Once configured, re-open this file and your live leaderboard will work!
+  `;
+}
+
+if (!IS_CONFIGURED) { showConfigBanner(); }
+
+// ── FIREBASE INIT ────────────────────────────────────────────────
+function initFirebase() {
+  app = initializeApp(FIREBASE_CONFIG);
+  db  = getFirestore(app);
+}
+
+// ── UTILS ────────────────────────────────────────────────────────
+function uid() { return Math.random().toString(36).slice(2, 10); }
+function initials(name) {
+  const p = name.trim().split(/\s+/);
+  return p.length >= 2 ? (p[0][0]+p[1][0]).toUpperCase() : name.slice(0,2).toUpperCase();
+}
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function colorClass(idx) { return COLORS[idx % COLORS.length]; }
+function avatarHTML(p, size) {
+  const cc = colorClass(p.colorIdx);
+  return `<div class="avatar ${cc}" style="width:${size}px;height:${size}px;font-size:${Math.round(size*0.32)}px">${initials(p.name)}</div>`;
+}
+function laborDay(year) {
+  const sep1 = new Date(year,8,1), dow = sep1.getDay();
+  const d = dow===0?1:dow===1?0:8-dow;
+  return new Date(year,8,1+d);
+}
+function daysUntilLaborDay() {
+  const now = new Date();
+  let ld = laborDay(now.getFullYear());
+  if (ld <= now) ld = laborDay(now.getFullYear()+1);
+  return Math.max(0, Math.ceil((ld-now)/86400000));
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── ROOM CODE ────────────────────────────────────────────────────
+function genRoomCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return Array.from({length:6}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+}
+
+// ── CREATE ROOM ──────────────────────────────────────────────────
+window.createRoom = async function() {
+  if (!IS_CONFIGURED) { showConfigBanner(); return; }
+  const name = document.getElementById('setup-name').value.trim();
+  if (!name) { alert('Enter your name first!'); return; }
+  initFirebase();
+  const btn = document.getElementById('btn-create');
+  btn.disabled = true; btn.textContent = 'Creating…';
+  try {
+    roomId = genRoomCode();
+    myPlayerId = uid();
+    myName = name;
+    const roomRef = doc(db, 'rooms', roomId);
+    await setDoc(roomRef, { createdAt: serverTimestamp(), code: roomId });
+    const playerRef = doc(db, 'rooms', roomId, 'players', myPlayerId);
+    await setDoc(playerRef, { name, count: 0, colorIdx: 0, joinedAt: serverTimestamp() });
+    saveSession();
+    startApp();
+  } catch(e) {
+    alert('Error: '+e.message);
+    btn.disabled = false; btn.textContent = '🍔 Create new challenge';
+  }
+};
+
+// ── JOIN ROOM ────────────────────────────────────────────────────
+window.joinRoom = async function() {
+  if (!IS_CONFIGURED) { showConfigBanner(); return; }
+  const name = document.getElementById('setup-name').value.trim();
+  const code = document.getElementById('setup-room').value.trim().toUpperCase();
+  if (!name) { alert('Enter your name first!'); return; }
+  if (!code) { alert('Enter a room code!'); return; }
+  initFirebase();
+  const btn = document.getElementById('btn-join');
+  btn.disabled = true; btn.textContent = 'Joining…';
+  try {
+    const roomRef = doc(db, 'rooms', code);
+    const snap = await getDoc(roomRef);
+    if (!snap.exists()) { alert('Room not found. Check the code and try again.'); btn.disabled=false; btn.textContent='Join challenge →'; return; }
+    roomId = code; myPlayerId = uid(); myName = name;
+    const existingPlayers = [];
+    const { getDocs } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const pSnap = await getDocs(collection(db,'rooms',roomId,'players'));
+    pSnap.forEach(d => existingPlayers.push(d.data()));
+    const colorIdx = existingPlayers.length % COLORS.length;
+    const playerRef = doc(db,'rooms',roomId,'players',myPlayerId);
+    await setDoc(playerRef, { name, count: 0, colorIdx, joinedAt: serverTimestamp() });
+    saveSession();
+    startApp();
+  } catch(e) {
+    alert('Error: '+e.message);
+    btn.disabled=false; btn.textContent='Join challenge →';
+  }
+};
+
+// ── SESSION PERSISTENCE ──────────────────────────────────────────
+function saveSession() {
+  localStorage.setItem('bc_session', JSON.stringify({ roomId, myPlayerId, myName }));
+}
+function loadSession() {
+  try {
+    const s = localStorage.getItem('bc_session');
+    if (!s) return false;
+    const { roomId: r, myPlayerId: p, myName: n } = JSON.parse(s);
+    roomId = r; myPlayerId = p; myName = n;
+    return true;
+  } catch(e) { return false; }
+}
+window.leaveRoom = function() {
+  if (!confirm('Leave this challenge? You can rejoin with the same room code.')) return;
+  if (unsubscribe) unsubscribe();
+  localStorage.removeItem('bc_session');
+  location.reload();
+};
+
+// ── START APP ────────────────────────────────────────────────────
+function startApp() {
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  document.getElementById('room-display').textContent = roomId;
+  document.getElementById('days-left').textContent = daysUntilLaborDay();
+  document.getElementById('stat-days').textContent = daysUntilLaborDay();
+  document.getElementById('add-player-form').style.display = 'flex';
+  subscribeToRoom();
+}
+
+// ── REAL-TIME LISTENER ───────────────────────────────────────────
+function subscribeToRoom() {
+  const connStatus = document.getElementById('conn-status');
+  const playersCol = collection(db, 'rooms', roomId, 'players');
+  unsubscribe = onSnapshot(playersCol,
+    (snap) => {
+      connStatus.className = 'live-dot';
+      connStatus.textContent = 'Live';
+      players = [];
+      snap.forEach(d => players.push({ id: d.id, ...d.data() }));
+      players.sort((a,b) => (a.joinedAt?.seconds||0) - (b.joinedAt?.seconds||0));
+      render();
+    },
+    (err) => {
+      connStatus.className = 'offline-dot';
+      connStatus.textContent = 'Reconnecting…';
+    }
+  );
+}
+
+// ── RENDER ───────────────────────────────────────────────────────
+function render() {
+  const sorted = [...players].sort((a,b) => b.count - a.count);
+  const days = daysUntilLaborDay();
+  document.getElementById('stat-days').textContent = days;
+  document.getElementById('stat-finished').textContent = players.filter(p=>p.count>=100).length;
+  document.getElementById('stat-top').textContent = sorted.length ? sorted[0].count : 0;
+  renderLeaderboard(sorted);
+  renderMyTally();
+  renderPlayersList();
+}
+
+function renderLeaderboard(sorted) {
+  const lb = document.getElementById('leaderboard');
+  const empty = document.getElementById('lb-empty');
+  const banner = document.getElementById('winner-banner');
+  const winners = players.filter(p=>p.count>=100);
+  if (winners.length) {
+    banner.style.display = 'block';
+    banner.textContent = '🎉 ' + winners.map(p=>p.name).join(', ') + (winners.length===1?' has':' have') + ' hit 100 burgers!';
+  } else { banner.style.display='none'; }
+  if (!sorted.length) { lb.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  const ranks = ['👑','🥈','🥉'];
+  lb.innerHTML = sorted.map((p,i) => {
+    const cc = colorClass(p.colorIdx);
+    const isFirst = i===0 && p.count>0;
+    const isDone = p.count>=100;
+    const isMe = p.id===myPlayerId;
+    const pct = Math.min(100, p.count);
+    return `<div class="lb-card ${cc} ${isFirst?'first-place':''} ${isDone?'complete':''} ${isMe?'is-me':''}">
+      <div class="rank-badge">${i<3&&p.count>0?ranks[i]:i+1}</div>
+      ${avatarHTML(p,46)}
+      <div class="player-info">
+        <div class="player-name">${escHtml(p.name)}${isMe?'<span class="me-badge">You</span>':''}${isDone?'<span class="done-badge">Done!</span>':''}</div>
+        <div class="player-sub">${p.count} / 100 burgers</div>
+        <div class="mini-bar-wrap"><div class="mini-bar-fill ${cc}" style="width:${pct}%"></div></div>
+      </div>
+      <div class="lb-count ${cc}">${p.count}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderMyTally() {
+  const area = document.getElementById('my-tally-area');
+  const me = players.find(p=>p.id===myPlayerId);
+  if (!me) { area.innerHTML = '<div class="empty"><div class="e-icon">🔍</div><p>Your player not found. Try rejoining.</p></div>'; return; }
+  const cc = colorClass(me.colorIdx);
+  const pct = Math.min(100, me.count);
+  const isDone = me.count>=100;
+  area.innerHTML = `<div class="my-tally-card ${cc} ${isDone?'complete':''}">
+    <div class="tally-top">
+      ${avatarHTML(me,52)}
+      <div class="tally-info">
+        <div class="tally-name">${escHtml(me.name)}</div>
+        <div class="tally-sub">${me.count} of 100 burgers</div>
+      </div>
+      <div class="tally-count ${cc}" id="my-count">${me.count}</div>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill ${cc}" id="my-bar" style="width:${pct}%"></div>
+    </div>
+    <div class="tally-controls">
+      <button class="ctrl-btn" onclick="changeMyCount(-1)" title="Remove">−</button>
+      <button class="ate-btn" onclick="changeMyCount(1)"><span class="bicon">🍔</span> Ate one!</button>
+      <button class="ctrl-btn" onclick="changeMyCount(-1)" title="Undo">↩</button>
+    </div>
+    <div class="complete-strip" ${isDone?'style="display:block"':''}>
+      🎉 You crushed 100 burgers! Legend.
+    </div>
+  </div>`;
+}
+
+function renderPlayersList() {
+  const list = document.getElementById('players-list');
+  const empty = document.getElementById('players-empty');
+  if (!players.length) { list.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  list.innerHTML = players.map(p => {
+    const cc = colorClass(p.colorIdx);
+    const isMe = p.id===myPlayerId;
+    return `<div class="player-row ${cc}">
+      ${avatarHTML(p,38)}
+      <div class="player-row-info">
+        <div class="player-row-name">${escHtml(p.name)}${isMe?' <span style="font-size:11px;color:var(--muted2)">(you)</span>':''}</div>
+        <div class="player-row-sub">${p.count}/100 · ${Math.min(100,p.count)}%</div>
+      </div>
+      ${isMe?`<button class="delete-btn" onclick="removeMe()" title="Leave">✕</button>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── ACTIONS ──────────────────────────────────────────────────────
+window.changeMyCount = async function(delta) {
+  const me = players.find(p=>p.id===myPlayerId);
+  if (!me) return;
+  const newCount = Math.max(0, Math.min(999, me.count + delta));
+
+  // Optimistic local update for instant feel
+  const cntEl = document.getElementById('my-count');
+  const barEl = document.getElementById('my-bar');
+  if (cntEl) {
+    cntEl.textContent = newCount;
+    cntEl.classList.remove('pop');
+    void cntEl.offsetWidth;
+    cntEl.classList.add('pop');
+    setTimeout(()=>cntEl.classList.remove('pop'),200);
+  }
+  if (barEl) barEl.style.width = Math.min(100,newCount)+'%';
+
+  try {
+    const ref = doc(db,'rooms',roomId,'players',myPlayerId);
+    await updateDoc(ref, { count: newCount });
+    if (delta > 0 && newCount === 100) showToast('🎉 You hit 100! You did it!');
+    else if (delta > 0) showToast('🍔 Burger #'+newCount+' logged!');
+  } catch(e) {
+    showToast('⚠️ Sync error — check connection');
+  }
+};
+
+window.addExtraPlayer = async function() {
+  const inp = document.getElementById('new-player-name');
+  const name = inp.value.trim();
+  if (!name) return;
+  try {
+    const colorIdx = players.length % COLORS.length;
+    const ref = collection(db,'rooms',roomId,'players');
+    await addDoc(ref, { name, count:0, colorIdx, joinedAt: serverTimestamp() });
+    inp.value = '';
+    showToast('👤 '+name+' added!');
+  } catch(e) { showToast('Error adding player'); }
+};
+
+window.removeMe = async function() {
+  if (!confirm('Remove yourself from this room?')) return;
+  try {
+    await deleteDoc(doc(db,'rooms',roomId,'players',myPlayerId));
+    localStorage.removeItem('bc_session');
+    location.reload();
+  } catch(e) { showToast('Error removing player'); }
+};
+
+window.switchTab = function(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+};
+
+// ── KEYBOARD ────────────────────────────────────────────────────
+document.getElementById('setup-name').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('setup-room').value ? joinRoom() : createRoom(); });
+document.getElementById('setup-room').addEventListener('keydown', e => { if(e.key==='Enter') joinRoom(); });
+document.getElementById('setup-room').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase(); });
+
+// ── AUTO REJOIN ──────────────────────────────────────────────────
+if (IS_CONFIGURED && loadSession()) {
+  initFirebase();
+  startApp();
+}
+</script>
+</body>
+</html>
