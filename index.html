@@ -8,9 +8,9 @@
 <style>
 :root {
   --amber:#F5C842; --amber-dark:#C8762A; --amber-mid:#E8943A; --patty:#2A1E10;
-  --bg:#0F0D09; --bg2:#161410;
-  --surface:#1C1914; --surface2:#232018; --surface3:#2C281E;
-  --border:rgba(255,255,255,0.06); --border2:rgba(255,255,255,0.10); --border3:rgba(255,255,255,0.18);
+  --bg:#090805; --bg2:#0F0D09;
+  --surface:#1A1814; --surface2:#222018; --surface3:#2C281E;
+  --border:rgba(255,255,255,0.08); --border2:rgba(255,255,255,0.12); --border3:rgba(255,255,255,0.20);
   --text:#EDE5D0; --muted:#5A4E38; --muted2:#8A7255;
   --green:#5CB85C; --red:#D94040;
   --cheese:#F5C842; --bun-top:#C8762A; --bun-mid:#E8943A; --sesame:#D4A85A;
@@ -83,7 +83,7 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 
 /* ── STAT CARDS ── */
 .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 14px 12px;text-align:left;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.3)}
+.stat-card{background:rgba(30,27,20,0.90);border:1px solid rgba(255,255,255,0.10);border-radius:var(--radius-sm);padding:14px 14px 12px;text-align:left;position:relative;overflow:hidden;box-shadow:0 2px 20px rgba(0,0,0,0.55),inset 0 1px 0 rgba(255,255,255,0.06)}
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--amber-dark),var(--amber));opacity:0.6}
 .stat-icon{position:absolute;top:11px;right:12px;font-size:13px;opacity:0.3;line-height:1}
 .stat-val{font-family:'Poppins',sans-serif;font-size:30px;font-weight:800;line-height:1;color:var(--amber);letter-spacing:-0.5px}
@@ -95,16 +95,16 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 @keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
 .lb-card{
-  background:rgba(18,16,12,0.72);
+  background:rgba(30,27,20,0.90);
   backdrop-filter:blur(20px) saturate(1.15);
   -webkit-backdrop-filter:blur(20px) saturate(1.15);
-  border:1px solid rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.10);
   border-radius:var(--radius);
   padding:13px 15px;
   display:flex;align-items:center;gap:12px;
   transition:transform 0.15s,box-shadow 0.2s;
   animation:slideIn 0.3s ease both;
-  box-shadow:0 2px 16px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.04);
+  box-shadow:0 2px 20px rgba(0,0,0,0.55),inset 0 1px 0 rgba(255,255,255,0.06);
   position:relative;overflow:hidden;
 }
 .lb-card:active{transform:scale(0.98)}
@@ -122,23 +122,27 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .ring-inner{position:absolute;top:5px;left:5px;right:5px;bottom:5px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:none;font-family:'Inter',sans-serif}
 
 .rank-badge{font-size:20px;width:28px;text-align:center;flex-shrink:0;line-height:1}
-.player-info{flex:1;min-width:0}
+.player-info{flex:0 0 auto;min-width:0;display:flex;flex-direction:column;justify-content:center}
 .player-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;font-family:'Inter',sans-serif}
 .me-badge{font-size:9px;font-weight:700;background:rgba(245,200,66,0.12);color:var(--amber);border:1px solid rgba(245,200,66,0.28);padding:2px 7px;border-radius:999px;white-space:nowrap;text-transform:uppercase;letter-spacing:0.04em}
 .done-badge{font-size:9px;font-weight:700;background:rgba(93,184,93,0.12);color:var(--green);border:1px solid rgba(93,184,93,0.28);padding:2px 7px;border-radius:999px;text-transform:uppercase;white-space:nowrap;letter-spacing:0.04em}
-.player-sub{font-size:11px;color:var(--muted2);margin-top:2px;font-weight:400}
-.mini-bar-wrap{height:3px;background:rgba(255,255,255,0.06);border-radius:999px;margin-top:7px;overflow:hidden}
+.mini-bar-wrap{height:2px;background:rgba(255,255,255,0.06);border-radius:999px;margin-top:6px;overflow:hidden;width:100%}
 .mini-bar-fill{height:100%;border-radius:999px;transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1)}
-.lb-count{font-family:'Poppins',sans-serif;font-size:28px;font-weight:800;line-height:1;min-width:44px;text-align:right;flex-shrink:0;letter-spacing:-0.5px}
+/* Middle: badge column */
+.badge-col{flex:1;display:flex;align-items:center;justify-content:center;min-width:0;padding:0 8px}
+/* Right: score block */
+.lb-score{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;flex-shrink:0;text-align:right;gap:1px}
+.lb-count{font-family:'Poppins',sans-serif;font-size:34px;font-weight:900;line-height:1;letter-spacing:-1px}
+.lb-of{font-size:9px;color:var(--muted2);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap}
 
 /* ── ACHIEVEMENT BADGES ── */
-.badge-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center}
+.badge-row{display:flex;gap:4px;flex-wrap:wrap;align-items:center;justify-content:center}
 .ach-badge{
   display:inline-flex;align-items:center;justify-content:center;
-  width:38px;height:38px;border-radius:50%;
+  width:28px;height:28px;border-radius:50%;
   background:rgba(0,0,0,0.3);
-  border:2px solid var(--bdg-color,rgba(245,200,66,0.55));
-  box-shadow:0 0 7px var(--bdg-glow,rgba(245,200,66,0.12)),inset 0 1px 0 rgba(255,255,255,0.07);
+  border:1.5px solid var(--bdg-color,rgba(245,200,66,0.55));
+  box-shadow:0 0 5px var(--bdg-glow,rgba(245,200,66,0.12)),inset 0 1px 0 rgba(255,255,255,0.07);
   cursor:pointer;position:relative;
   transition:transform 0.15s,box-shadow 0.2s,filter 0.2s,opacity 0.2s;
   flex-shrink:0;
@@ -780,24 +784,27 @@ function renderLeaderboard(sorted){
     const badgesHtml=`<div class="badge-row">${Object.entries(ACHIEVEMENTS).map(([k,a])=>{
       const earned=achievements.includes(k);
       const tip=earned?`${a.label}: ${a.tip}`:`🔒 Locked — ${a.tip}`;
-      const st=`--bdg-color:${a.color};--bdg-glow:${a.glow};${a.size?`font-size:${a.size}px`:''}`;
+      const sz=a.size?Math.round(a.size*0.72):null;
+      const st=`--bdg-color:${a.color};--bdg-glow:${a.glow};${sz?`font-size:${sz}px`:''}`;
       return `<span class="ach-badge${earned?'':' locked'}" data-tip="${tip}" onclick="toggleTip(this)" style="${st}">${a.emoji}</span>`;
     }).join('')}</div>`;
 
     return `<div class="lb-card ${cc} ${isFirst?'first-place':''} ${isDone?'complete':''} ${isMe?'is-me':''}">
       <div class="rank-badge">${i<3&&p.count>0?ranks[i]:i+1}</div>
-      ${ringAvatarHTML(p,52)}
+      ${ringAvatarHTML(p,48)}
       <div class="player-info">
         <div class="player-name">
           ${escHtml(p.name)}
           ${isMe?'<span class="me-badge">You</span>':''}
           ${isDone?'<span class="done-badge">Done!</span>':''}
         </div>
-        <div class="player-sub">${p.count} / 100 burgers</div>
-        ${badgesHtml}
         <div class="mini-bar-wrap"><div class="mini-bar-fill ${cc}" style="width:${pct}%"></div></div>
       </div>
-      <div class="lb-count ${cc}">${p.count}</div>
+      <div class="badge-col">${badgesHtml}</div>
+      <div class="lb-score">
+        <div class="lb-count ${cc}">${p.count}</div>
+        <div class="lb-of">/ 100</div>
+      </div>
     </div>`;
   }).join('');
 }
