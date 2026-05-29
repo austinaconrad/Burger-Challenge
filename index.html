@@ -1284,7 +1284,8 @@ let burgerMap = null;
 let mapMarkers = [];
 
 
-const RING_COLORS = ['#F87171','#FCD34D','#4ADE80','#FB923C','#60A5FA','#E879F9','#CBD5E1'];
+// Must match CSS c0–c11 av-text colors exactly
+const RING_COLORS = ['#F87171','#FCD34D','#4ADE80','#22D3EE','#60A5FA','#E879F9','#CBD5E1','#F472B6','#FB7185','#A78BFA','#FDB974','#5EEAD4'];
 
 function starsHtml(n) {
   return Array.from({length:5}, (_,i) => `<span style="color:${i<n?'#F59E0B':'#444'};font-size:14px">★</span>`).join('');
@@ -1310,16 +1311,17 @@ function renderBurgerMap() {
   mapMarkers = [];
 
   const legend = document.getElementById('map-legend');
-  if (legend) legend.innerHTML = '';
+  // Build legend for ALL players
+  if (legend) {
+    legend.innerHTML = players.map(p => {
+      const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
+      return `<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted2)"><span style="width:10px;height:10px;border-radius:50%;background:${color};display:inline-block;flex-shrink:0"></span>${escHtml(p.name)}</div>`;
+    }).join('');
+  }
 
   players.forEach((p, pi) => {
     const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
     const rawLogs = p.logs || [];
-
-    // Legend entry
-    if (legend && rawLogs.length) {
-      legend.innerHTML += `<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted2)"><span style="width:10px;height:10px;border-radius:50%;background:${color};display:inline-block;flex-shrink:0"></span>${escHtml(p.name)}</div>`;
-    }
 
     rawLogs.forEach((entry, ei) => {
       const ts = logTs(entry);
