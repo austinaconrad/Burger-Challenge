@@ -1048,7 +1048,7 @@ window.switchTab=function(name,btn){
   if(name==='social'){
     setTimeout(()=>{ const feed=document.getElementById('social-feed'); feed.scrollTop=feed.scrollHeight; },50);
   }
-  if(name==='flappy') initFlappy();
+  if(name==='flappy') setTimeout(initFlappy, 60);
   else stopFlappy();
 };
 
@@ -1114,17 +1114,17 @@ function stopFlappy() {
 }
 
 function initFlappy() {
-  if (flappyActive) return;
+  stopFlappy();
   flappyActive = true;
 
   const canvas = document.getElementById('flappy-canvas');
   const ctx = canvas.getContext('2d');
 
-  // Size the canvas to its CSS display width, 16:9-ish portrait
+  // Size canvas — fallback to 320 if layout hasn't happened yet
   function resize() {
-    const w = canvas.offsetWidth;
+    const w = canvas.offsetWidth || canvas.parentElement?.offsetWidth || 320;
     canvas.width = w;
-    canvas.height = Math.round(w * 1.55);
+    canvas.height = Math.round(w * 1.6);
   }
   resize();
 
