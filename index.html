@@ -174,6 +174,16 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 
 /* ── WINNER BANNER ── */
 .winner-banner{background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(217,119,6,0.08));border:1px solid rgba(217,119,6,0.25);border-radius:var(--radius-sm);padding:12px 16px;text-align:center;font-size:14px;font-weight:700;font-family:'Poppins',sans-serif;color:var(--amber);margin-bottom:14px;display:none}
+/* ── HEAVY LIFTING AWARD ── */
+.heavy-lifting-card{display:none;background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(109,40,217,0.08));border:1px solid rgba(139,92,246,0.35);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;align-items:center;gap:14px;box-shadow:0 0 24px rgba(139,92,246,0.12),inset 0 1px 0 rgba(255,255,255,0.05)}
+.heavy-lifting-card.visible{display:flex}
+.hl-emoji{font-size:38px;flex-shrink:0;line-height:1}
+.hl-info{flex:1;min-width:0}
+.hl-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(167,139,250,0.8);margin-bottom:3px}
+.hl-name{font-family:'Poppins',sans-serif;font-size:17px;font-weight:800;color:#C4B5FD;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hl-sub{font-size:11px;color:rgba(167,139,250,0.65);margin-top:2px;font-weight:400}
+.hl-count{font-family:'Poppins',sans-serif;font-size:32px;font-weight:900;color:#A78BFA;line-height:1;flex-shrink:0;text-align:right}
+.hl-count-lbl{font-size:9px;color:rgba(167,139,250,0.6);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;text-align:right}
 
 /* ── TALLY CARD ── */
 .my-tally-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,0.06),0 4px 24px rgba(0,0,0,0.04)}
@@ -416,6 +426,18 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
         </div>
       </div>
       <div id="winner-banner" class="winner-banner"></div>
+      <div class="heavy-lifting-card" id="heavy-lifting-card">
+        <div class="hl-emoji">🏋🏽‍♂️</div>
+        <div class="hl-info">
+          <div class="hl-label">⚡ Heavy Lifting Award</div>
+          <div class="hl-name" id="hl-name">—</div>
+          <div class="hl-sub">Most burgers this week</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+          <div class="hl-count" id="hl-count">0</div>
+          <div class="hl-count-lbl">this week</div>
+        </div>
+      </div>
       <div class="section-label">Rankings</div>
       <div class="leaderboard" id="leaderboard"></div>
       <div id="lb-empty" class="empty" style="display:none"><div class="e-icon">🍔</div><p>No players yet!</p></div>
@@ -589,13 +611,17 @@ function formatTime(ts) {
 }
 
 // ── SVG RING AVATAR ──────────────────────────────────────────────
-function ringAvatarHTML(p, size) {
+function ringAvatarHTML(p, size, emojiOverride=null) {
   const cc  = colorClass(p.colorIdx);
   const r   = (size / 2) - 4;
   const circ = 2 * Math.PI * r;
   const pct  = Math.min(100, p.count) / 100;
   const dash = circ * pct;
   const gap  = circ - dash;
+  const inner = emojiOverride
+    ? `<span style="font-size:${Math.round(size*0.44)}px;line-height:1">${emojiOverride}</span>`
+    : initials(p.name);
+  const innerStyle = emojiOverride ? '' : `font-size:${Math.round(size*0.28)}px;font-weight:700`;
   return `<div class="ring-avatar ${cc}" style="width:${size}px;height:${size}px">
     <svg viewBox="0 0 ${size} ${size}">
       <circle class="ring-track" cx="${size/2}" cy="${size/2}" r="${r}"/>
@@ -603,7 +629,7 @@ function ringAvatarHTML(p, size) {
         stroke-dasharray="${dash} ${gap}"
         stroke-dashoffset="0"/>
     </svg>
-    <div class="ring-inner" style="font-size:${Math.round(size*0.28)}px;font-weight:700">${initials(p.name)}</div>
+    <div class="ring-inner" style="${innerStyle}">${inner}</div>
   </div>`;
 }
 
@@ -859,6 +885,29 @@ function render(){
   renderPlayersList();
 }
 
+function getThisMonday() {
+  const now = new Date();
+  const day = now.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  const monday = new Date(now);
+  monday.setDate(now.getDate() + diff);
+  monday.setHours(0, 0, 0, 0);
+  return monday;
+}
+
+function computeHeavyLifting(allPlayers) {
+  const monday = getThisMonday();
+  let winner = null, top = 0;
+  allPlayers.forEach(p => {
+    const count = (p.logs || []).filter(entry => {
+      const ts = logTs(entry);
+      return ts && new Date(ts) >= monday;
+    }).length;
+    if (count > top) { top = count; winner = p; }
+  });
+  return top > 0 ? { player: winner, count: top } : null;
+}
+
 function renderLeaderboard(sorted){
   const lb=document.getElementById('leaderboard');
   const empty=document.getElementById('lb-empty');
@@ -866,6 +915,17 @@ function renderLeaderboard(sorted){
   const winners=players.filter(p=>p.count>=100);
   banner.style.display=winners.length?'block':'none';
   if(winners.length) banner.textContent='🎉 '+winners.map(p=>p.name).join(', ')+(winners.length===1?' has':' have')+' crushed 100 burgers!';
+  // Heavy Lifting Award
+  const hl = computeHeavyLifting(players);
+  const hlCard = document.getElementById('heavy-lifting-card');
+  if (hl && hlCard) {
+    hlCard.classList.add('visible');
+    document.getElementById('hl-name').textContent = hl.player.name;
+    document.getElementById('hl-count').textContent = hl.count;
+  } else if (hlCard) {
+    hlCard.classList.remove('visible');
+  }
+
   if(!sorted.length){lb.innerHTML='';empty.style.display='block';return;}
   empty.style.display='none';
   const ranks=['👑','🥈','🥉'];
@@ -875,6 +935,7 @@ function renderLeaderboard(sorted){
     const isFirst=i===0&&p.count>0, isDone=p.count>=100, isMe=p.id===myPlayerId;
     const pct=Math.min(100,p.count);
     const achievements=computeAchievements(p,players);
+    const isHLWinner = hl && p.id === hl.player.id;
 
     const badgesHtml=`<div class="badge-row">${Object.entries(ACHIEVEMENTS).map(([k,a])=>{
       const earned=achievements.includes(k);
@@ -886,7 +947,7 @@ function renderLeaderboard(sorted){
 
     return `<div class="lb-card ${cc} ${isFirst?'first-place':''} ${isDone?'complete':''} ${isMe?'is-me':''}">
       <div class="rank-badge">${i<3&&p.count>0?ranks[i]:i+1}</div>
-      ${ringAvatarHTML(p,48)}
+      ${ringAvatarHTML(p,48,isHLWinner?'🏋🏽‍♂️':null)}
       <div class="player-info">
         <div class="player-name">
           ${escHtml(p.name)}
