@@ -362,6 +362,7 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
     <input type="text" id="setup-room" placeholder="e.g. FRIES7" maxlength="12" style="text-transform:uppercase;letter-spacing:0.12em;font-weight:600"/>
     <div class="btn-row">
       <button class="btn-secondary" onclick="joinRoom()" id="btn-join">Join Challenge →</button>
+      <button class="btn-secondary" onclick="spectateRoom()" id="btn-spectate" style="flex:0 0 auto;white-space:nowrap">👁 Spectate</button>
     </div>
   </div>
 </div>
@@ -377,6 +378,7 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
       <div class="burger-deco">🍔</div>
       <h1>100 Burger Challenge</h1>
       <div class="room-pill">Room: <span id="room-display">—</span></div>
+      <div id="spectator-pill" style="display:none;font-size:11px;font-weight:600;color:var(--muted2);background:rgba(255,255,255,0.05);border:1px solid var(--border2);padding:3px 12px;border-radius:999px;letter-spacing:0.04em">👁 Spectating</div>
     </header>
 
     <div class="tabs">
@@ -519,7 +521,7 @@ const ACHIEVEMENTS = {
 };
 
 let app, db, unsubscribe, unsubMessages;
-let myPlayerId = null, myName = '', roomId = '';
+let myPlayerId = null, myName = '', roomId = '', spectatorMode = false;
 let players = [];
 let messages = [];
 let pendingImageBase64 = null, pendingImageName = '';
@@ -761,14 +763,29 @@ window.joinRoom = async function() {
   } catch(e){ alert('Error: '+e.message); btn.disabled=false; btn.textContent='Join Challenge →'; }
 };
 
-function saveSession(){ try{localStorage.setItem('bc_session',JSON.stringify({roomId,myPlayerId,myName}))}catch(e){} }
+function saveSession(){ try{localStorage.setItem('bc_session',JSON.stringify({roomId,myPlayerId,myName,spectatorMode}))}catch(e){} }
 function loadSession(){
   try{
     const s=localStorage.getItem('bc_session'); if(!s) return false;
-    const {roomId:r,myPlayerId:p,myName:n}=JSON.parse(s);
-    roomId=r; myPlayerId=p; myName=n; return true;
+    const {roomId:r,myPlayerId:p,myName:n,spectatorMode:sm}=JSON.parse(s);
+    roomId=r; myPlayerId=p; myName=n; spectatorMode=!!sm; return true;
   }catch(e){return false}
 }
+
+window.spectateRoom=async function(){
+  if(!IS_CONFIGURED){showConfigBanner();return;}
+  const code=document.getElementById('setup-room').value.trim().toUpperCase();
+  if(!code){alert('Enter a room code to spectate!');return;}
+  initFirebase();
+  const btn=document.getElementById('btn-spectate');
+  btn.disabled=true; btn.textContent='Joining…';
+  try{
+    const snap=await getDoc(doc(db,'rooms',code));
+    if(!snap.exists()){alert('Room not found.');btn.disabled=false;btn.textContent='👁 Spectate';return;}
+    roomId=code; myPlayerId=null; myName=''; spectatorMode=true;
+    saveSession(); startApp();
+  }catch(e){alert('Error: '+e.message);btn.disabled=false;btn.textContent='👁 Spectate';}
+};
 window.leaveRoom=function(){
   if(!confirm('Leave this challenge?')) return;
   if(unsubscribe) unsubscribe();
@@ -781,9 +798,21 @@ function startApp(){
   document.getElementById('app-screen').style.display='block';
   document.getElementById('room-display').textContent=roomId;
   document.getElementById('stat-days').textContent=daysUntilLaborDay();
-  document.getElementById('add-player-form').style.display='flex';
-  subscribeToRoom();
-  subscribeToMessages();
+  if(spectatorMode){
+    // Hide competitor-only tabs
+    document.querySelectorAll('.tab-btn').forEach(b=>{
+      const name=b.getAttribute('onclick')?.match(/'(\w+)'/)?.[1];
+      if(['tally','social','players'].includes(name)) b.style.display='none';
+    });
+    document.getElementById('add-player-form').style.display='none';
+    document.getElementById('spectator-pill').style.display='block';
+    subscribeToRoom();
+  } else {
+    document.getElementById('add-player-form').style.display='flex';
+    document.getElementById('spectator-pill').style.display='none';
+    subscribeToRoom();
+    subscribeToMessages();
+  }
 }
 
 function subscribeToRoom(){
