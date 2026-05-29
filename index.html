@@ -83,6 +83,9 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .tabs{display:flex;gap:3px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:var(--radius);padding:4px;margin-bottom:20px;box-shadow:inset 0 1px 3px rgba(0,0,0,0.06)}
 .tab-btn{flex:1;padding:8px 4px;border:none;background:transparent;color:var(--muted2);font-family:'Inter',sans-serif;font-size:11px;font-weight:500;border-radius:calc(var(--radius) - 4px);cursor:pointer;transition:all 0.2s;letter-spacing:0.01em}
 .tab-btn:active{transform:scale(0.95)}
+.tab-btn{position:relative}
+.tab-unread{position:absolute;top:4px;right:6px;width:8px;height:8px;border-radius:50%;background:#22C55E;border:1.5px solid var(--bg);display:none;animation:pulse 1.5s ease-in-out infinite}
+.tab-unread.visible{display:block}
 .tab-btn.active{background:var(--surface2);color:var(--amber);border:1px solid var(--border2);box-shadow:0 1px 6px rgba(0,0,0,0.10);font-weight:600}
 .tab-panel{display:none}
 .tab-panel.active{display:block}
@@ -385,7 +388,7 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
       <button class="tab-btn active" onclick="switchTab('leaderboard',this)">🏆 Ranks</button>
       <button class="tab-btn" onclick="switchTab('grid',this)">🍔 Grid</button>
       <button class="tab-btn" onclick="switchTab('tally',this)">➕ Tally</button>
-      <button class="tab-btn" onclick="switchTab('social',this)">💬 Social</button>
+      <button class="tab-btn" onclick="switchTab('social',this)" id="tab-btn-social">💬 Social<span class="tab-unread" id="social-unread-dot"></span></button>
       <button class="tab-btn" onclick="switchTab('players',this)">👥 Players</button>
       <button class="tab-btn" onclick="switchTab('map',this)">🗺 Map</button>
     </div>
@@ -524,6 +527,7 @@ let app, db, unsubscribe, unsubMessages;
 let myPlayerId = null, myName = '', roomId = '', spectatorMode = false;
 let players = [];
 let messages = [];
+let seenMessageCount = 0;
 let pendingImageBase64 = null, pendingImageName = '';
 
 // ── CONFIG BANNER ────────────────────────────────────────────────
@@ -994,6 +998,12 @@ function renderPlayersList(){
 function renderSocialFeed() {
   const feed = document.getElementById('social-feed');
   const empty = document.getElementById('social-empty');
+  // Show unread badge if Social tab isn't currently active
+  const socialTabActive = document.getElementById('tab-social')?.classList.contains('active');
+  if (!socialTabActive && messages.length > seenMessageCount) {
+    const dot = document.getElementById('social-unread-dot');
+    if (dot) dot.classList.add('visible');
+  }
   if (!messages.length) {
     feed.innerHTML = '';
     feed.appendChild(empty);
@@ -1223,6 +1233,9 @@ window.switchTab=function(name,btn){
   btn.classList.add('active');
   if(name==='social'){
     setTimeout(()=>{ const feed=document.getElementById('social-feed'); feed.scrollTop=feed.scrollHeight; },50);
+    seenMessageCount = messages.length;
+    const dot = document.getElementById('social-unread-dot');
+    if(dot) dot.classList.remove('visible');
   }
   if(name==='map') setTimeout(renderBurgerMap, 80);
 };
