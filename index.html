@@ -297,12 +297,15 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 /* ── FLAPPY BURGER ── */
 .flappy-wrap{display:flex;flex-direction:column;align-items:center;gap:16px}
 #flappy-canvas{
-  display:block;width:100%;max-width:380px;
+  display:block;
+  width:100%;max-width:360px;
+  aspect-ratio:9/14;
   border-radius:var(--radius);
   border:1px solid rgba(0,0,0,0.10);
   box-shadow:0 4px 24px rgba(0,0,0,0.10);
   touch-action:none;
   cursor:pointer;
+  background:#E0F2FE;
 }
 .flappy-scores-wrap{width:100%;max-width:380px}
 .flappy-scores-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.10em;font-weight:600;margin-bottom:8px}
@@ -1048,7 +1051,7 @@ window.switchTab=function(name,btn){
   if(name==='social'){
     setTimeout(()=>{ const feed=document.getElementById('social-feed'); feed.scrollTop=feed.scrollHeight; },50);
   }
-  if(name==='flappy') setTimeout(initFlappy, 60);
+  if(name==='flappy') setTimeout(initFlappy, 120);
   else stopFlappy();
 };
 
@@ -1120,11 +1123,13 @@ function initFlappy() {
   const canvas = document.getElementById('flappy-canvas');
   const ctx = canvas.getContext('2d');
 
-  // Size canvas — fallback to 320 if layout hasn't happened yet
+  // Size canvas buffer to match its CSS-rendered size
   function resize() {
-    const w = canvas.offsetWidth || canvas.parentElement?.offsetWidth || 320;
+    const rect = canvas.getBoundingClientRect();
+    const w = Math.round(rect.width) || 320;
+    const h = Math.round(rect.height) || Math.round(w * 14/9);
     canvas.width = w;
-    canvas.height = Math.round(w * 1.6);
+    canvas.height = h;
   }
   resize();
 
