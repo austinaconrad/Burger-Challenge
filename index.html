@@ -1296,7 +1296,7 @@ function renderBurgerMap() {
   if (!burgerMap) {
     burgerMap = L.map('burger-map', {
       center: [40.4173, -82.9071],
-      zoom: 7,
+      zoom: 6,
       maxBounds: [[36.5,-90],[44.5,-78]],
       maxBoundsViscosity: 0.85,
     });
@@ -1361,7 +1361,7 @@ function renderBurgerMap() {
   // Fit bounds to markers if any
   if (mapMarkers.length > 0) {
     const group = L.featureGroup(mapMarkers);
-    burgerMap.fitBounds(group.getBounds().pad(0.25), {maxZoom:10});
+    burgerMap.fitBounds(group.getBounds().pad(0.25), {maxZoom:8});
   }
 
   burgerMap.invalidateSize();
