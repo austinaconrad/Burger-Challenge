@@ -172,8 +172,11 @@ h1{font-family:'Fredoka One',cursive;font-size:clamp(34px,8vw,56px);letter-spaci
 
 /* ── ACHIEVEMENT BADGES ── */
 .badge-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
-.ach-badge{font-size:14px;cursor:default;position:relative;display:inline-block}
-.ach-badge[data-tip]:hover::after{
+.ach-badge{font-size:14px;cursor:pointer;position:relative;display:inline-block;transition:transform 0.15s}
+.ach-badge:hover{transform:scale(1.15)}
+.ach-badge.locked{filter:grayscale(1) brightness(0.35);opacity:0.55;cursor:default}
+.ach-badge.locked:hover{transform:none}
+.ach-badge[data-tip]:hover::after,.ach-badge[data-tip].tip-open::after{
   content:attr(data-tip);
   position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
   background:var(--surface3);border:1px solid var(--border2);color:var(--text);
@@ -470,6 +473,14 @@ const ACHIEVEMENTS = {
   double_down:     { emoji:'🍔🍔', label:'The Double Down',      tip:'Ate 2+ burgers in one day' },
   vegans_nightmare:{ emoji:'😱🥗', label:"The Vegan's Nightmare", tip:'Ate burgers 5 days in a row' },
   last_minute:     { emoji:'🌙⏰', label:'The Last Minute',       tip:'Logged a burger after 11 PM' },
+  opening_lap:     {
+    emoji:`<svg width="20" height="20" viewBox="0 0 20 20" style="vertical-align:middle;display:inline-block"><rect x="1" y="1" width="18" height="18" rx="3.5" fill="rgba(245,200,66,0.18)" stroke="rgba(245,200,66,0.75)" stroke-width="1.5"/><text x="10" y="13.5" text-anchor="middle" font-size="8" font-weight="800" font-family="monospace" fill="#F5C842" letter-spacing="1">01</text></svg>`,
+    label:'The Opening Lap', tip:'First in the group to log a burger'
+  },
+  back_to_back:    {
+    emoji:`<svg width="22" height="20" viewBox="0 0 22 20" style="vertical-align:middle;display:inline-block"><rect x="1" y="3" width="13" height="13" rx="3" fill="rgba(245,200,66,0.12)" stroke="rgba(245,200,66,0.55)" stroke-width="1.5"/><rect x="8" y="3" width="13" height="13" rx="3" fill="rgba(245,200,66,0.2)" stroke="rgba(245,200,66,0.8)" stroke-width="1.5"/></svg>`,
+    label:'The Back-to-Back', tip:'Ate 2 burgers within a 12-hour window'
+  },
 };
 
 let app, db, unsubscribe, unsubMessages;
@@ -568,10 +579,12 @@ function miniAvatarHTML(name, colorIdx, size) {
 }
 
 // ── ACHIEVEMENT LOGIC ────────────────────────────────────────────
-function computeAchievements(p) {
+// allPlayers is optional — needed for cross-player badges like opening_lap
+function computeAchievements(p, allPlayers) {
   const earned = [];
   const logs = p.logs || [];
 
+  // Last Minute: log after 11 PM
   if (logs.some(ts => { const d = new Date(ts); return d.getHours() >= 23; })) {
     earned.push('last_minute');
   }
@@ -583,8 +596,10 @@ function computeAchievements(p) {
     byDay[key] = (byDay[key] || 0) + 1;
   });
 
+  // Double Down: 2+ in one day
   if (Object.values(byDay).some(v => v >= 2)) earned.push('double_down');
 
+  // Vegan's Nightmare: 5 consecutive days
   const dayKeys = Object.keys(byDay).sort();
   let streak = 1, best = 1;
   for (let i = 1; i < dayKeys.length; i++) {
@@ -595,6 +610,22 @@ function computeAchievements(p) {
     best = Math.max(best, streak);
   }
   if (best >= 5) earned.push('vegans_nightmare');
+
+  // Back-to-Back: any two logs within 12 hours
+  const sortedLogs = [...logs].sort();
+  for (let i = 1; i < sortedLogs.length; i++) {
+    const diff = new Date(sortedLogs[i]) - new Date(sortedLogs[i-1]);
+    if (diff > 0 && diff <= 12 * 3600000) { earned.push('back_to_back'); break; }
+  }
+
+  // Opening Lap: first person in the group to ever log a burger
+  if (logs.length > 0 && allPlayers && allPlayers.length > 0) {
+    const myFirst = new Date(sortedLogs[0]).getTime();
+    const everyoneElseFirst = allPlayers
+      .filter(op => op.id !== p.id && op.logs && op.logs.length > 0)
+      .map(op => new Date([...op.logs].sort()[0]).getTime());
+    if (everyoneElseFirst.every(t => myFirst <= t)) earned.push('opening_lap');
+  }
 
   return earned;
 }
@@ -795,15 +826,17 @@ function renderLeaderboard(sorted){
     const isFirst=i===0&&p.count>0, isDone=p.count>=100, isMe=p.id===myPlayerId;
     const pct=Math.min(100,p.count);
     const {isFrozen,isOnFire,fireStreak}=getStreakInfo(p);
-    const achievements=computeAchievements(p);
+    const achievements=computeAchievements(p,players);
 
     let streakEl='';
     if(isFrozen) streakEl=`<span class="cold-badge" data-tip="No burger in 30+ hrs — log one to thaw!">🧊</span>`;
     else if(isOnFire) streakEl=`<span class="fire-badge" data-tip="${fireStreak} day streak 🔥">${fireStreak>=7?'🔥🔥':'🔥'}</span>`;
 
-    const badgesHtml=achievements.length
-      ? `<div class="badge-row">${achievements.map(k=>`<span class="ach-badge" data-tip="${ACHIEVEMENTS[k].label}: ${ACHIEVEMENTS[k].tip}">${ACHIEVEMENTS[k].emoji}</span>`).join('')}</div>`
-      : '';
+    const badgesHtml=`<div class="badge-row">${Object.entries(ACHIEVEMENTS).map(([k,a])=>{
+      const earned=achievements.includes(k);
+      const tip=earned?`${a.label}: ${a.tip}`:`🔒 Locked — ${a.tip}`;
+      return `<span class="ach-badge${earned?'':' locked'}" data-tip="${tip}" onclick="toggleTip(this)">${a.emoji}</span>`;
+    }).join('')}</div>`;
 
     const iciclesHtml=isFrozen?`<div class="icicles">${Array.from({length:18},(_,j)=>`<div class="icicle" style="height:${6+Math.sin(j*1.3)*4}px;opacity:${0.6+Math.random()*0.4};animation-delay:${j*0.08}s"></div>`).join('')}</div>`:'';
 
@@ -859,7 +892,7 @@ function renderMyTally(){
   if(!me){area.innerHTML='<div class="empty"><div class="e-icon">🔍</div><p>Player not found. Try rejoining.</p></div>';return;}
   const cc=colorClass(me.colorIdx);
   const pct=Math.min(100,me.count), isDone=me.count>=100;
-  const achievements=computeAchievements(me);
+  const achievements=computeAchievements(me,players);
   const badgesHtml=achievements.length
     ?`<div class="badge-row" style="padding:0 16px 12px">${achievements.map(k=>`<span class="ach-badge" data-tip="${ACHIEVEMENTS[k].label}">${ACHIEVEMENTS[k].emoji}</span>`).join('')}</div>`:'';
   area.innerHTML=`<div class="my-tally-card ${cc} ${isDone?'complete':''}">
@@ -1020,9 +1053,9 @@ window.changeMyCount = async function(delta){
 
   try{
     await updateDoc(doc(db,'rooms',roomId,'players',myPlayerId),{count:newCount,logs:newLogs});
-    const oldAch=computeAchievements(me);
+    const oldAch=computeAchievements(me,players);
     const newPlayer={...me,count:newCount,logs:newLogs};
-    const newAch=computeAchievements(newPlayer);
+    const newAch=computeAchievements(newPlayer,players);
     newAch.filter(k=>!oldAch.includes(k)).forEach(k=>{
       setTimeout(()=>showToast(`🏅 Badge unlocked: ${ACHIEVEMENTS[k].label} ${ACHIEVEMENTS[k].emoji}`),400);
     });
@@ -1070,6 +1103,21 @@ window.switchTab=function(name,btn){
 document.getElementById('setup-name').addEventListener('keydown',e=>{if(e.key==='Enter') document.getElementById('setup-room').value?joinRoom():createRoom()});
 document.getElementById('setup-room').addEventListener('keydown',e=>{if(e.key==='Enter') joinRoom()});
 document.getElementById('setup-room').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase()});
+
+// ── BADGE TOOLTIP (tap to show on mobile) ───────────────────────
+window.toggleTip = function(el) {
+  const isOpen = el.classList.contains('tip-open');
+  document.querySelectorAll('.ach-badge.tip-open').forEach(b => b.classList.remove('tip-open'));
+  if (!isOpen) {
+    el.classList.add('tip-open');
+    setTimeout(() => el.classList.remove('tip-open'), 2500);
+  }
+};
+document.addEventListener('click', e => {
+  if (!e.target.closest('.ach-badge')) {
+    document.querySelectorAll('.ach-badge.tip-open').forEach(b => b.classList.remove('tip-open'));
+  }
+});
 
 if(IS_CONFIGURED && loadSession()){initFirebase();startApp();}
 </script>
