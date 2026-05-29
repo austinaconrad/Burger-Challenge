@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>🍔 100 Burger Challenge</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -294,25 +297,6 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .mini-bar-fill,.progress-fill{background:var(--bar)}
 .lb-count,.tally-count{color:var(--av-text)}
 
-/* ── FLAPPY BURGER ── */
-.flappy-wrap{display:flex;flex-direction:column;align-items:center;gap:16px}
-#flappy-canvas{
-  display:block;
-  width:100%;max-width:360px;
-  height:500px;
-  border-radius:var(--radius);
-  border:1px solid rgba(0,0,0,0.10);
-  box-shadow:0 4px 24px rgba(0,0,0,0.10);
-  touch-action:none;
-  cursor:pointer;
-}
-.flappy-scores-wrap{width:100%;max-width:380px}
-.flappy-scores-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.10em;font-weight:600;margin-bottom:8px}
-.flappy-scores-list{display:flex;flex-direction:column;gap:6px}
-.flappy-score-row{background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:var(--radius-sm);padding:10px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
-.flappy-score-rank{font-size:16px;width:24px;text-align:center;flex-shrink:0}
-.flappy-score-name{flex:1;font-size:13px;font-weight:600;color:#0F172A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.flappy-score-val{font-family:'Poppins',sans-serif;font-size:18px;font-weight:800;color:var(--amber)}
 </style>
 </head>
 <body>
@@ -359,7 +343,6 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
       <button class="tab-btn" onclick="switchTab('tally',this)">➕ Tally</button>
       <button class="tab-btn" onclick="switchTab('social',this)">💬 Social</button>
       <button class="tab-btn" onclick="switchTab('players',this)">👥 Players</button>
-      <button class="tab-btn" onclick="switchTab('flappy',this)">🕹 Flappy</button>
     </div>
 
     <!-- LEADERBOARD TAB -->
@@ -439,16 +422,6 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
       <p style="font-size:11px;color:var(--muted);margin-top:12px;text-align:center;font-weight:400">Share the room code so friends can join on their own phones</p>
     </div>
 
-    <!-- FLAPPY BURGER TAB -->
-    <div class="tab-panel" id="tab-flappy">
-      <div class="flappy-wrap">
-        <canvas id="flappy-canvas"></canvas>
-        <div class="flappy-scores-wrap">
-          <div class="flappy-scores-label">🏆 Room High Scores</div>
-          <div id="flappy-scores-list" class="flappy-scores-list"></div>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -757,7 +730,6 @@ function startApp(){
   document.getElementById('add-player-form').style.display='flex';
   subscribeToRoom();
   subscribeToMessages();
-  subscribeFlappyScores();
 }
 
 function subscribeToRoom(){
@@ -1061,8 +1033,6 @@ window.switchTab=function(name,btn){
   if(name==='social'){
     setTimeout(()=>{ const feed=document.getElementById('social-feed'); feed.scrollTop=feed.scrollHeight; },50);
   }
-  if(name==='flappy') initFlappy();
-  else stopFlappy();
 };
 
 document.getElementById('setup-name').addEventListener('keydown',e=>{if(e.key==='Enter') document.getElementById('setup-room').value?joinRoom():createRoom()});
@@ -1117,250 +1087,7 @@ document.addEventListener('click', e => {
 
 if(IS_CONFIGURED && loadSession()){initFirebase();startApp();}
 
-// ── FLAPPY BURGER GAME ────────────────────────────────────────────
-let flappyRAF = null;
-let flappyTapFn = null; // shared tap handler, attached once
 
-function stopFlappy() {
-  if (flappyRAF) { cancelAnimationFrame(flappyRAF); flappyRAF = null; }
-}
-
-function initFlappy() {
-  stopFlappy();
-  try { _startFlappy(); } catch(err) {
-    const c = document.getElementById('flappy-canvas');
-    if (c) {
-      const x = c.getContext('2d');
-      x.fillStyle = '#E0F2FE'; x.fillRect(0,0,c.width,c.height);
-      x.fillStyle = '#DC2626'; x.font = '16px sans-serif'; x.textAlign = 'center';
-      x.fillText('Error: ' + err.message, c.width/2, c.height/2);
-    }
-  }
-}
-
-function _startFlappy() {
-  const CV = document.getElementById('flappy-canvas');
-  const CX = CV.getContext('2d');
-  const W = 320, H = 500;
-  CV.width = W; CV.height = H;
-
-  // Game constants
-  const GX = 70;          // bird x position
-  const GR = 14;          // bird radius for collision
-  const GW = 52;          // pipe width
-  const GAP = 130;        // pipe gap height
-  const SPD = 2.5;        // pipe speed
-  const GRAV = 0.4;       // gravity
-  const JMP = -7.5;       // jump velocity
-  const GROUND = 40;      // ground height
-  const SPAWN = 200;      // frames between pipes
-
-  let by = H/2, bvy = 0, brot = 0;
-  let pipes = [], score = 0, frame = 0, state = 'idle';
-  let best = 0;
-  try { best = +localStorage.getItem('fb') || 0; } catch(e){}
-
-  function reset() {
-    by = H/2; bvy = 0; brot = 0;
-    pipes = []; score = 0; frame = 0; state = 'idle';
-  }
-
-  function tap() {
-    if (state === 'dead') { reset(); return; }
-    if (state === 'idle') state = 'playing';
-    bvy = JMP;
-  }
-
-  // Input — attach once, replace handler each new game
-  flappyTapFn = tap;
-  if (!CV._flappyListened) {
-    CV._flappyListened = true;
-    CV.addEventListener('touchstart', e => { e.preventDefault(); if(flappyTapFn) flappyTapFn(); }, { passive: false });
-    CV.addEventListener('pointerdown', e => { e.preventDefault(); if(flappyTapFn) flappyTapFn(); }, { passive: false });
-    document.addEventListener('keydown', e => {
-      if (e.code === 'Space' && document.getElementById('tab-flappy').classList.contains('active')) {
-        e.preventDefault(); if(flappyTapFn) flappyTapFn();
-      }
-    });
-  }
-
-  function spawnPipe() {
-    const minY = 60, maxY = H - GROUND - GAP - 60;
-    const topH = minY + Math.random() * (maxY - minY);
-    pipes.push({ x: W, topH, scored: false });
-  }
-
-  function hit() {
-    if (by + GR >= H - GROUND || by - GR <= 0) return true;
-    for (const p of pipes) {
-      if (GX + GR > p.x + 4 && GX - GR < p.x + GW - 4) {
-        if (by - GR < p.topH || by + GR > p.topH + GAP) return true;
-      }
-    }
-    return false;
-  }
-
-  function draw() {
-    // Sky
-    const sky = CX.createLinearGradient(0, 0, 0, H - GROUND);
-    sky.addColorStop(0, '#BAE6FD');
-    sky.addColorStop(1, '#FEF9C3');
-    CX.fillStyle = sky;
-    CX.fillRect(0, 0, W, H - GROUND);
-
-    // Ground
-    CX.fillStyle = '#A16207';
-    CX.fillRect(0, H - GROUND, W, GROUND);
-    CX.fillStyle = '#15803D';
-    CX.fillRect(0, H - GROUND, W, 8);
-
-    // Pipes
-    for (const p of pipes) {
-      // top
-      CX.fillStyle = '#16A34A';
-      CX.fillRect(p.x, 0, GW, p.topH);
-      CX.fillStyle = '#22C55E';
-      CX.fillRect(p.x - 4, p.topH - 14, GW + 8, 14);
-      // bottom
-      const bpY = p.topH + GAP;
-      CX.fillStyle = '#16A34A';
-      CX.fillRect(p.x, bpY + 14, GW, H - GROUND - bpY - 14);
-      CX.fillStyle = '#22C55E';
-      CX.fillRect(p.x - 4, bpY, GW + 8, 14);
-    }
-
-    // Burger
-    CX.save();
-    CX.translate(GX, by);
-    CX.rotate(Math.max(-0.5, Math.min(1.2, brot)));
-    CX.font = '28px serif';
-    CX.textAlign = 'center';
-    CX.textBaseline = 'middle';
-    CX.fillText('🍔', 0, 0);
-    CX.restore();
-
-    // Score
-    CX.textAlign = 'center';
-    CX.fillStyle = '#0F172A';
-    CX.font = 'bold 36px sans-serif';
-    CX.fillText(score, W / 2, 48);
-
-    if (state === 'idle') {
-      CX.fillStyle = 'rgba(15,23,42,0.45)';
-      CX.fillRect(0, 0, W, H);
-      CX.fillStyle = '#fff';
-      CX.font = 'bold 28px sans-serif';
-      CX.textAlign = 'center';
-      CX.fillText('🍔 Flappy Burger', W/2, H*0.38);
-      CX.font = '16px sans-serif';
-      CX.fillStyle = 'rgba(255,255,255,0.85)';
-      CX.fillText('Tap to start', W/2, H*0.47);
-    }
-
-    if (state === 'dead') {
-      CX.fillStyle = 'rgba(15,23,42,0.6)';
-      CX.fillRect(0, 0, W, H);
-      CX.textAlign = 'center';
-      CX.fillStyle = '#fff';
-      CX.font = 'bold 32px sans-serif';
-      CX.fillText('Game Over', W/2, H*0.30);
-      CX.font = 'bold 52px sans-serif';
-      CX.fillStyle = '#F59E0B';
-      CX.fillText(score, W/2, H*0.42);
-      CX.font = '15px sans-serif';
-      CX.fillStyle = 'rgba(255,255,255,0.7)';
-      CX.fillText('Best: ' + best, W/2, H*0.50);
-      // Restart btn
-      const rx = W/2-90, ry = H*0.56, rw = 180, rh = 44, rr = 22;
-      CX.fillStyle = '#F59E0B';
-      CX.beginPath();
-      CX.moveTo(rx+rr, ry); CX.lineTo(rx+rw-rr, ry);
-      CX.arcTo(rx+rw,ry,rx+rw,ry+rr,rr); CX.lineTo(rx+rw,ry+rh-rr);
-      CX.arcTo(rx+rw,ry+rh,rx+rw-rr,ry+rh,rr); CX.lineTo(rx+rr,ry+rh);
-      CX.arcTo(rx,ry+rh,rx,ry+rh-rr,rr); CX.lineTo(rx,ry+rr);
-      CX.arcTo(rx,ry,rx+rr,ry,rr); CX.closePath();
-      CX.fill();
-      CX.fillStyle = '#fff';
-      CX.font = 'bold 17px sans-serif';
-      CX.fillText('▶  Tap to Restart', W/2, H*0.56 + 28);
-    }
-  }
-
-  function loop() {
-    if (!flappyRAF) return;
-    flappyRAF = requestAnimationFrame(loop);
-
-    if (state === 'playing') {
-      bvy += GRAV;
-      by += bvy;
-      brot = bvy * 0.08;
-      frame++;
-      if (frame % SPAWN === 0) spawnPipe();
-      pipes.forEach(p => { p.x -= SPD; if (!p.scored && p.x + GW < GX) { p.scored = true; score++; } });
-      pipes = pipes.filter(p => p.x + GW > -10);
-      if (hit()) {
-        state = 'dead';
-        if (score > best) { best = score; try { localStorage.setItem('fb', best); } catch(e){} }
-        saveFlappyScore(score);
-      }
-    }
-
-    draw();
-  }
-
-  flappyRAF = true;
-  loop();
-}
-
-// ── Firebase high-score helpers ──────────────────────────────────
-async function saveFlappyScore(score) {
-  if (!roomId || !myPlayerId || score < 1) return;
-  try {
-    const me = players.find(p => p.id === myPlayerId);
-    const name = me ? me.name : 'Unknown';
-    const ref = doc(db, 'rooms', roomId, 'flappy_scores', myPlayerId);
-    const snap = await getDoc(ref);
-    if (!snap.exists() || snap.data().score < score) {
-      await setDoc(ref, { score, name, updatedAt: serverTimestamp() });
-      loadFlappyScores();
-    }
-  } catch(e) { console.warn('flappy save error', e); }
-}
-
-let flappyScoreUnsub = null;
-function subscribeFlappyScores() {
-  if (flappyScoreUnsub) return;
-  try {
-    const q = query(collection(db, 'rooms', roomId, 'flappy_scores'), orderBy('score','desc'), limit(10));
-    flappyScoreUnsub = onSnapshot(q, snap => {
-      const scores = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      renderFlappyScores(scores);
-    });
-  } catch(e) {}
-}
-
-async function loadFlappyScores() {
-  try {
-    const q = query(collection(db, 'rooms', roomId, 'flappy_scores'), orderBy('score','desc'), limit(10));
-    const snap = await getDocs(q);
-    renderFlappyScores(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-  } catch(e) {}
-}
-
-function renderFlappyScores(scores) {
-  const list = document.getElementById('flappy-scores-list');
-  if (!list) return;
-  if (!scores.length) { list.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:8px 0">No scores yet — play to set the first!</div>'; return; }
-  const medals = ['🥇','🥈','🥉'];
-  list.innerHTML = scores.map((s, i) => {
-    const isMe = s.id === myPlayerId;
-    return `<div class="flappy-score-row" style="${isMe ? 'border-color:rgba(217,119,6,0.25);background:rgba(217,119,6,0.04)' : ''}">
-      <div class="flappy-score-rank">${medals[i] || (i+1)}</div>
-      <div class="flappy-score-name">${escHtml(s.name)}${isMe ? ' <span style="font-size:9px;color:var(--amber);font-weight:700;text-transform:uppercase;letter-spacing:0.04em">you</span>' : ''}</div>
-      <div class="flappy-score-val">${s.score}</div>
-    </div>`;
-  }).join('');
-}
 </script>
 </body>
 </html>
