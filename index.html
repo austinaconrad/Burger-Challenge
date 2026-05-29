@@ -569,12 +569,12 @@ function initSummerBanner() {
   let msg = '';
   if (now < july4) {
     const days = Math.ceil((july4 - now) / 86400000);
-    msg = `<span>🇺🇸 <span style="color:#EF4444;font-weight:700">${days} day${days===1?'':'s'}</span> <span style="color:#F1F5F9">until the</span> <span style="color:#60A5FA;font-weight:700">Fourth of July!</span></span>`;
+    msg = `<span>🇺🇸 ${days} day${days===1?'':'s'} until the Fourth of July!</span>`;
   } else if (now.toDateString() === july4.toDateString()) {
-    msg = `<span>🎆 <span style="color:#EF4444;font-weight:700">Happy</span> <span style="color:#F1F5F9">Fourth of</span> <span style="color:#60A5FA;font-weight:700">July!</span> 🇺🇸</span>`;
+    msg = `<span>🎆 Happy Fourth of July! 🇺🇸</span>`;
   } else if (now <= ld) {
     const days = Math.ceil((ld - now) / 86400000);
-    msg = `<span>🍔 <span style="color:#EF4444;font-weight:700">${days} day${days===1?'':'s'}</span> <span style="color:#F1F5F9">until Labor Day!</span></span>`;
+    msg = `<span>🍔 ${days} day${days===1?'':'s'} until Labor Day!</span>`;
   }
   el.innerHTML = msg;
 }
