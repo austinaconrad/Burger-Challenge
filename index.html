@@ -294,6 +294,11 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .c4{--av-bg:rgba(96,165,250,0.15);--av-text:#60A5FA;--bar:#3B82F6;--ring-color:#60A5FA}
 .c5{--av-bg:rgba(232,121,249,0.15);--av-text:#E879F9;--bar:#D946EF;--ring-color:#E879F9}
 .c6{--av-bg:rgba(148,163,184,0.15);--av-text:#CBD5E1;--bar:#94A3B8;--ring-color:#CBD5E1}
+.c7{--av-bg:rgba(52,211,153,0.15);--av-text:#34D399;--bar:#10B981;--ring-color:#34D399}
+.c8{--av-bg:rgba(251,113,133,0.15);--av-text:#FB7185;--bar:#F43F5E;--ring-color:#FB7185}
+.c9{--av-bg:rgba(167,139,250,0.15);--av-text:#A78BFA;--bar:#7C3AED;--ring-color:#A78BFA}
+.c10{--av-bg:rgba(253,186,116,0.15);--av-text:#FDB974;--bar:#F97316;--ring-color:#FDB974}
+.c11{--av-bg:rgba(94,234,212,0.15);--av-text:#5EEAD4;--bar:#14B8A6;--ring-color:#5EEAD4}
 
 .ring-inner{background:var(--av-bg);color:var(--av-text)}
 .ring-fill{stroke:var(--ring-color)}
@@ -494,7 +499,7 @@ const FIREBASE_CONFIG = {
 };
 // ─────────────────────────────────────────────────────────────────
 
-const COLORS = ['c0','c1','c2','c3','c4','c5','c6'];
+const COLORS = ['c0','c1','c2','c3','c4','c5','c6','c7','c8','c9','c10','c11'];
 const IS_CONFIGURED = !FIREBASE_CONFIG.apiKey.startsWith('YOUR_');
 const MAX_IMAGE_PX = 900;
 const JPEG_QUALITY = 0.72;
@@ -1153,12 +1158,12 @@ window.addExtraPlayer=async function(){
 window.rerollColor=async function(){
   const me=players.find(p=>p.id===myPlayerId);
   if(!me) return;
-  const usedIdxs=new Set(players.filter(p=>p.id!==myPlayerId).map(p=>p.colorIdx));
-  const available=Array.from({length:COLORS.length},(_,i)=>i).filter(i=>!usedIdxs.has(i));
-  if(!available.length){showToast('No unused colors available');return;}
-  // Pick a random available color that's different from current
-  const choices=available.filter(i=>i!==me.colorIdx);
-  const newIdx=(choices.length?choices:available)[Math.floor(Math.random()*(choices.length||available.length))];
+  const others=players.filter(p=>p.id!==myPlayerId);
+  // Count usage of each color among other players
+  const usage=Array.from({length:COLORS.length},(_,i)=>({idx:i,count:others.filter(p=>p.colorIdx===i).length}));
+  // Prefer unused, then least-used, but never same as current
+  const candidates=usage.filter(c=>c.idx!==me.colorIdx).sort((a,b)=>a.count-b.count);
+  const newIdx=candidates[0].idx;
   try{
     await updateDoc(doc(db,'rooms',roomId,'players',myPlayerId),{colorIdx:newIdx});
     showToast('🎨 Color updated!');
