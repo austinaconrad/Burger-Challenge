@@ -841,13 +841,6 @@ function renderMyTally(){
   if(!me){area.innerHTML='<div class="empty"><div class="e-icon">🔍</div><p>Player not found. Try rejoining.</p></div>';return;}
   const cc=colorClass(me.colorIdx);
   const pct=Math.min(100,me.count), isDone=me.count>=100;
-  const achievements=computeAchievements(me,players);
-  const badgesHtml=`<div class="badge-row" style="padding:0 16px 12px">${Object.entries(ACHIEVEMENTS).map(([k,a])=>{
-    const earned=achievements.includes(k);
-    const tip=earned?`${a.label}: ${a.tip}`:`🔒 Locked — ${a.tip}`;
-    const st=`--bdg-color:${a.color};--bdg-glow:${a.glow};${a.size?`font-size:${a.size}px`:''}`;
-    return `<span class="ach-badge${earned?'':' locked'}" data-tip="${tip}" onclick="toggleTip(this)" style="${st}">${a.emoji}</span>`;
-  }).join('')}</div>`;
   area.innerHTML=`<div class="my-tally-card ${cc} ${isDone?'complete':''}">
     <div class="tally-bun-top"></div>
     <div class="tally-top">
@@ -860,7 +853,6 @@ function renderMyTally(){
     </div>
     <div class="progress-track"><div class="progress-fill ${cc}" id="my-bar" style="width:${pct}%"></div></div>
     <div class="tally-bun-bottom"></div>
-    ${badgesHtml}
     <div class="tally-controls">
       <button class="ctrl-btn" onclick="changeMyCount(-1)" title="Remove one">−</button>
       <button class="ate-btn ${cc}" onclick="changeMyCount(1)" style="color:var(--av-text)"><span class="bicon">🍔</span> Ate One!</button>
