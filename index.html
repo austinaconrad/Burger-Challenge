@@ -528,6 +528,7 @@ let myPlayerId = null, myName = '', roomId = '', spectatorMode = false;
 let players = [];
 let messages = [];
 let seenMessageCount = 0;
+let socialInitialLoadDone = false;
 let pendingImageBase64 = null, pendingImageName = '';
 
 // ── CONFIG BANNER ────────────────────────────────────────────────
@@ -998,11 +999,17 @@ function renderPlayersList(){
 function renderSocialFeed() {
   const feed = document.getElementById('social-feed');
   const empty = document.getElementById('social-empty');
-  // Show unread badge if Social tab isn't currently active
-  const socialTabActive = document.getElementById('tab-social')?.classList.contains('active');
-  if (!socialTabActive && messages.length > seenMessageCount) {
-    const dot = document.getElementById('social-unread-dot');
-    if (dot) dot.classList.add('visible');
+  // On first load, silently mark everything as seen
+  if (!socialInitialLoadDone) {
+    seenMessageCount = messages.length;
+    socialInitialLoadDone = true;
+  } else {
+    // Show unread badge only for messages that arrived after initial load
+    const socialTabActive = document.getElementById('tab-social')?.classList.contains('active');
+    if (!socialTabActive && messages.length > seenMessageCount) {
+      const dot = document.getElementById('social-unread-dot');
+      if (dot) dot.classList.add('visible');
+    }
   }
   if (!messages.length) {
     feed.innerHTML = '';
