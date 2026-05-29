@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 <style>
 :root {
   --amber:#F59E0B; --amber-dark:#D97706; --amber-mid:#F59E0B; --patty:#1C0A00;
@@ -1034,8 +1035,28 @@ window.autoResize = function(el) {
 };
 
 // ── TALLY ACTION ─────────────────────────────────────────────────
+// ── CONFETTI ─────────────────────────────────────────────────────
+function fireConfetti(big = false) {
+  if (typeof confetti !== 'function') return;
+  const count = big ? 220 : 90;
+  const spread = big ? 100 : 60;
+  const opts = {
+    particleCount: count,
+    spread,
+    origin: { y: 0.55 },
+    colors: ['#F59E0B','#FCD34D','#22C55E','#60A5FA','#E879F9','#F87171','#fff'],
+    scalar: big ? 1.3 : 1,
+    zIndex: 9999,
+  };
+  confetti({ ...opts, angle: 70, origin: { x: 0.1, y: 0.6 } });
+  confetti({ ...opts, angle: 110, origin: { x: 0.9, y: 0.6 } });
+  if (big) {
+    setTimeout(() => confetti({ ...opts, angle: 90, origin: { x: 0.5, y: 0.4 }, particleCount: 80 }), 200);
+  }
+}
+
 // ── BURGER DETAIL / TALLY ────────────────────────────────────────
-const OHIO_SPOTS = ['Wendy\'s','McDonald\'s','Steak \'n Shake','Whataburger','Five Guys','Culver\'s','Swenson\'s','Burgers & Brews','Hat Trick Burger'];
+const OHIO_SPOTS = ['Wendy\'s','McDonald\'s','Burger King','Buffalo Wild Wings','Swenson\'s','Shake Shack','Five Guys','Steak \'n Shake','Culver\'s'];
 let pendingRating = 0;
 let pendingGPS = null;
 
@@ -1096,11 +1117,16 @@ async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null
     newAch.filter(k=>!oldAch.includes(k)).forEach(k=>{
       setTimeout(()=>showToast(`🏅 Badge unlocked: ${ACHIEVEMENTS[k].label}`),400);
     });
-    if(delta>0&&newCount===100) showToast('🎉 100 burgers!! ABSOLUTE LEGEND!');
-    else if(delta>0){
-      const hour=new Date().getHours();
-      if(hour>=23) showToast('🌙 Late night burger #'+newCount+' logged!');
-      else showToast('🍔 Burger #'+newCount+' at '+restaurant+' logged!');
+    if(delta>0){
+      const isMilestone = [25,50,75,100].includes(newCount);
+      fireConfetti(isMilestone);
+      if(newCount===100) showToast('🎉 100 burgers!! ABSOLUTE LEGEND!');
+      else if(isMilestone) showToast(`🎊 ${newCount} burgers! Milestone unlocked!`);
+      else {
+        const hour=new Date().getHours();
+        if(hour>=23) showToast('🌙 Late night burger #'+newCount+' logged!');
+        else showToast('🍔 Burger #'+newCount+' at '+restaurant+' logged!');
+      }
     }
     renderBurgerMap();
   }catch(e){showToast('⚠️ Sync error — check connection')}
@@ -1207,18 +1233,6 @@ if(IS_CONFIGURED && loadSession()){initFirebase();startApp();}
 let burgerMap = null;
 let mapMarkers = [];
 
-// Ohio-default coords for unmapped entries
-const OHIO_FALLBACK_COORDS = [
-  [41.4993, -81.6944], // Cleveland
-  [39.9612, -82.9988], // Columbus
-  [39.7589, -84.1916], // Dayton
-  [41.0814, -81.5190], // Akron
-  [41.6528, -83.5379], // Toledo
-  [40.7989, -81.3784], // Canton
-  [39.3292, -82.1013], // Athens
-  [41.1320, -81.3401], // Youngstown
-];
-let fallbackIdx = 0;
 
 const RING_COLORS = ['#F87171','#FCD34D','#4ADE80','#FB923C','#60A5FA','#E879F9','#CBD5E1'];
 
@@ -1264,15 +1278,9 @@ function renderBurgerMap() {
       const lat = typeof entry === 'object' && entry.lat;
       const lng = typeof entry === 'object' && entry.lng;
 
-      let coord;
-      if (lat && lng) {
-        coord = [lat, lng];
-      } else {
-        // Spread markers around Ohio for unmapped
-        coord = OHIO_FALLBACK_COORDS[(fallbackIdx++) % OHIO_FALLBACK_COORDS.length];
-        // Jitter slightly so stacked pins don't overlap
-        coord = [coord[0] + (Math.random()-0.5)*0.15, coord[1] + (Math.random()-0.5)*0.15];
-      }
+      // Only plot entries that have real GPS coordinates
+      if (!lat || !lng) return;
+      const coord = [lat, lng];
 
       const icon = L.divIcon({
         className: '',
