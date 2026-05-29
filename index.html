@@ -1061,7 +1061,7 @@ window.switchTab=function(name,btn){
   if(name==='social'){
     setTimeout(()=>{ const feed=document.getElementById('social-feed'); feed.scrollTop=feed.scrollHeight; },50);
   }
-  if(name==='flappy') setTimeout(initFlappy, 120);
+  if(name==='flappy') initFlappy();
   else stopFlappy();
 };
 
@@ -1119,6 +1119,7 @@ if(IS_CONFIGURED && loadSession()){initFirebase();startApp();}
 
 // ── FLAPPY BURGER GAME ────────────────────────────────────────────
 let flappyRAF = null;
+let flappyTapFn = null; // shared tap handler, attached once
 
 function stopFlappy() {
   if (flappyRAF) { cancelAnimationFrame(flappyRAF); flappyRAF = null; }
@@ -1170,9 +1171,18 @@ function _startFlappy() {
     bvy = JMP;
   }
 
-  // Input — both touch and pointer for iOS/Android/desktop
-  CV.addEventListener('touchstart', e => { e.preventDefault(); tap(); }, { passive: false });
-  CV.addEventListener('pointerdown', e => { e.preventDefault(); tap(); }, { passive: false });
+  // Input — attach once, replace handler each new game
+  flappyTapFn = tap;
+  if (!CV._flappyListened) {
+    CV._flappyListened = true;
+    CV.addEventListener('touchstart', e => { e.preventDefault(); if(flappyTapFn) flappyTapFn(); }, { passive: false });
+    CV.addEventListener('pointerdown', e => { e.preventDefault(); if(flappyTapFn) flappyTapFn(); }, { passive: false });
+    document.addEventListener('keydown', e => {
+      if (e.code === 'Space' && document.getElementById('tab-flappy').classList.contains('active')) {
+        e.preventDefault(); if(flappyTapFn) flappyTapFn();
+      }
+    });
+  }
 
   function spawnPipe() {
     const minY = 60, maxY = H - GROUND - GAP - 60;
