@@ -248,7 +248,7 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .bg-cell[data-num]:hover::after{content:attr(data-num);position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:#1A1A1A;border:1px solid rgba(255,255,255,0.12);color:var(--text);font-size:10px;font-family:'Inter',sans-serif;padding:2px 6px;border-radius:4px;white-space:nowrap;pointer-events:none;z-index:10}
 .bg-progress-row{display:flex;align-items:center;gap:10px;margin-top:10px}
 .bg-progress-track{flex:1;height:5px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden}
-.bg-progress-fill{height:100%;border-radius:999px;background:var(--bar);transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1)}
+.bg-progress-fill{height:100%;border-radius:999px;transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1)}
 .bg-pct{font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;color:var(--av-text);flex-shrink:0;min-width:40px;text-align:right}
 
 /* ── SOCIAL FEED ── */
@@ -322,7 +322,9 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 
 .ring-inner{background:var(--av-bg);color:var(--av-text)}
 .ring-fill{stroke:var(--ring-color)}
-.mini-bar-fill,.progress-fill{background:var(--bar)}
+.mini-bar-fill,.progress-fill,.bg-progress-fill{background:linear-gradient(90deg,#C8102E 0%,#E8E8E8 50%,#002868 100%)}
+#summer-banner{font-size:11px;font-weight:500;color:var(--muted2);letter-spacing:0.01em;margin-top:2px;min-height:16px}
+#summer-banner span{background:linear-gradient(90deg,#C8102E,#fff,#002868);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:700}
 .lb-count,.tally-count{color:var(--av-text)}
 
 /* ── BURGER DETAIL DRAWER (tally) ── */
@@ -398,6 +400,7 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
       <div class="burger-deco">🍔</div>
       <h1>100 Burger Challenge</h1>
       <div class="room-pill">Room: <span id="room-display">—</span></div>
+      <div id="summer-banner"></div>
       <div id="spectator-pill" style="display:none;font-size:11px;font-weight:600;color:var(--muted2);background:rgba(255,255,255,0.05);border:1px solid var(--border2);padding:3px 12px;border-radius:999px;letter-spacing:0.04em">👁 Spectating</div>
     </header>
 
@@ -711,6 +714,26 @@ function daysUntilLaborDay() {
   if (ld <= now) ld = laborDay(now.getFullYear()+1);
   return Math.max(0, Math.ceil((ld-now)/86400000));
 }
+function initSummerBanner() {
+  const el = document.getElementById('summer-banner');
+  if (!el) return;
+  const now = new Date();
+  const y = now.getFullYear();
+  const july4 = new Date(y, 6, 4);
+  const ld = laborDay(y);
+  let msg = '';
+  if (now < july4) {
+    const days = Math.ceil((july4 - now) / 86400000);
+    msg = `🇺🇸 <span>${days} day${days===1?'':'s'} until the Fourth of July!</span>`;
+  } else if (now.toDateString() === july4.toDateString()) {
+    msg = `🎆 <span>Happy Fourth of July! 🇺🇸</span>`;
+  } else if (now <= ld) {
+    const days = Math.ceil((ld - now) / 86400000);
+    msg = `🍔 <span>${days} day${days===1?'':'s'} until Labor Day!</span> Finish strong.`;
+  }
+  el.innerHTML = msg;
+}
+
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
@@ -949,6 +972,7 @@ function startApp(){
   document.getElementById('room-display').textContent=roomId;
   document.getElementById('stat-days').textContent=daysUntilLaborDay();
   initJokeOfTheDay();
+  initSummerBanner();
   if(spectatorMode){
     // Hide competitor-only tabs
     document.querySelectorAll('.tab-btn').forEach(b=>{
@@ -1267,22 +1291,43 @@ window.autoResize = function(el) {
 
 // ── TALLY ACTION ─────────────────────────────────────────────────
 // ── CONFETTI ─────────────────────────────────────────────────────
+function isSummerHoliday() {
+  const d = new Date();
+  const m = d.getMonth(), day = d.getDate();
+  return (m === 6 && day === 4) || (m === 4 && day === 26) || (m === 7 && day === 4);
+}
+
 function fireConfetti(big = false) {
   if (typeof confetti !== 'function') return;
-  const count = big ? 220 : 90;
-  const spread = big ? 100 : 60;
-  const opts = {
-    particleCount: count,
-    spread,
-    origin: { y: 0.55 },
-    colors: ['#F59E0B','#FCD34D','#22C55E','#60A5FA','#E879F9','#F87171','#fff'],
-    scalar: big ? 1.3 : 1,
-    zIndex: 9999,
-  };
-  confetti({ ...opts, angle: 70, origin: { x: 0.1, y: 0.6 } });
-  confetti({ ...opts, angle: 110, origin: { x: 0.9, y: 0.6 } });
-  if (big) {
-    setTimeout(() => confetti({ ...opts, angle: 90, origin: { x: 0.5, y: 0.4 }, particleCount: 80 }), 200);
+  const patriotic = isSummerHoliday() || big;
+  const colors = patriotic
+    ? ['#C8102E','#FFFFFF','#002868','#FF6B6B','#A8C4FF','#FFD700']
+    : ['#F59E0B','#FCD34D','#22C55E','#60A5FA','#E879F9','#F87171','#fff'];
+
+  if (patriotic) {
+    const burst = (x, y, angle, delay = 0) => setTimeout(() => confetti({
+      particleCount: big ? 75 : 35,
+      spread: big ? 110 : 65,
+      angle, origin: { x, y },
+      colors, scalar: big ? 1.35 : 1,
+      startVelocity: big ? 48 : 28,
+      gravity: 0.85, shapes: ['circle'],
+      zIndex: 9999,
+    }), delay);
+    burst(0.1, 0.65, 70);
+    burst(0.9, 0.65, 110);
+    if (big) {
+      burst(0.5, 0.38, 90, 200);
+      burst(0.25, 0.55, 78, 380);
+      burst(0.75, 0.55, 102, 380);
+      burst(0.5, 0.5, 90, 560);
+    }
+  } else {
+    const opts = { particleCount: big ? 220 : 90, spread: big ? 100 : 60,
+      origin: { y: 0.55 }, colors, scalar: big ? 1.3 : 1, zIndex: 9999 };
+    confetti({ ...opts, angle: 70, origin: { x: 0.1, y: 0.6 } });
+    confetti({ ...opts, angle: 110, origin: { x: 0.9, y: 0.6 } });
+    if (big) setTimeout(() => confetti({ ...opts, angle: 90, origin: { x: 0.5, y: 0.4 }, particleCount: 80 }), 200);
   }
 }
 
