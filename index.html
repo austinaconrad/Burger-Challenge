@@ -29,12 +29,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:
   radial-gradient(ellipse at 85% 90%,rgba(217,119,6,0.04) 0%,transparent 50%);
   pointer-events:none}
 .wrapper{position:relative;z-index:1;max-width:700px;margin:0 auto;padding:0 16px calc(80px + env(safe-area-inset-bottom))}
-
-/* ── BURGER DECO ── */
 .burger-deco{font-size:80px;line-height:1;animation:wobble 1.6s ease-in-out infinite;filter:drop-shadow(0 4px 24px rgba(217,119,6,0.30))}
 @keyframes wobble{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-7px) rotate(3deg)}}
-
-/* ── SETUP ── */
 #setup-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px;text-align:center;gap:0;position:relative;z-index:1}
 #setup-screen h1{font-family:'Poppins',sans-serif;font-size:clamp(38px,10vw,66px);font-weight:900;letter-spacing:-1px;line-height:1;color:var(--text);margin-bottom:8px}
 #setup-screen .subtitle{font-size:14px;color:var(--muted2);margin-bottom:32px;font-weight:400}
@@ -55,22 +51,16 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:
 .btn-secondary:hover{border-color:var(--border3);color:var(--text)}
 .divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted);font-size:12px}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
-
-/* CONFIG BANNER */
 #config-banner{background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.2);border-radius:var(--radius-sm);padding:14px 18px;font-size:13px;color:#DC2626;line-height:1.7;margin-bottom:20px;display:none;max-width:440px;width:100%;text-align:left}
 #config-banner strong{color:var(--amber)}
 #config-banner code{background:rgba(255,255,255,0.08);border-radius:4px;padding:1px 6px;font-size:12px;font-family:monospace}
 #config-banner ol{padding-left:18px;margin:8px 0}
 #config-banner li{margin:4px 0}
 #config-banner a{color:var(--amber)}
-
-/* ── LIVE DOT ── */
 .live-dot{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--green);background:rgba(34,197,94,0.10);border:1px solid rgba(34,197,94,0.25);padding:3px 10px;border-radius:999px}
 .live-dot::before{content:'';width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 1.5s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)}}
 .offline-dot{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--muted2);background:rgba(255,255,255,0.03);border:1px solid var(--border);padding:3px 10px;border-radius:999px}
-
-/* ── HEADER ── */
 header{padding:22px 0 16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
 .header-top{display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:4px}
 .leave-btn{background:none;border:1px solid var(--border);color:var(--muted2);font-family:'Inter',sans-serif;font-size:11px;font-weight:500;padding:5px 12px;border-radius:999px;cursor:pointer;transition:border-color 0.2s,color 0.2s}
@@ -78,8 +68,6 @@ header{padding:22px 0 16px;display:flex;flex-direction:column;align-items:center
 h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:900;letter-spacing:-1px;line-height:1;color:var(--text)}
 .room-pill{font-size:11px;font-weight:500;color:var(--muted2);background:rgba(217,119,6,0.07);border:1px solid var(--border);padding:4px 14px;border-radius:999px;letter-spacing:0.04em}
 .room-pill span{color:var(--amber);font-weight:700}
-
-/* ── TABS ── */
 .tabs{display:flex;gap:3px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:var(--radius);padding:4px;margin-bottom:20px;box-shadow:inset 0 1px 3px rgba(0,0,0,0.06)}
 .tab-btn{flex:1;padding:8px 4px;border:none;background:transparent;color:var(--muted2);font-family:'Inter',sans-serif;font-size:11px;font-weight:500;border-radius:calc(var(--radius) - 4px);cursor:pointer;transition:all 0.2s;letter-spacing:0.01em}
 .tab-btn:active{transform:scale(0.95)}
@@ -89,8 +77,6 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .tab-btn.active{background:var(--surface2);color:var(--amber);border:1px solid var(--border2);box-shadow:0 1px 6px rgba(0,0,0,0.10);font-weight:600}
 .tab-panel{display:none}
 .tab-panel.active{display:block}
-
-/* ── STAT CARDS ── */
 .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 14px 12px;text-align:left;position:relative;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.04)}
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--amber-dark),var(--amber));opacity:0.8}
@@ -105,37 +91,20 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .joke-a{font-size:10px;font-weight:700;color:var(--amber);line-height:1.35;margin-top:5px;display:none}
 .joke-a.revealed{display:block}
 .joke-hint{font-size:9px;color:var(--muted);margin-top:5px;font-weight:400;font-style:italic}
-
-/* ── LEADERBOARD ── */
 .leaderboard{display:flex;flex-direction:column;gap:8px}
 @keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
-.lb-card{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  padding:13px 15px;
-  display:flex;align-items:center;gap:12px;
-  transition:transform 0.15s,box-shadow 0.2s;
-  animation:slideIn 0.3s ease both;
-  box-shadow:0 2px 16px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.04);
-  position:relative;overflow:hidden;
-}
+.lb-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px 15px;display:flex;align-items:center;gap:12px;transition:transform 0.15s,box-shadow 0.2s;animation:slideIn 0.3s ease both;box-shadow:0 2px 16px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.04);position:relative;overflow:hidden;}
 .lb-card:active{transform:scale(0.98)}
 .lb-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--amber-dark),#F59E0B,var(--amber-dark));opacity:0.5}
-/* #1 ambient glow */
 .lb-card.first-place{box-shadow:0 0 0 2px rgba(245,158,11,0.30),0 4px 24px rgba(245,158,11,0.12),0 2px 16px rgba(0,0,0,0.4)}
 .lb-card.first-place::before{opacity:1}
 .lb-card.complete{box-shadow:0 0 0 1.5px rgba(34,197,94,0.25),0 2px 16px rgba(0,0,0,0.4)}
 .lb-card.is-me{box-shadow:0 0 0 2px rgba(245,158,11,0.30),0 2px 16px rgba(0,0,0,0.4)}
-
-/* ── SVG RING AVATAR ── */
 .ring-avatar{position:relative;flex-shrink:0;width:52px;height:52px}
 .ring-avatar svg{position:absolute;top:0;left:0;width:100%;height:100%;transform:rotate(-90deg)}
 .ring-track{fill:none;stroke:rgba(255,255,255,0.08);stroke-width:3}
 .ring-fill{fill:none;stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset 0.7s cubic-bezier(0.34,1.56,0.64,1);filter:drop-shadow(0 0 3px currentColor)}
 .ring-inner{position:absolute;top:5px;left:5px;right:5px;bottom:5px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:none;font-family:'Inter',sans-serif}
-
 .rank-badge{font-size:20px;width:28px;text-align:center;flex-shrink:0;line-height:1}
 .player-info{flex:0 0 110px;width:110px;min-width:0;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
 .player-name{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;font-family:'Inter',sans-serif}
@@ -143,45 +112,21 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .done-badge{font-size:9px;font-weight:700;background:rgba(34,197,94,0.12);color:var(--green);border:1px solid rgba(34,197,94,0.30);padding:2px 7px;border-radius:999px;text-transform:uppercase;white-space:nowrap;letter-spacing:0.04em}
 .mini-bar-wrap{height:3px;background:rgba(255,255,255,0.08);border-radius:999px;margin-top:6px;overflow:hidden;width:100%}
 .mini-bar-fill{height:100%;border-radius:999px;transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1)}
-/* Middle: badge column — 2 rows × 3 cols grid */
 .badge-col{flex:1;display:flex;align-items:center;justify-content:center;min-width:0;padding:0 6px}
 .badge-row{display:grid;grid-template-columns:repeat(3,28px);gap:4px;justify-content:center}
-/* Right: score block */
 .lb-score{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;flex-shrink:0;text-align:right;gap:0}
 .lb-count{font-family:'Poppins',sans-serif;font-size:40px;font-weight:900;line-height:1;letter-spacing:-1.5px}
 .lb-of{font-size:9px;color:var(--muted2);font-weight:700;text-transform:uppercase;letter-spacing:0.07em;white-space:nowrap;margin-top:2px}
 .lb-of-label{font-size:8px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:0.07em;white-space:nowrap}
-
-/* ── ACHIEVEMENT BADGES ── */
-.ach-badge{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:28px;height:28px;border-radius:50%;
-  background:rgba(255,255,255,0.07);
-  border:1.5px solid var(--bdg-color,rgba(217,119,6,0.55));
-  box-shadow:0 1px 4px rgba(0,0,0,0.10),0 0 5px var(--bdg-glow,rgba(217,119,6,0.10));
-  cursor:pointer;position:relative;
-  transition:transform 0.15s,box-shadow 0.2s,filter 0.2s,opacity 0.2s;
-  flex-shrink:0;
-}
+.ach-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.07);border:1.5px solid var(--bdg-color,rgba(217,119,6,0.55));box-shadow:0 1px 4px rgba(0,0,0,0.10),0 0 5px var(--bdg-glow,rgba(217,119,6,0.10));cursor:pointer;position:relative;transition:transform 0.15s,box-shadow 0.2s,filter 0.2s,opacity 0.2s;flex-shrink:0;}
 .ach-badge:hover{transform:scale(1.12);box-shadow:0 2px 8px rgba(0,0,0,0.15),0 0 12px var(--bdg-glow,rgba(217,119,6,0.25))}
-/* locked: muted silver placeholder */
 .ach-badge.locked{filter:grayscale(1);opacity:0.25;border-color:rgba(255,255,255,0.10);box-shadow:none;background:rgba(255,255,255,0.04)}
 .ach-badge.locked:hover,.ach-badge.locked.tip-open{filter:none;opacity:1;transform:scale(1.1);background:rgba(255,255,255,0.08);border-color:var(--bdg-color,rgba(217,119,6,0.55));box-shadow:0 2px 8px rgba(0,0,0,0.15),0 0 12px var(--bdg-glow,rgba(217,119,6,0.25))}
-#bdg-tip{
-  position:fixed;z-index:9999;pointer-events:none;
-  background:#1A1A1A;border:1px solid rgba(255,255,255,0.15);color:var(--text);
-  font-size:11px;font-family:'Inter',sans-serif;font-weight:500;
-  padding:5px 10px;border-radius:7px;white-space:nowrap;
-  box-shadow:0 4px 16px rgba(0,0,0,0.25);
-  opacity:0;transition:opacity 0.15s;
-}
+#bdg-tip{position:fixed;z-index:9999;pointer-events:none;background:#1A1A1A;border:1px solid rgba(255,255,255,0.15);color:var(--text);font-size:11px;font-family:'Inter',sans-serif;font-weight:500;padding:5px 10px;border-radius:7px;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,0.25);opacity:0;transition:opacity 0.15s;}
 #bdg-tip.visible{opacity:1}
 .ach-badge.new-badge{animation:badgePop 0.5s cubic-bezier(0.34,1.56,0.64,1)}
 @keyframes badgePop{0%{transform:scale(0) rotate(-30deg)}80%{transform:scale(1.2) rotate(5deg)}100%{transform:scale(1) rotate(0)}}
-
-/* ── WINNER BANNER ── */
 .winner-banner{background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(217,119,6,0.08));border:1px solid rgba(217,119,6,0.25);border-radius:var(--radius-sm);padding:12px 16px;text-align:center;font-size:14px;font-weight:700;font-family:'Poppins',sans-serif;color:var(--amber);margin-bottom:14px;display:none}
-/* ── HEAVY LIFTING AWARD ── */
 .heavy-lifting-card{display:none;background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(109,40,217,0.08));border:1px solid rgba(139,92,246,0.35);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;align-items:center;gap:14px;box-shadow:0 0 24px rgba(139,92,246,0.12),inset 0 1px 0 rgba(255,255,255,0.05)}
 .heavy-lifting-card.visible{display:flex}
 .hl-emoji{font-size:38px;flex-shrink:0;line-height:1}
@@ -191,8 +136,6 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .hl-sub{font-size:11px;color:rgba(167,139,250,0.65);margin-top:2px;font-weight:400}
 .hl-count{font-family:'Poppins',sans-serif;font-size:32px;font-weight:900;color:#A78BFA;line-height:1;flex-shrink:0;text-align:right}
 .hl-count-lbl{font-size:9px;color:rgba(167,139,250,0.6);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;text-align:right}
-
-/* ── TALLY CARD ── */
 .my-tally-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,0.06),0 4px 24px rgba(0,0,0,0.04)}
 .my-tally-card.complete{border-color:rgba(34,197,94,0.30);box-shadow:0 0 0 1.5px rgba(34,197,94,0.20),0 4px 24px rgba(0,0,0,0.4)}
 .tally-bun-top{height:3px;background:linear-gradient(90deg,var(--amber-dark),#F59E0B,var(--amber-mid),#F59E0B,var(--amber-dark));opacity:0.8}
@@ -215,8 +158,6 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .ate-btn .bicon{font-size:18px;transition:transform 0.2s}
 .ate-btn:active .bicon{transform:scale(1.4) rotate(-12deg)}
 .complete-strip{padding:10px 16px;background:rgba(34,197,94,0.10);color:var(--green);font-size:13px;font-weight:600;text-align:center;border-top:1px solid rgba(34,197,94,0.15);display:none}
-
-/* ── PLAYERS ── */
 .players-list{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
 .player-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;gap:12px;animation:slideIn 0.25s ease both;transition:transform 0.15s;box-shadow:0 2px 12px rgba(0,0,0,0.3)}
 .player-row:active{transform:scale(0.98)}
@@ -232,8 +173,6 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .add-form button{background:linear-gradient(135deg,var(--amber),var(--amber-dark));color:#fff;border:none;border-radius:var(--radius-xs);font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;padding:10px 18px;cursor:pointer;transition:opacity 0.15s;white-space:nowrap}
 .add-form button:hover{opacity:0.9}
 .add-form button:active{transform:scale(0.97)}
-
-/* ── BURGER GRID ── */
 .bg-player-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px 10px;margin-bottom:8px;box-shadow:0 2px 16px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.04);position:relative;overflow:hidden}
 .bg-player-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--amber-dark),#F59E0B,var(--amber-dark));opacity:0.7}
 .bg-player-card.complete::before{background:linear-gradient(90deg,var(--green),#4ADE80,var(--green));opacity:0.8}
@@ -250,14 +189,11 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .bg-progress-track{flex:1;height:5px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden}
 .bg-progress-fill{height:100%;border-radius:999px;transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1)}
 .bg-pct{font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;color:var(--av-text);flex-shrink:0;min-width:40px;text-align:right}
-
-/* ── SOCIAL FEED ── */
 .social-wrap{display:flex;flex-direction:column;height:calc(100dvh - 310px);min-height:360px}
 .social-feed{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding:4px 2px 10px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
 .social-feed::-webkit-scrollbar{width:4px}
 .social-feed::-webkit-scrollbar-track{background:transparent}
 .social-feed::-webkit-scrollbar-thumb{background:var(--border2);border-radius:999px}
-/* Post card — unified block for each message */
 .msg-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 13px;animation:slideIn 0.25s ease both;box-shadow:0 1px 4px rgba(0,0,0,0.05)}
 .msg-card.mine{background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.18)}
 .msg-header{display:flex;align-items:center;gap:8px;margin-bottom:5px}
@@ -272,14 +208,12 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 #lightbox{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.85);backdrop-filter:blur(16px);align-items:center;justify-content:center;cursor:zoom-out}
 #lightbox.open{display:flex}
 #lightbox img{max-width:92vw;max-height:88vh;border-radius:14px;box-shadow:0 8px 48px rgba(0,0,0,0.4)}
-/* Image preview above input */
 .img-preview-bar{display:none;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-sm);margin-bottom:8px}
 .img-preview-bar.visible{display:flex}
 .img-preview-thumb{width:42px;height:42px;border-radius:10px;object-fit:cover;border:1px solid var(--border2)}
 .img-preview-name{flex:1;font-size:12px;color:var(--muted2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .img-preview-remove{background:none;border:none;color:var(--muted);font-size:17px;cursor:pointer;line-height:1;padding:2px 6px;border-radius:6px;transition:color 0.15s,background 0.15s}
 .img-preview-remove:hover{color:var(--red);background:rgba(220,38,38,0.07)}
-/* Input capsule */
 .social-input-area{padding-top:10px;padding-bottom:max(24px, env(safe-area-inset-bottom));border-top:1px solid var(--border)}
 .social-capsule{display:flex;align-items:center;gap:0;background:var(--surface);border:1.5px solid rgba(0,0,0,0.10);border-radius:999px;padding:6px 6px 6px 14px;box-shadow:0 1px 8px rgba(0,0,0,0.07);transition:border-color 0.2s,box-shadow 0.2s}
 .social-capsule:focus-within{border-color:var(--amber);box-shadow:0 0 0 3px rgba(245,158,11,0.15)}
@@ -296,8 +230,6 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .social-empty{text-align:center;padding:48px 20px;color:var(--muted);flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .social-empty .e-icon{font-size:40px;margin-bottom:12px}
 .social-empty p{font-size:13px;font-weight:400}
-
-/* ── MISC ── */
 .empty{text-align:center;padding:48px 20px;color:var(--muted)}
 .empty .e-icon{font-size:40px;margin-bottom:12px}
 .empty p{font-size:13px}
@@ -305,8 +237,6 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 .section-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px}
 .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
-
-/* ── PLAYER COLORS (vibrant for dark-mode) ── */
 .c0{--av-bg:rgba(248,113,113,0.15);--av-text:#F87171;--bar:#EF4444;--ring-color:#F87171}
 .c1{--av-bg:rgba(251,191,36,0.15);--av-text:#FCD34D;--bar:#F59E0B;--ring-color:#FCD34D}
 .c2{--av-bg:rgba(34,197,94,0.15);--av-text:#4ADE80;--bar:#22C55E;--ring-color:#4ADE80}
@@ -319,15 +249,12 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .c9{--av-bg:rgba(167,139,250,0.15);--av-text:#A78BFA;--bar:#7C3AED;--ring-color:#A78BFA}
 .c10{--av-bg:rgba(253,186,116,0.15);--av-text:#FDB974;--bar:#F97316;--ring-color:#FDB974}
 .c11{--av-bg:rgba(94,234,212,0.15);--av-text:#5EEAD4;--bar:#14B8A6;--ring-color:#5EEAD4}
-
 .ring-inner{background:var(--av-bg);color:var(--av-text)}
 .ring-fill{stroke:var(--ring-color)}
 .mini-bar-fill,.progress-fill,.bg-progress-fill{background:linear-gradient(90deg,#C8102E 0%,#E8E8E8 50%,#002868 100%)}
-#summer-banner{font-size:11px;font-weight:500;color:var(--muted2);letter-spacing:0.01em;margin-top:2px;min-height:16px}
-#summer-banner span{background:linear-gradient(90deg,#C8102E,#fff,#002868);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:700}
+#summer-banner{font-size:11px;font-weight:500;letter-spacing:0.01em;margin-top:4px;min-height:16px;display:flex;justify-content:center}
+#summer-banner span{display:inline-flex;align-items:center;gap:4px;background:rgba(125,211,252,0.18);border:1px solid rgba(125,211,252,0.45);border-radius:20px;padding:4px 14px;color:#7dd3fc;font-weight:600;font-size:11px;letter-spacing:0.02em;box-shadow:0 0 12px rgba(125,211,252,0.12)}
 .lb-count,.tally-count{color:var(--av-text)}
-
-/* ── BURGER DETAIL DRAWER (tally) ── */
 .burger-detail{background:var(--surface2);border-top:1px solid var(--border);padding:14px 16px;display:none;flex-direction:column;gap:10px;animation:slideIn 0.2s ease both}
 .burger-detail.open{display:flex}
 .burger-detail-row{display:flex;align-items:center;gap:10px}
@@ -345,8 +272,6 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .detail-confirm-btn{background:linear-gradient(135deg,var(--amber),var(--amber-dark));color:#fff;border:none;border-radius:var(--radius-xs);font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;padding:10px;cursor:pointer;width:100%;margin-top:4px;transition:opacity 0.15s}
 .detail-confirm-btn:hover{opacity:0.9}
 .detail-confirm-btn:active{transform:scale(0.97)}
-
-/* ── MAP TAB ── */
 .map-wrap{position:relative;border-radius:12px;overflow:hidden;border:1px solid #333;box-shadow:0 4px 20px rgba(0,0,0,0.6);margin:0 2px}
 #burger-map{width:100%;height:520px}
 .leaflet-popup-content-wrapper{background:var(--surface2)!important;border:1px solid var(--border2)!important;border-radius:12px!important;box-shadow:0 4px 24px rgba(0,0,0,0.6)!important;color:var(--text)!important;padding:0!important}
@@ -360,11 +285,9 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .map-popup-stars{font-size:15px;margin-bottom:6px}
 .map-popup-time{font-size:11px;color:var(--muted);font-weight:400}
 .map-section-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.10em;font-weight:600;margin:16px 0 8px}
-
 </style>
 </head>
 <body>
-
 <!-- SETUP SCREEN -->
 <div id="setup-screen">
   <div class="burger-deco">🍔</div>
@@ -436,7 +359,7 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
         </div>
       </div>
       <div id="winner-banner" class="winner-banner"></div>
-<div class="section-label">Rankings</div>
+      <div class="section-label">Rankings</div>
       <div class="leaderboard" id="leaderboard"></div>
       <div id="lb-empty" class="empty" style="display:none"><div class="e-icon">🍔</div><p>No players yet!</p></div>
     </div>
@@ -505,15 +428,11 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 <div id="bdg-tip"></div>
 <div id="lightbox" onclick="closeLightbox()"><img id="lightbox-img" src="" alt=""/></div>
 <div class="toast" id="toast"></div>
-
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getFirestore, doc, collection, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp, query, orderBy, limit }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-// ─────────────────────────────────────────────────────────────────
-// 🔧 FIREBASE CONFIG
-// ─────────────────────────────────────────────────────────────────
 const FIREBASE_CONFIG = {
   apiKey:            "AIzaSyCqqA4XLxrRNQLAEcLSuszvpsJIhZLWqcQ",
   authDomain:        "burger-challenge.firebaseapp.com",
@@ -522,14 +441,12 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "245243594858",
   appId:             "1:245243594858:web:5281332310b1b78a382213"
 };
-// ─────────────────────────────────────────────────────────────────
 
 const COLORS = ['c0','c1','c2','c3','c4','c5','c6','c7','c8','c9','c10','c11'];
 const IS_CONFIGURED = !FIREBASE_CONFIG.apiKey.startsWith('YOUR_');
 const MAX_IMAGE_PX = 900;
 const JPEG_QUALITY = 0.72;
 
-// ── ACHIEVEMENT DEFINITIONS ──────────────────────────────────────
 const ACHIEVEMENTS = {
   double_down:     { label:'The Double Down',      tip:'Ate 2+ burgers in one day',              color:'rgba(245,180,42,0.7)',  glow:'rgba(245,180,42,0.22)', size:11, emoji:'🍔🍔' },
   vegans_nightmare:{ label:"The Vegan's Nightmare", tip:'Ate burgers 5 days in a row',             color:'rgba(80,184,80,0.7)',   glow:'rgba(80,184,80,0.2)',   size:11, emoji:'😱🥗' },
@@ -551,7 +468,6 @@ let seenMessageCount = 0;
 let socialInitialLoadDone = false;
 let pendingImageBase64 = null, pendingImageName = '';
 
-// ── CONFIG BANNER ────────────────────────────────────────────────
 function showConfigBanner() {
   const b = document.getElementById('config-banner');
   b.style.display = 'block';
@@ -569,7 +485,6 @@ function initFirebase() {
   db  = getFirestore(app);
 }
 
-// ── UTILS ────────────────────────────────────────────────────────
 const uid = () => Math.random().toString(36).slice(2,10);
 function initials(name) {
   const p = name.trim().split(/\s+/);
@@ -584,7 +499,7 @@ function laborDay(year) {
   const sep1 = new Date(year,8,1), dow = sep1.getDay();
   return new Date(year, 8, 1 + (dow===0?1:dow===1?0:8-dow));
 }
-// ── JOKE OF THE DAY ──────────────────────────────────────────────
+
 const JOKES = [
   { q: "Why did the burger go to therapy?", a: "It had too many layers to deal with." },
   { q: "What do you call a burger that tells jokes?", a: "A ham-comedian." },
@@ -595,44 +510,6 @@ const JOKES = [
   { q: "Why did the burger go to school?", a: "To get a little more well-done." },
   { q: "What do you call a burger that won't stop talking?", a: "A blabber-patty." },
   { q: "Why was the burger so popular?", a: "It really knew how to stack up." },
-  { q: "What did one burger say to the other at the gym?", a: "Bro, you're really shredded." },
-  { q: "Why did the burger refuse to fight?", a: "It didn't want beef with anyone." },
-  { q: "What do you call a cold burger?", a: "A chilly cheeseburger." },
-  { q: "Why did the burger join the band?", a: "It had the best buns." },
-  { q: "What's a burger's favorite movie?", a: "Grease." },
-  { q: "What do you call a burger that can do magic?", a: "A hocus-pattus." },
-  { q: "Why did the burger feel self-conscious?", a: "Everyone kept calling it a patty melt." },
-  { q: "What do burgers say before a race?", a: "Lettuce go!" },
-  { q: "Why was the burger a great detective?", a: "It always got to the meat of the matter." },
-  { q: "What do you call an overconfident burger?", a: "A smug-wich." },
-  { q: "Why did the burger cross the road?", a: "To get to the other sizzle." },
-  { q: "What do you call a burger that plays guitar?", a: "A rock and roll." },
-  { q: "Why did the burger win the award?", a: "It was well-seasoned for the role." },
-  { q: "What do you call a burger at a fancy restaurant?", a: "Filet-mig-bun." },
-  { q: "Why don't burgers use GPS?", a: "They always follow their gut." },
-  { q: "What did the burger say on its birthday?", a: "This is the best day of my life — no mustard!" },
-  { q: "What do you call a burger that works out?", a: "A buff-alo burger." },
-  { q: "Why did the burger go to the art museum?", a: "To see the Mona Lizza." },
-  { q: "What do you call a burger that's also a philosopher?", a: "A deep-fried thinker." },
-  { q: "What's a burger's least favorite weather?", a: "Hail — it always ruins the bun." },
-  { q: "Why did the cowboy eat his burger so fast?", a: "He wanted to beat the grill before it got cold." },
-  { q: "What do you call a burger that's always late?", a: "A slow-broiled patty." },
-  { q: "Why did the burger get promoted?", a: "It always delivered the goods." },
-  { q: "What do you call a burger who gives great advice?", a: "A sage-and-onion patty." },
-  { q: "Why did the burger write a book?", a: "It had a lot of beef to get off its chest." },
-  { q: "What do you call a competitive burger?", a: "A grill-seeker." },
-  { q: "Why was the burger so calm under pressure?", a: "It had been well-grilled before." },
-  { q: "What did the burger say to the cheese?", a: "You complete me." },
-  { q: "Why did the burger get good grades?", a: "It was on a roll every day." },
-  { q: "What do you call a really fast burger?", a: "A speed patty." },
-  { q: "Why did the burger go to the beach?", a: "It heard the waves were well-done." },
-  { q: "What do you call a burger with great hair?", a: "A bun-dle of style." },
-  { q: "Why don't burgers argue?", a: "They always end up in a wrap." },
-  { q: "What did the burger say at the job interview?", a: "I really bring the heat." },
-  { q: "What do you call a burger that's obsessed with money?", a: "A cash-and-carry patty." },
-  { q: "Why was the burger a bad comedian?", a: "Its jokes were always half-baked." },
-  { q: "What do you call a paranoid burger?", a: "A well-done worrier." },
-  { q: "Why did the burger start meditating?", a: "It needed inner peas." },
   { q: "What do you call a burger at a concert?", a: "A mosh-room Swiss melt." },
   { q: "Why did the burger win at poker?", a: "It had the best all-in patty face." },
   { q: "What do you call a burger that sings opera?", a: "Pava-patty." },
@@ -654,39 +531,6 @@ const JOKES = [
   { q: "What do you call a burger who writes poetry?", a: "A tender bard." },
   { q: "Why did the burger stay up all night?", a: "It was on the night grill." },
   { q: "What do you call a burger that's really into fitness?", a: "A lean mean grilling machine." },
-  { q: "Why did the burger get a standing ovation?", a: "It was a real show-stopper with the ketchup." },
-  { q: "What do you call a fancy burger that drives a sports car?", a: "A Ferrari-Filet." },
-  { q: "Why did the burger go to the library?", a: "To find a good recipe for success." },
-  { q: "What do you call a burger that's a superhero?", a: "Patty Man." },
-  { q: "Why was the burger so stressed?", a: "Too much on its plate." },
-  { q: "What do you call a burger at a wedding?", a: "The best bun." },
-  { q: "Why did the burger file a police report?", a: "It got grilled by the detective." },
-  { q: "What do you call a scientifically advanced burger?", a: "A lab-grown patty." },
-  { q: "Why was the burger so good at chess?", a: "It always thought 10 moves a-head of lettuce." },
-  { q: "What do you call a burger who loves math?", a: "A calcu-patty-tor." },
-  { q: "Why did the burger get a standing desk?", a: "It was tired of being pressed all day." },
-  { q: "What do you call a burger in a suit?", a: "A formal patty-tion." },
-  { q: "Why did the burger go to acting school?", a: "It wanted to be in a bigger roll." },
-  { q: "What do you call a burger that's scared of the dark?", a: "A chicken burger." },
-  { q: "Why was the veggie burger always confident?", a: "It had a lot of guts — courgette ones." },
-  { q: "What do you call a burger that does magic tricks?", a: "The Great Patty-ni." },
-  { q: "Why did the burger win the marathon?", a: "Because it had great stamina and a good bun." },
-  { q: "What do you call a burger with a GPS?", a: "A navigate-your-way patty." },
-  { q: "Why did the burger go to the doctor?", a: "It had a bad case of the grill flu." },
-  { q: "What do you call a burger that's always right?", a: "A know-it-patty." },
-  { q: "Why did the burger take a selfie?", a: "For the 'gram — it was looking extra saucy." },
-  { q: "What do you call a burger that gardens?", a: "A ground beef planter." },
-  { q: "Why did the burger become a pilot?", a: "It always wanted to be high and well-done." },
-  { q: "What do you call a burger at a science fair?", a: "A lab-patty experiment." },
-  { q: "Why did the burger get a trophy?", a: "It was the meatiest performance of the year." },
-  { q: "What do you call a burger that's also a nurse?", a: "A first-aid patty." },
-  { q: "Why did the burger get sunburned?", a: "It forgot its bun-screen." },
-  { q: "What do you call a burger that's always early?", a: "A punctu-patty." },
-  { q: "Why did the burger go to the comedy club?", a: "It heard the crowd was hungry for laughs." },
-  { q: "What do you call a burger that loves to travel?", a: "A globe-trotter patty." },
-  { q: "Why did the burger get glasses?", a: "Too much screen-time — it was always watching the grill." },
-  { q: "What do you call a burger that moonlights as a DJ?", a: "DJ Patty Melt." },
-  { q: "Why did the burger start a podcast?", a: "It had a lot to say between the buns." },
 ];
 
 function getDayOfYear() {
@@ -714,6 +558,7 @@ function daysUntilLaborDay() {
   if (ld <= now) ld = laborDay(now.getFullYear()+1);
   return Math.max(0, Math.ceil((ld-now)/86400000));
 }
+
 function initSummerBanner() {
   const el = document.getElementById('summer-banner');
   if (!el) return;
@@ -752,7 +597,6 @@ function formatTime(ts) {
   return time + ' ' + date;
 }
 
-// ── SVG RING AVATAR ──────────────────────────────────────────────
 function ringAvatarHTML(p, size, emojiOverride=null) {
   const cc  = colorClass(p.colorIdx);
   const r   = (size / 2) - 4;
@@ -785,7 +629,6 @@ function miniAvatarHTML(name, colorIdx, size) {
   return `<div class="${cc}" style="width:${size}px;height:${size}px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.36)}px;font-weight:700;background:var(--av-bg);color:var(--av-text);flex-shrink:0;font-family:'Inter',sans-serif">${initials(name)}</div>`;
 }
 
-// ── ACHIEVEMENT LOGIC ────────────────────────────────────────────
 function logTs(entry) { return typeof entry === 'string' ? entry : (entry && entry.ts) || ''; }
 
 function computeAchievements(p, allPlayers) {
@@ -793,9 +636,7 @@ function computeAchievements(p, allPlayers) {
   const rawLogs = p.logs || [];
   const logs = rawLogs.map(logTs).filter(Boolean);
 
-  if (logs.some(ts => { const d = new Date(ts); return d.getHours() >= 23; })) {
-    earned.push('last_minute');
-  }
+  if (logs.some(ts => { const d = new Date(ts); return d.getHours() >= 23; })) earned.push('last_minute');
 
   const byDay = {};
   logs.forEach(ts => {
@@ -803,7 +644,6 @@ function computeAchievements(p, allPlayers) {
     const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
     byDay[key] = (byDay[key] || 0) + 1;
   });
-
   if (Object.values(byDay).some(v => v >= 2)) earned.push('double_down');
 
   const dayKeys = Object.keys(byDay).sort();
@@ -844,11 +684,9 @@ function computeAchievements(p, allPlayers) {
       .map(op => new Date([...op.logs].sort()[0]).getTime());
     if (everyoneElseFirst.every(t => myFirst <= t)) earned.push('opening_lap');
   }
-
   return earned;
 }
 
-// ── IMAGE COMPRESSION ────────────────────────────────────────────
 function compressImage(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -885,9 +723,7 @@ window.handleImageSelect = async function(e) {
     document.getElementById('img-preview-name').textContent = file.name;
     document.getElementById('img-preview-bar').classList.add('visible');
     document.getElementById('photo-btn').classList.add('has-image');
-  } catch(err) {
-    showToast('⚠️ Could not load image');
-  }
+  } catch(err) { showToast('⚠️ Could not load image'); }
   e.target.value = '';
 };
 
@@ -898,7 +734,6 @@ window.clearPendingImage = function() {
   document.getElementById('img-preview-thumb').src = '';
 };
 
-// ── ROOM OPS ─────────────────────────────────────────────────────
 window.createRoom = async function() {
   if (!IS_CONFIGURED) { showConfigBanner(); return; }
   const name = document.getElementById('setup-name').value.trim();
@@ -959,6 +794,7 @@ window.spectateRoom=async function(){
     saveSession(); startApp();
   }catch(e){alert('Error: '+e.message);btn.disabled=false;btn.textContent='👁 Spectate';}
 };
+
 window.leaveRoom=function(){
   if(!confirm('Leave this challenge?')) return;
   if(unsubscribe) unsubscribe();
@@ -974,7 +810,6 @@ function startApp(){
   initJokeOfTheDay();
   initSummerBanner();
   if(spectatorMode){
-    // Hide competitor-only tabs
     document.querySelectorAll('.tab-btn').forEach(b=>{
       const name=b.getAttribute('onclick')?.match(/'(\w+)'/)?.[1];
       if(['tally','social','players'].includes(name)) b.style.display='none';
@@ -1005,11 +840,7 @@ function subscribeToRoom(){
 }
 
 function subscribeToMessages(){
-  const q = query(
-    collection(db,'rooms',roomId,'messages'),
-    orderBy('createdAt','asc'),
-    limit(200)
-  );
+  const q = query(collection(db,'rooms',roomId,'messages'),orderBy('createdAt','asc'),limit(200));
   unsubMessages = onSnapshot(q, snap => {
     messages = [];
     snap.forEach(d => messages.push({id:d.id,...d.data()}));
@@ -1017,7 +848,6 @@ function subscribeToMessages(){
   }, () => {});
 }
 
-// ── RENDER ───────────────────────────────────────────────────────
 function render(){
   const sorted=[...players].sort((a,b)=>b.count-a.count);
   document.getElementById('stat-days').textContent=daysUntilLaborDay();
@@ -1058,16 +888,13 @@ function renderLeaderboard(sorted){
   const winners=players.filter(p=>p.count>=100);
   banner.style.display=winners.length?'block':'none';
   if(winners.length) banner.textContent='🎉 '+winners.map(p=>p.name).join(', ')+(winners.length===1?' has':' have')+' crushed 100 burgers!';
-  // Heavy Lifting Award
   const hl = computeHeavyLifting(players);
   const hlCard = document.getElementById('heavy-lifting-card');
   if (hl && hlCard) {
     hlCard.classList.add('visible');
     document.getElementById('hl-name').textContent = hl.player.name;
     document.getElementById('hl-count').textContent = hl.count;
-  } else if (hlCard) {
-    hlCard.classList.remove('visible');
-  }
+  } else if (hlCard) { hlCard.classList.remove('visible'); }
 
   if(!sorted.length){lb.innerHTML='';empty.style.display='block';return;}
   empty.style.display='none';
@@ -1199,16 +1026,13 @@ function renderPlayersList(){
   }).join('');
 }
 
-// ── SOCIAL FEED ──────────────────────────────────────────────────
 function renderSocialFeed() {
   const feed = document.getElementById('social-feed');
   const empty = document.getElementById('social-empty');
-  // On first load, silently mark everything as seen
   if (!socialInitialLoadDone) {
     seenMessageCount = messages.length;
     socialInitialLoadDone = true;
   } else {
-    // Show unread badge only for messages that arrived after initial load
     const socialTabActive = document.getElementById('tab-social')?.classList.contains('active');
     if (!socialTabActive && messages.length > seenMessageCount) {
       const dot = document.getElementById('social-unread-dot');
@@ -1255,11 +1079,8 @@ window.openLightbox = function(msgId) {
   document.getElementById('lightbox-img').src = src;
   document.getElementById('lightbox').classList.add('open');
 };
-window.closeLightbox = function() {
-  document.getElementById('lightbox').classList.remove('open');
-};
+window.closeLightbox = function() { document.getElementById('lightbox').classList.remove('open'); };
 
-// ── SOCIAL POST ──────────────────────────────────────────────────
 window.sendSocialPost = async function() {
   const text = document.getElementById('social-text').value.trim();
   if (!text && !pendingImageBase64) return;
@@ -1274,11 +1095,8 @@ window.sendSocialPost = async function() {
     document.getElementById('social-text').value = '';
     autoResize(document.getElementById('social-text'));
     clearPendingImage();
-  } catch(e) {
-    showToast('⚠️ Could not send — check connection');
-  } finally {
-    btn.disabled = false;
-  }
+  } catch(e) { showToast('⚠️ Could not send — check connection'); }
+  finally { btn.disabled = false; }
 };
 
 window.socialKeydown = function(e) {
@@ -1289,8 +1107,6 @@ window.autoResize = function(el) {
   el.style.height = Math.min(el.scrollHeight, 120) + 'px';
 };
 
-// ── TALLY ACTION ─────────────────────────────────────────────────
-// ── CONFETTI ─────────────────────────────────────────────────────
 function isSummerHoliday() {
   const d = new Date();
   const m = d.getMonth(), day = d.getDate();
@@ -1303,36 +1119,23 @@ function fireConfetti(big = false) {
   const colors = patriotic
     ? ['#C8102E','#FFFFFF','#002868','#FF6B6B','#A8C4FF','#FFD700']
     : ['#F59E0B','#FCD34D','#22C55E','#60A5FA','#E879F9','#F87171','#fff'];
-
   if (patriotic) {
     const burst = (x, y, angle, delay = 0) => setTimeout(() => confetti({
-      particleCount: big ? 75 : 35,
-      spread: big ? 110 : 65,
-      angle, origin: { x, y },
-      colors, scalar: big ? 1.35 : 1,
-      startVelocity: big ? 48 : 28,
-      gravity: 0.85, shapes: ['circle'],
-      zIndex: 9999,
+      particleCount: big ? 75 : 35, spread: big ? 110 : 65, angle, origin: { x, y },
+      colors, scalar: big ? 1.35 : 1, startVelocity: big ? 48 : 28,
+      gravity: 0.85, shapes: ['circle'], zIndex: 9999,
     }), delay);
-    burst(0.1, 0.65, 70);
-    burst(0.9, 0.65, 110);
-    if (big) {
-      burst(0.5, 0.38, 90, 200);
-      burst(0.25, 0.55, 78, 380);
-      burst(0.75, 0.55, 102, 380);
-      burst(0.5, 0.5, 90, 560);
-    }
+    burst(0.1, 0.65, 70); burst(0.9, 0.65, 110);
+    if (big) { burst(0.5, 0.38, 90, 200); burst(0.25, 0.55, 78, 380); burst(0.75, 0.55, 102, 380); burst(0.5, 0.5, 90, 560); }
   } else {
-    const opts = { particleCount: big ? 220 : 90, spread: big ? 100 : 60,
-      origin: { y: 0.55 }, colors, scalar: big ? 1.3 : 1, zIndex: 9999 };
+    const opts = { particleCount: big ? 220 : 90, spread: big ? 100 : 60, origin: { y: 0.55 }, colors, scalar: big ? 1.3 : 1, zIndex: 9999 };
     confetti({ ...opts, angle: 70, origin: { x: 0.1, y: 0.6 } });
     confetti({ ...opts, angle: 110, origin: { x: 0.9, y: 0.6 } });
     if (big) setTimeout(() => confetti({ ...opts, angle: 90, origin: { x: 0.5, y: 0.4 }, particleCount: 80 }), 200);
   }
 }
 
-// ── BURGER DETAIL / TALLY ────────────────────────────────────────
-const OHIO_SPOTS = ['Wendy\'s','McDonald\'s','Burger King','Buffalo Wild Wings','Swenson\'s','Shake Shack','Five Guys','Steak \'n Shake','Culver\'s'];
+const OHIO_SPOTS = ["Wendy's","McDonald's","Burger King","Buffalo Wild Wings","Swenson's","Shake Shack","Five Guys","Steak 'n Shake","Culver's"];
 let pendingRating = 0;
 let pendingGPS = null;
 
@@ -1341,13 +1144,11 @@ window.openBurgerDetail = function() {
   if (!d) return;
   d.classList.toggle('open');
   if (d.classList.contains('open')) {
-    // Pre-populate Ohio quick spots
     document.getElementById('quick-spots').innerHTML = OHIO_SPOTS.slice(0,5).map(s =>
       `<button class="quick-spot" onclick="document.getElementById('detail-restaurant').value='${s}'">${s}</button>`
     ).join('');
     setStar(0);
     document.getElementById('detail-restaurant').value = '';
-    // Attempt GPS silently
     pendingGPS = null;
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(pos => {
@@ -1359,9 +1160,7 @@ window.openBurgerDetail = function() {
 
 window.setStar = function(n) {
   pendingRating = n;
-  document.querySelectorAll('.star-btn').forEach(b => {
-    b.classList.toggle('active', +b.dataset.star <= n);
-  });
+  document.querySelectorAll('.star-btn').forEach(b => { b.classList.toggle('active', +b.dataset.star <= n); });
 };
 
 window.confirmBurger = async function() {
@@ -1428,9 +1227,7 @@ window.rerollColor=async function(){
   const me=players.find(p=>p.id===myPlayerId);
   if(!me) return;
   const others=players.filter(p=>p.id!==myPlayerId);
-  // Count usage of each color among other players
   const usage=Array.from({length:COLORS.length},(_,i)=>({idx:i,count:others.filter(p=>p.colorIdx===i).length}));
-  // Prefer unused, then least-used, but never same as current
   const candidates=usage.filter(c=>c.idx!==me.colorIdx).sort((a,b)=>a.count-b.count);
   const newIdx=candidates[0].idx;
   try{
@@ -1449,13 +1246,6 @@ window.removePlayer=async function(playerId){
     await deleteDoc(doc(db,'rooms',roomId,'players',playerId));
     if(isMe){ localStorage.removeItem('bc_session'); location.reload(); }
   } catch(e){ alert('Error: '+e.message); }
-};
-window.removeMe=async function(){
-  if(!confirm('Remove yourself from this room?')) return;
-  try{
-    await deleteDoc(doc(db,'rooms',roomId,'players',myPlayerId));
-    localStorage.removeItem('bc_session'); location.reload();
-  }catch(e){showToast('Error removing player')}
 };
 
 window.switchTab=function(name,btn){
@@ -1476,16 +1266,11 @@ document.getElementById('setup-name').addEventListener('keydown',e=>{if(e.key===
 document.getElementById('setup-room').addEventListener('keydown',e=>{if(e.key==='Enter') joinRoom()});
 document.getElementById('setup-room').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase()});
 
-// ── BADGE TOOLTIP (fixed-position, never clipped) ───────────────
 const bdgTip = document.getElementById('bdg-tip');
 let bdgTipTimer = null;
-
 function showBdgTip(el) {
-  const tip = el.getAttribute('data-tip');
-  if (!tip) return;
-  bdgTip.textContent = tip;
-  bdgTip.classList.add('visible');
-  positionBdgTip(el);
+  const tip = el.getAttribute('data-tip'); if (!tip) return;
+  bdgTip.textContent = tip; bdgTip.classList.add('visible'); positionBdgTip(el);
 }
 function hideBdgTip() { bdgTip.classList.remove('visible'); }
 function positionBdgTip(el) {
@@ -1495,23 +1280,16 @@ function positionBdgTip(el) {
   let top  = r.top - th - 8;
   left = Math.max(8, Math.min(left, window.innerWidth - tw - 8));
   if (top < 8) top = r.bottom + 8;
-  bdgTip.style.left = left + 'px';
-  bdgTip.style.top  = top  + 'px';
+  bdgTip.style.left = left + 'px'; bdgTip.style.top = top + 'px';
 }
-document.addEventListener('mouseover', e => {
-  const b = e.target.closest('.ach-badge[data-tip]');
-  if (b) showBdgTip(b);
-});
-document.addEventListener('mouseout', e => {
-  if (e.target.closest('.ach-badge[data-tip]')) hideBdgTip();
-});
+document.addEventListener('mouseover', e => { const b = e.target.closest('.ach-badge[data-tip]'); if (b) showBdgTip(b); });
+document.addEventListener('mouseout', e => { if (e.target.closest('.ach-badge[data-tip]')) hideBdgTip(); });
 window.toggleTip = function(el) {
   const isOpen = el.classList.contains('tip-open');
   document.querySelectorAll('.ach-badge.tip-open').forEach(b => b.classList.remove('tip-open'));
   hideBdgTip(); clearTimeout(bdgTipTimer);
   if (!isOpen) {
-    el.classList.add('tip-open');
-    showBdgTip(el);
+    el.classList.add('tip-open'); showBdgTip(el);
     bdgTipTimer = setTimeout(() => { el.classList.remove('tip-open'); hideBdgTip(); }, 2500);
   }
 };
@@ -1524,12 +1302,8 @@ document.addEventListener('click', e => {
 
 if(IS_CONFIGURED && loadSession()){initFirebase();startApp();}
 
-// ── BURGER MAP ───────────────────────────────────────────────────
 let burgerMap = null;
 let mapMarkers = [];
-
-
-// Must match CSS c0–c11 av-text colors exactly
 const RING_COLORS = ['#F87171','#FCD34D','#4ADE80','#22D3EE','#60A5FA','#E879F9','#CBD5E1','#F472B6','#FB7185','#A78BFA','#FDB974','#5EEAD4'];
 
 function starsHtml(n) {
@@ -1537,78 +1311,60 @@ function starsHtml(n) {
 }
 
 function renderBurgerMap() {
-  // Init map once
   if (!burgerMap) {
     burgerMap = L.map('burger-map', {
-      center: [40.4173, -82.9071],
-      zoom: 6,
-      maxBounds: [[36.5,-90],[44.5,-78]],
-      maxBoundsViscosity: 0.85,
+      center: [40.4173, -82.9071], zoom: 6,
+      maxBounds: [[36.5,-90],[44.5,-78]], maxBoundsViscosity: 0.85,
     });
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/">CARTO</a>',
       subdomains: 'abcd', maxZoom: 20
     }).addTo(burgerMap);
   }
-
-  // Clear old markers
   mapMarkers.forEach(m => m.remove());
   mapMarkers = [];
-
   const legend = document.getElementById('map-legend');
-  // Build legend for ALL players
   if (legend) {
     legend.innerHTML = players.map(p => {
       const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
       return `<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted2)"><span style="width:10px;height:10px;border-radius:50%;background:${color};display:inline-block;flex-shrink:0"></span>${escHtml(p.name)}</div>`;
     }).join('');
   }
-
-  players.forEach((p, pi) => {
+  players.forEach((p) => {
     const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
     const rawLogs = p.logs || [];
-
-    rawLogs.forEach((entry, ei) => {
+    rawLogs.forEach((entry) => {
       const ts = logTs(entry);
       const restaurant = (typeof entry === 'object' && entry.restaurant) || 'Unknown spot';
       const rating = (typeof entry === 'object' && entry.rating) || 0;
       const lat = typeof entry === 'object' && entry.lat;
       const lng = typeof entry === 'object' && entry.lng;
-
-      // Only plot entries that have real GPS coordinates
       if (!lat || !lng) return;
       const coord = [lat, lng];
-
       const icon = L.divIcon({
         className: '',
         html: `<div style="width:28px;height:28px;border-radius:50%;background:${color};border:2.5px solid rgba(255,255,255,0.85);display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,0.6)">🍔</div>`,
         iconSize: [28,28], iconAnchor: [14,14]
       });
-
-      const initials = p.name.trim().split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
+      const ini = p.name.trim().split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
       const timeStr = ts ? formatTime(ts) : '';
-      const popup = `
-        <div class="map-popup">
-          <div class="map-popup-header">
-            <div style="width:36px;height:36px;border-radius:50%;background:${color}22;border:2px solid ${color};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:${color};flex-shrink:0">${initials}</div>
-            <div class="map-popup-name">${escHtml(p.name)}</div>
-          </div>
-          <div class="map-popup-restaurant">🍔 ${escHtml(restaurant)}</div>
-          <div class="map-popup-stars">${starsHtml(rating)}</div>
-          <div class="map-popup-time">🕐 ${timeStr}</div>
-        </div>`;
-
+      const popup = `<div class="map-popup">
+        <div class="map-popup-header">
+          <div style="width:36px;height:36px;border-radius:50%;background:${color}22;border:2px solid ${color};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:${color};flex-shrink:0">${ini}</div>
+          <div class="map-popup-name">${escHtml(p.name)}</div>
+        </div>
+        <div class="map-popup-restaurant">🍔 ${escHtml(restaurant)}</div>
+        <div class="map-popup-stars">${starsHtml(rating)}</div>
+        <div class="map-popup-time">🕐 ${timeStr}</div>
+      </div>`;
       const marker = L.marker(coord, {icon}).addTo(burgerMap).bindPopup(popup, {maxWidth:260});
       mapMarkers.push(marker);
     });
   });
-
-  // Fit bounds to markers if any
   if (mapMarkers.length > 0) {
     const group = L.featureGroup(mapMarkers);
     burgerMap.fitBounds(group.getBounds().pad(0.25), {maxZoom:8});
   }
-
   burgerMap.invalidateSize();
 }
 </script>
