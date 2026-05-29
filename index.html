@@ -98,6 +98,13 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .stat-val{font-family:'Poppins',sans-serif;font-size:30px;font-weight:800;line-height:1;color:var(--amber);letter-spacing:-0.5px}
 .stat-lbl{font-size:10px;color:var(--muted2);margin-top:4px;text-transform:uppercase;letter-spacing:0.07em;font-weight:600}
 .stat-sub{font-size:10px;color:var(--muted);margin-top:4px;font-weight:400}
+.joke-card{cursor:pointer;user-select:none;transition:border-color 0.2s}
+.joke-card:hover{border-color:var(--amber)!important}
+.joke-card:active{transform:scale(0.97)}
+.joke-q{font-size:10px;font-weight:600;color:var(--text);line-height:1.35;margin-top:2px}
+.joke-a{font-size:10px;font-weight:700;color:var(--amber);line-height:1.35;margin-top:5px;display:none}
+.joke-a.revealed{display:block}
+.joke-hint{font-size:9px;color:var(--muted);margin-top:5px;font-weight:400;font-style:italic}
 
 /* ── LEADERBOARD ── */
 .leaderboard{display:flex;flex-direction:column;gap:8px}
@@ -418,11 +425,11 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
           <div class="stat-lbl">Total Devoured</div>
           <div class="stat-sub">Burgers eaten by the group</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-icon">👑</div>
-          <div class="stat-val" id="stat-top">0</div>
-          <div class="stat-lbl">Leader</div>
-          <div class="stat-sub">Current high score</div>
+        <div class="stat-card joke-card" id="joke-card" onclick="toggleJoke()" title="Tap for punchline">
+          <div class="stat-icon">🤡</div>
+          <div class="joke-q" id="joke-q"></div>
+          <div class="joke-a" id="joke-a"></div>
+          <div class="joke-hint" id="joke-hint">Tap for punchline 👆</div>
         </div>
       </div>
       <div id="winner-banner" class="winner-banner"></div>
@@ -574,6 +581,130 @@ function laborDay(year) {
   const sep1 = new Date(year,8,1), dow = sep1.getDay();
   return new Date(year, 8, 1 + (dow===0?1:dow===1?0:8-dow));
 }
+// ── JOKE OF THE DAY ──────────────────────────────────────────────
+const JOKES = [
+  { q: "Why did the burger go to therapy?", a: "It had too many layers to deal with." },
+  { q: "What do you call a burger that tells jokes?", a: "A ham-comedian." },
+  { q: "Why don't burgers ever get lost?", a: "They always know which way the patty is." },
+  { q: "What did the burger say to the hotdog?", a: "You're on a roll, but I'm on a bun." },
+  { q: "Why did the burger break up with the fries?", a: "It felt smothered." },
+  { q: "What do you call a sleeping burger?", a: "A slumber patty." },
+  { q: "Why did the burger go to school?", a: "To get a little more well-done." },
+  { q: "What do you call a burger that won't stop talking?", a: "A blabber-patty." },
+  { q: "Why was the burger so popular?", a: "It really knew how to stack up." },
+  { q: "What did one burger say to the other at the gym?", a: "Bro, you're really shredded." },
+  { q: "Why did the burger refuse to fight?", a: "It didn't want beef with anyone." },
+  { q: "What do you call a cold burger?", a: "A chilly cheeseburger." },
+  { q: "Why did the burger join the band?", a: "It had the best buns." },
+  { q: "What's a burger's favorite movie?", a: "Grease." },
+  { q: "What do you call a burger that can do magic?", a: "A hocus-pattus." },
+  { q: "Why did the burger feel self-conscious?", a: "Everyone kept calling it a patty melt." },
+  { q: "What do burgers say before a race?", a: "Lettuce go!" },
+  { q: "Why was the burger a great detective?", a: "It always got to the meat of the matter." },
+  { q: "What do you call an overconfident burger?", a: "A smug-wich." },
+  { q: "Why did the burger cross the road?", a: "To get to the other sizzle." },
+  { q: "What do you call a burger that plays guitar?", a: "A rock and roll." },
+  { q: "Why did the burger win the award?", a: "It was well-seasoned for the role." },
+  { q: "What do you call a burger at a fancy restaurant?", a: "Filet-mig-bun." },
+  { q: "Why don't burgers use GPS?", a: "They always follow their gut." },
+  { q: "What did the burger say on its birthday?", a: "This is the best day of my life — no mustard!" },
+  { q: "What do you call a burger that works out?", a: "A buff-alo burger." },
+  { q: "Why did the burger go to the art museum?", a: "To see the Mona Lizza." },
+  { q: "What do you call a burger that's also a philosopher?", a: "A deep-fried thinker." },
+  { q: "What's a burger's least favorite weather?", a: "Hail — it always ruins the bun." },
+  { q: "Why did the cowboy eat his burger so fast?", a: "He wanted to beat the grill before it got cold." },
+  { q: "What do you call a burger that's always late?", a: "A slow-broiled patty." },
+  { q: "Why did the burger get promoted?", a: "It always delivered the goods." },
+  { q: "What do you call a burger who gives great advice?", a: "A sage-and-onion patty." },
+  { q: "Why did the burger write a book?", a: "It had a lot of beef to get off its chest." },
+  { q: "What do you call a competitive burger?", a: "A grill-seeker." },
+  { q: "Why was the burger so calm under pressure?", a: "It had been well-grilled before." },
+  { q: "What did the burger say to the cheese?", a: "You complete me." },
+  { q: "Why did the burger get good grades?", a: "It was on a roll every day." },
+  { q: "What do you call a really fast burger?", a: "A speed patty." },
+  { q: "Why did the burger go to the beach?", a: "It heard the waves were well-done." },
+  { q: "What do you call a burger with great hair?", a: "A bun-dle of style." },
+  { q: "Why don't burgers argue?", a: "They always end up in a wrap." },
+  { q: "What did the burger say at the job interview?", a: "I really bring the heat." },
+  { q: "What do you call a burger that's obsessed with money?", a: "A cash-and-carry patty." },
+  { q: "Why was the burger a bad comedian?", a: "Its jokes were always half-baked." },
+  { q: "What do you call a paranoid burger?", a: "A well-done worrier." },
+  { q: "Why did the burger start meditating?", a: "It needed inner peas." },
+  { q: "What do you call a burger at a concert?", a: "A mosh-room Swiss melt." },
+  { q: "Why did the burger win at poker?", a: "It had the best all-in patty face." },
+  { q: "What do you call a burger that sings opera?", a: "Pava-patty." },
+  { q: "Why did the burger become a politician?", a: "It was great at flipping positions." },
+  { q: "What do you call a burger on a diet?", a: "A wishful patty." },
+  { q: "Why was the cheeseburger embarrassed?", a: "It saw the salad dressing." },
+  { q: "What do you call a tiny burger?", a: "A mini-moo." },
+  { q: "Why did the burger go to space?", a: "To find the Milky Whey sauce." },
+  { q: "What do you call a burger that knows karate?", a: "A chop-patty." },
+  { q: "Why did the burger get a tattoo?", a: "It wanted to show its grill marks." },
+  { q: "What's a burger's favorite sport?", a: "Sizzle-ball." },
+  { q: "Why did the burger get an umbrella?", a: "It heard there was a chance of meatballs." },
+  { q: "What do you call a burger that's also a lawyer?", a: "A legal tender patty." },
+  { q: "Why did the burger go to Vegas?", a: "It was feeling saucy." },
+  { q: "What do you call a married burger?", a: "A wedded patty." },
+  { q: "Why was the burger always tired?", a: "It was grilled every single day." },
+  { q: "What do you call a confused burger?", a: "A muddled meat." },
+  { q: "Why did the burger get lost in the mall?", a: "It couldn't find the exit bun." },
+  { q: "What do you call a burger who writes poetry?", a: "A tender bard." },
+  { q: "Why did the burger stay up all night?", a: "It was on the night grill." },
+  { q: "What do you call a burger that's really into fitness?", a: "A lean mean grilling machine." },
+  { q: "Why did the burger get a standing ovation?", a: "It was a real show-stopper with the ketchup." },
+  { q: "What do you call a fancy burger that drives a sports car?", a: "A Ferrari-Filet." },
+  { q: "Why did the burger go to the library?", a: "To find a good recipe for success." },
+  { q: "What do you call a burger that's a superhero?", a: "Patty Man." },
+  { q: "Why was the burger so stressed?", a: "Too much on its plate." },
+  { q: "What do you call a burger at a wedding?", a: "The best bun." },
+  { q: "Why did the burger file a police report?", a: "It got grilled by the detective." },
+  { q: "What do you call a scientifically advanced burger?", a: "A lab-grown patty." },
+  { q: "Why was the burger so good at chess?", a: "It always thought 10 moves a-head of lettuce." },
+  { q: "What do you call a burger who loves math?", a: "A calcu-patty-tor." },
+  { q: "Why did the burger get a standing desk?", a: "It was tired of being pressed all day." },
+  { q: "What do you call a burger in a suit?", a: "A formal patty-tion." },
+  { q: "Why did the burger go to acting school?", a: "It wanted to be in a bigger roll." },
+  { q: "What do you call a burger that's scared of the dark?", a: "A chicken burger." },
+  { q: "Why was the veggie burger always confident?", a: "It had a lot of guts — courgette ones." },
+  { q: "What do you call a burger that does magic tricks?", a: "The Great Patty-ni." },
+  { q: "Why did the burger win the marathon?", a: "Because it had great stamina and a good bun." },
+  { q: "What do you call a burger with a GPS?", a: "A navigate-your-way patty." },
+  { q: "Why did the burger go to the doctor?", a: "It had a bad case of the grill flu." },
+  { q: "What do you call a burger that's always right?", a: "A know-it-patty." },
+  { q: "Why did the burger take a selfie?", a: "For the 'gram — it was looking extra saucy." },
+  { q: "What do you call a burger that gardens?", a: "A ground beef planter." },
+  { q: "Why did the burger become a pilot?", a: "It always wanted to be high and well-done." },
+  { q: "What do you call a burger at a science fair?", a: "A lab-patty experiment." },
+  { q: "Why did the burger get a trophy?", a: "It was the meatiest performance of the year." },
+  { q: "What do you call a burger that's also a nurse?", a: "A first-aid patty." },
+  { q: "Why did the burger get sunburned?", a: "It forgot its bun-screen." },
+  { q: "What do you call a burger that's always early?", a: "A punctu-patty." },
+  { q: "Why did the burger go to the comedy club?", a: "It heard the crowd was hungry for laughs." },
+  { q: "What do you call a burger that loves to travel?", a: "A globe-trotter patty." },
+  { q: "Why did the burger get glasses?", a: "Too much screen-time — it was always watching the grill." },
+  { q: "What do you call a burger that moonlights as a DJ?", a: "DJ Patty Melt." },
+  { q: "Why did the burger start a podcast?", a: "It had a lot to say between the buns." },
+];
+
+function getDayOfYear() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  return Math.floor((now - start) / 86400000);
+}
+
+function initJokeOfTheDay() {
+  const joke = JOKES[getDayOfYear() % JOKES.length];
+  document.getElementById('joke-q').textContent = joke.q;
+  document.getElementById('joke-a').textContent = '👉 ' + joke.a;
+}
+
+window.toggleJoke = function() {
+  const a = document.getElementById('joke-a');
+  const hint = document.getElementById('joke-hint');
+  const revealed = a.classList.toggle('revealed');
+  hint.textContent = revealed ? 'Tap to hide 🙈' : 'Tap for punchline 👆';
+};
+
 function daysUntilLaborDay() {
   const now = new Date();
   let ld = laborDay(now.getFullYear());
@@ -817,6 +948,7 @@ function startApp(){
   document.getElementById('app-screen').style.display='block';
   document.getElementById('room-display').textContent=roomId;
   document.getElementById('stat-days').textContent=daysUntilLaborDay();
+  initJokeOfTheDay();
   if(spectatorMode){
     // Hide competitor-only tabs
     document.querySelectorAll('.tab-btn').forEach(b=>{
@@ -866,7 +998,6 @@ function render(){
   const sorted=[...players].sort((a,b)=>b.count-a.count);
   document.getElementById('stat-days').textContent=daysUntilLaborDay();
   document.getElementById('stat-finished').textContent=players.reduce((sum,p)=>sum+(p.count||0),0);
-  document.getElementById('stat-top').textContent=sorted.length?sorted[0].count:0;
   renderLeaderboard(sorted);
   renderBurgerGrid(sorted);
   renderMyTally();
