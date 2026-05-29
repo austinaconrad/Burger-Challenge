@@ -751,7 +751,8 @@ window.joinRoom = async function() {
     roomId=code; myPlayerId=uid(); myName=name;
     const {getDocs}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const pSnap=await getDocs(collection(db,'rooms',roomId,'players'));
-    const colorIdx=pSnap.size%COLORS.length;
+    const usedColors=new Set(pSnap.docs.map(d=>d.data().colorIdx));
+    const colorIdx=Array.from({length:COLORS.length},(_,i)=>i).find(i=>!usedColors.has(i))??pSnap.size%COLORS.length;
     await setDoc(doc(db,'rooms',roomId,'players',myPlayerId),{name,count:0,colorIdx,joinedAt:serverTimestamp(),logs:[]});
     saveSession(); startApp();
   } catch(e){ alert('Error: '+e.message); btn.disabled=false; btn.textContent='Join Challenge →'; }
@@ -951,6 +952,7 @@ function renderPlayersList(){
         <div class="player-row-name">${escHtml(p.name)}${isMe?' <span style="font-size:10px;color:var(--muted2);font-weight:400">(you)</span>':''}</div>
         <div class="player-row-sub">${p.count}/100 · ${Math.min(100,p.count)}% done</div>
       </div>
+      ${isMe?`<button class="delete-btn" onclick="rerollColor()" title="Change your color" style="font-size:14px">🎨</button>`:''}
       <button class="delete-btn" onclick="removePlayer('${p.id}')" title="${isMe?'Leave':'Remove'}">✕</button>
     </div>`;
   }).join('');
@@ -1141,10 +1143,26 @@ window.addExtraPlayer=async function(){
   const inp=document.getElementById('new-player-name');
   const name=inp.value.trim(); if(!name) return;
   try{
-    const colorIdx=players.length%COLORS.length;
+    const usedIdxs=new Set(players.map(p=>p.colorIdx));
+    const colorIdx=Array.from({length:COLORS.length},(_,i)=>i).find(i=>!usedIdxs.has(i))??players.length%COLORS.length;
     await addDoc(collection(db,'rooms',roomId,'players'),{name,count:0,colorIdx,joinedAt:serverTimestamp(),logs:[]});
     inp.value=''; showToast('👤 '+name+' added!');
   }catch(e){showToast('Error adding player')}
+};
+
+window.rerollColor=async function(){
+  const me=players.find(p=>p.id===myPlayerId);
+  if(!me) return;
+  const usedIdxs=new Set(players.filter(p=>p.id!==myPlayerId).map(p=>p.colorIdx));
+  const available=Array.from({length:COLORS.length},(_,i)=>i).filter(i=>!usedIdxs.has(i));
+  if(!available.length){showToast('No unused colors available');return;}
+  // Pick a random available color that's different from current
+  const choices=available.filter(i=>i!==me.colorIdx);
+  const newIdx=(choices.length?choices:available)[Math.floor(Math.random()*(choices.length||available.length))];
+  try{
+    await updateDoc(doc(db,'rooms',roomId,'players',myPlayerId),{colorIdx:newIdx});
+    showToast('🎨 Color updated!');
+  }catch(e){showToast('Error updating color');}
 };
 
 window.removePlayer=async function(playerId){
