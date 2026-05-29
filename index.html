@@ -171,18 +171,27 @@ h1{font-family:'Fredoka One',cursive;font-size:clamp(34px,8vw,56px);letter-spaci
 .lb-count{font-family:'Fredoka One',cursive;font-size:34px;line-height:1;min-width:48px;text-align:right;flex-shrink:0}
 
 /* ── ACHIEVEMENT BADGES ── */
-.badge-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
-.ach-badge{font-size:14px;cursor:pointer;position:relative;display:inline-block;transition:transform 0.15s}
-.ach-badge:hover{transform:scale(1.15)}
-.ach-badge.locked{filter:grayscale(1) brightness(0.35);opacity:0.55;cursor:pointer}
-.ach-badge.locked:hover,.ach-badge.locked.tip-open{filter:none;opacity:1}
+.badge-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;align-items:center}
+.ach-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:40px;height:40px;border-radius:50%;
+  background:rgba(0,0,0,0.35);
+  border:2px solid var(--bdg-color,rgba(245,200,66,0.6));
+  box-shadow:0 0 8px var(--bdg-glow,rgba(245,200,66,0.15)),inset 0 1px 0 rgba(255,255,255,0.08);
+  cursor:pointer;position:relative;
+  transition:transform 0.15s,box-shadow 0.2s,filter 0.2s,opacity 0.2s;
+  flex-shrink:0;
+}
+.ach-badge:hover{transform:scale(1.12);box-shadow:0 0 16px var(--bdg-glow,rgba(245,200,66,0.3)),inset 0 1px 0 rgba(255,255,255,0.1)}
+.ach-badge.locked{filter:grayscale(1) brightness(0.35);opacity:0.5}
+.ach-badge.locked:hover,.ach-badge.locked.tip-open{filter:none;opacity:1;transform:scale(1.12)}
 .ach-badge[data-tip]:hover::after,.ach-badge[data-tip].tip-open::after{
   content:attr(data-tip);
-  position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
   background:var(--surface3);border:1px solid var(--border2);color:var(--text);
   font-size:11px;font-family:'DM Sans',sans-serif;
-  padding:4px 8px;border-radius:6px;white-space:nowrap;pointer-events:none;z-index:20;
-  box-shadow:0 4px 12px rgba(0,0,0,0.5);
+  padding:5px 10px;border-radius:7px;white-space:nowrap;pointer-events:none;z-index:20;
+  box-shadow:0 4px 16px rgba(0,0,0,0.6);
 }
 .ach-badge.new-badge{animation:badgePop 0.5s cubic-bezier(0.34,1.56,0.64,1)}
 @keyframes badgePop{0%{transform:scale(0) rotate(-30deg)}80%{transform:scale(1.2) rotate(5deg)}100%{transform:scale(1) rotate(0)}}
@@ -470,17 +479,16 @@ const JPEG_QUALITY = 0.72;  // JPEG compression quality
 
 // ── ACHIEVEMENT DEFINITIONS ──────────────────────────────────────
 const ACHIEVEMENTS = {
-  double_down:     { emoji:'🍔🍔', label:'The Double Down',      tip:'Ate 2+ burgers in one day' },
-  vegans_nightmare:{ emoji:'😱🥗', label:"The Vegan's Nightmare", tip:'Ate burgers 5 days in a row' },
-  last_minute:     { emoji:'🌙⏰', label:'The Last Minute',       tip:'Logged a burger after 11 PM' },
-  opening_lap:     {
-    emoji:`<svg width="20" height="20" viewBox="0 0 20 20" style="vertical-align:middle;display:inline-block"><rect x="1" y="1" width="18" height="18" rx="3.5" fill="rgba(245,200,66,0.18)" stroke="rgba(245,200,66,0.75)" stroke-width="1.5"/><text x="10" y="13.5" text-anchor="middle" font-size="8" font-weight="800" font-family="monospace" fill="#F5C842" letter-spacing="1">01</text></svg>`,
-    label:'The Opening Lap', tip:'First in the group to log a burger'
+  double_down:     { label:'The Double Down',      tip:'Ate 2+ burgers in one day',              color:'rgba(245,180,42,0.7)',  glow:'rgba(245,180,42,0.22)', size:11, emoji:'🍔🍔' },
+  vegans_nightmare:{ label:"The Vegan's Nightmare", tip:'Ate burgers 5 days in a row',             color:'rgba(80,184,80,0.7)',   glow:'rgba(80,184,80,0.2)',   size:11, emoji:'😱🥗' },
+  last_minute:     { label:'The Last Minute',       tip:'Logged a burger after 11 PM',             color:'rgba(140,100,230,0.7)', glow:'rgba(140,100,230,0.2)', size:11, emoji:'🌙⏰' },
+  opening_lap:     { label:'The Opening Lap',       tip:'First in the group to log a burger',      color:'rgba(220,80,60,0.7)',   glow:'rgba(220,80,60,0.2)',   size:null,
+    emoji:`<svg width="24" height="16" viewBox="0 0 24 16"><rect x="1" y="1" width="22" height="14" rx="3" fill="rgba(220,80,60,0.2)" stroke="rgba(220,80,60,0.9)" stroke-width="1.5"/><text x="12" y="11.5" text-anchor="middle" font-size="9.5" font-weight="800" font-family="monospace" fill="#E87060" letter-spacing="1">01</text></svg>`
   },
-  back_to_back:    {
-    emoji:`<svg width="22" height="20" viewBox="0 0 22 20" style="vertical-align:middle;display:inline-block"><rect x="1" y="3" width="13" height="13" rx="3" fill="rgba(245,200,66,0.12)" stroke="rgba(245,200,66,0.55)" stroke-width="1.5"/><rect x="8" y="3" width="13" height="13" rx="3" fill="rgba(245,200,66,0.2)" stroke="rgba(245,200,66,0.8)" stroke-width="1.5"/></svg>`,
-    label:'The Back-to-Back', tip:'Ate 2 burgers within a 12-hour window'
+  back_to_back:    { label:'The Back-to-Back',      tip:'Ate 2 burgers within a 12-hour window',  color:'rgba(60,180,180,0.7)',  glow:'rgba(60,180,180,0.2)',  size:null,
+    emoji:`<svg width="22" height="16" viewBox="0 0 22 16"><rect x="1" y="1.5" width="12" height="12" rx="2.5" fill="rgba(60,180,180,0.12)" stroke="rgba(60,180,180,0.6)" stroke-width="1.5"/><rect x="9" y="1.5" width="12" height="12" rx="2.5" fill="rgba(60,180,180,0.25)" stroke="rgba(60,180,180,0.9)" stroke-width="1.5"/></svg>`
   },
+  weekend_warrior: { label:'The Weekend Warrior',   tip:'6 burgers in a single Fri–Sun window',   color:'rgba(180,90,230,0.7)',  glow:'rgba(180,90,230,0.2)', size:18, emoji:'⚔️' },
 };
 
 let app, db, unsubscribe, unsubMessages;
@@ -617,6 +625,21 @@ function computeAchievements(p, allPlayers) {
     const diff = new Date(sortedLogs[i]) - new Date(sortedLogs[i-1]);
     if (diff > 0 && diff <= 12 * 3600000) { earned.push('back_to_back'); break; }
   }
+
+  // Weekend Warrior: 6+ logs in a single Fri morning – Sun night window
+  const weekendCounts = {};
+  logs.forEach(ts => {
+    const d = new Date(ts);
+    const dow = d.getDay(); // 0=Sun, 5=Fri, 6=Sat
+    if (dow === 0 || dow === 5 || dow === 6) {
+      const fri = new Date(d);
+      if (dow === 0) fri.setDate(d.getDate() - 2);
+      else if (dow === 6) fri.setDate(d.getDate() - 1);
+      const key = `${fri.getFullYear()}-${fri.getMonth()}-${fri.getDate()}`;
+      weekendCounts[key] = (weekendCounts[key] || 0) + 1;
+    }
+  });
+  if (Object.values(weekendCounts).some(v => v >= 6)) earned.push('weekend_warrior');
 
   // Opening Lap: first person in the group to ever log a burger
   if (logs.length > 0 && allPlayers && allPlayers.length > 0) {
@@ -835,7 +858,8 @@ function renderLeaderboard(sorted){
     const badgesHtml=`<div class="badge-row">${Object.entries(ACHIEVEMENTS).map(([k,a])=>{
       const earned=achievements.includes(k);
       const tip=earned?`${a.label}: ${a.tip}`:`🔒 Locked — ${a.tip}`;
-      return `<span class="ach-badge${earned?'':' locked'}" data-tip="${tip}" onclick="toggleTip(this)">${a.emoji}</span>`;
+      const st=`--bdg-color:${a.color};--bdg-glow:${a.glow};${a.size?`font-size:${a.size}px`:''}`;
+      return `<span class="ach-badge${earned?'':' locked'}" data-tip="${tip}" onclick="toggleTip(this)" style="${st}">${a.emoji}</span>`;
     }).join('')}</div>`;
 
     const iciclesHtml=isFrozen?`<div class="icicles">${Array.from({length:18},(_,j)=>`<div class="icicle" style="height:${6+Math.sin(j*1.3)*4}px;opacity:${0.6+Math.random()*0.4};animation-delay:${j*0.08}s"></div>`).join('')}</div>`:'';
@@ -893,8 +917,12 @@ function renderMyTally(){
   const cc=colorClass(me.colorIdx);
   const pct=Math.min(100,me.count), isDone=me.count>=100;
   const achievements=computeAchievements(me,players);
-  const badgesHtml=achievements.length
-    ?`<div class="badge-row" style="padding:0 16px 12px">${achievements.map(k=>`<span class="ach-badge" data-tip="${ACHIEVEMENTS[k].label}">${ACHIEVEMENTS[k].emoji}</span>`).join('')}</div>`:'';
+  const badgesHtml=`<div class="badge-row" style="padding:0 16px 12px">${Object.entries(ACHIEVEMENTS).map(([k,a])=>{
+    const earned=achievements.includes(k);
+    const tip=earned?`${a.label}: ${a.tip}`:`🔒 Locked — ${a.tip}`;
+    const st=`--bdg-color:${a.color};--bdg-glow:${a.glow};${a.size?`font-size:${a.size}px`:''}`;
+    return `<span class="ach-badge${earned?'':' locked'}" data-tip="${tip}" onclick="toggleTip(this)" style="${st}">${a.emoji}</span>`;
+  }).join('')}</div>`;
   area.innerHTML=`<div class="my-tally-card ${cc} ${isDone?'complete':''}">
     <div class="tally-bun-top"></div>
     <div class="tally-top">
