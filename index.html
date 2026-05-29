@@ -911,7 +911,7 @@ function renderPlayersList(){
         <div class="player-row-name">${escHtml(p.name)}${isMe?' <span style="font-size:10px;color:var(--muted2);font-weight:400">(you)</span>':''}</div>
         <div class="player-row-sub">${p.count}/100 · ${Math.min(100,p.count)}% done</div>
       </div>
-      ${isMe?`<button class="delete-btn" onclick="removeMe()" title="Leave">✕</button>`:''}
+      <button class="delete-btn" onclick="removePlayer('${p.id}')" title="${isMe?'Leave':'Remove'}">✕</button>
     </div>`;
   }).join('');
 }
@@ -1034,6 +1034,17 @@ window.addExtraPlayer=async function(){
   }catch(e){showToast('Error adding player')}
 };
 
+window.removePlayer=async function(playerId){
+  const isMe = playerId === myPlayerId;
+  const target = players.find(p=>p.id===playerId);
+  const name = target ? target.name : 'this player';
+  const msg = isMe ? 'Leave the challenge?' : `Remove ${name} from the challenge?`;
+  if(!confirm(msg)) return;
+  try {
+    await deleteDoc(doc(db,'rooms',roomId,'players',playerId));
+    if(isMe){ localStorage.removeItem('bc_session'); location.reload(); }
+  } catch(e){ alert('Error: '+e.message); }
+};
 window.removeMe=async function(){
   if(!confirm('Remove yourself from this room?')) return;
   try{
