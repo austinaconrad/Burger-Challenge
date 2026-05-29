@@ -299,13 +299,12 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 #flappy-canvas{
   display:block;
   width:100%;max-width:360px;
-  aspect-ratio:9/14;
+  height:500px;
   border-radius:var(--radius);
   border:1px solid rgba(0,0,0,0.10);
   box-shadow:0 4px 24px rgba(0,0,0,0.10);
   touch-action:none;
   cursor:pointer;
-  background:#E0F2FE;
 }
 .flappy-scores-wrap{width:100%;max-width:380px}
 .flappy-scores-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.10em;font-weight:600;margin-bottom:8px}
@@ -1267,7 +1266,7 @@ function _startFlappy() {
   }
 
   function loop() {
-    if (flappyRAF === null) return;
+    if (!flappyRAF) return;
     flappyRAF = requestAnimationFrame(loop);
 
     if (state === 'playing') {
@@ -1288,8 +1287,8 @@ function _startFlappy() {
     draw();
   }
 
-  flappyRAF = 0; // mark as active (non-null)
-  flappyRAF = requestAnimationFrame(loop);
+  flappyRAF = true;
+  loop();
 }
 
 // ── Firebase high-score helpers ──────────────────────────────────
