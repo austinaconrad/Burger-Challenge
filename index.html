@@ -301,6 +301,30 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .map-popup-stars{font-size:15px;margin-bottom:6px}
 .map-popup-time{font-size:11px;color:var(--muted);font-weight:400}
 .map-section-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.10em;font-weight:600;margin:16px 0 8px}
+/* ── MAP FEED ── */
+.map-feed-wrap{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
+.map-feed-empty{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px}
+.map-feed-card{
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:var(--radius-sm);
+  padding:11px 14px;
+  display:flex;align-items:center;gap:12px;
+  cursor:pointer;
+  transition:background 0.15s,border-color 0.15s,transform 0.1s;
+  box-shadow:0 2px 12px rgba(0,0,0,0.25);
+}
+.map-feed-card:hover{background:rgba(255,255,255,0.055);border-color:rgba(255,255,255,0.15)}
+.map-feed-card:active{transform:scale(0.98)}
+.map-feed-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;font-family:'Inter',sans-serif}
+.map-feed-body{flex:1;min-width:0}
+.map-feed-name{font-size:12px;font-weight:700;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.map-feed-restaurant{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.map-feed-meta{display:flex;align-items:center;gap:6px;margin-top:3px}
+.map-feed-stars{font-size:11px;line-height:1;letter-spacing:-1px}
+.map-feed-time{font-size:10px;color:var(--muted2);font-weight:400}
+.map-feed-arrow{font-size:14px;color:var(--muted);flex-shrink:0;transition:color 0.15s}
+.map-feed-card:hover .map-feed-arrow{color:var(--amber)}
 </style>
 </head>
 <body>
@@ -436,6 +460,8 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
       </div>
       <div class="map-section-label">All Burger Locations</div>
       <div id="map-legend" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px"></div>
+      <div class="map-section-label">Recent Burger Spots</div>
+      <div id="map-feed" class="map-feed-wrap"></div>
     </div>
 
   </div>
@@ -1382,6 +1408,88 @@ function renderBurgerMap() {
     burgerMap.fitBounds(group.getBounds().pad(0.25), {maxZoom:8});
   }
   burgerMap.invalidateSize();
+
+  // ── ACTIVITY FEED ──────────────────────────────────────────────
+  const feedEl = document.getElementById('map-feed');
+  if (!feedEl) return;
+
+  // Collect all GPS-logged entries across all players, newest first
+  const feedItems = [];
+  players.forEach((p, pi) => {
+    const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
+    const ini = p.name.trim().split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
+    (p.logs || []).forEach((entry, ei) => {
+      const ts = logTs(entry);
+      const lat = typeof entry === 'object' && entry.lat;
+      const lng = typeof entry === 'object' && entry.lng;
+      if (!lat || !lng) return; // only show pinned burgers
+      feedItems.push({
+        player: p, color, ini,
+        restaurant: (typeof entry === 'object' && entry.restaurant) || 'Unknown spot',
+        rating: (typeof entry === 'object' && entry.rating) || 0,
+        ts, lat, lng,
+        markerIdx: mapMarkers.findIndex(m => {
+          const ll = m.getLatLng();
+          return Math.abs(ll.lat - lat) < 0.0001 && Math.abs(ll.lng - lng) < 0.0001;
+        }),
+      });
+    });
+  });
+  feedItems.sort((a, b) => new Date(b.ts) - new Date(a.ts));
+
+  if (!feedItems.length) {
+    feedEl.innerHTML = '<div class="map-feed-empty">No pinned burgers yet — log one with location on!</div>';
+    return;
+  }
+
+  function feedTimeStr(ts) {
+    if (!ts) return '';
+    const d = new Date(ts);
+    if (isNaN(d)) return '';
+    const now = new Date();
+    const isToday = d.toDateString() === now.toDateString();
+    const time = d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', hour12:true});
+    if (isToday) return 'Today at ' + time;
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return months[d.getMonth()] + ' ' + d.getDate() + ' at ' + time;
+  }
+
+  function feedStars(n) {
+    return '⭐'.repeat(Math.max(0, Math.min(5, n || 0))) || '<span style="color:var(--muted);font-size:10px">No rating</span>';
+  }
+
+  feedEl.innerHTML = feedItems.slice(0, 20).map((item, idx) => `
+    <div class="map-feed-card" data-feed-idx="${idx}">
+      <div class="map-feed-avatar" style="background:${item.color}22;border:2px solid ${item.color};color:${item.color}">${item.ini}</div>
+      <div class="map-feed-body">
+        <div class="map-feed-name" style="color:${item.color}">${escHtml(item.player.name)}</div>
+        <div class="map-feed-restaurant">${escHtml(item.restaurant)}</div>
+        <div class="map-feed-meta">
+          <span class="map-feed-stars">${feedStars(item.rating)}</span>
+          <span style="color:var(--muted);font-size:10px">·</span>
+          <span class="map-feed-time">${feedTimeStr(item.ts)}</span>
+        </div>
+      </div>
+      <div class="map-feed-arrow">›</div>
+    </div>
+  `).join('');
+
+  // Store feed items for click handler
+  window._feedItems = feedItems;
+
+  feedEl.querySelectorAll('.map-feed-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const idx = +card.dataset.feedIdx;
+      const item = window._feedItems[idx];
+      if (!item) return;
+      // Switch to map tab if not already there (shouldn't happen but safe)
+      const coord = [item.lat, item.lng];
+      burgerMap.flyTo(coord, 15, {animate: true, duration: 0.8});
+      if (item.markerIdx >= 0 && mapMarkers[item.markerIdx]) {
+        setTimeout(() => mapMarkers[item.markerIdx].openPopup(), 850);
+      }
+    });
+  });
 }
 </script>
 </body>
