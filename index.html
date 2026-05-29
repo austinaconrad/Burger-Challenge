@@ -327,7 +327,6 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 /* ── MAP TAB ── */
 .map-wrap{position:relative;border-radius:12px;overflow:hidden;border:1px solid #333;box-shadow:0 4px 20px rgba(0,0,0,0.6);margin:0 2px}
 #burger-map{width:100%;height:520px}
-#burger-map .leaflet-tile-pane{filter:contrast(1.25) brightness(1.15);}
 .leaflet-popup-content-wrapper{background:var(--surface2)!important;border:1px solid var(--border2)!important;border-radius:12px!important;box-shadow:0 4px 24px rgba(0,0,0,0.6)!important;color:var(--text)!important;padding:0!important}
 .leaflet-popup-content{margin:0!important;padding:0!important}
 .leaflet-popup-tip{background:var(--surface2)!important}
@@ -1301,7 +1300,7 @@ function renderBurgerMap() {
       maxBounds: [[36.5,-90],[44.5,-78]],
       maxBoundsViscosity: 0.85,
     });
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/">CARTO</a>',
       subdomains: 'abcd', maxZoom: 20
     }).addTo(burgerMap);
