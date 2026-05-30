@@ -500,9 +500,7 @@ const ACHIEVEMENTS = {
   double_down:     { label:'The Double Down',      tip:'Ate 2+ burgers in one day',              color:'rgba(245,180,42,0.7)',  glow:'rgba(245,180,42,0.22)', size:11, emoji:'🍔🍔' },
   vegans_nightmare:{ label:"The Vegan's Nightmare", tip:'Ate burgers 5 days in a row',             color:'rgba(80,184,80,0.7)',   glow:'rgba(80,184,80,0.2)',   size:11, emoji:'😱🥗' },
   last_minute:     { label:'The Last Minute',       tip:'Logged a burger after 11 PM',             color:'rgba(140,100,230,0.7)', glow:'rgba(140,100,230,0.2)', size:11, emoji:'🌙⏰' },
-  opening_lap:     { label:'The Opening Lap',       tip:'First in the group to log a burger',      color:'rgba(220,80,60,0.7)',   glow:'rgba(220,80,60,0.2)',   size:null,
-    emoji:`<svg width="24" height="16" viewBox="0 0 24 16"><rect x="1" y="1" width="22" height="14" rx="3" fill="rgba(220,80,60,0.2)" stroke="rgba(220,80,60,0.9)" stroke-width="1.5"/><text x="12" y="11.5" text-anchor="middle" font-size="9.5" font-weight="800" font-family="monospace" fill="#E87060" letter-spacing="1">01</text></svg>`
-  },
+  state_trooper:   { label:'State Trooper',           tip:'Logged a burger outside of Ohio',         color:'rgba(56,189,248,0.7)', glow:'rgba(56,189,248,0.2)', size:13, emoji:'🗺️' },
   back_to_back:    { label:'The Back-to-Back',      tip:'Ate 2 burgers within a 12-hour window',  color:'rgba(60,180,180,0.7)',  glow:'rgba(60,180,180,0.2)',  size:null,
     emoji:`<svg width="22" height="16" viewBox="0 0 22 16"><rect x="1" y="1.5" width="12" height="12" rx="2.5" fill="rgba(60,180,180,0.12)" stroke="rgba(60,180,180,0.6)" stroke-width="1.5"/><rect x="9" y="1.5" width="12" height="12" rx="2.5" fill="rgba(60,180,180,0.25)" stroke="rgba(60,180,180,0.9)" stroke-width="1.5"/></svg>`
   },
@@ -726,13 +724,12 @@ function computeAchievements(p, allPlayers) {
   });
   if (Object.values(weekendCounts).some(v => v >= 6)) earned.push('weekend_warrior');
 
-  if (logs.length > 0 && allPlayers && allPlayers.length > 0) {
-    const myFirst = new Date(sortedLogs[0]).getTime();
-    const everyoneElseFirst = allPlayers
-      .filter(op => op.id !== p.id && op.logs && op.logs.length > 0)
-      .map(op => new Date([...op.logs].sort()[0]).getTime());
-    if (everyoneElseFirst.every(t => myFirst <= t)) earned.push('opening_lap');
-  }
+  // Ohio bounding box: lat 38.4–42.3, lng -84.8–-80.5
+  const outsideOhio = (p.logs || []).some(entry =>
+    typeof entry === 'object' && entry.lat && entry.lng &&
+    (entry.lat < 38.4 || entry.lat > 42.3 || entry.lng < -84.8 || entry.lng > -80.5)
+  );
+  if (outsideOhio) earned.push('state_trooper');
   return earned;
 }
 
