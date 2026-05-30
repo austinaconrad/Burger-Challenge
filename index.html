@@ -966,6 +966,7 @@ function renderLeaderboard(sorted){
           ${isMe?'<span class="me-badge">You</span>':''}
           ${isDone?'<span class="done-badge">Done!</span>':''}
         </div>
+        <div class="mini-bar-wrap"><div class="mini-bar-fill ${cc}" style="width:${pct}%"></div></div>
         ${(()=>{
           const gpsLogs = (p.logs||[]).filter(e=>typeof e==='object'&&e.lat&&e.lng);
           if(!gpsLogs.length) return '';
@@ -975,7 +976,6 @@ function renderLeaderboard(sorted){
           const starsStr = stars ? ` · ${stars}` : '';
           return `<div class="player-last-spot" onclick="panMapToSpot(${last.lat},${last.lng})" title="View on map">📍 ${label}${starsStr}</div>`;
         })()}
-        <div class="mini-bar-wrap"><div class="mini-bar-fill ${cc}" style="width:${pct}%"></div></div>
       </div>
       <div class="badge-col">${badgesHtml}</div>
       <div class="lb-score">
