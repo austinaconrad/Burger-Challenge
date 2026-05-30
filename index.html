@@ -201,7 +201,7 @@ button{transition:transform 0.1s ease}
 .receipt-total-row.grand span:first-child{font-size:16px;color:#1A1A1A}
 .receipt-footer-txt{font-family:monospace;font-size:9px;color:#888;text-align:center;letter-spacing:0.1em;line-height:1.8;margin-top:2px;text-transform:uppercase}
 .receipt-progress{height:3px;background:#E0D8CC;border-radius:999px;margin-top:14px;overflow:hidden}
-.receipt-progress-fill{height:100%;background:linear-gradient(90deg,#B45309,#F59E0B);border-radius:999px;width:100%;transform-origin:left;animation:receiptDrain 10s linear forwards}
+.receipt-progress-fill{height:100%;background:linear-gradient(90deg,#B45309,#F59E0B);border-radius:999px;width:100%;transform-origin:left;animation:receiptDrain 8s linear forwards}
 @keyframes receiptDrain{from{transform:scaleX(1)}to{transform:scaleX(0)}}
 .my-tally-card.complete{border-color:rgba(34,197,94,0.30);box-shadow:0 0 0 1.5px rgba(34,197,94,0.20),0 4px 24px rgba(0,0,0,0.4)}
 .tally-bun-top{height:3px;background:linear-gradient(90deg,var(--amber-dark),#F59E0B,var(--amber-mid),#F59E0B,var(--amber-dark));opacity:0.8}
@@ -1467,7 +1467,7 @@ window.confirmBurger = async function() {
     setTimeout(() => {
       receipt.classList.remove('show');
       receipt.classList.add('hide');
-    }, 10000);
+    }, 8000);
   }
 };
 
