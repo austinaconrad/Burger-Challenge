@@ -436,54 +436,62 @@ button{transition:transform 0.1s ease}
 .hw-board{padding:4px 2px 16px}
 .hw-header{font-size:9px;color:var(--muted);text-align:center;margin-bottom:10px;letter-spacing:0.04em;font-weight:500}
 .hw-track{position:relative}
-.hw-rows{display:flex;flex-direction:column;gap:0}
-/* Road strip per row — dashed lane via repeating gradient, visible only in gaps */
+.hw-rows{display:flex;flex-direction:column;gap:10px;overflow:visible}
+/* Road strip — solid background pill per row */
 .hw-row{
   display:flex;flex-direction:row;gap:2px;
+  background:rgba(255,255,255,0.04);
   border-radius:999px;
   padding:3px 4px;
   position:relative;
-  margin-bottom:0;
-  /* solid lane colour + dashed centre line combined */
-  background-color:rgba(255,255,255,0.04);
-  background-image:repeating-linear-gradient(
-    to right,
-    rgba(255,255,255,0.14) 0px, rgba(255,255,255,0.14) 5px,
-    transparent 5px, transparent 12px
-  );
-  background-position:center;
-  background-size:100% 1px;
-  background-repeat:repeat-x;
+  overflow:visible;
+}
+/* ::before — straight horizontal road line running behind all circles */
+.hw-row::before{
+  content:'';
+  position:absolute;
+  top:50%;left:4px;right:4px;
+  height:3px;
+  background:rgba(255,255,255,0.07);
+  border-radius:999px;
+  transform:translateY(-50%);
+  z-index:0;
+  pointer-events:none;
+}
+/* ::after — U-turn curve bridging the 10px gap up to the row above */
+/* Right turn (L→R rows exit right): C-shape opening LEFT */
+.hw-row.hw-turn-right::after{
+  content:'';
+  position:absolute;
+  right:0;
+  top:calc(-10px);
+  width:calc(10% + 4px);
+  height:calc(100% + 10px);
+  border-top:2px solid rgba(255,255,255,0.16);
+  border-right:2px solid rgba(255,255,255,0.16);
+  border-bottom:2px solid rgba(255,255,255,0.16);
+  border-left:none;
+  border-radius:0 18px 18px 0;
+  z-index:0;
+  pointer-events:none;
+}
+/* Left turn (R→L rows exit left): C-shape opening RIGHT */
+.hw-row.hw-turn-left::after{
+  content:'';
+  position:absolute;
+  left:0;
+  top:calc(-10px);
+  width:calc(10% + 4px);
+  height:calc(100% + 10px);
+  border-top:2px solid rgba(255,255,255,0.16);
+  border-left:2px solid rgba(255,255,255,0.16);
+  border-bottom:2px solid rgba(255,255,255,0.16);
+  border-right:none;
+  border-radius:18px 0 0 18px;
+  z-index:0;
+  pointer-events:none;
 }
 .hw-row-rev{flex-direction:row-reverse}
-/* U-turn connectors — narrow C-shape at the edge only */
-.hw-turn{
-  height:16px;
-  width:calc(10% + 2px); /* matches ~one circle width */
-  box-sizing:border-box;
-  flex-shrink:0;
-  margin:0;
-}
-/* Right edge: road exits right → curves around → re-enters right row above */
-/* C-shape opening LEFT: top + right + bottom borders */
-.hw-turn-right{
-  align-self:flex-end;
-  border-top:2px solid rgba(255,255,255,0.14);
-  border-right:2px solid rgba(255,255,255,0.14);
-  border-bottom:2px solid rgba(255,255,255,0.14);
-  border-left:none;
-  border-radius:0 14px 14px 0;
-}
-/* Left edge: road exits left → curves around → re-enters left row above */
-/* C-shape opening RIGHT: top + left + bottom borders */
-.hw-turn-left{
-  align-self:flex-start;
-  border-top:2px solid rgba(255,255,255,0.14);
-  border-left:2px solid rgba(255,255,255,0.14);
-  border-bottom:2px solid rgba(255,255,255,0.14);
-  border-right:none;
-  border-radius:14px 0 0 14px;
-}
 /* Spaces — solid background so dashed lane line doesn't bleed through */
 .hw-space{
   flex:1;min-width:0;aspect-ratio:1;border-radius:50%;
@@ -1785,20 +1793,18 @@ function renderHighway() {
   for (let vRow = 0; vRow < 10; vRow++) {
     const rowFromBottom = 9 - vRow;          // 9 at top, 0 at bottom
     const startSpace = rowFromBottom * 10 + 1; // 91, 81, …, 1
-    const isRev = rowFromBottom % 2 === 1;    // odd rows from bottom go R→L
+    const isRev = rowFromBottom % 2 === 1; // odd rows from bottom go R→L
 
-    // Turn connector above this row (skip for the very top row)
-    const showTurn = vRow > 0;
-    const prevRowFromBottom = rowFromBottom + 1;
-    const prevIsRev = prevRowFromBottom % 2 === 1;
-    // The previous row ends on the RIGHT if it went L→R (prevIsRev=false), LEFT if R→L
-    const turnSide = prevIsRev ? 'left' : 'right';
-
-    if (showTurn) {
-      rowsHtml += `<div class="hw-turn hw-turn-${turnSide}"></div>`;
+    // Every row except the top one gets a U-turn class on the appropriate edge.
+    // L→R rows (even rowFromBottom) exit on the RIGHT → hw-turn-right
+    // R→L rows (odd rowFromBottom) exit on the LEFT  → hw-turn-left
+    // Top row (rowFromBottom === 9) has no row above → no turn
+    let turnClass = '';
+    if (rowFromBottom < 9) {
+      turnClass = rowFromBottom % 2 === 0 ? ' hw-turn-right' : ' hw-turn-left';
     }
 
-    rowsHtml += `<div class="hw-row${isRev ? ' hw-row-rev' : ''}">`;
+    rowsHtml += `<div class="hw-row${isRev ? ' hw-row-rev' : ''}${turnClass}">`;
     for (let i = 0; i < 10; i++) {
       const n = startSpace + i;
       const ms = HW_MILESTONES[n];
