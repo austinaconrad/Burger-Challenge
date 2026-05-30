@@ -1414,9 +1414,7 @@ window.confirmBurger = async function() {
   const stars = '⭐'.repeat(pendingRating) || '—';
   const pattyLabel = count === 1 ? 'Single' : count === 2 ? 'Double' : 'Triple';
 
-  for (let i = 0; i < count; i++) {
-    await changeMyCountWithDetails(1, restaurant, pendingRating, i === 0 ? pendingGPS : null);
-  }
+  await changeMyCountWithDetails(1, restaurant, pendingRating, pendingGPS);
 
   // Reset builder
   document.getElementById('burger-detail').classList.remove('open');
@@ -1453,7 +1451,7 @@ window.confirmBurger = async function() {
       <hr class="receipt-dash"/>
       <div class="receipt-total-row grand">
         <span>Total Burgers</span>
-        <span>+${count} 🍔</span>
+        <span>+1 🍔</span>
       </div>
       <hr class="receipt-dash"/>
       <div class="receipt-footer-txt">THANK YOU, ${escHtml(myName).toUpperCase()}<br>HEADING TO LEADERBOARD…</div>
