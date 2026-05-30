@@ -1457,7 +1457,7 @@ window.confirmBurger = async function() {
         <span>+1 🍔</span>
       </div>
       <hr class="receipt-dash"/>
-      <div class="receipt-footer-txt">THANK YOU, ${escHtml(myName).toUpperCase()}<br>HEADING TO LEADERBOARD…</div>
+      <div class="receipt-footer-txt">THANK YOU, ${escHtml(myName).toUpperCase()}<br>KEEP EATING BURGERS!</div>
       <div class="receipt-progress"><div class="receipt-progress-fill"></div></div>
     `;
     receipt.classList.remove('hide');
@@ -1467,8 +1467,6 @@ window.confirmBurger = async function() {
     setTimeout(() => {
       receipt.classList.remove('show');
       receipt.classList.add('hide');
-      const ranksBtn = [...document.querySelectorAll('.tab-btn')].find(b => b.getAttribute('onclick')?.includes("'leaderboard'"));
-      if (ranksBtn) switchTab('leaderboard', ranksBtn);
     }, 10000);
   }
 };
