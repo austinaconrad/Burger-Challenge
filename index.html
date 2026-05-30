@@ -134,7 +134,7 @@ button{transition:transform 0.1s ease}
 .ring-inner{position:absolute;top:5px;left:5px;right:5px;bottom:5px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:none;font-family:'Inter',sans-serif}
 .rank-badge{font-size:20px;width:28px;text-align:center;flex-shrink:0;line-height:1}
 .player-info{flex:0 0 110px;width:110px;min-width:0;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
-.player-name{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;font-family:'Inter',sans-serif}
+.player-name{font-size:16px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;font-family:'Inter',sans-serif}
 .player-last-spot{font-size:10px;color:#a3a3a3;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:color 0.15s;line-height:1.3;font-weight:400}
 .player-last-spot:hover{color:var(--amber)}
 /* ── MICRO GRID ── */
@@ -1088,13 +1088,7 @@ function renderLeaderboard(sorted){
   const winners=players.filter(p=>p.count>=100);
   banner.style.display=winners.length?'block':'none';
   if(winners.length) banner.textContent='🎉 '+winners.map(p=>p.name).join(', ')+(winners.length===1?' has':' have')+' crushed 100 burgers!';
-  const hl = computeHeavyLifting(players);
-  const hlCard = document.getElementById('heavy-lifting-card');
-  if (hl && hlCard) {
-    hlCard.classList.add('visible');
-    document.getElementById('hl-name').textContent = hl.player.name;
-    document.getElementById('hl-count').textContent = hl.count;
-  } else if (hlCard) { hlCard.classList.remove('visible'); }
+  const hl = null; // Heavy lifting award removed
 
   if(!sorted.length){lb.innerHTML='';empty.style.display='block';return;}
   empty.style.display='none';
@@ -1105,8 +1099,6 @@ function renderLeaderboard(sorted){
     const isFirst=i===0&&p.count>0, isDone=p.count>=100, isMe=p.id===myPlayerId;
     const pct=Math.min(100,p.count);
     const achievements=computeAchievements(p,players);
-    const isHLWinner = hl && p.id === hl.player.id;
-
     const badgesHtml=`<div class="badge-row">${Object.entries(ACHIEVEMENTS).map(([k,a])=>{
       const earned=achievements.includes(k);
       const tip=earned?`${a.label}: ${a.tip}`:`🔒 Locked — ${a.tip}`;
@@ -1117,7 +1109,7 @@ function renderLeaderboard(sorted){
 
     return `<div class="lb-card ${cc} ${isFirst?'first-place':''} ${isDone?'complete':''} ${isMe?'is-me':''}">
       <div class="rank-badge">${i<3&&p.count>0?ranks[i]:i+1}</div>
-      ${ringAvatarHTML(p,48,isHLWinner?'🏋🏽‍♂️':null)}
+      ${ringAvatarHTML(p,48)}
       <div class="player-info">
         <div class="player-name">
           ${escHtml(p.name)}
