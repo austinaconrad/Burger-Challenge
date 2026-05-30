@@ -174,27 +174,32 @@ button{transition:transform 0.1s ease}
 /* ── ORDER RECEIPT ── */
 .order-receipt{
   position:absolute;top:0;left:0;right:0;z-index:10;
-  background:rgba(18,18,18,0.92);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  border-bottom:1px dashed rgba(245,158,11,0.4);
-  padding:18px 20px 16px;
-  text-align:center;
+  background:#F5F0E8;
+  border-bottom:3px solid #E8E0D0;
+  padding:22px 22px 18px;
   transform:translateY(-110%);
-  transition:transform 0.38s cubic-bezier(0.34,1.2,0.64,1), opacity 0.3s ease;
-  opacity:0;
-  pointer-events:none;
+  transition:transform 0.42s cubic-bezier(0.34,1.15,0.64,1),opacity 0.3s ease;
+  opacity:0;pointer-events:none;
+  box-shadow:0 8px 32px rgba(0,0,0,0.45);
 }
 .order-receipt.show{transform:translateY(0);opacity:1}
 .order-receipt.hide{transform:translateY(-110%);opacity:0}
-.receipt-header{font-size:9px;font-weight:700;letter-spacing:0.22em;color:var(--amber);text-transform:uppercase;margin-bottom:10px;font-family:'Inter',sans-serif}
-.receipt-divider{border:none;border-top:1px dashed rgba(255,255,255,0.12);margin:8px 0}
-.receipt-row{display:flex;justify-content:space-between;align-items:center;font-family:monospace;font-size:12px;color:var(--text);margin:4px 0;letter-spacing:0.04em}
-.receipt-row.total{font-size:14px;font-weight:700;color:var(--amber);margin-top:6px}
-.receipt-row span:last-child{color:var(--muted2);font-weight:400}
-.receipt-row.total span:last-child{color:var(--amber);font-weight:700}
-.receipt-footer{font-size:9px;color:var(--muted);margin-top:10px;letter-spacing:0.1em;font-family:'Inter',sans-serif}
-.receipt-progress{height:2px;background:rgba(255,255,255,0.08);border-radius:999px;margin-top:12px;overflow:hidden}
-.receipt-progress-fill{height:100%;background:linear-gradient(90deg,var(--amber-dark),var(--amber));border-radius:999px;width:100%;transform-origin:left;animation:receiptDrain 3s linear forwards}
+.receipt-title{font-family:monospace;font-size:17px;font-weight:900;color:#1A1A1A;letter-spacing:0.04em;margin-bottom:2px}
+.receipt-subtitle{font-family:monospace;font-size:10px;color:#666;letter-spacing:0.06em;line-height:1.6;margin-bottom:10px}
+.receipt-dash{border:none;border-top:1px dashed #BBBBBB;margin:10px 0}
+.receipt-meta{display:flex;justify-content:space-between;font-family:monospace;font-size:9px;color:#888;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px}
+.receipt-items{margin:8px 0}
+.receipt-item{display:flex;align-items:baseline;font-family:monospace;font-size:12px;color:#1A1A1A;margin:5px 0;gap:6px}
+.receipt-item-qty{width:14px;flex-shrink:0;color:#555}
+.receipt-item-name{flex:1;text-align:center}
+.receipt-item-price{color:#1A1A1A;font-weight:600;white-space:nowrap}
+.receipt-total-row{display:flex;justify-content:space-between;align-items:baseline;font-family:monospace;margin:4px 0}
+.receipt-total-row.grand{font-size:16px;font-weight:900;color:#1A1A1A;margin-top:6px}
+.receipt-total-row span:first-child{font-size:13px;color:#555}
+.receipt-total-row.grand span:first-child{font-size:16px;color:#1A1A1A}
+.receipt-footer-txt{font-family:monospace;font-size:9px;color:#888;text-align:center;letter-spacing:0.1em;line-height:1.8;margin-top:2px;text-transform:uppercase}
+.receipt-progress{height:3px;background:#E0D8CC;border-radius:999px;margin-top:14px;overflow:hidden}
+.receipt-progress-fill{height:100%;background:linear-gradient(90deg,#B45309,#F59E0B);border-radius:999px;width:100%;transform-origin:left;animation:receiptDrain 10s linear forwards}
 @keyframes receiptDrain{from{transform:scaleX(1)}to{transform:scaleX(0)}}
 .my-tally-card.complete{border-color:rgba(34,197,94,0.30);box-shadow:0 0 0 1.5px rgba(34,197,94,0.20),0 4px 24px rgba(0,0,0,0.4)}
 .tally-bun-top{height:3px;background:linear-gradient(90deg,var(--amber-dark),#F59E0B,var(--amber-mid),#F59E0B,var(--amber-dark));opacity:0.8}
@@ -1425,30 +1430,51 @@ window.confirmBurger = async function() {
   const receipt = document.getElementById('order-receipt');
   if (receipt) {
     const now = new Date();
+    const dateStr = (now.getMonth()+1).toString().padStart(2,'0') + '/' + now.getDate().toString().padStart(2,'0') + '/' + now.getFullYear();
     const timeStr = now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', hour12:true});
+    const starsDisplay = pendingRating ? '⭐'.repeat(pendingRating) + ' (' + pendingRating + '/5)' : 'No rating';
     receipt.innerHTML = `
-      <div class="receipt-header">🍔 Order Confirmed</div>
-      <hr class="receipt-divider"/>
-      <div class="receipt-row"><span>${escHtml(myName)}</span><span>${timeStr}</span></div>
-      <div class="receipt-row"><span>${pattyLabel} Burger</span><span>${escHtml(restaurant)}</span></div>
-      <div class="receipt-row"><span>Rating</span><span>${stars}</span></div>
-      <hr class="receipt-divider"/>
-      <div class="receipt-row total"><span>+${count} BURGER${count > 1 ? 'S' : ''} LOGGED</span><span>🏆</span></div>
-      <div class="receipt-footer">Redirecting to leaderboard…</div>
+      <div class="receipt-title">100 BURGER CHALLENGE</div>
+      <div class="receipt-subtitle">THE SUMMER GRIND<br>ROOM: ${escHtml(roomId)}</div>
+      <hr class="receipt-dash"/>
+      <div class="receipt-meta"><span>DATE: ${dateStr}</span><span>TIME: ${timeStr}</span></div>
+      <hr class="receipt-dash"/>
+      <div class="receipt-items">
+        <div class="receipt-item">
+          <span class="receipt-item-qty">${count}x</span>
+          <span class="receipt-item-name">${pattyLabel} Burger</span>
+          <span class="receipt-item-price">LOGGED</span>
+        </div>
+        <div class="receipt-item">
+          <span class="receipt-item-qty"></span>
+          <span class="receipt-item-name">${escHtml(restaurant)}</span>
+          <span class="receipt-item-price"></span>
+        </div>
+        <div class="receipt-item">
+          <span class="receipt-item-qty"></span>
+          <span class="receipt-item-name">${starsDisplay}</span>
+          <span class="receipt-item-price"></span>
+        </div>
+      </div>
+      <hr class="receipt-dash"/>
+      <div class="receipt-total-row grand">
+        <span>Total Burgers</span>
+        <span>+${count} 🍔</span>
+      </div>
+      <hr class="receipt-dash"/>
+      <div class="receipt-footer-txt">THANK YOU, ${escHtml(myName).toUpperCase()}<br>HEADING TO LEADERBOARD…</div>
       <div class="receipt-progress"><div class="receipt-progress-fill"></div></div>
     `;
-    // Force reflow then slide in
     receipt.classList.remove('hide');
     void receipt.offsetWidth;
     receipt.classList.add('show');
 
-    // After 3s slide out and switch tabs
     setTimeout(() => {
       receipt.classList.remove('show');
       receipt.classList.add('hide');
       const ranksBtn = [...document.querySelectorAll('.tab-btn')].find(b => b.getAttribute('onclick')?.includes("'leaderboard'"));
       if (ranksBtn) switchTab('leaderboard', ranksBtn);
-    }, 3000);
+    }, 10000);
   }
 };
 
