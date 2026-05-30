@@ -1442,7 +1442,7 @@ window.confirmBurger = async function() {
       <hr class="receipt-dash"/>
       <div class="receipt-items">
         <div class="receipt-item">
-          <span class="receipt-item-qty">${count}x</span>
+          <span class="receipt-item-qty"></span>
           <span class="receipt-item-price">LOGGED</span>
         </div>
         <div style="font-family:monospace;font-size:12px;color:#1A1A1A;text-align:center;line-height:1.9;margin:4px 0">
@@ -1648,22 +1648,14 @@ if(IS_CONFIGURED && loadSession()){initFirebase();startApp();}
 
   function onBurgerTap(e) {
     if (eggActive) return;
-    const now = Date.now();
-    if (now - lastTap > 500) tapCount = 0; // reset if too slow
-    lastTap = now;
-    tapCount++;
-
-    if (tapCount === 3) {
-      tapCount = 0;
-      // Pop animation on all burger decos
-      document.querySelectorAll('.burger-deco').forEach(el => {
-        el.classList.remove('egg-pop');
-        void el.offsetWidth; // reflow
-        el.classList.add('egg-pop');
-        setTimeout(() => el.classList.remove('egg-pop'), 400);
-      });
-      setTimeout(launchFireworks, 50);
-    }
+    // Pop animation on all burger decos
+    document.querySelectorAll('.burger-deco').forEach(el => {
+      el.classList.remove('egg-pop');
+      void el.offsetWidth;
+      el.classList.add('egg-pop');
+      setTimeout(() => el.classList.remove('egg-pop'), 400);
+    });
+    setTimeout(launchFireworks, 50);
   }
 
   // Attach to both setup and app burger decos (live delegation)
