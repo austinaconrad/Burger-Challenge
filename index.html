@@ -432,6 +432,43 @@ button{transition:transform 0.1s ease}
 .map-popup-stars{font-size:15px;margin-bottom:6px}
 .map-popup-time{font-size:11px;color:var(--muted);font-weight:400}
 .map-section-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.10em;font-weight:600;margin:16px 0 8px}
+/* ── HIGHWAY BOARD ── */
+.hw-board{padding:4px 2px 16px}
+.hw-header{font-size:9px;color:var(--muted);text-align:center;margin-bottom:10px;letter-spacing:0.06em;text-transform:uppercase;font-weight:500}
+.hw-track{position:relative}
+.hw-rows{display:flex;flex-direction:column;gap:3px}
+.hw-row{display:flex;flex-direction:row;gap:3px}
+.hw-row-rev{flex-direction:row-reverse}
+.hw-space{
+  flex:1;min-width:0;aspect-ratio:1;border-radius:50%;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Inter',sans-serif;font-size:6.5px;font-weight:600;color:var(--muted);
+  position:relative;transition:border-color 0.2s;
+}
+.hw-sn{line-height:1;text-align:center;user-select:none}
+/* Milestones */
+.hw-ms{border-width:1.5px;font-size:6px}
+.hw-ms-start{background:rgba(34,197,94,0.12);border-color:rgba(34,197,94,0.55);color:#4ADE80;box-shadow:0 0 8px rgba(34,197,94,0.18)}
+.hw-ms-blue{background:rgba(96,165,250,0.1);border-color:rgba(96,165,250,0.5);color:#60A5FA;box-shadow:0 0 8px rgba(96,165,250,0.15)}
+.hw-ms-red{background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.5);color:#F87171;box-shadow:0 0 8px rgba(248,113,113,0.15)}
+.hw-ms-gold{background:rgba(245,158,11,0.14);border-color:rgba(245,158,11,0.6);color:var(--amber);box-shadow:0 0 12px rgba(245,158,11,0.22);font-size:10px}
+/* Tokens */
+.hw-tokens-overlay{position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:4}
+.hw-token{
+  position:absolute;transform:translate(-50%,-50%);
+  width:22px;height:22px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:7px;font-weight:800;font-family:'Inter',sans-serif;
+  background:var(--av-bg);color:var(--av-text);
+  border:2.5px solid var(--ring-color);
+  box-shadow:0 2px 8px rgba(0,0,0,0.55),0 0 6px var(--ring-color);
+  transition:left 0.65s cubic-bezier(0.25,1,0.5,1),top 0.65s cubic-bezier(0.25,1,0.5,1);
+  z-index:5;
+}
+/* Legend */
+.hw-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;justify-content:center}
+.hw-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted2)}
 /* ── MAP FEED ── */
 .map-feed-wrap{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
 .map-feed-empty{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px}
@@ -505,6 +542,7 @@ button{transition:transform 0.1s ease}
       <button class="tab-btn" onclick="switchTab('social',this)" id="tab-btn-social">💬 Social<span class="tab-unread" id="social-unread-dot"></span></button>
       <button class="tab-btn" onclick="switchTab('players',this)">👥 Players</button>
       <button class="tab-btn" onclick="switchTab('map',this)">🗺 Map</button>
+      <button class="tab-btn" onclick="switchTab('highway',this)">🏁 Highway</button>
     </div>
 
     <!-- LEADERBOARD TAB -->
@@ -582,6 +620,13 @@ button{transition:transform 0.1s ease}
         <button onclick="addExtraPlayer()">Add +</button>
       </div>
       <p style="font-size:11px;color:var(--muted);margin-top:12px;text-align:center;font-weight:400">Share the room code so friends can join on their own phones</p>
+    </div>
+
+    <!-- HIGHWAY TAB -->
+    <div class="tab-panel" id="tab-highway">
+      <div class="hw-board" id="highway-board">
+        <div class="empty"><div class="e-icon">🏁</div><p>Switch to this tab to load the board.</p></div>
+      </div>
     </div>
 
     <!-- MAP TAB -->
@@ -1056,6 +1101,7 @@ function render(){
   renderBurgerGrid(sorted);
   renderMyTally();
   renderPlayersList();
+  if(document.getElementById('hw-rows')) updateHighwayTokens();
 }
 
 function getThisMonday() {
@@ -1575,6 +1621,10 @@ window.switchTab=function(name,btn){
     if(dot) dot.classList.remove('visible');
   }
   if(name==='map') setTimeout(renderBurgerMap, 80);
+  if(name==='highway'){
+    if(!document.getElementById('hw-rows')) renderHighway();
+    else setTimeout(updateHighwayTokens, 80);
+  }
 };
 
 document.getElementById('setup-name').addEventListener('keydown',e=>{if(e.key==='Enter') document.getElementById('setup-room').value?joinRoom():createRoom()});
@@ -1674,6 +1724,110 @@ if(IS_CONFIGURED && loadSession()){initFirebase();startApp();}
     if (e.target.closest('.burger-deco')) onBurgerTap(e);
   });
 })();
+
+// ── HIGHWAY BOARD ─────────────────────────────────────────────────
+const HW_MILESTONES = {
+  1:   {label:'GO!',   cls:'hw-ms-start'},
+  10:  {label:'10 🔵', cls:'hw-ms-blue'},
+  25:  {label:'25 ⭐', cls:'hw-ms-red'},
+  50:  {label:'HALF',  cls:'hw-ms-gold'},
+  75:  {label:'75 🔴', cls:'hw-ms-red'},
+  100: {label:'🏆',   cls:'hw-ms-gold'},
+};
+
+function renderHighway() {
+  const board = document.getElementById('highway-board');
+  if (!board) return;
+
+  let rowsHtml = '';
+  // 10 visual rows: vRow 0 = top (spaces 91-100), vRow 9 = bottom (spaces 1-10)
+  for (let vRow = 0; vRow < 10; vRow++) {
+    const rowFromBottom = 9 - vRow;
+    const startSpace = rowFromBottom * 10 + 1;
+    // Even visual rows (0,2,4...) go R→L (row-reverse); odd rows go L→R
+    const isRev = vRow % 2 === 0;
+    rowsHtml += `<div class="hw-row${isRev ? ' hw-row-rev' : ''}">`;
+    for (let i = 0; i < 10; i++) {
+      const n = startSpace + i;
+      const ms = HW_MILESTONES[n];
+      rowsHtml += `<div class="hw-space${ms ? ' hw-ms ' + ms.cls : ''}" id="hw-space-${n}" data-n="${n}">
+        <span class="hw-sn">${ms ? ms.label : n}</span>
+      </div>`;
+    }
+    rowsHtml += '</div>';
+  }
+
+  // Player legend
+  const legendHtml = players.map(p => {
+    const cc = colorClass(p.colorIdx);
+    return `<div class="hw-legend-item">
+      <div class="hw-token ${cc}" style="position:static;transform:none;width:18px;height:18px;font-size:6.5px;box-shadow:none;pointer-events:none">${initials(p.name)}</div>
+      <span>${escHtml(p.name)}</span>
+    </div>`;
+  }).join('');
+
+  board.innerHTML = `
+    <p class="hw-header">🚗 Start at the bottom · Race to 100 by Labor Day · 🏁</p>
+    <div class="hw-track" id="hw-track">
+      <div class="hw-rows" id="hw-rows">${rowsHtml}</div>
+      <div class="hw-tokens-overlay" id="hw-tokens"></div>
+    </div>
+    <div class="hw-legend">${legendHtml}</div>
+  `;
+
+  setTimeout(updateHighwayTokens, 120);
+}
+
+function updateHighwayTokens() {
+  const track = document.getElementById('hw-track');
+  const tokensDiv = document.getElementById('hw-tokens');
+  if (!track || !tokensDiv) return;
+  const trackRect = track.getBoundingClientRect();
+  if (!trackRect.width) return;
+
+  // Group players by clamped board position
+  const byPos = {};
+  players.forEach(p => {
+    const pos = Math.max(1, Math.min(100, p.count || 1));
+    if (!byPos[pos]) byPos[pos] = [];
+    byPos[pos].push(p);
+  });
+
+  const seen = new Set();
+  players.forEach(p => {
+    const pos = Math.max(1, Math.min(100, p.count || 1));
+    const group = byPos[pos] || [];
+    const idx = group.indexOf(p);
+    const spread = group.length > 1 ? (idx - (group.length - 1) / 2) * 11 : 0;
+
+    const spaceEl = document.getElementById(`hw-space-${pos}`);
+    if (!spaceEl) return;
+
+    const r = spaceEl.getBoundingClientRect();
+    const cx = r.left - trackRect.left + r.width / 2;
+    const cy = r.top - trackRect.top + r.height / 2;
+
+    const tokenId = `hw-token-${p.id}`;
+    seen.add(tokenId);
+
+    let el = document.getElementById(tokenId);
+    if (!el) {
+      el = document.createElement('div');
+      el.id = tokenId;
+      el.className = `hw-token ${colorClass(p.colorIdx)}`;
+      tokensDiv.appendChild(el);
+    }
+    el.textContent = initials(p.name);
+    el.title = `${p.name}: ${p.count} burgers`;
+    el.style.left = `${cx + spread}px`;
+    el.style.top  = `${cy}px`;
+  });
+
+  // Remove stale tokens
+  tokensDiv.querySelectorAll('.hw-token').forEach(el => {
+    if (!seen.has(el.id)) el.remove();
+  });
+}
 
 window.panMapToSpot = function(lat, lng) {
   // Switch to map tab
