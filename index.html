@@ -29,8 +29,10 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:
   radial-gradient(ellipse at 85% 90%,rgba(217,119,6,0.04) 0%,transparent 50%);
   pointer-events:none}
 .wrapper{position:relative;z-index:1;max-width:700px;margin:0 auto;padding:0 16px calc(80px + env(safe-area-inset-bottom))}
-.burger-deco{font-size:80px;line-height:1;animation:wobble 1.6s ease-in-out infinite;filter:drop-shadow(0 4px 24px rgba(217,119,6,0.30))}
+.burger-deco{font-size:80px;line-height:1;animation:wobble 1.6s ease-in-out infinite;filter:drop-shadow(0 4px 24px rgba(217,119,6,0.30));cursor:pointer;user-select:none}
 @keyframes wobble{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-7px) rotate(3deg)}}
+@keyframes burgerPop{0%{transform:scale(1)}30%{transform:scale(1.35) rotate(8deg)}55%{transform:scale(0.88) rotate(-5deg)}75%{transform:scale(1.12) rotate(3deg)}100%{transform:scale(1) rotate(0deg)}}
+.burger-deco.egg-pop{animation:burgerPop 0.35s cubic-bezier(0.34,1.56,0.64,1) both!important}
 #setup-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px;text-align:center;gap:0;position:relative;z-index:1}
 #setup-screen h1{font-family:'Poppins',sans-serif;font-size:clamp(38px,10vw,66px);font-weight:900;letter-spacing:-1px;line-height:1;color:var(--text);margin-bottom:8px}
 #setup-screen .subtitle{font-size:14px;color:var(--muted2);margin-bottom:32px;font-weight:400}
@@ -1602,6 +1604,72 @@ document.addEventListener('click', e => {
 });
 
 if(IS_CONFIGURED && loadSession()){initFirebase();startApp();}
+
+// ── EASTER EGG: Triple-tap burger fireworks ──────────────────────
+(function() {
+  let tapCount = 0, lastTap = 0, eggActive = false;
+
+  function launchFireworks() {
+    if (typeof confetti !== 'function') return;
+    eggActive = true;
+    const colors = ['#FF0000','#FFFFFF','#0000FF','#FF4444','#AAAAFF'];
+    const end = Date.now() + 5000;
+
+    const positions = [
+      {x:0.1,angle:70},{x:0.5,angle:90},{x:0.9,angle:110},
+      {x:0.25,angle:80},{x:0.75,angle:100},
+    ];
+
+    const loop = setInterval(() => {
+      if (Date.now() > end) {
+        clearInterval(loop);
+        eggActive = false;
+        return;
+      }
+      // Pick 2 random launch positions each tick
+      const picks = [...positions].sort(()=>Math.random()-0.5).slice(0,2);
+      picks.forEach(p => {
+        confetti({
+          particleCount: 40 + Math.floor(Math.random()*30),
+          spread: 55 + Math.random()*30,
+          angle: p.angle + (Math.random()-0.5)*20,
+          origin: {x: p.x, y: 0.5 + Math.random()*0.2},
+          colors,
+          scalar: 1.1 + Math.random()*0.4,
+          startVelocity: 42 + Math.random()*18,
+          gravity: 0.9,
+          shapes: ['circle','square'],
+          zIndex: 9999,
+        });
+      });
+    }, 180);
+  }
+
+  function onBurgerTap(e) {
+    if (eggActive) return;
+    const now = Date.now();
+    if (now - lastTap > 500) tapCount = 0; // reset if too slow
+    lastTap = now;
+    tapCount++;
+
+    if (tapCount === 3) {
+      tapCount = 0;
+      // Pop animation on all burger decos
+      document.querySelectorAll('.burger-deco').forEach(el => {
+        el.classList.remove('egg-pop');
+        void el.offsetWidth; // reflow
+        el.classList.add('egg-pop');
+        setTimeout(() => el.classList.remove('egg-pop'), 400);
+      });
+      setTimeout(launchFireworks, 50);
+    }
+  }
+
+  // Attach to both setup and app burger decos (live delegation)
+  document.addEventListener('click', e => {
+    if (e.target.closest('.burger-deco')) onBurgerTap(e);
+  });
+})();
 
 window.panMapToSpot = function(lat, lng) {
   // Switch to map tab
