@@ -1442,18 +1442,12 @@ window.confirmBurger = async function() {
       <div class="receipt-items">
         <div class="receipt-item">
           <span class="receipt-item-qty">${count}x</span>
-          <span class="receipt-item-name">${pattyLabel} Burger</span>
           <span class="receipt-item-price">LOGGED</span>
         </div>
-        <div class="receipt-item">
-          <span class="receipt-item-qty"></span>
-          <span class="receipt-item-name">${escHtml(restaurant)}</span>
-          <span class="receipt-item-price"></span>
-        </div>
-        <div class="receipt-item">
-          <span class="receipt-item-qty"></span>
-          <span class="receipt-item-name">${starsDisplay}</span>
-          <span class="receipt-item-price"></span>
+        <div style="font-family:monospace;font-size:12px;color:#1A1A1A;text-align:center;line-height:1.9;margin:4px 0">
+          ${pattyLabel} Burger<br>
+          ${escHtml(restaurant)}<br>
+          ${starsDisplay}
         </div>
       </div>
       <hr class="receipt-dash"/>
