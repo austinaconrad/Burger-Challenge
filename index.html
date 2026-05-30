@@ -456,14 +456,34 @@ button{transition:transform 0.1s ease}
   background-repeat:repeat-x;
 }
 .hw-row-rev{flex-direction:row-reverse}
-/* U-turn connectors between rows */
-.hw-turn{height:7px;width:52%;margin:0 2px;box-sizing:border-box;
-  border-bottom:2px solid rgba(255,255,255,0.09);
-  border-left:2px solid rgba(255,255,255,0.09);
-  border-right:2px solid rgba(255,255,255,0.09);
+/* U-turn connectors — narrow C-shape at the edge only */
+.hw-turn{
+  height:16px;
+  width:calc(10% + 2px); /* matches ~one circle width */
+  box-sizing:border-box;
+  flex-shrink:0;
+  margin:0;
 }
-.hw-turn-right{align-self:flex-end;border-radius:0 0 20px 20px}
-.hw-turn-left{align-self:flex-start;border-radius:0 0 20px 20px}
+/* Right edge: road exits right → curves around → re-enters right row above */
+/* C-shape opening LEFT: top + right + bottom borders */
+.hw-turn-right{
+  align-self:flex-end;
+  border-top:2px solid rgba(255,255,255,0.14);
+  border-right:2px solid rgba(255,255,255,0.14);
+  border-bottom:2px solid rgba(255,255,255,0.14);
+  border-left:none;
+  border-radius:0 14px 14px 0;
+}
+/* Left edge: road exits left → curves around → re-enters left row above */
+/* C-shape opening RIGHT: top + left + bottom borders */
+.hw-turn-left{
+  align-self:flex-start;
+  border-top:2px solid rgba(255,255,255,0.14);
+  border-left:2px solid rgba(255,255,255,0.14);
+  border-bottom:2px solid rgba(255,255,255,0.14);
+  border-right:none;
+  border-radius:14px 0 0 14px;
+}
 /* Spaces — solid background so dashed lane line doesn't bleed through */
 .hw-space{
   flex:1;min-width:0;aspect-ratio:1;border-radius:50%;
