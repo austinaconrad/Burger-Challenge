@@ -967,15 +967,6 @@ function renderLeaderboard(sorted){
           ${isDone?'<span class="done-badge">Done!</span>':''}
         </div>
         <div class="mini-bar-wrap"><div class="mini-bar-fill ${cc}" style="width:${pct}%"></div></div>
-        ${(()=>{
-          const gpsLogs = (p.logs||[]).filter(e=>typeof e==='object'&&e.lat&&e.lng);
-          if(!gpsLogs.length) return '';
-          const last = gpsLogs[gpsLogs.length-1];
-          const stars = '⭐'.repeat(Math.max(0,Math.min(5,last.rating||0)));
-          const label = escHtml(last.restaurant||'Unknown spot');
-          const starsStr = stars ? ` · ${stars}` : '';
-          return `<div class="player-last-spot" onclick="panMapToSpot(${last.lat},${last.lng})" title="View on map">📍 ${label}${starsStr}</div>`;
-        })()}
       </div>
       <div class="badge-col">${badgesHtml}</div>
       <div class="lb-score">
