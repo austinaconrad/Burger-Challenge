@@ -170,7 +170,32 @@ button{transition:transform 0.1s ease}
 .hl-sub{font-size:11px;color:rgba(167,139,250,0.65);margin-top:2px;font-weight:400}
 .hl-count{font-family:'Poppins',sans-serif;font-size:32px;font-weight:900;color:#A78BFA;line-height:1;flex-shrink:0;text-align:right}
 .hl-count-lbl{font-size:9px;color:rgba(167,139,250,0.6);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;text-align:right}
-.my-tally-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,0.06),0 4px 24px rgba(0,0,0,0.04)}
+.my-tally-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,0.06),0 4px 24px rgba(0,0,0,0.04);position:relative}
+/* ── ORDER RECEIPT ── */
+.order-receipt{
+  position:absolute;top:0;left:0;right:0;z-index:10;
+  background:rgba(18,18,18,0.92);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-bottom:1px dashed rgba(245,158,11,0.4);
+  padding:18px 20px 16px;
+  text-align:center;
+  transform:translateY(-110%);
+  transition:transform 0.38s cubic-bezier(0.34,1.2,0.64,1), opacity 0.3s ease;
+  opacity:0;
+  pointer-events:none;
+}
+.order-receipt.show{transform:translateY(0);opacity:1}
+.order-receipt.hide{transform:translateY(-110%);opacity:0}
+.receipt-header{font-size:9px;font-weight:700;letter-spacing:0.22em;color:var(--amber);text-transform:uppercase;margin-bottom:10px;font-family:'Inter',sans-serif}
+.receipt-divider{border:none;border-top:1px dashed rgba(255,255,255,0.12);margin:8px 0}
+.receipt-row{display:flex;justify-content:space-between;align-items:center;font-family:monospace;font-size:12px;color:var(--text);margin:4px 0;letter-spacing:0.04em}
+.receipt-row.total{font-size:14px;font-weight:700;color:var(--amber);margin-top:6px}
+.receipt-row span:last-child{color:var(--muted2);font-weight:400}
+.receipt-row.total span:last-child{color:var(--amber);font-weight:700}
+.receipt-footer{font-size:9px;color:var(--muted);margin-top:10px;letter-spacing:0.1em;font-family:'Inter',sans-serif}
+.receipt-progress{height:2px;background:rgba(255,255,255,0.08);border-radius:999px;margin-top:12px;overflow:hidden}
+.receipt-progress-fill{height:100%;background:linear-gradient(90deg,var(--amber-dark),var(--amber));border-radius:999px;width:100%;transform-origin:left;animation:receiptDrain 3s linear forwards}
+@keyframes receiptDrain{from{transform:scaleX(1)}to{transform:scaleX(0)}}
 .my-tally-card.complete{border-color:rgba(34,197,94,0.30);box-shadow:0 0 0 1.5px rgba(34,197,94,0.20),0 4px 24px rgba(0,0,0,0.4)}
 .tally-bun-top{height:3px;background:linear-gradient(90deg,var(--amber-dark),#F59E0B,var(--amber-mid),#F59E0B,var(--amber-dark));opacity:0.8}
 .tally-top{display:flex;align-items:center;gap:14px;padding:16px 16px 12px}
@@ -1137,6 +1162,7 @@ function renderMyTally(){
   const cc=colorClass(me.colorIdx);
   const pct=Math.min(100,me.count), isDone=me.count>=100;
   area.innerHTML=`<div class="my-tally-card ${cc} ${isDone?'complete':''}">
+    <div class="order-receipt" id="order-receipt"></div>
     <div class="tally-bun-top"></div>
     <div class="tally-top">
       ${ringAvatarHTML(me,58)}
@@ -1380,9 +1406,13 @@ window.setStar = function(n) {
 window.confirmBurger = async function() {
   const count = pendingPattyCount || 1;
   const restaurant = document.getElementById('detail-restaurant').value.trim() || 'Unknown spot';
+  const stars = '⭐'.repeat(pendingRating) || '—';
+  const pattyLabel = count === 1 ? 'Single' : count === 2 ? 'Double' : 'Triple';
+
   for (let i = 0; i < count; i++) {
     await changeMyCountWithDetails(1, restaurant, pendingRating, i === 0 ? pendingGPS : null);
   }
+
   // Reset builder
   document.getElementById('burger-detail').classList.remove('open');
   document.getElementById('pb-stack').innerHTML = '';
@@ -1390,6 +1420,36 @@ window.confirmBurger = async function() {
   const lbl = document.getElementById('pb-label');
   if (lbl) lbl.textContent = 'How many patties?';
   pendingPattyCount = 0;
+
+  // Show order receipt
+  const receipt = document.getElementById('order-receipt');
+  if (receipt) {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', hour12:true});
+    receipt.innerHTML = `
+      <div class="receipt-header">🍔 Order Confirmed</div>
+      <hr class="receipt-divider"/>
+      <div class="receipt-row"><span>${escHtml(myName)}</span><span>${timeStr}</span></div>
+      <div class="receipt-row"><span>${pattyLabel} Burger</span><span>${escHtml(restaurant)}</span></div>
+      <div class="receipt-row"><span>Rating</span><span>${stars}</span></div>
+      <hr class="receipt-divider"/>
+      <div class="receipt-row total"><span>+${count} BURGER${count > 1 ? 'S' : ''} LOGGED</span><span>🏆</span></div>
+      <div class="receipt-footer">Redirecting to leaderboard…</div>
+      <div class="receipt-progress"><div class="receipt-progress-fill"></div></div>
+    `;
+    // Force reflow then slide in
+    receipt.classList.remove('hide');
+    void receipt.offsetWidth;
+    receipt.classList.add('show');
+
+    // After 3s slide out and switch tabs
+    setTimeout(() => {
+      receipt.classList.remove('show');
+      receipt.classList.add('hide');
+      const ranksBtn = [...document.querySelectorAll('.tab-btn')].find(b => b.getAttribute('onclick')?.includes("'leaderboard'"));
+      if (ranksBtn) switchTab('leaderboard', ranksBtn);
+    }, 3000);
+  }
 };
 
 async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null) {
