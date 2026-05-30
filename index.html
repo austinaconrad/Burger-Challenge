@@ -289,6 +289,21 @@ button{transition:transform 0.1s ease}
 #summer-banner{font-size:11px;font-weight:500;letter-spacing:0.01em;margin-top:4px;min-height:16px;display:flex;justify-content:center}
 #summer-banner span{display:inline-flex;align-items:center;gap:4px;background:rgba(125,211,252,0.18);border:1px solid rgba(125,211,252,0.45);border-radius:20px;padding:4px 14px;color:#7dd3fc;font-weight:600;font-size:11px;letter-spacing:0.02em;box-shadow:0 0 12px rgba(125,211,252,0.12)}
 .lb-count,.tally-count{color:var(--av-text)}
+/* ── PATTY STACK BUILDER ── */
+.patty-builder{padding:20px 16px 0;display:flex;flex-direction:column;align-items:center;gap:0}
+.pb-bun{width:120px;text-align:center;line-height:1;user-select:none}
+.pb-bun-top{font-size:52px;filter:drop-shadow(0 4px 8px rgba(217,119,6,0.35));margin-bottom:-4px}
+.pb-bun-bottom{font-size:42px;filter:drop-shadow(0 2px 6px rgba(217,119,6,0.25));margin-top:-4px}
+.pb-stack{display:flex;flex-direction:column;align-items:center;gap:3px;min-height:10px;width:120px}
+.pb-patty{width:110px;height:16px;background:linear-gradient(135deg,#3D1A00,#5C2800);border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,0.45),inset 0 1px 0 rgba(255,255,255,0.06);animation:pattyDrop 0.28s cubic-bezier(0.175,0.885,0.32,1.275) both;position:relative}
+.pb-patty::after{content:'';position:absolute;top:4px;left:12px;right:12px;height:2px;background:rgba(255,255,255,0.06);border-radius:999px}
+@keyframes pattyDrop{0%{opacity:0;transform:translateY(-18px) scaleX(0.7)}100%{opacity:1;transform:translateY(0) scaleX(1)}}
+.pb-selector{display:flex;gap:8px;margin-top:18px;margin-bottom:4px}
+.pb-btn{flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-sm);color:var(--muted2);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;padding:10px 16px;cursor:pointer;transition:all 0.15s,transform 0.1s ease;letter-spacing:0.01em}
+.pb-btn:hover{background:rgba(255,255,255,0.08);color:var(--text);border-color:rgba(255,255,255,0.18)}
+.pb-btn:active{transform:scale(0.95)}
+.pb-btn.selected{background:rgba(245,158,11,0.12);border-color:rgba(245,158,11,0.5);color:var(--amber);box-shadow:0 0 12px rgba(245,158,11,0.12)}
+.pb-label{font-size:11px;color:var(--muted);text-align:center;margin-top:6px;font-weight:400;letter-spacing:0.03em;min-height:16px}
 .burger-detail{background:var(--surface2);border-top:1px solid var(--border);padding:14px 16px;display:none;flex-direction:column;gap:10px;animation:slideIn 0.2s ease both}
 .burger-detail.open{display:flex}
 .burger-detail-row{display:flex;align-items:center;gap:10px}
@@ -1071,11 +1086,19 @@ function renderMyTally(){
     </div>
     <div class="progress-track"><div class="progress-fill ${cc}" id="my-bar" style="width:${pct}%"></div></div>
     <div class="tally-bun-bottom"></div>
-    <div class="tally-controls">
-      <button class="ctrl-btn" onclick="changeMyCount(-1)" title="Undo last">↩</button>
-      <button class="ate-btn ${cc}" onclick="openBurgerDetail()" style="color:var(--av-text)"><span class="bicon">🍔</span> Ate One!</button>
-      <button class="ctrl-btn" onclick="changeMyCount(-1)" title="Remove one">−</button>
+    <!-- Patty Stack Builder -->
+    <div class="patty-builder">
+      <div class="pb-bun pb-bun-top">🍔</div>
+      <div class="pb-stack" id="pb-stack"></div>
+      <div class="pb-bun pb-bun-bottom">🫓</div>
+      <div class="pb-selector">
+        <button class="pb-btn" onclick="selectPatties(1)">Single</button>
+        <button class="pb-btn" onclick="selectPatties(2)">Double</button>
+        <button class="pb-btn" onclick="selectPatties(3)">Triple</button>
+      </div>
+      <div class="pb-label" id="pb-label">How many patties?</div>
     </div>
+    <!-- Detail form (revealed after patty selection) -->
     <div class="burger-detail" id="burger-detail">
       <div class="burger-detail-row">
         <label>Where?</label>
@@ -1092,7 +1115,11 @@ function renderMyTally(){
           <button class="star-btn" data-star="5" onclick="setStar(5)">⭐</button>
         </div>
       </div>
-      <button class="detail-confirm-btn" onclick="confirmBurger()">✓ Log This Burger</button>
+      <button class="detail-confirm-btn" id="confirm-btn" onclick="confirmBurger()">✓ Log Burger</button>
+    </div>
+    <!-- Undo strip -->
+    <div style="display:flex;justify-content:center;padding:8px 16px 14px;border-top:1px solid var(--border)">
+      <button class="ctrl-btn" onclick="changeMyCount(-1)" style="font-size:13px;color:var(--muted2);gap:6px;display:flex;align-items:center">↩ Undo last burger</button>
     </div>
     <div class="complete-strip" ${isDone?'style="display:block"':''}>🎉 You crushed 100 burgers! You're a legend!</div>
   </div>`;
@@ -1229,13 +1256,41 @@ function fireConfetti(big = false) {
 const OHIO_SPOTS = ["Wendy's","McDonald's","Burger King","Buffalo Wild Wings","Swenson's","Shake Shack","Five Guys","Steak 'n Shake","Culver's"];
 let pendingRating = 0;
 let pendingGPS = null;
+let pendingPattyCount = 0;
 
-window.openBurgerDetail = function() {
+window.selectPatties = function(n) {
+  pendingPattyCount = n;
+
+  // Update button highlights
+  document.querySelectorAll('.pb-btn').forEach((b, i) => b.classList.toggle('selected', i + 1 === n));
+
+  // Render patties with staggered drop
+  const stack = document.getElementById('pb-stack');
+  if (!stack) return;
+  stack.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const patty = document.createElement('div');
+    patty.className = 'pb-patty';
+    patty.style.animationDelay = `${i * 80}ms`;
+    stack.appendChild(patty);
+  }
+
+  // Update label
+  const labels = ['', 'One patty — classic!', 'Two patties — serious.', 'Three patties — legend.'];
+  const lbl = document.getElementById('pb-label');
+  if (lbl) lbl.textContent = labels[n] || '';
+
+  // Update confirm button text
+  const confirmBtn = document.getElementById('confirm-btn');
+  if (confirmBtn) confirmBtn.textContent = `✓ Log ${n === 1 ? 'This Burger' : n + ' Burgers'}`;
+
+  // Reveal detail form
   const d = document.getElementById('burger-detail');
-  if (!d) return;
-  d.classList.toggle('open');
-  if (d.classList.contains('open')) {
-    document.getElementById('quick-spots').innerHTML = OHIO_SPOTS.slice(0,5).map(s =>
+  if (d && !d.classList.contains('open')) {
+    d.classList.add('open');
+    // Seed quick spots & GPS
+    const qs = document.getElementById('quick-spots');
+    if (qs) qs.innerHTML = OHIO_SPOTS.slice(0,5).map(s =>
       `<button class="quick-spot" onclick="document.getElementById('detail-restaurant').value='${s}'">${s}</button>`
     ).join('');
     setStar(0);
@@ -1249,15 +1304,27 @@ window.openBurgerDetail = function() {
   }
 };
 
+// Keep openBurgerDetail as a no-op (called by changeMyCount +1 path)
+window.openBurgerDetail = function() {};
+
 window.setStar = function(n) {
   pendingRating = n;
   document.querySelectorAll('.star-btn').forEach(b => { b.classList.toggle('active', +b.dataset.star <= n); });
 };
 
 window.confirmBurger = async function() {
+  const count = pendingPattyCount || 1;
   const restaurant = document.getElementById('detail-restaurant').value.trim() || 'Unknown spot';
-  await changeMyCountWithDetails(1, restaurant, pendingRating, pendingGPS);
+  for (let i = 0; i < count; i++) {
+    await changeMyCountWithDetails(1, restaurant, pendingRating, i === 0 ? pendingGPS : null);
+  }
+  // Reset builder
   document.getElementById('burger-detail').classList.remove('open');
+  document.getElementById('pb-stack').innerHTML = '';
+  document.querySelectorAll('.pb-btn').forEach(b => b.classList.remove('selected'));
+  const lbl = document.getElementById('pb-label');
+  if (lbl) lbl.textContent = 'How many patties?';
+  pendingPattyCount = 0;
 };
 
 async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null) {
@@ -1467,6 +1534,7 @@ function renderBurgerMap() {
         <div class="map-popup-time">🕐 ${timeStr}</div>
       </div>`;
       const marker = L.marker(coord, {icon}).addTo(burgerMap).bindPopup(popup, {maxWidth:260});
+      marker._feedKey = `${p.id}_${ts}`;
       mapMarkers.push(marker);
     });
   });
@@ -1495,10 +1563,7 @@ function renderBurgerMap() {
         restaurant: (typeof entry === 'object' && entry.restaurant) || 'Unknown spot',
         rating: (typeof entry === 'object' && entry.rating) || 0,
         ts, lat, lng,
-        markerIdx: mapMarkers.findIndex(m => {
-          const ll = m.getLatLng();
-          return Math.abs(ll.lat - lat) < 0.0001 && Math.abs(ll.lng - lng) < 0.0001;
-        }),
+        feedKey: `${p.id}_${ts}`,
       });
     });
   });
@@ -1552,9 +1617,8 @@ function renderBurgerMap() {
       // Switch to map tab if not already there (shouldn't happen but safe)
       const coord = [item.lat, item.lng];
       burgerMap.flyTo(coord, 15, {animate: true, duration: 0.8});
-      if (item.markerIdx >= 0 && mapMarkers[item.markerIdx]) {
-        setTimeout(() => mapMarkers[item.markerIdx].openPopup(), 850);
-      }
+      const exactMarker = mapMarkers.find(m => m._feedKey === item.feedKey);
+      if (exactMarker) setTimeout(() => exactMarker.openPopup(), 850);
     });
   });
 }
