@@ -472,7 +472,8 @@ button{transition:transform 0.1s ease}
   font-family:'Inter',sans-serif;font-size:6.5px;font-weight:600;color:var(--muted);
   position:relative;z-index:1;transition:background 0.4s,border-color 0.4s,box-shadow 0.4s;
 }
-.hw-sn{line-height:1;text-align:center;user-select:none}
+.hw-sn{line-height:1;text-align:center;user-select:none;transition:opacity 0.25s ease}
+.hw-space.hw-occupied .hw-sn{opacity:0}
 /* Conquered road — solid so dashed lane doesn't bleed through */
 .hw-space.hw-conquered{
   background:#1A2A35;
@@ -501,9 +502,24 @@ button{transition:transform 0.1s ease}
   transition:left 0.65s cubic-bezier(0.25,1,0.5,1),top 0.65s cubic-bezier(0.25,1,0.5,1);
   z-index:5;
 }
+/* Overflow bubble for 5+ players on one space */
+.hw-overflow-bubble{
+  position:absolute;transform:translate(-50%,-50%);
+  background:rgba(28,28,28,0.95);border:1.5px solid rgba(255,255,255,0.28);
+  border-radius:999px;font-size:7px;font-weight:800;color:var(--text);
+  padding:2px 5px;white-space:nowrap;font-family:'Inter',sans-serif;
+  box-shadow:0 2px 8px rgba(0,0,0,0.6);
+  transition:left 0.65s cubic-bezier(0.25,1,0.5,1),top 0.65s cubic-bezier(0.25,1,0.5,1);
+}
 /* Legend */
-.hw-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;justify-content:center}
-.hw-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted2)}
+.hw-legend{
+  display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;
+  justify-content:center;align-items:center;
+  padding:10px 12px;
+  background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);
+  border-radius:var(--radius-sm);
+}
+.hw-legend-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--muted2)}
 /* ── MAP FEED ── */
 .map-feed-wrap{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
 .map-feed-empty{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px}
@@ -1818,43 +1834,78 @@ function updateHighwayTokens() {
     byPos[pos].push(p);
   });
 
-  const seen = new Set();
-  players.forEach(p => {
-    const pos = Math.max(1, Math.min(100, p.count || 1));
-    const group = byPos[pos] || [];
-    const idx = group.indexOf(p);
-    // Stack like overlapping group avatars: each token shifts right by 8px,
-    // centred as a group so they sit over the space.
-    const step = 8;
-    const groupWidth = (group.length - 1) * step;
-    const spread = group.length > 1 ? idx * step - groupWidth / 2 : 0;
-
-    const spaceEl = document.getElementById(`hw-space-${pos}`);
-    if (!spaceEl) return;
-
-    const r = spaceEl.getBoundingClientRect();
-    const cx = r.left - trackRect.left + r.width / 2;
-    const cy = r.top - trackRect.top + r.height / 2;
-
-    const tokenId = `hw-token-${p.id}`;
-    seen.add(tokenId);
-
-    let el = document.getElementById(tokenId);
-    if (!el) {
-      el = document.createElement('div');
-      el.id = tokenId;
-      el.className = `hw-token ${colorClass(p.colorIdx)}`;
-      tokensDiv.appendChild(el);
-    }
-    el.textContent = initials(p.name);
-    el.title = `${p.name}: ${p.count} burgers`;
-    el.style.left   = `${cx + spread}px`;
-    el.style.top    = `${cy}px`;
-    el.style.zIndex = `${5 + idx}`; // later tokens render on top
+  // Clear all occupied flags, then re-apply only to spaces with players
+  document.querySelectorAll('.hw-space.hw-occupied').forEach(el => el.classList.remove('hw-occupied'));
+  Object.keys(byPos).forEach(pos => {
+    const el = document.getElementById(`hw-space-${pos}`);
+    if (el) el.classList.add('hw-occupied');
   });
 
-  // Remove stale tokens
-  tokensDiv.querySelectorAll('.hw-token').forEach(el => {
+  // Symmetrical offsets for 1–4 players on the same space
+  const CLUSTER_OFFSETS = {
+    1: [[0,    0   ]],
+    2: [[-9,   0   ], [9,    0   ]],
+    3: [[-9,  -6   ], [9,   -6   ], [0,    8   ]],
+    4: [[-9,  -7   ], [9,   -7   ], [-9,   7   ], [9,    7   ]],
+  };
+
+  const seen = new Set();
+
+  Object.entries(byPos).forEach(([posStr, group]) => {
+    const spaceEl = document.getElementById(`hw-space-${posStr}`);
+    if (!spaceEl) return;
+
+    const r   = spaceEl.getBoundingClientRect();
+    const cx  = r.left - trackRect.left + r.width  / 2;
+    const cy  = r.top  - trackRect.top  + r.height / 2;
+
+    const n       = group.length;
+    const maxShow = n > 4 ? 3 : n;
+    const offsets = CLUSTER_OFFSETS[maxShow] || CLUSTER_OFFSETS[3];
+
+    // Render up to maxShow tokens with cluster offsets
+    group.slice(0, maxShow).forEach((p, idx) => {
+      const [ox, oy] = offsets[idx] || [0, 0];
+      const tokenId  = `hw-token-${p.id}`;
+      seen.add(tokenId);
+
+      let el = document.getElementById(tokenId);
+      if (!el) {
+        el = document.createElement('div');
+        el.id        = tokenId;
+        el.className = `hw-token ${colorClass(p.colorIdx)}`;
+        tokensDiv.appendChild(el);
+      }
+      el.textContent  = initials(p.name);
+      el.title        = `${p.name}: ${p.count} burgers`;
+      el.style.left   = `${cx + ox}px`;
+      el.style.top    = `${cy + oy}px`;
+      el.style.zIndex = `${5 + idx}`;
+    });
+
+    // "+N" overflow bubble when > 4 players share a space
+    const bubbleId = `hw-bubble-${posStr}`;
+    if (n > 4) {
+      seen.add(bubbleId);
+      let bub = document.getElementById(bubbleId);
+      if (!bub) {
+        bub = document.createElement('div');
+        bub.id        = bubbleId;
+        bub.className = 'hw-overflow-bubble';
+        tokensDiv.appendChild(bub);
+      }
+      bub.textContent  = `+${n - 3}`;
+      bub.style.left   = `${cx + 18}px`;
+      bub.style.top    = `${cy - 10}px`;
+      bub.style.zIndex = '12';
+    } else {
+      const old = document.getElementById(bubbleId);
+      if (old) old.remove();
+    }
+  });
+
+  // Remove stale tokens and bubbles
+  tokensDiv.querySelectorAll('.hw-token, .hw-overflow-bubble').forEach(el => {
     if (!seen.has(el.id)) el.remove();
   });
 }
