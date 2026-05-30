@@ -305,6 +305,73 @@ button{transition:transform 0.1s ease}
 .empty p{font-size:13px}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-size:13px;font-weight:500;padding:10px 20px;border-radius:999px;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1),opacity 0.3s;opacity:0;z-index:999;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.25);font-family:'Inter',sans-serif}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* ── Minecraft "Advancement Unlocked" toast ── */
+#mc-advancement-toast{
+  position:fixed;
+  top:72px;
+  right:16px;
+  z-index:1000;
+  width:260px;
+  background:#1C1C1C;
+  border:2px solid #555;
+  box-shadow:
+    inset -2px -2px 0 #111,
+    inset  2px  2px 0 #444,
+    0 4px 24px rgba(0,0,0,0.7);
+  image-rendering:pixelated;
+  opacity:0;
+  transform:translateX(290px);
+  transition:transform 0.35s cubic-bezier(0.34,1.2,0.64,1), opacity 0.25s ease;
+  pointer-events:none;
+}
+#mc-advancement-toast.mc-show{
+  opacity:1;
+  transform:translateX(0);
+}
+.mc-toast-header{
+  background:#2A2A00;
+  border-bottom:2px solid #555;
+  padding:5px 10px;
+  font-family:'Press Start 2P',monospace;
+  font-size:6px;
+  color:#FFD700;
+  letter-spacing:0.05em;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.mc-toast-body{
+  padding:10px 12px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.mc-toast-icon{
+  width:36px;height:36px;
+  border:2px solid #666;
+  box-shadow:inset -1px -1px 0 #222, inset 1px 1px 0 #888;
+  background:#2B2B2B;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+  flex-shrink:0;
+  image-rendering:pixelated;
+}
+.mc-toast-text{
+  display:flex;flex-direction:column;gap:3px;
+}
+.mc-toast-title{
+  font-family:'Press Start 2P',monospace;
+  font-size:6px;
+  color:#FFD700;
+  line-height:1.4;
+}
+.mc-toast-desc{
+  font-family:'Press Start 2P',monospace;
+  font-size:5px;
+  color:#E0E0E0;
+  line-height:1.6;
+}
 .section-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px}
 .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
 .c0{--av-bg:rgba(248,113,113,0.15);--av-text:#F87171;--bar:#EF4444;--ring-color:#F87171}
@@ -446,28 +513,34 @@ button{transition:transform 0.1s ease}
   position:relative;
   overflow:visible;
 }
-/* ::before — pixel horizontal connector line (no rounded ends) */
+/* ::before — pixelated dashed horizontal road line */
 .hw-row::before{
   content:'';
   position:absolute;
   top:50%;left:4px;right:4px;
   height:2px;
-  background:rgba(255,255,255,0.10);
+  background: repeating-linear-gradient(
+    90deg,
+    #444 0px, #444 4px,
+    transparent 4px, transparent 7px
+  );
   border-radius:0;
   transform:translateY(-50%);
   z-index:0;
   pointer-events:none;
 }
-/* Sharp 90° pixel connectors — 2px vertical stub fills the gap, no curves */
+/* Sharp 90° pixel connectors — solid 2px dark-border stub, no curves */
 .hw-row.hw-turn-right::after{
   content:'';
   position:absolute;
   right:2px;
-  top:-10px;        /* reaches up into the 10px row gap */
+  top:-10px;
   width:2px;
   height:10px;
-  background:rgba(255,255,255,0.18);
-  border-radius:0;  /* crisp pixel line */
+  background:#555;
+  border-left:1px solid #333;
+  border-right:1px solid #222;
+  border-radius:0;
   z-index:0;
   pointer-events:none;
 }
@@ -478,7 +551,9 @@ button{transition:transform 0.1s ease}
   top:-10px;
   width:2px;
   height:10px;
-  background:rgba(255,255,255,0.18);
+  background:#555;
+  border-left:1px solid #333;
+  border-right:1px solid #222;
   border-radius:0;
   z-index:0;
   pointer-events:none;
@@ -595,6 +670,12 @@ button{transition:transform 0.1s ease}
   border-radius: 2px;
   z-index: 2;
   pointer-events: none;
+}
+/* Keep locked slot numbers legible — crisp light silver */
+.hw-space.hw-locked .hw-sn {
+  color: rgba(220,220,220,0.75) !important;
+  position: relative;
+  z-index: 3; /* sit above the dark overlay */
 }
 
 /* 2. Pixel font on node numbers */
@@ -794,6 +875,16 @@ button{transition:transform 0.1s ease}
 <div id="bdg-tip"></div>
 <div id="lightbox" onclick="closeLightbox()"><img id="lightbox-img" src="" alt=""/></div>
 <div class="toast" id="toast"></div>
+<div id="mc-advancement-toast">
+  <div class="mc-toast-header">⚡ Challenge Complete!</div>
+  <div class="mc-toast-body">
+    <div class="mc-toast-icon" id="mc-toast-icon">🍔</div>
+    <div class="mc-toast-text">
+      <div class="mc-toast-title" id="mc-toast-title"></div>
+      <div class="mc-toast-desc" id="mc-toast-desc"></div>
+    </div>
+  </div>
+</div>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getFirestore, doc, collection, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp, query, orderBy, limit }
@@ -979,6 +1070,25 @@ function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+let _mcToastTimer = null;
+function showMcAdvancement(icon, title, desc) {
+  const el    = document.getElementById('mc-advancement-toast');
+  const elIco = document.getElementById('mc-toast-icon');
+  const elTtl = document.getElementById('mc-toast-title');
+  const elDsc = document.getElementById('mc-toast-desc');
+  if (!el) return;
+  elIco.textContent = icon;
+  elTtl.textContent = title;
+  elDsc.textContent = desc;
+  // Reset animation if already showing
+  el.classList.remove('mc-show');
+  clearTimeout(_mcToastTimer);
+  requestAnimationFrame(() => {
+    el.classList.add('mc-show');
+    _mcToastTimer = setTimeout(() => el.classList.remove('mc-show'), 5000);
+  });
 }
 function genRoomCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -1680,8 +1790,15 @@ async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null
     if(delta>0){
       const isMilestone = [25,50,75,100].includes(newCount);
       fireConfetti(isMilestone);
-      if(newCount===100) showToast('🎉 100 burgers!! ABSOLUTE LEGEND!');
-      else if(isMilestone) showToast(`🎊 ${newCount} burgers! Milestone unlocked!`);
+      if(newCount===100){
+        showMcAdvancement('🏆','Reached the FINISH!','100 burgers. You are a legend.');
+      } else if(newCount===75){
+        showMcAdvancement('⚡','Reached Space 75!','Only 25 burgers away from glory.');
+      } else if(newCount===50){
+        showMcAdvancement('⚡','Halfway There!','50 burgers down. The road is yours.');
+      } else if(newCount===25){
+        showMcAdvancement('⚡','First Milestone!','25 burgers eaten. Just getting warmed up.');
+      }
       else {
         const hour=new Date().getHours();
         if(hour>=23) showToast('🌙 Late night burger #'+newCount+' logged!');
