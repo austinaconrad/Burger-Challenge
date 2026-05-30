@@ -434,60 +434,52 @@ button{transition:transform 0.1s ease}
 .map-section-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.10em;font-weight:600;margin:16px 0 8px}
 /* ── HIGHWAY BOARD ── */
 .hw-board{padding:4px 2px 16px}
-.hw-header{font-size:9px;color:var(--muted);text-align:center;margin-bottom:10px;letter-spacing:0.04em;font-weight:500}
+.hw-header{font-size:5px;color:var(--muted);text-align:center;margin-bottom:10px;letter-spacing:0.04em;font-weight:500;font-family:'Press Start 2P',monospace;line-height:1.8}
 .hw-track{position:relative}
 .hw-rows{display:flex;flex-direction:column;gap:10px;overflow:visible}
-/* Road strip — solid background pill per row */
+/* Road strip — flat pixel row, no pill rounding */
 .hw-row{
   display:flex;flex-direction:row;gap:2px;
   background:rgba(255,255,255,0.04);
-  border-radius:999px;
+  border-radius:3px;
   padding:3px 4px;
   position:relative;
   overflow:visible;
 }
-/* ::before — straight horizontal road line running behind all circles */
+/* ::before — pixel horizontal connector line (no rounded ends) */
 .hw-row::before{
   content:'';
   position:absolute;
   top:50%;left:4px;right:4px;
-  height:3px;
-  background:rgba(255,255,255,0.07);
-  border-radius:999px;
+  height:2px;
+  background:rgba(255,255,255,0.10);
+  border-radius:0;
   transform:translateY(-50%);
   z-index:0;
   pointer-events:none;
 }
-/* ::after — U-turn curve bridging the 10px gap up to the row above */
-/* Right turn (L→R rows exit right): C-shape opening LEFT */
+/* Sharp 90° pixel connectors — 2px vertical stub fills the gap, no curves */
 .hw-row.hw-turn-right::after{
   content:'';
   position:absolute;
-  right:0;
-  top:calc(-10px);
-  width:calc(10% + 4px);
-  height:calc(100% + 10px);
-  border-top:2px solid rgba(255,255,255,0.16);
-  border-right:2px solid rgba(255,255,255,0.16);
-  border-bottom:2px solid rgba(255,255,255,0.16);
-  border-left:none;
-  border-radius:0 18px 18px 0;
+  right:2px;
+  top:-10px;        /* reaches up into the 10px row gap */
+  width:2px;
+  height:10px;
+  background:rgba(255,255,255,0.18);
+  border-radius:0;  /* crisp pixel line */
   z-index:0;
   pointer-events:none;
 }
-/* Left turn (R→L rows exit left): C-shape opening RIGHT */
 .hw-row.hw-turn-left::after{
   content:'';
   position:absolute;
-  left:0;
-  top:calc(-10px);
-  width:calc(10% + 4px);
-  height:calc(100% + 10px);
-  border-top:2px solid rgba(255,255,255,0.16);
-  border-left:2px solid rgba(255,255,255,0.16);
-  border-bottom:2px solid rgba(255,255,255,0.16);
-  border-right:none;
-  border-radius:18px 0 0 18px;
+  left:2px;
+  top:-10px;
+  width:2px;
+  height:10px;
+  background:rgba(255,255,255,0.18);
+  border-radius:0;
   z-index:0;
   pointer-events:none;
 }
@@ -547,7 +539,7 @@ button{transition:transform 0.1s ease}
   background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);
   border-radius:var(--radius-sm);
 }
-.hw-legend-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--muted2)}
+.hw-legend-item{display:flex;align-items:center;gap:6px;font-size:6px;font-weight:500;color:var(--muted2);font-family:'Press Start 2P',monospace;letter-spacing:0.02em}
 /* ── MAP FEED ── */
 .map-feed-wrap{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
 .map-feed-empty{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px}
@@ -592,6 +584,17 @@ button{transition:transform 0.1s ease}
 .hw-space.hw-conquered {
   background: #1A2D38 !important;
   border-color: rgba(56,189,248,0.5) !important;
+}
+
+/* Locked advancement overlay — slots beyond the leader's progress */
+.hw-space.hw-locked::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  border-radius: 2px;
+  z-index: 2;
+  pointer-events: none;
 }
 
 /* 2. Pixel font on node numbers */
@@ -1920,12 +1923,18 @@ function updateHighwayTokens() {
   if (!trackRect.width) return;
 
   // Conquered road: highlight all spaces up to the leader's count
+  // Locked overlay: dim all spaces beyond the leader's count
   const maxCount = players.reduce((m, p) => Math.max(m, p.count || 0), 0);
   for (let n = 1; n <= 100; n++) {
     const el = document.getElementById(`hw-space-${n}`);
     if (!el) continue;
-    if (n <= maxCount) el.classList.add('hw-conquered');
-    else el.classList.remove('hw-conquered');
+    if (n <= maxCount) {
+      el.classList.add('hw-conquered');
+      el.classList.remove('hw-locked');
+    } else {
+      el.classList.remove('hw-conquered');
+      el.classList.add('hw-locked');
+    }
   }
 
   // Group players by clamped board position
