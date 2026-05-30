@@ -1379,8 +1379,9 @@ window.selectPatties = function(n) {
   if (lbl) lbl.textContent = labels[n] || '';
 
   // Update confirm button text
+  const btnLabels = ['', '✓ Log This Burger', '✓ Log This Double', '✓ Log This Triple'];
   const confirmBtn = document.getElementById('confirm-btn');
-  if (confirmBtn) confirmBtn.textContent = `✓ Log ${n === 1 ? 'This Burger' : n + ' Burgers'}`;
+  if (confirmBtn) confirmBtn.textContent = btnLabels[n] || '✓ Log This Burger';
 
   // Reveal detail form
   const d = document.getElementById('burger-detail');
@@ -1414,7 +1415,7 @@ window.confirmBurger = async function() {
   const count = pendingPattyCount || 1;
   const restaurant = document.getElementById('detail-restaurant').value.trim() || 'Unknown spot';
   const stars = '⭐'.repeat(pendingRating) || '—';
-  const pattyLabel = count === 1 ? 'Single' : count === 2 ? 'Double' : 'Triple';
+  const pattyLabel = ['', 'Single', 'Double', 'Triple'][count] || 'Single';
 
   await changeMyCountWithDetails(1, restaurant, pendingRating, pendingGPS);
 
