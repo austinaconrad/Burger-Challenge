@@ -92,7 +92,8 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .joke-a.revealed{display:block}
 .joke-hint{font-size:9px;color:var(--muted);margin-top:5px;font-weight:400;font-style:italic}
 .leaderboard{display:flex;flex-direction:column;gap:8px}
-@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
 .lb-card{
   background:rgba(255,255,255,0.035);
   backdrop-filter:blur(8px);
@@ -106,7 +107,15 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
   box-shadow:0 4px 24px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.05);
   position:relative;overflow:hidden;
 }
-.lb-card:active{transform:scale(0.98)}
+.lb-card{animation:none} /* stagger applied via JS */
+.lb-card:active{transform:scale(0.98);transition:transform 0.1s ease}
+/* universal active press feel */
+button{transition:transform 0.1s ease}
+.tab-btn{transition:all 0.2s,transform 0.1s ease}
+.tab-btn:active{transform:scale(0.95);transition:transform 0.1s ease}
+.btn-primary:active,.btn-secondary:active,.detail-confirm-btn:active,.add-form button:active{transition:transform 0.1s ease}
+.map-feed-card{transition:background 0.15s,border-color 0.15s,transform 0.1s ease}
+.ach-badge{transition:transform 0.1s ease,box-shadow 0.2s,filter 0.2s,opacity 0.2s}
 .lb-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.12),transparent);opacity:1}
 .lb-card.first-place{
   background:rgba(245,158,11,0.06);
@@ -533,6 +542,27 @@ function initFirebase() {
 }
 
 const uid = () => Math.random().toString(36).slice(2,10);
+
+// Number ticker — counts from current displayed value up to target
+const _countUpPrev = {};
+function countUp(id, target, duration=500) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const prev = _countUpPrev[id] ?? 0;
+  if (prev === target) { el.textContent = target; return; }
+  _countUpPrev[id] = target;
+  const start = Date.now();
+  const from = prev;
+  const tick = () => {
+    const elapsed = Date.now() - start;
+    const progress = Math.min(elapsed / duration, 1);
+    // ease-out cubic
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(from + (target - from) * eased);
+    if (progress < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
 function initials(name) {
   const p = name.trim().split(/\s+/);
   return p.length >= 2 ? (p[0][0]+p[1][0]).toUpperCase() : name.slice(0,2).toUpperCase();
@@ -896,8 +926,8 @@ function subscribeToMessages(){
 
 function render(){
   const sorted=[...players].sort((a,b)=>b.count-a.count);
-  document.getElementById('stat-days').textContent=daysUntilLaborDay();
-  document.getElementById('stat-finished').textContent=players.reduce((sum,p)=>sum+(p.count||0),0);
+  countUp('stat-days', daysUntilLaborDay(), 500);
+  countUp('stat-finished', players.reduce((sum,p)=>sum+(p.count||0),0), 500);
   renderLeaderboard(sorted);
   renderBurgerGrid(sorted);
   renderMyTally();
@@ -980,6 +1010,20 @@ function renderLeaderboard(sorted){
       </div>
     </div>`;
   }).join('');
+
+  // Staggered entrance animation
+  lb.querySelectorAll('.lb-card').forEach((card, i) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(10px)';
+    card.style.transition = 'none';
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        card.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+      }, i * 45);
+    });
+  });
 }
 
 
