@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>🍔 100 Burger Challenge</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@700;800;900&family=Press+Start+2P&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
@@ -572,6 +572,82 @@ button{transition:transform 0.1s ease}
 .map-feed-time{font-size:10px;color:var(--muted2);font-weight:400}
 .map-feed-arrow{font-size:14px;color:var(--muted);flex-shrink:0;transition:color 0.15s}
 .map-feed-card:hover .map-feed-arrow{color:var(--amber)}
+
+/* ══════════════════════════════════════════════
+   🎮 MINECRAFT HIGHWAY OVERHAUL
+   ══════════════════════════════════════════════ */
+
+/* 1. Inventory slot nodes — square chiseled boxes */
+.hw-space {
+  border-radius: 3px !important;
+  background: #2B2B2B !important;
+  border: 2px solid #555 !important;
+  box-shadow:
+    inset -2px -2px 0 0 #111,
+    inset  2px  2px 0 0 #444 !important;
+  image-rendering: pixelated;
+}
+
+/* Conquered spaces keep the square slot shape */
+.hw-space.hw-conquered {
+  background: #1A2D38 !important;
+  border-color: rgba(56,189,248,0.5) !important;
+}
+
+/* 2. Pixel font on node numbers */
+.hw-sn {
+  font-family: 'Press Start 2P', monospace !important;
+  font-size: 4px !important;
+  line-height: 1.1;
+}
+
+/* Milestone nodes: keep square, override milestone colours */
+.hw-ms {
+  border-radius: 3px !important;
+}
+
+/* ── Glowing gold "Challenge Completed" borders for spaces 25, 50, 75 ── */
+#hw-space-25,
+#hw-space-50,
+#hw-space-75 {
+  background: rgba(255, 200, 0, 0.10) !important;
+  border-color: #FFD700 !important;
+  box-shadow:
+    inset -2px -2px 0 0 #8B6800,
+    inset  2px  2px 0 0 #FFE55C,
+    0 0 10px rgba(255, 215, 0, 0.55),
+    0 0 20px rgba(255, 215, 0, 0.25) !important;
+  color: #FFD700 !important;
+}
+
+/* 3. Tokens — square to sit cleanly on square slots */
+.hw-token {
+  border-radius: 3px !important;
+  overflow: hidden;
+  padding: 0 !important;
+  font-size: 0 !important; /* hide text when img loads */
+}
+.hw-token img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+  border-radius: 2px;
+}
+
+/* Legend token square match */
+.hw-legend-item .hw-token {
+  border-radius: 3px !important;
+  overflow: hidden;
+  padding: 0 !important;
+  font-size: 0 !important;
+}
+.hw-legend-item .hw-token img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+}
 </style>
 </head>
 <body>
@@ -1819,7 +1895,7 @@ function renderHighway() {
   const legendHtml = players.map(p => {
     const cc = colorClass(p.colorIdx);
     return `<div class="hw-legend-item">
-      <div class="hw-token ${cc}" style="position:static;transform:none;width:18px;height:18px;font-size:6.5px;box-shadow:none;pointer-events:none">${initials(p.name)}</div>
+      <div class="hw-token ${cc}" style="position:static;transform:none;width:18px;height:18px;box-shadow:none;pointer-events:none"><img src="https://minotar.net/avatar/${encodeURIComponent(p.name.trim().split(/\s+/)[0])}/18" alt="${initials(p.name)}" style="width:100%;height:100%;display:block;image-rendering:pixelated" onerror="this.outerHTML='<span style=\\'font-size:6px;font-weight:900\\'>${initials(p.name)}</span>'"/></div>
       <span>${escHtml(p.name)}</span>
     </div>`;
   }).join('');
@@ -1902,7 +1978,8 @@ function updateHighwayTokens() {
         el.className = `hw-token ${colorClass(p.colorIdx)}`;
         tokensDiv.appendChild(el);
       }
-      el.textContent  = initials(p.name);
+      const mcUser = encodeURIComponent(p.name.trim().split(/\s+/)[0]);
+      el.innerHTML = `<img src="https://minotar.net/avatar/${mcUser}/22" alt="${initials(p.name)}" title="${p.name}: ${p.count} burgers" onerror="this.outerHTML='<span style=\\'font-size:7px;font-weight:900\\'>${initials(p.name)}</span>'"/>`;
       el.title        = `${p.name}: ${p.count} burgers`;
       el.style.left   = `${cx + ox}px`;
       el.style.top    = `${cy + oy}px`;
