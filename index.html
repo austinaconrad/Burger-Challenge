@@ -437,44 +437,47 @@ button{transition:transform 0.1s ease}
 .hw-header{font-size:9px;color:var(--muted);text-align:center;margin-bottom:10px;letter-spacing:0.04em;font-weight:500}
 .hw-track{position:relative}
 .hw-rows{display:flex;flex-direction:column;gap:0}
-/* Road strip per row */
+/* Road strip per row — dashed lane via repeating gradient, visible only in gaps */
 .hw-row{
   display:flex;flex-direction:row;gap:2px;
-  background:rgba(255,255,255,0.035);
   border-radius:999px;
   padding:3px 4px;
   position:relative;
   margin-bottom:0;
-}
-.hw-row::after{
-  content:'';position:absolute;top:50%;left:5%;right:5%;
-  height:0;border-top:1px dashed rgba(255,255,255,0.13);
-  transform:translateY(-50%);pointer-events:none;z-index:0;
+  /* solid lane colour + dashed centre line combined */
+  background-color:rgba(255,255,255,0.04);
+  background-image:repeating-linear-gradient(
+    to right,
+    rgba(255,255,255,0.14) 0px, rgba(255,255,255,0.14) 5px,
+    transparent 5px, transparent 12px
+  );
+  background-position:center;
+  background-size:100% 1px;
+  background-repeat:repeat-x;
 }
 .hw-row-rev{flex-direction:row-reverse}
 /* U-turn connectors between rows */
-.hw-turn{height:6px;width:52%;margin:0 1px;border-radius:0 0 999px 999px;
-  border-bottom:3px solid rgba(255,255,255,0.07);
-  border-left:3px solid rgba(255,255,255,0.07);
-  border-right:3px solid rgba(255,255,255,0.07);
-  box-sizing:border-box;
+.hw-turn{height:7px;width:52%;margin:0 2px;box-sizing:border-box;
+  border-bottom:2px solid rgba(255,255,255,0.09);
+  border-left:2px solid rgba(255,255,255,0.09);
+  border-right:2px solid rgba(255,255,255,0.09);
 }
-.hw-turn-right{align-self:flex-end;border-radius:0 0 999px 999px;margin-right:0}
-.hw-turn-left{align-self:flex-start;border-radius:0 0 999px 999px;margin-left:0}
-/* Spaces */
+.hw-turn-right{align-self:flex-end;border-radius:0 0 20px 20px}
+.hw-turn-left{align-self:flex-start;border-radius:0 0 20px 20px}
+/* Spaces — solid background so dashed lane line doesn't bleed through */
 .hw-space{
   flex:1;min-width:0;aspect-ratio:1;border-radius:50%;
-  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+  background:#1C1C1C;border:1px solid rgba(255,255,255,0.12);
   display:flex;align-items:center;justify-content:center;
   font-family:'Inter',sans-serif;font-size:6.5px;font-weight:600;color:var(--muted);
   position:relative;z-index:1;transition:background 0.4s,border-color 0.4s,box-shadow 0.4s;
 }
 .hw-sn{line-height:1;text-align:center;user-select:none}
-/* Conquered road — all spaces up to the leader's count */
+/* Conquered road — solid so dashed lane doesn't bleed through */
 .hw-space.hw-conquered{
-  background:rgba(56,189,248,0.12);
-  border-color:rgba(56,189,248,0.28);
-  color:rgba(186,230,253,0.8);
+  background:#1A2A35;
+  border-color:rgba(56,189,248,0.35);
+  color:rgba(186,230,253,0.85);
 }
 /* Milestones — override conquered tint */
 .hw-ms{border-width:2px;z-index:2}
@@ -491,10 +494,10 @@ button{transition:transform 0.1s ease}
   position:absolute;transform:translate(-50%,-50%);
   width:22px;height:22px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  font-size:7px;font-weight:800;font-family:'Inter',sans-serif;
+  font-size:7.5px;font-weight:900;font-family:'Inter',sans-serif;letter-spacing:-0.3px;
   background:var(--av-bg);color:var(--av-text);
-  border:2.5px solid var(--ring-color);
-  box-shadow:0 2px 8px rgba(0,0,0,0.55),0 0 6px var(--ring-color);
+  border:3px solid var(--ring-color);
+  box-shadow:0 2px 10px rgba(0,0,0,0.65),0 0 8px var(--ring-color),0 0 0 1px rgba(0,0,0,0.4);
   transition:left 0.65s cubic-bezier(0.25,1,0.5,1),top 0.65s cubic-bezier(0.25,1,0.5,1);
   z-index:5;
 }
@@ -1820,7 +1823,11 @@ function updateHighwayTokens() {
     const pos = Math.max(1, Math.min(100, p.count || 1));
     const group = byPos[pos] || [];
     const idx = group.indexOf(p);
-    const spread = group.length > 1 ? (idx - (group.length - 1) / 2) * 11 : 0;
+    // Stack like overlapping group avatars: each token shifts right by 8px,
+    // centred as a group so they sit over the space.
+    const step = 8;
+    const groupWidth = (group.length - 1) * step;
+    const spread = group.length > 1 ? idx * step - groupWidth / 2 : 0;
 
     const spaceEl = document.getElementById(`hw-space-${pos}`);
     if (!spaceEl) return;
@@ -1841,8 +1848,9 @@ function updateHighwayTokens() {
     }
     el.textContent = initials(p.name);
     el.title = `${p.name}: ${p.count} burgers`;
-    el.style.left = `${cx + spread}px`;
-    el.style.top  = `${cy}px`;
+    el.style.left   = `${cx + spread}px`;
+    el.style.top    = `${cy}px`;
+    el.style.zIndex = `${5 + idx}`; // later tokens render on top
   });
 
   // Remove stale tokens
