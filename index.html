@@ -100,7 +100,7 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
   border:1px solid rgba(255,255,255,0.1);
   border-radius:var(--radius);
   padding:13px 15px;
-  display:flex;flex-direction:column;gap:0;align-items:stretch;
+  display:flex;align-items:center;gap:12px;
   transition:transform 0.15s,box-shadow 0.2s,border-color 0.2s;
   animation:slideIn 0.3s ease both;
   box-shadow:0 4px 24px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.05);
@@ -122,7 +122,7 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .ring-fill{fill:none;stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset 0.7s cubic-bezier(0.34,1.56,0.64,1);filter:drop-shadow(0 0 3px currentColor)}
 .ring-inner{position:absolute;top:5px;left:5px;right:5px;bottom:5px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:none;font-family:'Inter',sans-serif}
 .rank-badge{font-size:20px;width:28px;text-align:center;flex-shrink:0;line-height:1}
-.player-info{flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
+.player-info{flex:0 0 110px;width:110px;min-width:0;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
 .player-name{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;font-family:'Inter',sans-serif}
 .player-last-spot{font-size:10px;color:#a3a3a3;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:color 0.15s;line-height:1.3;font-weight:400}
 .player-last-spot:hover{color:var(--amber)}
@@ -378,6 +378,7 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('leaderboard',this)">🏆 Ranks</button>
+      <button class="tab-btn" onclick="switchTab('grid',this)">🍔 Grid</button>
       <button class="tab-btn" onclick="switchTab('tally',this)">➕ Tally</button>
       <button class="tab-btn" onclick="switchTab('social',this)" id="tab-btn-social">💬 Social<span class="tab-unread" id="social-unread-dot"></span></button>
       <button class="tab-btn" onclick="switchTab('players',this)">👥 Players</button>
@@ -410,6 +411,13 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
       <div class="section-label">Rankings</div>
       <div class="leaderboard" id="leaderboard"></div>
       <div id="lb-empty" class="empty" style="display:none"><div class="e-icon">🍔</div><p>No players yet!</p></div>
+    </div>
+
+    <!-- BURGER GRID TAB -->
+    <div class="tab-panel" id="tab-grid">
+      <div class="section-label">Burger Progress — each 🍔 = 1 burger eaten</div>
+      <div id="burger-grid-area"></div>
+      <div id="grid-empty" class="empty" style="display:none"><div class="e-icon">🍔</div><p>No players yet!</p></div>
     </div>
 
     <!-- TALLY TAB -->
@@ -894,6 +902,7 @@ function render(){
   document.getElementById('stat-days').textContent=daysUntilLaborDay();
   document.getElementById('stat-finished').textContent=players.reduce((sum,p)=>sum+(p.count||0),0);
   renderLeaderboard(sorted);
+  renderBurgerGrid(sorted);
   renderMyTally();
   renderPlayersList();
 }
@@ -955,44 +964,53 @@ function renderLeaderboard(sorted){
       return `<span class="ach-badge${earned?'':' locked'}" data-tip="${tip}" onclick="toggleTip(this)" style="${st}">${a.emoji}</span>`;
     }).join('')}</div>`;
 
-    // Build micro-grid (5 rows × 20 cols = 100 cells)
-    const eaten = Math.min(p.count, 100);
-    const ringColor = RING_COLORS[p.colorIdx % RING_COLORS.length];
-    let microCells = '';
-    for (let n = 1; n <= 100; n++) {
-      const isFilled = n <= eaten;
-      const isMilestone = n % 10 === 0;
-      if (isFilled) {
-        microCells += `<div class="mc filled${isMilestone?' milestone':''}" style="background:${ringColor};opacity:${isMilestone?'1':'0.85'}"></div>`;
-      } else {
-        microCells += `<div class="mc empty${isMilestone?' milestone':''}"></div>`;
-      }
-    }
-
     return `<div class="lb-card ${cc} ${isFirst?'first-place':''} ${isDone?'complete':''} ${isMe?'is-me':''}">
-      <div style="display:flex;align-items:center;gap:12px;width:100%">
-        <div class="rank-badge">${i<3&&p.count>0?ranks[i]:i+1}</div>
-        ${ringAvatarHTML(p,44,isHLWinner?'🏋🏽‍♂️':null)}
-        <div class="player-info">
-          <div class="player-name">
-            ${escHtml(p.name)}
-            ${isMe?'<span class="me-badge">You</span>':''}
-            ${isDone?'<span class="done-badge">Done!</span>':''}
-          </div>
+      <div class="rank-badge">${i<3&&p.count>0?ranks[i]:i+1}</div>
+      ${ringAvatarHTML(p,48,isHLWinner?'🏋🏽‍♂️':null)}
+      <div class="player-info">
+        <div class="player-name">
+          ${escHtml(p.name)}
+          ${isMe?'<span class="me-badge">You</span>':''}
+          ${isDone?'<span class="done-badge">Done!</span>':''}
         </div>
-        <div class="badge-col" style="flex:0 0 auto;padding:0">${badgesHtml}</div>
-        <div class="lb-score" style="flex:0 0 auto">
-          <div class="lb-count ${cc}">${p.count}</div>
-          <div class="lb-of">/ 100</div>
-        </div>
+        <div class="mini-bar-wrap"><div class="mini-bar-fill ${cc}" style="width:${pct}%"></div></div>
       </div>
-      <div class="micro-grid-wrap">
-        <div class="micro-grid">${microCells}</div>
+      <div class="badge-col">${badgesHtml}</div>
+      <div class="lb-score">
+        <div class="lb-count ${cc}">${p.count}</div>
+        <div class="lb-of">/ 100</div>
+        <div class="lb-of-label">burgers</div>
       </div>
     </div>`;
   }).join('');
 }
 
+
+function renderBurgerGrid(sorted){
+  const area=document.getElementById('burger-grid-area');
+  const empty=document.getElementById('grid-empty');
+  if(!sorted.length){area.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  area.innerHTML=sorted.map(p=>{
+    const cc=colorClass(p.colorIdx);
+    const eaten=Math.min(p.count,100), isDone=p.count>=100, isMe=p.id===myPlayerId;
+    let cells='';
+    for(let i=1;i<=100;i++) cells+=`<div class="bg-cell ${i<=eaten?'eaten':'empty-burger'}" data-num="${i}">🍔</div>`;
+    return `<div class="bg-player-card ${cc} ${isDone?'complete':''}">
+      <div class="bg-header">
+        ${avatarHTML(p,38)}
+        <div class="bg-name">${escHtml(p.name)}${isMe?' <span style="font-size:11px;color:var(--muted2);font-family:\'Inter\',sans-serif;font-weight:400">(you)</span>':''}</div>
+        <div class="bg-count-pill">${eaten}/100</div>
+        ${isDone?'<span style="font-size:16px">🏆</span>':''}
+      </div>
+      <div class="bg-grid">${cells}</div>
+      <div class="bg-progress-row">
+        <div class="bg-progress-track"><div class="bg-progress-fill ${cc}" style="width:${eaten}%"></div></div>
+        <div class="bg-pct ${cc}">${eaten}%</div>
+      </div>
+    </div>`;
+  }).join('');
+}
 
 function renderMyTally(){
   const area=document.getElementById('my-tally-area');
