@@ -842,25 +842,44 @@ body.social-active .social-input-area{
   grid-template-columns:repeat(5,1fr);
   grid-template-rows:repeat(5,1fr);
   aspect-ratio:1;
-  background:
-    repeating-linear-gradient(0deg,transparent,transparent 19%,rgba(0,0,0,0.06) 19%,rgba(0,0,0,0.06) 20%),
-    repeating-linear-gradient(90deg,transparent,transparent 19%,rgba(0,0,0,0.06) 19%,rgba(0,0,0,0.06) 20%),
-    linear-gradient(135deg,#3a7d3a 0%,#2a5e2a 100%);
-  border:3px solid #1c3d1c;
+  background:#2e7d32;
+  border:3px solid #1b5e20;
   border-radius:14px;
-  padding:6px;
-  gap:4px;
+  padding:0;
+  gap:0;
   box-shadow:0 6px 32px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.08);
+  overflow:hidden;
 }
+/* Checkerboard tiles */
 .v-cell{
   display:flex;align-items:center;justify-content:center;
-  border-radius:6px;
-  background:rgba(255,255,255,0.04);
   position:relative;
   min-height:0;
   transition:background 0.3s;
 }
-.v-cell.has-building{background:rgba(0,0,0,0.18);box-shadow:inset 0 2px 4px rgba(0,0,0,0.3)}
+.v-cell.tile-dark{ background:#2e7d32 }
+.v-cell.tile-light{ background:#388e3c }
+.v-cell.has-building.tile-dark{ background:#1b5e20 }
+.v-cell.has-building.tile-light{ background:#2e7d32 }
+/* Locked building silhouettes */
+.v-cell.cell-locked .v-building{opacity:0.35;filter:grayscale(100%)}
+.v-lock-icon{
+  position:absolute;top:2px;right:3px;
+  font-size:9px;line-height:1;pointer-events:none;
+}
+.v-unlock-label{
+  position:absolute;bottom:1px;left:50%;transform:translateX(-50%);
+  font-size:5px;font-family:'Press Start 2P',monospace;
+  background:rgba(0,0,0,0.65);color:#ccc;
+  border-radius:3px;padding:1px 3px;white-space:nowrap;pointer-events:none;
+  line-height:1.4;
+}
+/* Decoration props */
+.v-deco{
+  font-size:clamp(14px,4vw,24px);line-height:1;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,0.4));
+  animation:buildingFloat 4s ease-in-out infinite;
+}
 .v-building{
   font-size:clamp(18px,5.5vw,32px);
   line-height:1;
@@ -2688,76 +2707,132 @@ const VILLAGE_TIERS = [
   },
 ];
 
+// Decorative props — unlocked progressively by total burger count
+// Placed in cells that don't conflict with buildings or locked buildings
+const VILLAGE_DECORATIONS = [
+  { r:1, c:0, e:'🌲', unlockAt:0  },
+  { r:0, c:1, e:'🌲', unlockAt:0  },
+  { r:3, c:4, e:'🌲', unlockAt:0  },
+  { r:4, c:3, e:'🌲', unlockAt:5  },
+  { r:1, c:4, e:'🪵', unlockAt:15 },
+  { r:3, c:0, e:'🪵', unlockAt:20 },
+  { r:4, c:1, e:'🥩', unlockAt:30 },
+  { r:1, c:2, e:'🌿', unlockAt:45 },
+  { r:3, c:2, e:'🌿', unlockAt:55 },
+  { r:2, c:4, e:'🎪', unlockAt:70 },
+  { r:2, c:1, e:'⛲', unlockAt:85 },
+];
+
 let _confettiBaseInterval = null;
 
 function updateVillageBase() {
-  const lawn        = document.getElementById('village-lawn');
-  const progressEl  = document.getElementById('village-progress');
-  const legendEl    = document.getElementById('voyage-legend');
+  const lawn       = document.getElementById('village-lawn');
+  const progressEl = document.getElementById('village-progress');
+  const legendEl   = document.getElementById('voyage-legend');
   if (!lawn || !progressEl) return;
 
   const total = players.reduce((sum, p) => sum + (p.count || 0), 0);
 
-  // Find current tier
+  // Current tier
   let tierIdx = 0;
   for (let i = VILLAGE_TIERS.length - 1; i >= 0; i--) {
     if (total >= VILLAGE_TIERS[i].minTotal) { tierIdx = i; break; }
   }
-  const tier = VILLAGE_TIERS[tierIdx];
+  const tier     = VILLAGE_TIERS[tierIdx];
+  const nextTier = VILLAGE_TIERS[tierIdx + 1] || null;
 
-  // Build grid
-  const bmap = {};
-  tier.buildings.forEach(b => { bmap[`${b.r},${b.c}`] = b; });
+  // Maps for quick lookup
+  const activeMap = {};
+  tier.buildings.forEach(b => { activeMap[`${b.r},${b.c}`] = b; });
+
+  const lockedMap = {};
+  if (nextTier) {
+    nextTier.buildings.forEach(b => {
+      const key = `${b.r},${b.c}`;
+      if (!activeMap[key]) lockedMap[key] = b; // only show if not already built
+    });
+  }
+
+  // Unlocked decorations — skip any that conflict with active or locked buildings
+  const decoMap = {};
+  VILLAGE_DECORATIONS.forEach(d => {
+    const key = `${d.r},${d.c}`;
+    if (d.unlockAt <= total && !activeMap[key] && !lockedMap[key]) {
+      decoMap[key] = d;
+    }
+  });
+
+  // Render 5×5 grid
   lawn.className = 'village-lawn' + (tier.lawnClass ? ' ' + tier.lawnClass : '');
   lawn.innerHTML = '';
   const legendBuildings = [];
+
   for (let r = 0; r < 5; r++) {
     for (let c = 0; c < 5; c++) {
+      const key  = `${r},${c}`;
       const cell = document.createElement('div');
-      cell.className = 'v-cell';
-      const b = bmap[`${r},${c}`];
-      if (b) {
+      const dark = (r + c) % 2 === 0;
+      cell.className = `v-cell ${dark ? 'tile-dark' : 'tile-light'}`;
+
+      const active  = activeMap[key];
+      const locked  = lockedMap[key];
+      const deco    = decoMap[key];
+      const delay   = ((r * 5 + c) * 0.11).toFixed(2);
+
+      if (active) {
         cell.classList.add('has-building');
-        const delay = ((r * 5 + c) * 0.12).toFixed(2);
-        cell.innerHTML = `<span class="v-building ${b.cls}" title="${b.label}" style="animation-delay:${delay}s">${b.e}</span>`;
-        if (!legendBuildings.find(x => x.label === b.label)) legendBuildings.push(b);
+        cell.innerHTML = `<span class="v-building ${active.cls}" title="${active.label}" style="animation-delay:${delay}s">${active.e}</span>`;
+        if (!legendBuildings.find(x => x.label === active.label)) legendBuildings.push(active);
+      } else if (locked) {
+        cell.classList.add('has-building', 'cell-locked');
+        const needed = nextTier ? nextTier.minTotal - total : 0;
+        cell.innerHTML = `
+          <span class="v-building" style="animation-delay:${delay}s">${locked.e}</span>
+          <span class="v-lock-icon">🔒</span>
+          <span class="v-unlock-label">${nextTier ? nextTier.minTotal : ''}🍔</span>`;
+      } else if (deco) {
+        cell.innerHTML = `<span class="v-deco" style="animation-delay:${delay}s">${deco.e}</span>`;
       }
+
       lawn.appendChild(cell);
     }
   }
 
   // Progress bar
   const maxed = tier.nextAt === null;
-  let pct = 100, label = '👑 Maximum Level Achieved!';
+  let pct = 100, progressLabel = '👑 Maximum Level Achieved!';
   if (!maxed) {
     pct = Math.min(100, Math.round((total - tier.minTotal) / (tier.nextAt - tier.minTotal) * 100));
     const needed = tier.nextAt - total;
-    const nextTier = VILLAGE_TIERS[tierIdx + 1];
-    label = needed > 0
-      ? `${total} / ${tier.nextAt} burgers &mdash; ${needed} more to unlock ${nextTier.name}!`
+    progressLabel = needed > 0
+      ? `${total} / ${tier.nextAt} burgers — ${needed} more to unlock ${nextTier.name}!`
       : 'Ready to upgrade!';
   }
   progressEl.innerHTML = `
     <div class="voyage-tier-name">${tier.name}</div>
     <div class="voyage-tier-desc">${tier.desc}</div>
     <div class="voyage-track"><div class="voyage-fill${maxed?' maxed':''}" style="width:${pct}%"></div></div>
-    <div class="voyage-progress-label">${label}</div>
+    <div class="voyage-progress-label">${progressLabel}</div>
   `;
 
-  // Legend
+  // Building legend
   if (legendEl) {
-    legendEl.innerHTML = legendBuildings.map(b =>
-      `<div class="voyage-legend-item">${b.e} ${b.label}</div>`
-    ).join('');
+    const lockedLegend = nextTier
+      ? Object.values(lockedMap).filter((b,i,a) => a.findIndex(x=>x.label===b.label)===i)
+          .map(b => `<div class="voyage-legend-item" style="opacity:0.45">🔒 ${b.e} ${b.label}</div>`).join('')
+      : '';
+    legendEl.innerHTML =
+      legendBuildings.map(b => `<div class="voyage-legend-item">${b.e} ${b.label}</div>`).join('') +
+      lockedLegend;
   }
 
-  // Tier 4: periodic confetti
+  // Tier 4: confetti
   if (tierIdx === 3) {
     if (!_confettiBaseInterval) {
       _confettiBaseInterval = setInterval(() => {
         if (!document.getElementById('tab-base')?.classList.contains('active')) return;
-        confetti({ particleCount: 18, spread: 80, origin: { y: 0.5 },
-          colors: ['#FFD700','#F59E0B','#EF4444','#22C55E','#3B82F6'] });
+        confetti({ particleCount:18, spread:80, origin:{y:0.5},
+          colors:['#FFD700','#F59E0B','#EF4444','#22C55E','#3B82F6'] });
       }, 3500);
     }
   } else {
