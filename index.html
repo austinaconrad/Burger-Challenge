@@ -1852,11 +1852,11 @@ function renderSocialFeed() {
   }).join('');
   window._msgImages = {};
   messages.forEach(m => { if (m.imageBase64) window._msgImages[m.id] = m.imageBase64; });
-  // Double rAF: first frame lets the browser parse & layout the new innerHTML,
-  // second frame fires after the first paint — scrollHeight is real by then
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    feed.scrollTop = feed.scrollHeight;
-  }));
+  // Try immediately (works if feed is already visible and laid out)
+  feed.scrollTop = feed.scrollHeight;
+  // Also retry after 50ms to catch cases where social-active CSS height
+  // hasn't been computed yet at render time
+  setTimeout(() => { feed.scrollTop = feed.scrollHeight; }, 50);
 }
 
 window.openLightbox = function(msgId) {
