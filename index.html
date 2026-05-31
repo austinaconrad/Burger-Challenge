@@ -2019,9 +2019,10 @@ function renderMyTally(){
   const me=players.find(p=>p.id===myPlayerId);
   if(!me){area.innerHTML='<div class="empty"><div class="e-icon">🔍</div><p>Player not found. Try rejoining.</p></div>';return;}
 
-  // Preserve burger detail state so a Firestore re-render doesn't wipe the user's restaurant selection mid-entry
+  // Preserve burger detail state so a Firestore re-render doesn't wipe the user's mid-entry selection
   const detailWasOpen = document.getElementById('burger-detail')?.classList.contains('open') || false;
   const savedRestaurant = detailWasOpen ? (document.getElementById('detail-restaurant')?.value || '') : '';
+  const savedPattyCount = detailWasOpen ? pendingPattyCount : 0;
   const cc=colorClass(me.colorIdx);
   const pct=Math.min(100,me.count), isDone=me.count>=100;
   area.innerHTML=`<div class="my-tally-card ${cc} ${isDone?'complete':''}">
@@ -2086,17 +2087,36 @@ function renderMyTally(){
     <div class="complete-strip" ${isDone?'style="display:block"':''}>🎉 You crushed 100 burgers! You're a legend!</div>
   </div>`;
 
-  // Restore detail panel state so a mid-entry Firestore re-render doesn't lose the restaurant name
+  // Restore detail panel state so a mid-entry Firestore re-render doesn't lose selections
   if (detailWasOpen) {
     const d = document.getElementById('burger-detail');
     if (d) d.classList.add('open');
     const inp = document.getElementById('detail-restaurant');
     if (inp) inp.value = savedRestaurant;
-    // Re-seed quick spots since the HTML was just replaced
+    // Re-seed quick spots
     const qs = document.getElementById('quick-spots');
     if (qs) qs.innerHTML = OHIO_SPOTS.slice(0,5).map(s =>
       `<button class="quick-spot" data-spot="${escHtml(s)}" onclick="document.getElementById('detail-restaurant').value=this.dataset.spot">${escHtml(s)}</button>`
     ).join('');
+    // Restore patty selection — re-highlight the correct button and rebuild the visual stack
+    if (savedPattyCount > 0) {
+      document.querySelectorAll('.pb-btn').forEach((b, i) => b.classList.toggle('selected', i + 1 === savedPattyCount));
+      const stack = document.getElementById('pb-stack');
+      if (stack) {
+        stack.innerHTML = '';
+        for (let i = 0; i < savedPattyCount; i++) {
+          const patty = document.createElement('div');
+          patty.className = 'pb-patty';
+          stack.appendChild(patty);
+        }
+      }
+      const lbl = document.getElementById('pb-label');
+      const lblMap = ['', 'One patty — classic!', 'Two patties — serious.', 'Three patties — legend.'];
+      if (lbl) lbl.textContent = lblMap[savedPattyCount] || '';
+      const confirmBtn = document.getElementById('confirm-btn');
+      const btnMap = ['', '✓ Log This Burger', '✓ Log This Double', '✓ Log This Triple'];
+      if (confirmBtn) confirmBtn.textContent = btnMap[savedPattyCount] || '✓ Log This Burger';
+    }
   }
 }
 
@@ -2973,7 +2993,7 @@ function renderGrillFeed() {
         ts,
         restaurant:        (typeof entry === 'object' && entry.restaurant)        || 'Unknown Spot',
         rating:            (typeof entry === 'object' && entry.rating)            || 0,
-        patties:           (typeof entry === 'object' && entry.patties)           || 1,
+        patties:           (typeof entry === 'object' && entry.patties != null) ? entry.patties : null,
         lat:               (typeof entry === 'object' && entry.lat)               || null,
         lng:               (typeof entry === 'object' && entry.lng)               || null,
         locationCityState: (typeof entry === 'object' && entry.locationCityState) || '',
@@ -2995,14 +3015,20 @@ function renderGrillFeed() {
   }
 
   feedEl.innerHTML = allEntries.map((item, idx) => {
-    const p = item.patties || 1;
+    // null = legacy entry with no patty data; number = explicitly set
+    const p = item.patties;
+    const pattyKnown = p != null;
+    const pattyCount = p || 1;
 
     // ── Patty stamp
     let stampText, stampCls;
-    if (p >= 3) {
+    if (!pattyKnown) {
+      stampText = '🍔 BURGER LOGGED';
+      stampCls  = 'stamp-single';
+    } else if (pattyCount >= 3) {
       stampText = '🇺🇸🚨 THE PATTIE MELTDOWN (Triple)';
       stampCls  = 'stamp-triple';
-    } else if (p === 2) {
+    } else if (pattyCount === 2) {
       stampText = '🥩 THE DOUBLE OR NOTHING (Double)';
       stampCls  = 'stamp-double';
     } else {
@@ -3044,7 +3070,7 @@ function renderGrillFeed() {
     const burgerNum = item.player.count - playerEntries.indexOf(item);
 
     return `
-<div class="grill-feed-card ${p >= 3 ? 'triple-card' : ''}" style="animation-delay:${Math.min(idx * 0.04, 0.6)}s">
+<div class="grill-feed-card ${pattyCount >= 3 && pattyKnown ? 'triple-card' : ''}" style="animation-delay:${Math.min(idx * 0.04, 0.6)}s">
   <div class="grill-card-inner">
     <div class="grill-card-banner">
       <div class="grill-banner-left">
@@ -3067,7 +3093,7 @@ function renderGrillFeed() {
           ${ratingTxt}
         </div>
       </div>
-      ${miniBurgerStack(p)}
+      ${miniBurgerStack(pattyCount)}
     </div>
   </div>
 </div>`.trim();
