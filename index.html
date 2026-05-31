@@ -927,6 +927,218 @@ body.social-active .social-input-area{
 }
 .players-pill:hover{border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,0.07)}
 .players-pill.active{color:var(--amber);border-color:rgba(245,158,11,0.5);background:rgba(245,158,11,0.08)}
+/* ══════════════════════════════════════════════
+   🇺🇸 AMERICAN SMOKEHOUSE FEED
+   ══════════════════════════════════════════════ */
+
+.grill-feed-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 4px 0 24px;
+}
+.grill-feed-empty {
+  text-align: center;
+  padding: 56px 20px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.grill-feed-empty .gfe-icon { font-size: 48px; margin-bottom: 12px; display: block; }
+.grill-feed-empty .gfe-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--amber);
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+/* Card: gradient border via pseudo-element mask trick */
+.grill-feed-card {
+  position: relative;
+  border-radius: 14px;
+  background: #1A1A1A;
+  padding: 3px;
+  box-shadow: 0 4px 28px rgba(0,0,0,0.55);
+  animation: grillCardIn 0.3s ease both;
+}
+@keyframes grillCardIn {
+  from { opacity:0; transform: translateY(10px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+.grill-feed-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  padding: 3px;
+  background: linear-gradient(135deg, #C8102E 0%, #ffffff 45%, #002868 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+.grill-feed-card.triple-card {
+  animation: grillCardIn 0.3s ease both, tripleGlow 2.4s ease-in-out infinite;
+}
+@keyframes tripleGlow {
+  0%,100% { box-shadow: 0 4px 28px rgba(0,0,0,0.55), 0 0 0 rgba(200,16,46,0); }
+  50%      { box-shadow: 0 4px 28px rgba(0,0,0,0.55), 0 0 22px rgba(200,16,46,0.35); }
+}
+.grill-card-inner {
+  background: #1A1A1A;
+  border-radius: 11px;
+  overflow: hidden;
+}
+
+/* Diner header banner */
+.grill-card-banner {
+  background: linear-gradient(90deg, #8B0000 0%, #C8102E 35%, #9C0020 70%, #6B0000 100%);
+  padding: 7px 14px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+.grill-card-banner::after {
+  content: '★ ★ ★ ★ ★';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 7px;
+  color: rgba(255,255,255,0.18);
+  letter-spacing: 4px;
+  pointer-events: none;
+}
+.grill-banner-left { display: flex; align-items: center; gap: 8px; }
+.grill-banner-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  border: 2px solid rgba(255,255,255,0.5);
+  flex-shrink: 0;
+  font-family: 'Inter', sans-serif;
+  box-shadow: 0 0 8px rgba(0,0,0,0.4);
+}
+.grill-banner-name {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  letter-spacing: 0.02em;
+}
+.grill-banner-badge {
+  font-size: 9px;
+  font-weight: 700;
+  background: rgba(0,0,0,0.35);
+  color: #FFD700;
+  border: 1px solid rgba(255,215,0,0.4);
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Patty stamp bar */
+.grill-patty-stamp {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6.5px;
+  color: #fff;
+  background: linear-gradient(90deg, #002868, #003580);
+  border-bottom: 2px solid rgba(200,16,46,0.5);
+  padding: 8px 14px 7px;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+}
+.grill-patty-stamp.stamp-triple {
+  background: linear-gradient(90deg, #6B0000, #C8102E);
+  border-bottom-color: rgba(255,215,0,0.5);
+  color: #FFD700;
+}
+.grill-patty-stamp.stamp-double {
+  background: linear-gradient(90deg, #002868, #1a3a7a);
+  border-bottom-color: rgba(255,255,255,0.18);
+}
+
+/* Card body */
+.grill-card-body {
+  padding: 11px 14px 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Pills */
+.grill-pill-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.grill-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  padding: 4px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  line-height: 1;
+}
+.grill-pill-location {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: #E0E0E0;
+}
+.grill-pill-location.has-gps {
+  background: rgba(34,197,94,0.10);
+  border-color: rgba(34,197,94,0.30);
+  color: #4ADE80;
+}
+.grill-pill-location.no-gps {
+  background: rgba(148,163,184,0.08);
+  border-color: rgba(148,163,184,0.18);
+  color: #94A3B8;
+}
+.grill-pill-time {
+  background: rgba(245,158,11,0.08);
+  border: 1px solid rgba(245,158,11,0.22);
+  color: var(--amber);
+}
+
+/* Flame rating */
+.grill-rating-row { display: flex; align-items: center; gap: 8px; }
+.grill-flames { font-size: 14px; line-height: 1; letter-spacing: 1px; }
+.grill-rating-num {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted2);
+}
+
+/* USA stripe divider */
+.grill-stripe {
+  height: 3px;
+  background: repeating-linear-gradient(
+    90deg,
+    #C8102E 0px, #C8102E 8px,
+    #fff    8px, #fff    16px,
+    #002868 16px, #002868 24px
+  );
+  opacity: 0.5;
+  margin: 0;
+}
+
 /* Legend token square match */
 .hw-legend-item .hw-token {
   border-radius: 3px !important;
@@ -989,6 +1201,7 @@ body.social-active .social-input-area{
       <button class="tab-btn active" onclick="switchTab('leaderboard',this)">🏆 Ranks</button>
       <button class="tab-btn" onclick="switchTab('tally',this)">➕ Tally</button>
       <button class="tab-btn" onclick="switchTab('social',this)" id="tab-btn-social">💬 Social<span class="tab-unread" id="social-unread-dot"></span></button>
+      <button class="tab-btn" onclick="switchTab('feed',this)">🔥 Feed</button>
       <button class="tab-btn" onclick="switchTab('map',this)">🗺 Map</button>
       <button class="tab-btn" onclick="switchTab('highway',this)">🏁 Highway</button>
     </div>
@@ -1048,6 +1261,11 @@ body.social-active .social-input-area{
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- FEED TAB -->
+    <div class="tab-panel" id="tab-feed">
+      <div class="grill-feed-wrap" id="grill-feed"></div>
     </div>
 
     <!-- PLAYERS TAB -->
@@ -1625,6 +1843,7 @@ function render(){
   renderPlayersList();
   renderDailyCard(players);
   if(document.getElementById('hw-rows')) updateHighwayTokens();
+  if(document.getElementById('tab-feed')?.classList.contains('active')) renderGrillFeed();
   // Update players pill count
   const pill = document.getElementById('players-pill-btn');
   if(pill) pill.textContent = `👥 Players (${players.length})`;
@@ -2139,7 +2358,7 @@ window.confirmBurger = async function() {
   const stars = '⭐'.repeat(Math.floor(pendingRating)) + (pendingRating % 1 ? '✨' : '') || '—';
   const pattyLabel = ['', 'Single', 'Double', 'Triple'][count] || 'Single';
 
-  await changeMyCountWithDetails(1, restaurant, pendingRating, pendingGPS);
+  await changeMyCountWithDetails(1, restaurant, pendingRating, pendingGPS, pendingPattyCount || 1);
 
   // Reset builder
   document.getElementById('burger-detail').classList.remove('open');
@@ -2198,7 +2417,7 @@ window.confirmBurger = async function() {
   }
 };
 
-async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null) {
+async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null, patties=1) {
   const me=players.find(p=>p.id===myPlayerId);
   if(!me) return;
   const newCount=Math.max(0,Math.min(999,me.count+delta));
@@ -2209,7 +2428,7 @@ async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null
   const currentLogs = me.logs || [];
   let newLogs = [...currentLogs];
   if(delta > 0){
-    const entry = {ts: new Date().toISOString(), restaurant, rating: rating||0};
+    const entry = {ts: new Date().toISOString(), restaurant, rating: rating||0, patties: patties||1};
     if(gps) { entry.lat = gps.lat; entry.lng = gps.lng; }
     newLogs.push(entry);
   } else if(delta < 0 && newLogs.length > 0) newLogs.pop();
@@ -2309,6 +2528,7 @@ window.switchTab=function(name,btn){
     if(!document.getElementById('hw-rows')) renderHighway();
     else setTimeout(updateHighwayTokens, 80);
   }
+  if(name==='feed') renderGrillFeed();
 };
 
 window.switchToPlayers = function() {
@@ -2589,6 +2809,128 @@ function updateHighwayTokens() {
   tokensDiv.querySelectorAll('.hw-token, .hw-overflow-bubble').forEach(el => {
     if (!seen.has(el.id)) el.remove();
   });
+}
+
+// ── AMERICAN SMOKEHOUSE FEED ──────────────────────────────────────
+
+function ratingToFlames(rating) {
+  if (!rating || rating <= 0) return '<span style="color:var(--muted);font-size:12px">— unrated</span>';
+  let html = '';
+  for (let i = 1; i <= 5; i++) {
+    if (rating >= i)         html += '🔥';
+    else if (rating >= i - 0.5) html += '♨️';
+    else                     html += '<span style="opacity:0.18;font-size:14px">🔥</span>';
+  }
+  return html;
+}
+
+function renderGrillFeed() {
+  const feedEl = document.getElementById('grill-feed');
+  if (!feedEl) return;
+
+  // Collect every log entry from every player
+  const allEntries = [];
+  players.forEach(p => {
+    (p.logs || []).forEach(entry => {
+      const ts = logTs(entry);
+      if (!ts) return;
+      allEntries.push({
+        player:     p,
+        ts,
+        restaurant: (typeof entry === 'object' && entry.restaurant) || 'Unknown Spot',
+        rating:     (typeof entry === 'object' && entry.rating)     || 0,
+        patties:    (typeof entry === 'object' && entry.patties)    || 1,
+        lat:        (typeof entry === 'object' && entry.lat)        || null,
+        lng:        (typeof entry === 'object' && entry.lng)        || null,
+      });
+    });
+  });
+
+  // Newest first
+  allEntries.sort((a, b) => new Date(b.ts) - new Date(a.ts));
+
+  if (!allEntries.length) {
+    feedEl.innerHTML = `
+      <div class="grill-feed-empty">
+        <span class="gfe-icon">🍔🔥</span>
+        <div class="gfe-title">THE GRILL IS COLD</div>
+        Log your first burger to fire up the feed!
+      </div>`;
+    return;
+  }
+
+  feedEl.innerHTML = allEntries.map((item, idx) => {
+    const p = item.patties || 1;
+
+    // ── Patty stamp
+    let stampText, stampCls;
+    if (p >= 3) {
+      stampText = '🇺🇸🚨 THE PATTIE MELTDOWN (Triple)';
+      stampCls  = 'stamp-triple';
+    } else if (p === 2) {
+      stampText = '🥩 THE DOUBLE OR NOTHING (Double)';
+      stampCls  = 'stamp-double';
+    } else {
+      stampText = '🍔 THE SOLO DOLO (Single)';
+      stampCls  = 'stamp-single';
+    }
+
+    // ── Location pill
+    let locPill;
+    if (item.lat && item.lng) {
+      const coordStr = `${item.lat.toFixed(3)}°, ${item.lng.toFixed(3)}°`;
+      locPill = `<span class="grill-pill grill-pill-location has-gps">📍 DEVOURED AT: ${escHtml(item.restaurant)} (${coordStr})</span>`;
+    } else {
+      locPill = `<span class="grill-pill grill-pill-location no-gps">🕵️‍♂️ GRILL STATION: ${escHtml(item.restaurant)} (Off the Grid)</span>`;
+    }
+
+    // ── Time
+    const d       = new Date(item.ts);
+    const month   = String(d.getMonth() + 1).padStart(2, '0');
+    const day     = String(d.getDate()).padStart(2, '0');
+    const year    = d.getFullYear();
+    const timeStr = d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', hour12:true});
+    const timePill = `<span class="grill-pill grill-pill-time">🔥 SEARED: ${month}/${day}/${year} @ ${timeStr}</span>`;
+
+    // ── Flames
+    const flames   = ratingToFlames(item.rating);
+    const ratingTxt = item.rating > 0 ? `<span class="grill-rating-num">${item.rating}/5</span>` : '';
+
+    // ── Avatar color
+    const color  = RING_COLORS[item.player.colorIdx % RING_COLORS.length];
+    const cc     = colorClass(item.player.colorIdx);
+    const ini    = initials(item.player.name);
+    const isMe   = item.player.id === myPlayerId;
+
+    // ── Burger number for this player (reverse: most recent = highest)
+    const playerEntries = allEntries.filter(e => e.player.id === item.player.id);
+    const burgerNum = item.player.count - playerEntries.indexOf(item); // ordinal position
+
+    return `
+<div class="grill-feed-card ${p >= 3 ? 'triple-card' : ''}" style="animation-delay:${Math.min(idx * 0.04, 0.6)}s">
+  <div class="grill-card-inner">
+    <div class="grill-card-banner">
+      <div class="grill-banner-left">
+        <div class="grill-banner-avatar ${cc}" style="background:var(--av-bg);color:var(--av-text)">${ini}</div>
+        <div class="grill-banner-name">${escHtml(item.player.name)}${isMe ? ' <span style="font-size:9px;opacity:0.7">(you)</span>' : ''}</div>
+      </div>
+      <div class="grill-banner-badge">🍔 #${burgerNum > 0 ? burgerNum : '?'}</div>
+    </div>
+    <div class="grill-stripe"></div>
+    <div class="grill-patty-stamp ${stampCls}">${stampText}</div>
+    <div class="grill-card-body">
+      <div class="grill-pill-row">
+        ${locPill}
+        ${timePill}
+      </div>
+      <div class="grill-rating-row">
+        <span class="grill-flames">${flames}</span>
+        ${ratingTxt}
+      </div>
+    </div>
+  </div>
+</div>`.trim();
+  }).join('\n');
 }
 
 window.panMapToSpot = function(lat, lng) {
