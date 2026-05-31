@@ -268,7 +268,7 @@ button{transition:transform 0.1s ease}
 .msg-time{font-size:10px;color:var(--muted2);font-weight:400;white-space:nowrap;margin-top:0}
 /* Cinematic: cap photo height so portraits don't swamp the feed */
 .msg-img-wrap img{max-height:240px;object-fit:cover;border-radius:12px;width:100%;display:block}
-/* ── Compact header: shared rules for Social + Map tabs ── */
+/* ── Compact header: shared rules for Social + Map + Base tabs ── */
 body.social-active header .burger-deco,
 body.social-active header h1,
 body.social-active header .room-pill,
@@ -278,11 +278,18 @@ body.map-active header .burger-deco,
 body.map-active header h1,
 body.map-active header .room-pill,
 body.map-active header #summer-banner,
-body.map-active header #spectator-pill{display:none!important}
+body.map-active header #spectator-pill,
+body.base-active header .burger-deco,
+body.base-active header h1,
+body.base-active header .room-pill,
+body.base-active header #summer-banner,
+body.base-active header #spectator-pill{display:none!important}
 body.social-active header,
-body.map-active header{padding:6px 0 0!important;gap:0!important}
+body.map-active header,
+body.base-active header{padding:6px 0 0!important;gap:0!important}
 body.social-active .tabs,
-body.map-active .tabs{
+body.map-active .tabs,
+body.base-active .tabs{
   position:sticky;top:0;z-index:20;
   background:var(--bg);
   padding-top:6px;
@@ -2408,6 +2415,7 @@ window.switchTab=function(name,btn){
   // Compact header for Social + Map; restore for all other tabs
   document.body.classList.toggle('social-active', name==='social');
   document.body.classList.toggle('map-active',    name==='map');
+  document.body.classList.toggle('base-active',   name==='base');
   if(name==='social'){
     seenMessageCount = messages.length;
     const dot = document.getElementById('social-unread-dot');
