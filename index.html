@@ -2255,10 +2255,10 @@ window.switchTab=function(name,btn){
     // height to calc(100dvh - 130px)) has been fully laid out before we scroll.
     // A single rAF queues before paint; the second rAF runs after the browser
     // has committed the new geometry — scroll then lands at the true bottom.
-    requestAnimationFrame(() => requestAnimationFrame(() => {
+    setTimeout(() => {
       const feed = document.getElementById('social-feed');
       if (feed) feed.scrollTop = feed.scrollHeight;
-    }));
+    }, 80);
   }
   if(name==='map') setTimeout(() => {
     renderBurgerMap();
