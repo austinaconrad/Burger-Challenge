@@ -302,7 +302,8 @@ body.map-active #burger-map{
 body.social-active .social-wrap{height:auto;min-height:0}
 body.social-active .social-feed{
   height:calc(100dvh - 130px);
-  padding-bottom:180px; /* input bar (~70px) + reaction pills + generous breathing room */
+  padding-bottom:180px;
+  scroll-padding-bottom:180px; /* offset scrollIntoView target above the fixed input bar */
   min-height:0;
 }
 /* Sticky input footer */
@@ -1856,7 +1857,7 @@ function renderSocialFeed() {
   feed.insertAdjacentHTML('beforeend', '<div id="feed-bottom-anchor" style="height:1px;flex-shrink:0"></div>');
   if(_scrollFeedToBottom){
     _scrollFeedToBottom = false;
-    document.getElementById('feed-bottom-anchor')?.scrollIntoView({behavior:'instant', block:'end'});
+    document.getElementById('feed-bottom-anchor')?.scrollIntoView({behavior:'instant', block:'start'});
   }
 }
 
@@ -2259,7 +2260,7 @@ window.switchTab=function(name,btn){
     _scrollFeedToBottom = true;
     setTimeout(() => {
       const anchor = document.getElementById('feed-bottom-anchor');
-      if(anchor) anchor.scrollIntoView({behavior:'instant', block:'end'});
+      if(anchor) anchor.scrollIntoView({behavior:'instant', block:'start'});
       else {
         const feedEl = document.querySelector('.social-feed');
         if(feedEl) feedEl.scrollTop = feedEl.scrollHeight;
