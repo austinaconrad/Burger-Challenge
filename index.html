@@ -1877,12 +1877,17 @@ async function toggleReaction(msgId, emoji) {
     const msgRef = doc(db, 'rooms', roomId, 'messages', msgId);
     const snap = await getDoc(msgRef);
     if (!snap.exists()) return;
-    const current = (snap.data().reactions || {})[emoji] || [];
-    const next = current.includes(myPlayerId)
+    // Read the full reactions map, mutate the relevant key, write it back
+    // as a single top-level field. Avoids dot-notation field paths which
+    // break on multi-codepoint emoji (e.g. ❤️ = U+2764 + U+FE0F).
+    const reactions = { ...(snap.data().reactions || {}) };
+    const current = reactions[emoji] || [];
+    reactions[emoji] = current.includes(myPlayerId)
       ? current.filter(id => id !== myPlayerId)   // toggle off
       : [...current, myPlayerId];                 // toggle on
-    // Use a plain object update; dot-notation field path handles nested write
-    await updateDoc(msgRef, { [`reactions.${emoji}`]: next });
+    // Clean up empty arrays so Firestore doesn't accumulate dead keys
+    if (reactions[emoji].length === 0) delete reactions[emoji];
+    await updateDoc(msgRef, { reactions });
   } catch(e) { showToast('⚠️ Could not save reaction'); }
 }
 
