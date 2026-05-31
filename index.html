@@ -1946,7 +1946,7 @@ function renderMyTally(){
     // Re-seed quick spots since the HTML was just replaced
     const qs = document.getElementById('quick-spots');
     if (qs) qs.innerHTML = OHIO_SPOTS.slice(0,5).map(s =>
-      `<button class="quick-spot" onclick="document.getElementById('detail-restaurant').value='${s}'">${s}</button>`
+      `<button class="quick-spot" data-spot="${escHtml(s)}" onclick="document.getElementById('detail-restaurant').value=this.dataset.spot">${escHtml(s)}</button>`
     ).join('');
   }
 }
@@ -2230,7 +2230,7 @@ window.selectPatties = function(n) {
     // Seed quick spots & GPS
     const qs = document.getElementById('quick-spots');
     if (qs) qs.innerHTML = OHIO_SPOTS.slice(0,5).map(s =>
-      `<button class="quick-spot" onclick="document.getElementById('detail-restaurant').value='${s}'">${s}</button>`
+      `<button class="quick-spot" data-spot="${escHtml(s)}" onclick="document.getElementById('detail-restaurant').value=this.dataset.spot">${escHtml(s)}</button>`
     ).join('');
     setRating(0);
     const sliderEl = document.getElementById('rating-slider');
