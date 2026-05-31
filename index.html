@@ -1869,6 +1869,10 @@ function renderMyTally(){
   const area=document.getElementById('my-tally-area');
   const me=players.find(p=>p.id===myPlayerId);
   if(!me){area.innerHTML='<div class="empty"><div class="e-icon">🔍</div><p>Player not found. Try rejoining.</p></div>';return;}
+
+  // Preserve burger detail state so a Firestore re-render doesn't wipe the user's restaurant selection mid-entry
+  const detailWasOpen = document.getElementById('burger-detail')?.classList.contains('open') || false;
+  const savedRestaurant = detailWasOpen ? (document.getElementById('detail-restaurant')?.value || '') : '';
   const cc=colorClass(me.colorIdx);
   const pct=Math.min(100,me.count), isDone=me.count>=100;
   area.innerHTML=`<div class="my-tally-card ${cc} ${isDone?'complete':''}">
@@ -1932,6 +1936,19 @@ function renderMyTally(){
     </div>
     <div class="complete-strip" ${isDone?'style="display:block"':''}>🎉 You crushed 100 burgers! You're a legend!</div>
   </div>`;
+
+  // Restore detail panel state so a mid-entry Firestore re-render doesn't lose the restaurant name
+  if (detailWasOpen) {
+    const d = document.getElementById('burger-detail');
+    if (d) d.classList.add('open');
+    const inp = document.getElementById('detail-restaurant');
+    if (inp) inp.value = savedRestaurant;
+    // Re-seed quick spots since the HTML was just replaced
+    const qs = document.getElementById('quick-spots');
+    if (qs) qs.innerHTML = OHIO_SPOTS.slice(0,5).map(s =>
+      `<button class="quick-spot" onclick="document.getElementById('detail-restaurant').value='${s}'">${s}</button>`
+    ).join('');
+  }
 }
 
 function renderPlayersList(){
@@ -2262,7 +2279,7 @@ window.setStar = window.setRating;
 window.confirmBurger = async function() {
   const count = pendingPattyCount || 1;
   const restaurant = document.getElementById('detail-restaurant').value.trim() || 'Unknown spot';
-  const stars = '⭐'.repeat(pendingRating) || '—';
+  const stars = '⭐'.repeat(Math.floor(pendingRating)) + (pendingRating % 1 ? '✨' : '') || '—';
   const pattyLabel = ['', 'Single', 'Double', 'Triple'][count] || 'Single';
 
   await changeMyCountWithDetails(1, restaurant, pendingRating, pendingGPS);
@@ -2281,9 +2298,12 @@ window.confirmBurger = async function() {
     const now = new Date();
     const dateStr = (now.getMonth()+1).toString().padStart(2,'0') + '/' + now.getDate().toString().padStart(2,'0') + '/' + now.getFullYear();
     const timeStr = now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', hour12:true});
-    const starsDisplay = pendingRating > 0
-      ? '⭐'.repeat(Math.floor(pendingRating)) + (pendingRating % 1 ? '½' : '') + ' (' + pendingRating + '/5)'
-      : 'No rating';
+    const starsDisplay = (() => {
+      if (!pendingRating) return 'No rating';
+      const full = Math.floor(pendingRating);
+      const half = pendingRating % 1 !== 0;
+      return '⭐'.repeat(full) + (half ? '✨' : '') + ' (' + pendingRating + '/5)';
+    })();
     receipt.innerHTML = `
       <div class="receipt-title">100 BURGER CHALLENGE</div>
       <div class="receipt-subtitle">THE SUMMER GRIND<br>ROOM: ${escHtml(roomId)}</div>
