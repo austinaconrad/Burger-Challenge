@@ -2965,7 +2965,7 @@ function renderGrillFeed() {
         ts,
         restaurant:        (typeof entry === 'object' && entry.restaurant)        || 'Unknown Spot',
         rating:            (typeof entry === 'object' && entry.rating)            || 0,
-        patties:           (typeof entry === 'object' && entry.patties != null) ? entry.patties : null,
+        patties:           (typeof entry === 'object' && entry.patties > 0) ? entry.patties : null,
         lat:               (typeof entry === 'object' && entry.lat)               || null,
         lng:               (typeof entry === 'object' && entry.lng)               || null,
         locationCityState: (typeof entry === 'object' && entry.locationCityState) || '',
@@ -2987,17 +2987,12 @@ function renderGrillFeed() {
   }
 
   feedEl.innerHTML = allEntries.map((item, idx) => {
-    // null = legacy entry with no patty data; number = explicitly set
-    const p = item.patties;
-    const pattyKnown = p != null;
-    const pattyCount = p || 1;
+    // Default old entries (no patties field) to 1 so they get the Single pun
+    const pattyCount = (item.patties != null && item.patties > 0) ? item.patties : 1;
 
-    // ── Patty stamp
+    // ── Patty stamp — always show a pun, never "Burger Logged"
     let stampText, stampCls;
-    if (!pattyKnown) {
-      stampText = '🍔 BURGER LOGGED';
-      stampCls  = 'stamp-single';
-    } else if (pattyCount >= 3) {
+    if (pattyCount >= 3) {
       stampText = '🇺🇸🚨 THE PATTIE MELTDOWN (Triple)';
       stampCls  = 'stamp-triple';
     } else if (pattyCount === 2) {
@@ -3008,13 +3003,15 @@ function renderGrillFeed() {
       stampCls  = 'stamp-single';
     }
 
-    // ── Location pill — prefer resolved City, State; fall back to coords or off-grid
+    // ── Location pill
+    // If locationCityState is already resolved, render it directly.
+    // If lat/lng exist but no city string yet, show coords and tag the element for lazy geocoding.
     let locPill;
     if (item.lat && item.lng) {
-      const locLabel = item.locationCityState
-        ? escHtml(item.locationCityState)
-        : `${item.lat.toFixed(2)}°N, ${Math.abs(item.lng).toFixed(2)}°W`;
-      locPill = `<span class="grill-pill grill-pill-location has-gps">📍 DEVOURED AT: ${escHtml(item.restaurant)} · ${locLabel}</span>`;
+      const resolved   = item.locationCityState ? escHtml(item.locationCityState) : null;
+      const coordLabel = `${item.lat.toFixed(2)}°N, ${Math.abs(item.lng).toFixed(2)}°W`;
+      const locText    = resolved || coordLabel;
+      locPill = `<span class="grill-pill grill-pill-location has-gps">📍 DEVOURED AT: ${escHtml(item.restaurant)} · <span id="geo-${idx}">${locText}</span></span>`;
     } else {
       locPill = `<span class="grill-pill grill-pill-location no-gps">🕵️‍♂️ GRILL STATION: ${escHtml(item.restaurant)} (Off the Grid)</span>`;
     }
@@ -3033,7 +3030,6 @@ function renderGrillFeed() {
 
     // ── Player color + avatar
     const color = RING_COLORS[item.player.colorIdx % RING_COLORS.length];
-    const cc    = colorClass(item.player.colorIdx);
     const ini   = initials(item.player.name);
     const isMe  = item.player.id === myPlayerId;
 
@@ -3042,7 +3038,7 @@ function renderGrillFeed() {
     const burgerNum = item.player.count - playerEntries.indexOf(item);
 
     return `
-<div class="grill-feed-card ${pattyCount >= 3 && pattyKnown ? 'triple-card' : ''}" style="animation-delay:${Math.min(idx * 0.04, 0.6)}s">
+<div class="grill-feed-card ${pattyCount >= 3 ? 'triple-card' : ''}" style="animation-delay:${Math.min(idx * 0.04, 0.6)}s">
   <div class="grill-card-inner">
     <div class="grill-left-accent" style="background:${color}"></div>
     <div class="grill-card-banner">
@@ -3071,6 +3067,19 @@ function renderGrillFeed() {
   </div>
 </div>`.trim();
   }).join('\n');
+
+  // ── Lazy reverse-geocode old entries that have coords but no saved City, State
+  // Staggered to respect Nominatim's 1-req/sec rate limit
+  allEntries.forEach((item, idx) => {
+    if (!item.lat || !item.lng || item.locationCityState) return;
+    setTimeout(() => {
+      const targetEl = document.getElementById(`geo-${idx}`);
+      if (!targetEl) return; // card scrolled away or feed re-rendered
+      reverseGeocode(item.lat, item.lng).then(loc => {
+        if (loc && targetEl.isConnected) targetEl.textContent = loc;
+      });
+    }, 120 * idx); // 120 ms gap keeps well under the 1-req/sec cap
+  });
 }
 
 window.panMapToSpot = function(lat, lng) {
