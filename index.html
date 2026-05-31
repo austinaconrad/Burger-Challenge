@@ -1846,8 +1846,8 @@ function renderSocialFeed() {
   }).join('');
   window._msgImages = {};
   messages.forEach(m => { if (m.imageBase64) window._msgImages[m.id] = m.imageBase64; });
-  // Always anchor to newest message after any render
-  feed.scrollTop = feed.scrollHeight;
+  // Defer scroll by one frame so the browser has finished layout after innerHTML write
+  requestAnimationFrame(() => { feed.scrollTop = feed.scrollHeight; });
 }
 
 window.openLightbox = function(msgId) {
@@ -2246,6 +2246,8 @@ window.switchTab=function(name,btn){
     seenMessageCount = messages.length;
     const dot = document.getElementById('social-unread-dot');
     if(dot) dot.classList.remove('visible');
+    // Re-render while the tab is visible so the rAF scroll fires against real layout
+    renderSocialFeed();
   }
   if(name==='map') setTimeout(() => {
     renderBurgerMap();
