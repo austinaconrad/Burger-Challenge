@@ -86,13 +86,8 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .stat-val{font-family:'Poppins',sans-serif;font-size:30px;font-weight:800;line-height:1;color:var(--amber);letter-spacing:-0.5px}
 .stat-lbl{font-size:10px;color:var(--muted2);margin-top:4px;text-transform:uppercase;letter-spacing:0.07em;font-weight:600}
 .stat-sub{font-size:10px;color:var(--muted);margin-top:4px;font-weight:400}
-.joke-card{cursor:pointer;user-select:none;transition:border-color 0.2s}
-.joke-card:hover{border-color:var(--amber)!important}
-.joke-card:active{transform:scale(0.97)}
-.joke-q{font-size:10px;font-weight:600;color:var(--text);line-height:1.35;margin-top:2px;padding-right:26px}
-.joke-a{font-size:10px;font-weight:700;color:var(--amber);line-height:1.35;margin-top:5px;display:none}
-.joke-a.revealed{display:block}
-.joke-hint{font-size:9px;color:var(--muted);margin-top:5px;font-weight:400;font-style:italic}
+/* daily-card sub-message */
+#daily-msg{font-size:9px;color:var(--muted2);margin-top:4px;font-weight:400;line-height:1.4}
 .leaderboard{display:flex;flex-direction:column;gap:8px}
 @keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeUp{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
@@ -598,15 +593,15 @@ body.social-active .social-input-area{
 .burger-detail input[type=text]:focus{border-color:var(--amber)}
 .burger-detail input[type=text]::placeholder{color:var(--muted)}
 /* ── Half-star rating widget ── */
-.rating-widget{display:flex;flex-direction:column;gap:6px;flex:1}
-/* Wrapper that sizes itself to the stars and lets the invisible slider sit on top */
+.rating-widget{display:flex;flex-direction:column;gap:4px;flex:1}
+/* Wrapper: column stack — stars on top, slider directly beneath, same width */
 .star-slider-wrap{
-  position:relative;
-  display:inline-flex;   /* shrink-wraps to star row width */
-  align-items:center;
-  cursor:pointer;
+  display:inline-flex;
+  flex-direction:column;
+  gap:6px;
+  width:fit-content;   /* shrink-wraps to the 114px star row */
 }
-.star-display{display:flex;gap:1px;line-height:1;pointer-events:none}
+.star-display{display:flex;gap:1px;line-height:1}
 .star-icon{font-size:22px;line-height:1;display:inline-block;color:#3A3A3A;transition:color 0.12s}
 .star-icon.full{color:#F59E0B}
 .star-icon.half{
@@ -616,21 +611,47 @@ body.social-active .social-input-area{
   background-clip:text;
 }
 .rating-label{font-size:10px;color:var(--muted2);font-weight:500;letter-spacing:0.03em;height:14px}
-/* Invisible slider — covers the star row exactly, all interaction via stars */
+/*
+  Alignment math:
+  Star display = 5×22px + 4×1px gap = 114px wide.
+  Thumb width = 22px (= one star width).
+  Browser inset = thumbW/2 = 11px on each side.
+  So thumb center travels from 11px (star 1 center) to 103px (star 5 center).
+  With min=0.5, max=5:  value 0.5 → star 1 center, value 5 → star 5 center. ✓
+*/
 .rating-slider{
-  position:absolute;
-  top:0;left:0;
-  width:100%;height:100%;
-  opacity:0;
-  cursor:pointer;
-  margin:0;padding:0;
-  box-sizing:border-box;
   -webkit-appearance:none;
   appearance:none;
+  display:block;
+  width:114px;        /* exact star-row width */
+  height:4px;
+  margin:0;padding:0;
+  box-sizing:border-box;
+  border-radius:2px;
+  background:linear-gradient(90deg,#F59E0B var(--fill,0%),#333 var(--fill,0%));
+  outline:none;
+  cursor:pointer;
+  opacity:1;
+  position:static;
 }
-/* Zero-size thumb so the browser's inset math collapses: thumb travels 0→trackWidth */
-.rating-slider::-webkit-slider-thumb{-webkit-appearance:none;width:0;height:0}
-.rating-slider::-moz-range-thumb{width:0;height:0;border:none;background:none}
+.rating-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:22px;height:22px;   /* = one star width → correct inset math */
+  border-radius:50%;
+  background:#F59E0B;
+  border:2px solid #D97706;
+  box-shadow:0 1px 8px rgba(217,119,6,0.55);
+  cursor:pointer;
+  transition:transform 0.1s;
+}
+.rating-slider::-webkit-slider-thumb:active{transform:scale(1.2)}
+.rating-slider::-moz-range-thumb{
+  width:22px;height:22px;
+  border-radius:50%;
+  background:#F59E0B;
+  border:2px solid #D97706;
+  cursor:pointer;
+}
 .quick-spots{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
 .quick-spot{background:var(--surface3);border:1px solid var(--border2);border-radius:999px;color:var(--muted2);font-size:11px;font-weight:500;padding:4px 10px;cursor:pointer;transition:border-color 0.15s,color 0.15s,background 0.15s}
 .quick-spot:hover{border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,0.07)}
@@ -944,16 +965,16 @@ body.social-active .social-input-area{
           <div class="stat-sub">Until Labor Day</div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">👹</div>
+          <div class="stat-icon">🫃🏼</div>
           <div class="stat-val" id="stat-finished">0</div>
           <div class="stat-lbl">Total Devoured</div>
           <div class="stat-sub">Burgers eaten by the group</div>
         </div>
-        <div class="stat-card joke-card" id="joke-card" onclick="toggleJoke()" title="Tap for punchline">
-          <div class="stat-icon">🤡</div>
-          <div class="joke-q" id="joke-q"></div>
-          <div class="joke-a" id="joke-a"></div>
-          <div class="joke-hint" id="joke-hint">Tap for punchline 👆</div>
+        <div class="stat-card" id="daily-card">
+          <div class="stat-icon" id="daily-icon">🍔</div>
+          <div class="stat-val" id="daily-count">0</div>
+          <div class="stat-lbl">Today's Haul</div>
+          <div class="stat-sub" id="daily-msg">Loading…</div>
         </div>
       </div>
       <div id="winner-banner" class="winner-banner"></div>
@@ -1185,31 +1206,55 @@ function getDayOfYear() {
   return Math.floor((now - start) / 86400000);
 }
 
-function initJokeOfTheDay() {
-  const joke = JOKES[getDayOfYear() % JOKES.length];
-  document.getElementById('joke-q').textContent = joke.q;
-  document.getElementById('joke-a').textContent = '👉 ' + joke.a;
-  // Also reset the revealed state so the new joke starts hidden
-  document.getElementById('joke-a').classList.remove('revealed');
-  document.getElementById('joke-hint').textContent = 'Tap for punchline 👆';
-  scheduleJokeMidnightRefresh();
+// ── Daily burger counter ──────────────────────────────────────────
+function getTodayKey() {
+  // Returns "YYYY-MM-DD" in the user's local timezone — consistent for everyone
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
-function scheduleJokeMidnightRefresh() {
+function getDailyBurgerCount(allPlayers) {
+  const todayKey = getTodayKey();
+  let total = 0;
+  allPlayers.forEach(p => {
+    (p.logs || []).forEach(entry => {
+      const ts = logTs(entry);
+      if (!ts) return;
+      const d = new Date(ts);
+      const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      if (key === todayKey) total++;
+    });
+  });
+  return total;
+}
+
+function renderDailyCard(allPlayers) {
+  const count = getDailyBurgerCount(allPlayers);
+  const countEl = document.getElementById('daily-count');
+  const msgEl   = document.getElementById('daily-msg');
+  const iconEl  = document.getElementById('daily-icon');
+  if (!countEl || !msgEl || !iconEl) return;
+  countEl.textContent = count;
+  if (count === 0) {
+    iconEl.textContent = '🤫';
+    msgEl.textContent  = 'Nobody has logged one today. Who breaks the ice?';
+  } else if (count === 1) {
+    iconEl.textContent = '🔥';
+    msgEl.textContent  = 'One brave soul has started the day!';
+  } else {
+    iconEl.textContent = '🔥';
+    msgEl.textContent  = `The crew has crushed ${count} burgers today!`;
+  }
+}
+
+function scheduleDailyReset() {
   const now = new Date();
   const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-  const msUntilMidnight = nextMidnight - now;
   setTimeout(() => {
-    initJokeOfTheDay(); // will also re-schedule for the next midnight
-  }, msUntilMidnight);
+    renderDailyCard(players); // resets to 0 naturally — no logs yet for the new day
+    scheduleDailyReset();     // chain for the next midnight
+  }, nextMidnight - now);
 }
-
-window.toggleJoke = function() {
-  const a = document.getElementById('joke-a');
-  const hint = document.getElementById('joke-hint');
-  const revealed = a.classList.toggle('revealed');
-  hint.textContent = revealed ? 'Tap to hide 🙈' : 'Tap for punchline 👆';
-};
 
 function daysUntilLaborDay() {
   const now = new Date();
@@ -1484,8 +1529,9 @@ function startApp(){
   document.getElementById('app-screen').style.display='block';
   document.getElementById('room-display').textContent=roomId;
   document.getElementById('stat-days').textContent=daysUntilLaborDay();
-  initJokeOfTheDay();
   initSummerBanner();
+  renderDailyCard(players);
+  scheduleDailyReset();
   if(spectatorMode){
     document.querySelectorAll('.tab-btn').forEach(b=>{
       const name=b.getAttribute('onclick')?.match(/'(\w+)'/)?.[1];
@@ -1532,6 +1578,7 @@ function render(){
   renderLeaderboard(sorted);
   renderMyTally();
   renderPlayersList();
+  renderDailyCard(players);
   if(document.getElementById('hw-rows')) updateHighwayTokens();
 }
 
@@ -1679,7 +1726,7 @@ function renderMyTally(){
               <span class="star-icon" data-idx="4">★</span>
               <span class="star-icon" data-idx="5">★</span>
             </div>
-            <input type="range" min="0" max="5" step="0.5" value="0"
+            <input type="range" min="0.5" max="5" step="0.5" value="0.5"
                    class="rating-slider" id="rating-slider"
                    oninput="setRating(+this.value)"/>
           </div>
@@ -1782,7 +1829,14 @@ function renderSocialFeed() {
   }).join('');
   window._msgImages = {};
   messages.forEach(m => { if (m.imageBase64) window._msgImages[m.id] = m.imageBase64; });
-  if (isNearBottom) feed.scrollTop = feed.scrollHeight;
+  if (isNearBottom) {
+    const lastMsg = feed.lastElementChild;
+    if (lastMsg && lastMsg.classList.contains('msg-card')) {
+      lastMsg.scrollIntoView({ behavior: 'auto', block: 'end' });
+    } else {
+      feed.scrollTop = feed.scrollHeight;
+    }
+  }
 }
 
 window.openLightbox = function(msgId) {
@@ -1958,9 +2012,9 @@ window.selectPatties = function(n) {
     if (qs) qs.innerHTML = OHIO_SPOTS.slice(0,5).map(s =>
       `<button class="quick-spot" onclick="document.getElementById('detail-restaurant').value='${s}'">${s}</button>`
     ).join('');
-    setRating(0);
+    setRating(0.5);
     const sliderEl = document.getElementById('rating-slider');
-    if (sliderEl) sliderEl.value = 0;
+    if (sliderEl) sliderEl.value = 0.5;
     document.getElementById('detail-restaurant').value = '';
     pendingGPS = null;
     if (navigator.geolocation) {
@@ -1983,6 +2037,9 @@ window.setRating = function(val) {
     if (val >= n)           el.classList.add('full');
     else if (val >= n - 0.5) el.classList.add('half');
   });
+  // Update track fill (0.5–5 range → 0–100%)
+  const slider = document.getElementById('rating-slider');
+  if (slider) slider.style.setProperty('--fill', ((val - 0.5) / 4.5 * 100) + '%');
   // Update label
   const lbl = document.getElementById('rating-label');
   if (lbl) lbl.textContent = val > 0 ? `Rating: ${val} / 5` : 'No rating';
@@ -2147,10 +2204,23 @@ window.switchTab=function(name,btn){
   document.body.classList.toggle('social-active', name==='social');
   document.body.classList.toggle('map-active',    name==='map');
   if(name==='social'){
-    setTimeout(()=>{ const feed=document.getElementById('social-feed'); feed.scrollTop=feed.scrollHeight; },50);
     seenMessageCount = messages.length;
     const dot = document.getElementById('social-unread-dot');
     if(dot) dot.classList.remove('visible');
+    // Wait two animation frames so the social-active CSS (which changes the feed
+    // height to calc(100dvh - 130px)) has been fully laid out before we scroll.
+    // A single rAF queues before paint; the second rAF runs after the browser
+    // has committed the new geometry — scroll then lands at the true bottom.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const feed = document.getElementById('social-feed');
+      if (!feed) return;
+      const lastMsg = feed.lastElementChild;
+      if (lastMsg && lastMsg.classList.contains('msg-card')) {
+        lastMsg.scrollIntoView({ behavior: 'auto', block: 'end' });
+      } else {
+        feed.scrollTop = feed.scrollHeight;
+      }
+    }));
   }
   if(name==='map') setTimeout(() => {
     renderBurgerMap();
