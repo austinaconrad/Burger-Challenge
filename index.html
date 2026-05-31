@@ -1852,11 +1852,10 @@ function renderSocialFeed() {
   }).join('');
   window._msgImages = {};
   messages.forEach(m => { if (m.imageBase64) window._msgImages[m.id] = m.imageBase64; });
-  // Try immediately (works if feed is already visible and laid out)
-  feed.scrollTop = feed.scrollHeight;
-  // Also retry after 50ms to catch cases where social-active CSS height
-  // hasn't been computed yet at render time
-  setTimeout(() => { feed.scrollTop = feed.scrollHeight; }, 50);
+  if(_scrollFeedToBottom){
+    _scrollFeedToBottom = false;
+    feed.scrollTop = feed.scrollHeight;
+  }
 }
 
 window.openLightbox = function(msgId) {
@@ -2255,9 +2254,11 @@ window.switchTab=function(name,btn){
     seenMessageCount = messages.length;
     const dot = document.getElementById('social-unread-dot');
     if(dot) dot.classList.remove('visible');
-    // Defer render out of the click handler so the browser has laid out the
-    // newly-visible tab before we write innerHTML and measure scrollHeight
-    setTimeout(() => renderSocialFeed(), 0);
+    _scrollFeedToBottom = true;
+    setTimeout(() => {
+      const feedEl = document.querySelector('.social-feed');
+      if(feedEl) feedEl.scrollTop = feedEl.scrollHeight;
+    }, 80);
   }
   if(name==='map') setTimeout(() => {
     renderBurgerMap();
