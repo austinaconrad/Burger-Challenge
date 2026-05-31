@@ -1942,7 +1942,7 @@ function renderSocialFeed() {
   feed.insertAdjacentHTML('beforeend', '<div id="feed-bottom-anchor" style="height:1px;flex-shrink:0"></div>');
   if(_scrollFeedToBottom){
     _scrollFeedToBottom = false;
-    document.getElementById('feed-bottom-anchor')?.scrollIntoView({behavior:'instant', block:'nearest'});
+    feed.scrollTop = feed.scrollHeight;
   }
 }
 
@@ -2343,14 +2343,14 @@ window.switchTab=function(name,btn){
     const dot = document.getElementById('social-unread-dot');
     if(dot) dot.classList.remove('visible');
     _scrollFeedToBottom = true;
-    setTimeout(() => {
-      const anchor = document.getElementById('feed-bottom-anchor');
-      if(anchor) anchor.scrollIntoView({behavior:'instant', block:'nearest'});
-      else {
-        const feedEl = document.querySelector('.social-feed');
-        if(feedEl) feedEl.scrollTop = feedEl.scrollHeight;
-      }
-    }, 80);
+    // Retry at 0 / 100 / 250ms — one of these always catches the feed post-layout
+    const snapToBottom = () => {
+      const f = document.querySelector('.social-feed');
+      if(f) f.scrollTop = f.scrollHeight;
+    };
+    setTimeout(snapToBottom, 0);
+    setTimeout(snapToBottom, 100);
+    setTimeout(snapToBottom, 250);
   }
   if(name==='map') setTimeout(() => {
     renderBurgerMap();
