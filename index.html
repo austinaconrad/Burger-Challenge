@@ -1852,9 +1852,11 @@ function renderSocialFeed() {
   }).join('');
   window._msgImages = {};
   messages.forEach(m => { if (m.imageBase64) window._msgImages[m.id] = m.imageBase64; });
+  // Anchor div at the very bottom — scrollIntoView finds the right scroll container automatically
+  feed.insertAdjacentHTML('beforeend', '<div id="feed-bottom-anchor" style="height:1px;flex-shrink:0"></div>');
   if(_scrollFeedToBottom){
     _scrollFeedToBottom = false;
-    feed.scrollTop = feed.scrollHeight;
+    document.getElementById('feed-bottom-anchor')?.scrollIntoView({behavior:'instant', block:'end'});
   }
 }
 
@@ -2256,8 +2258,12 @@ window.switchTab=function(name,btn){
     if(dot) dot.classList.remove('visible');
     _scrollFeedToBottom = true;
     setTimeout(() => {
-      const feedEl = document.querySelector('.social-feed');
-      if(feedEl) feedEl.scrollTop = feedEl.scrollHeight;
+      const anchor = document.getElementById('feed-bottom-anchor');
+      if(anchor) anchor.scrollIntoView({behavior:'instant', block:'end'});
+      else {
+        const feedEl = document.querySelector('.social-feed');
+        if(feedEl) feedEl.scrollTop = feedEl.scrollHeight;
+      }
     }, 80);
   }
   if(name==='map') setTimeout(() => {
