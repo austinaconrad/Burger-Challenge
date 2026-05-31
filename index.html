@@ -1010,12 +1010,11 @@ body.social-active .social-input-area{
     <!-- SOCIAL TAB -->
     <div class="tab-panel" id="tab-social">
       <div class="social-wrap">
-        <div class="social-feed" id="social-feed">
-          <div class="social-empty" id="social-empty">
-            <div class="e-icon">🍔💬</div>
-            <p>No posts yet — share your first burger!</p>
-          </div>
+        <div class="social-empty" id="social-empty" style="display:none">
+          <div class="e-icon">🍔💬</div>
+          <p>No posts yet — share your first burger!</p>
         </div>
+        <div class="social-feed" id="social-feed"></div>
         <div class="social-input-area">
           <div class="img-preview-bar" id="img-preview-bar">
             <img class="img-preview-thumb" id="img-preview-thumb" src="" alt=""/>
@@ -1796,11 +1795,10 @@ function renderSocialFeed() {
   }
   if (!messages.length) {
     feed.innerHTML = '';
-    feed.appendChild(empty);
-    empty.style.display = 'flex';
+    if (empty) empty.style.display = 'flex';
     return;
   }
-  empty.style.display = 'none';
+  if (empty) empty.style.display = 'none';
   const isNearBottom = feed.scrollHeight - feed.scrollTop - feed.clientHeight < 80;
   feed.innerHTML = messages.map(m => {
     const isMe = m.playerId === myPlayerId;
