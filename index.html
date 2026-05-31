@@ -1893,6 +1893,15 @@ function showReactionTray(msgId, anchorEl) {
 async function toggleReaction(msgId, emoji) {
   if (!myPlayerId || spectatorMode) return;
   if (!db || !roomId) { showToast('⚠️ Not connected'); return; }
+  // Guard: both values must be non-empty strings before touching Firestore
+  if (!msgId || typeof msgId !== 'string') {
+    console.error('toggleReaction: bad msgId', msgId);
+    return;
+  }
+  if (!emoji || typeof emoji !== 'string') {
+    console.error('toggleReaction: bad emoji', emoji);
+    return;
+  }
   try {
     const cached = messages.find(m => m.id === msgId);
     const reactions = { ...(cached?.reactions || {}) };
@@ -1901,25 +1910,8 @@ async function toggleReaction(msgId, emoji) {
       ? current.filter(id => id !== myPlayerId)
       : [...current, myPlayerId];
     if (reactions[emoji].length === 0) delete reactions[emoji];
-
-    // First try updating the message doc itself.
-    // If rules block it (e.g. only the author can update their message),
-    // fall back to a dedicated reactions doc that anyone in the room can write.
-    try {
-      const msgRef = doc(db, 'rooms', roomId, 'messages', msgId);
-      await updateDoc(msgRef, { reactions });
-    } catch(innerErr) {
-      if (innerErr.code === 'permission-denied' || innerErr.code === 'PERMISSION_DENIED') {
-        // Fallback: store reactions separately so message-doc write rules don't block us
-        await setDoc(
-          doc(db, 'rooms', roomId, 'reactions', msgId),
-          { reactions, msgId },
-          { merge: true }
-        );
-      } else {
-        throw innerErr; // re-throw non-permissions errors
-      }
-    }
+    const msgRef = doc(db, 'rooms', roomId, 'messages', msgId);
+    await updateDoc(msgRef, { reactions });
   } catch(e) {
     console.error('toggleReaction failed:', e.code, e.message);
     showToast(`⚠️ Reaction failed (${e.code || e.message})`);
@@ -1935,11 +1927,12 @@ document.addEventListener('click', e => {
       hideReactionTray();
     }
   }
-  // Open tray
+  // Open tray — always read dataset from the button element, not the SVG child
   const reactBtn = e.target.closest('.msg-react-btn');
   if (reactBtn) {
     e.stopPropagation();
-    showReactionTray(reactBtn.dataset.msgId, reactBtn);
+    const mid = reactBtn.dataset.msgId;
+    if (mid) showReactionTray(mid, reactBtn);
     return;
   }
   // Tray emoji pick
@@ -1947,13 +1940,15 @@ document.addEventListener('click', e => {
   if (trayBtn && _trayMsgId) {
     const emoji = trayBtn.dataset.emoji;
     hideReactionTray();
-    toggleReaction(_trayMsgId, emoji);
+    if (emoji) toggleReaction(_trayMsgId, emoji);
     return;
   }
   // Pill toggle
   const pill = e.target.closest('.reaction-pill');
   if (pill) {
-    toggleReaction(pill.dataset.msgId, pill.dataset.emoji);
+    const mid   = pill.dataset.msgId;
+    const emoji = pill.dataset.emoji;
+    if (mid && emoji) toggleReaction(mid, emoji);
   }
 });
 
