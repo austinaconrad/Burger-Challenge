@@ -845,16 +845,19 @@ body.social-active .social-input-area{
   background:#2e7d32;
   border:3px solid #1b5e20;
   border-radius:14px;
-  padding:0;
-  gap:0;
+  padding:4px;
+  gap:4px;           /* retro map grid lines */
   box-shadow:0 6px 32px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.08);
   overflow:hidden;
 }
-/* Checkerboard tiles */
+/* Checkerboard tiles — strict square so they never stretch on tall screens */
 .v-cell{
   display:flex;align-items:center;justify-content:center;
   position:relative;
+  aspect-ratio:1/1;  /* force perfect square */
   min-height:0;
+  min-width:0;
+  overflow:visible;
   transition:background 0.3s;
 }
 .v-cell.tile-dark{ background:#2e7d32 }
@@ -903,20 +906,42 @@ body.social-active .social-input-area{
   font-size:11px;line-height:1;pointer-events:none;z-index:10;
   animation:hammerSwing 0.55s ease-in-out infinite;
 }
-/* Chief flag on Town Hall */
+/* Chief flag on Town Hall — bold, elevated, wind-swaying */
+@keyframes flagSway{
+  0%,100%{transform:translateY(-14px) scale(1.5) rotate(0deg)}
+  50%{transform:translateY(-17px) scale(1.5) rotate(5deg)}
+}
 .v-chief-flag{
-  position:absolute;top:-12px;right:-2px;
+  position:absolute;top:-4px;right:-4px;
   display:flex;flex-direction:column;align-items:center;
-  pointer-events:none;z-index:10;
-  animation:buildingFloat 2s ease-in-out infinite;
+  pointer-events:none;z-index:20;
+  animation:flagSway 2.2s ease-in-out infinite;
 }
 .v-chief-banner{
-  font-family:'Inter',sans-serif;font-size:6px;font-weight:800;
+  font-family:'Poppins',sans-serif;font-size:8px;font-weight:900;
   background:var(--amber);color:#000;
-  border-radius:2px 3px 0 0;
-  padding:1px 3px;line-height:1.4;white-space:nowrap;
+  border-radius:3px 4px 0 0;
+  padding:2px 5px;line-height:1.4;white-space:nowrap;
+  box-shadow:0 2px 6px rgba(0,0,0,0.4);
 }
-.v-chief-pole{width:1.5px;height:9px;background:#888}
+.v-chief-pole{width:2px;height:13px;background:#aaa;box-shadow:0 1px 3px rgba(0,0,0,0.4)}
+/* Village Log ticker */
+.village-log{
+  background:rgba(0,0,0,0.5);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:var(--radius-xs);
+  padding:10px 12px;
+  overflow:hidden;
+}
+.village-log-label{
+  font-family:'Press Start 2P',monospace;
+  font-size:5.5px;color:var(--amber);
+  letter-spacing:0.08em;margin-bottom:6px;
+}
+.village-log-text{
+  font-size:11px;color:var(--text);line-height:1.5;
+  font-weight:400;
+}
 .voyage-legend{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:4px 0}
 .voyage-legend-item{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--muted2);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:999px;padding:3px 10px}
 
@@ -1173,6 +1198,10 @@ body.social-active .social-input-area{
         </div>
         <div class="village-lawn" id="village-lawn"></div>
         <div class="voyage-legend" id="voyage-legend"></div>
+        <div class="village-log">
+          <div class="village-log-label">🏰 CLAN RECON:</div>
+          <div class="village-log-text" id="village-log-text">Scanning the horizon…</div>
+        </div>
       </div>
     </div>
 
@@ -2861,6 +2890,38 @@ function updateVillageBase() {
     legendEl.innerHTML =
       legendBuildings.map(b => `<div class="voyage-legend-item">${b.e} ${b.label}</div>`).join('') +
       lockedLegend;
+  }
+
+  // Village Log — pull the most recent burger log entry across all players
+  const logEl = document.getElementById('village-log-text');
+  if (logEl) {
+    let latestEntry = null, latestPlayer = null;
+    players.forEach(p => {
+      (p.logs || []).forEach(entry => {
+        const ts = logTs(entry);
+        if (!ts) return;
+        if (!latestEntry || ts > logTs(latestEntry)) {
+          latestEntry = entry; latestPlayer = p;
+        }
+      });
+    });
+    if (!latestEntry || !latestPlayer) {
+      logEl.textContent = '💤 The village is quiet… Send someone to the drive-thru.';
+    } else {
+      const today = getTodayKey();
+      const d     = new Date(logTs(latestEntry));
+      const entryDay = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      const restaurant = (typeof latestEntry === 'object' && latestEntry.restaurant && latestEntry.restaurant !== 'Unknown spot')
+        ? ` from ${latestEntry.restaurant}` : '';
+      const countLabel = ['','Single','Double','Triple'][(typeof latestEntry === 'object' && latestEntry.patties) || 1] || 'burger';
+      if (entryDay === today) {
+        logEl.textContent = `🔥 ${latestPlayer.name} just reinforced the base with a ${countLabel}${restaurant}!`;
+      } else {
+        const timeAgo = Math.round((Date.now() - d) / 3600000);
+        const ago = timeAgo < 24 ? `${timeAgo}h ago` : `${Math.round(timeAgo/24)}d ago`;
+        logEl.textContent = `⚔️ Last sighting: ${latestPlayer.name} struck${restaurant} — ${ago}. The base awaits reinforcements.`;
+      }
+    }
   }
 
   // Tier 4: confetti
