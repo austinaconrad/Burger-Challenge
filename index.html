@@ -273,19 +273,35 @@ button{transition:transform 0.1s ease}
 .msg-time{font-size:10px;color:var(--muted2);font-weight:400;white-space:nowrap;margin-top:0}
 /* Cinematic: cap photo height so portraits don't swamp the feed */
 .msg-img-wrap img{max-height:240px;object-fit:cover;border-radius:12px;width:100%;display:block}
-/* ── Social compact / cinematic mode (active when Social tab is open) ── */
+/* ── Compact header: shared rules for Social + Map tabs ── */
 body.social-active header .burger-deco,
 body.social-active header h1,
 body.social-active header .room-pill,
 body.social-active header #summer-banner,
-body.social-active header #spectator-pill{display:none!important}
-body.social-active header{padding:6px 0 0!important;gap:0!important}
-body.social-active .tabs{
+body.social-active header #spectator-pill,
+body.map-active header .burger-deco,
+body.map-active header h1,
+body.map-active header .room-pill,
+body.map-active header #summer-banner,
+body.map-active header #spectator-pill{display:none!important}
+body.social-active header,
+body.map-active header{padding:6px 0 0!important;gap:0!important}
+body.social-active .tabs,
+body.map-active .tabs{
   position:sticky;top:0;z-index:20;
   background:var(--bg);
   padding-top:6px;
   margin-bottom:10px;
   box-shadow:0 2px 12px rgba(0,0,0,0.25);
+}
+/* ── Map-specific expansions ── */
+body.map-active .map-wrap{
+  border-radius:10px;
+  box-shadow:0 6px 32px rgba(0,0,0,0.7);
+}
+body.map-active #burger-map{
+  height:52vh;   /* was 520px fixed — now fills half the viewport */
+  min-height:280px;
 }
 /* Full-height scrollable feed */
 body.social-active .social-wrap{height:auto;min-height:0}
@@ -310,8 +326,21 @@ body.social-active .social-input-area{
 }
 .msg-mine-tag{font-size:9px;font-weight:700;background:rgba(217,119,6,0.10);color:var(--amber);border:1px solid rgba(217,119,6,0.22);padding:2px 7px;border-radius:999px;white-space:nowrap;flex-shrink:0;text-transform:uppercase;letter-spacing:0.04em}
 /* ── Tapback reaction trigger ── */
-.msg-react-btn{background:none;border:none;font-size:14px;color:var(--muted);cursor:pointer;padding:2px 5px;border-radius:999px;line-height:1;transition:color 0.15s,background 0.15s;flex-shrink:0;margin-left:auto}
-.msg-react-btn:hover{color:var(--text);background:rgba(255,255,255,0.08)}
+.msg-react-btn{
+  background:none;border:none;padding:4px;border-radius:999px;
+  cursor:pointer;flex-shrink:0;margin-left:auto;
+  color:rgba(255,255,255,0.28);
+  display:flex;align-items:center;justify-content:center;
+  transition:color 0.2s ease,transform 0.2s ease,background 0.2s ease;
+  line-height:0;
+}
+.msg-react-btn:hover,.msg-react-btn:focus-visible{
+  color:#fff;
+  transform:scale(1.15);
+  background:rgba(255,255,255,0.08);
+  outline:none;
+}
+.msg-react-btn:active{transform:scale(0.92)}
 /* ── Floating reaction tray ── */
 #reaction-tray{
   position:fixed;z-index:500;
@@ -569,8 +598,15 @@ body.social-active .social-input-area{
 .burger-detail input[type=text]:focus{border-color:var(--amber)}
 .burger-detail input[type=text]::placeholder{color:var(--muted)}
 /* ── Half-star rating widget ── */
-.rating-widget{display:flex;flex-direction:column;gap:7px;flex:1}
-.star-display{display:flex;gap:1px;line-height:1}
+.rating-widget{display:flex;flex-direction:column;gap:6px;flex:1}
+/* Wrapper that sizes itself to the stars and lets the invisible slider sit on top */
+.star-slider-wrap{
+  position:relative;
+  display:inline-flex;   /* shrink-wraps to star row width */
+  align-items:center;
+  cursor:pointer;
+}
+.star-display{display:flex;gap:1px;line-height:1;pointer-events:none}
 .star-icon{font-size:22px;line-height:1;display:inline-block;color:#3A3A3A;transition:color 0.12s}
 .star-icon.full{color:#F59E0B}
 .star-icon.half{
@@ -580,40 +616,21 @@ body.social-active .social-input-area{
   background-clip:text;
 }
 .rating-label{font-size:10px;color:var(--muted2);font-weight:500;letter-spacing:0.03em;height:14px}
-/* Range slider — amber thumb, dark track */
+/* Invisible slider — covers the star row exactly, all interaction via stars */
 .rating-slider{
+  position:absolute;
+  top:0;left:0;
+  width:100%;height:100%;
+  opacity:0;
+  cursor:pointer;
+  margin:0;padding:0;
+  box-sizing:border-box;
   -webkit-appearance:none;
   appearance:none;
-  width:100%;
-  height:3px;
-  border-radius:0;          /* pixel-flat */
-  background:#2A2A2A;
-  outline:none;
-  cursor:pointer;
-  margin:0;
 }
-.rating-slider::-webkit-slider-thumb{
-  -webkit-appearance:none;
-  width:14px;height:14px;
-  border-radius:50%;
-  background:#F59E0B;
-  border:2px solid #D97706;
-  box-shadow:0 1px 6px rgba(217,119,6,0.5);
-  cursor:pointer;
-  transition:transform 0.1s;
-}
-.rating-slider::-webkit-slider-thumb:active{transform:scale(1.25)}
-.rating-slider::-moz-range-thumb{
-  width:14px;height:14px;
-  border-radius:50%;
-  background:#F59E0B;
-  border:2px solid #D97706;
-  cursor:pointer;
-}
-/* Track fill colour is handled by a JS-updated CSS variable */
-.rating-slider{
-  background:linear-gradient(90deg,#F59E0B var(--fill,0%),#2A2A2A var(--fill,0%));
-}
+/* Zero-size thumb so the browser's inset math collapses: thumb travels 0→trackWidth */
+.rating-slider::-webkit-slider-thumb{-webkit-appearance:none;width:0;height:0}
+.rating-slider::-moz-range-thumb{width:0;height:0;border:none;background:none}
 .quick-spots{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
 .quick-spot{background:var(--surface3);border:1px solid var(--border2);border-radius:999px;color:var(--muted2);font-size:11px;font-weight:500;padding:4px 10px;cursor:pointer;transition:border-color 0.15s,color 0.15s,background 0.15s}
 .quick-spot:hover{border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,0.07)}
@@ -1654,16 +1671,18 @@ function renderMyTally(){
       <div class="burger-detail-row" style="align-items:flex-start;gap:10px">
         <label style="padding-top:4px">Rating</label>
         <div class="rating-widget" id="rating-widget">
-          <div class="star-display" id="star-display">
-            <span class="star-icon" data-idx="1">★</span>
-            <span class="star-icon" data-idx="2">★</span>
-            <span class="star-icon" data-idx="3">★</span>
-            <span class="star-icon" data-idx="4">★</span>
-            <span class="star-icon" data-idx="5">★</span>
+          <div class="star-slider-wrap">
+            <div class="star-display" id="star-display">
+              <span class="star-icon" data-idx="1">★</span>
+              <span class="star-icon" data-idx="2">★</span>
+              <span class="star-icon" data-idx="3">★</span>
+              <span class="star-icon" data-idx="4">★</span>
+              <span class="star-icon" data-idx="5">★</span>
+            </div>
+            <input type="range" min="0" max="5" step="0.5" value="0"
+                   class="rating-slider" id="rating-slider"
+                   oninput="setRating(+this.value)"/>
           </div>
-          <input type="range" min="0" max="5" step="0.5" value="0"
-                 class="rating-slider" id="rating-slider"
-                 oninput="setRating(+this.value)"/>
           <div class="rating-label" id="rating-label">No rating</div>
         </div>
       </div>
@@ -1745,7 +1764,16 @@ function renderSocialFeed() {
           <div class="msg-time">${timeStr}</div>
         </div>
         ${isMe ? '<span class="msg-mine-tag">You</span>' : ''}
-        <button class="msg-react-btn" data-msg-id="${m.id}" title="React">☺</button>
+        <button class="msg-react-btn" data-msg-id="${m.id}" title="Add reaction">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M8 1.5C4.41 1.5 1.5 4.41 1.5 8C1.5 11.59 4.41 14.5 8 14.5C11.59 14.5 14.5 11.59 14.5 8C14.5 4.41 11.59 1.5 8 1.5Z" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
+            <circle cx="5.5" cy="7.5" r="0.85" fill="currentColor"/>
+            <circle cx="10.5" cy="7.5" r="0.85" fill="currentColor"/>
+            <path d="M5.5 10C6.1 11 9.9 11 10.5 10" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
+            <circle cx="12.5" cy="3.5" r="2" fill="var(--bg)"/>
+            <path d="M12.5 2.25V4.75M11.25 3.5H13.75" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </button>
       </div>
       ${textHtml}
       ${imgHtml}
@@ -1955,9 +1983,6 @@ window.setRating = function(val) {
     if (val >= n)           el.classList.add('full');
     else if (val >= n - 0.5) el.classList.add('half');
   });
-  // Update slider fill gradient
-  const slider = document.getElementById('rating-slider');
-  if (slider) slider.style.setProperty('--fill', (val / 5 * 100) + '%');
   // Update label
   const lbl = document.getElementById('rating-label');
   if (lbl) lbl.textContent = val > 0 ? `Rating: ${val} / 5` : 'No rating';
@@ -2118,15 +2143,20 @@ window.switchTab=function(name,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
   btn.classList.add('active');
-  // Cinematic social mode: collapse header, fix input bar
+  // Compact header for Social + Map; restore for all other tabs
   document.body.classList.toggle('social-active', name==='social');
+  document.body.classList.toggle('map-active',    name==='map');
   if(name==='social'){
     setTimeout(()=>{ const feed=document.getElementById('social-feed'); feed.scrollTop=feed.scrollHeight; },50);
     seenMessageCount = messages.length;
     const dot = document.getElementById('social-unread-dot');
     if(dot) dot.classList.remove('visible');
   }
-  if(name==='map') setTimeout(renderBurgerMap, 80);
+  if(name==='map') setTimeout(() => {
+    renderBurgerMap();
+    // Invalidate Leaflet size after the vh-based height is applied
+    if(burgerMap) burgerMap.invalidateSize();
+  }, 80);
   if(name==='highway'){
     if(!document.getElementById('hw-rows')) renderHighway();
     else setTimeout(updateHighwayTokens, 80);
