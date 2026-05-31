@@ -301,9 +301,9 @@ body.map-active #burger-map{
 /* Full-height scrollable feed */
 body.social-active .social-wrap{height:auto;min-height:0}
 body.social-active .social-feed{
-  height:calc(100dvh - 130px);
-  padding-bottom:150px;
-  scroll-padding-bottom:150px; /* keeps scrollIntoView target above the fixed input bar */
+  /* 130px = compact header + tabs; 80px = input bar + safe area — feed never reaches the input bar */
+  height:calc(100dvh - 130px - 80px);
+  padding-bottom:16px;
   min-height:0;
 }
 /* Sticky input footer */
@@ -1857,7 +1857,7 @@ function renderSocialFeed() {
   feed.insertAdjacentHTML('beforeend', '<div id="feed-bottom-anchor" style="height:1px;flex-shrink:0"></div>');
   if(_scrollFeedToBottom){
     _scrollFeedToBottom = false;
-    document.getElementById('feed-bottom-anchor')?.scrollIntoView({behavior:'instant', block:'end'});
+    document.getElementById('feed-bottom-anchor')?.scrollIntoView({behavior:'instant', block:'nearest'});
   }
 }
 
@@ -2260,7 +2260,7 @@ window.switchTab=function(name,btn){
     _scrollFeedToBottom = true;
     setTimeout(() => {
       const anchor = document.getElementById('feed-bottom-anchor');
-      if(anchor) anchor.scrollIntoView({behavior:'instant', block:'end'});
+      if(anchor) anchor.scrollIntoView({behavior:'instant', block:'nearest'});
       else {
         const feedEl = document.querySelector('.social-feed');
         if(feedEl) feedEl.scrollTop = feedEl.scrollHeight;
