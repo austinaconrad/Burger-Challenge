@@ -1995,6 +1995,9 @@ function renderMyTally(){
   const detailWasOpen = document.getElementById('burger-detail')?.classList.contains('open') || false;
   const savedRestaurant = detailWasOpen ? (document.getElementById('detail-restaurant')?.value || '') : '';
   const savedPattyCount = detailWasOpen ? pendingPattyCount : 0;
+  // Preserve receipt — snapshot re-renders would wipe it mid-display
+  const savedReceiptHTML  = document.getElementById('order-receipt')?.innerHTML || '';
+  const savedReceiptShown = document.getElementById('order-receipt')?.classList.contains('show') || false;
   const cc=colorClass(me.colorIdx);
   const pct=Math.min(100,me.count), isDone=me.count>=100;
   area.innerHTML=`<div class="my-tally-card ${cc} ${isDone?'complete':''}">
@@ -2088,6 +2091,14 @@ function renderMyTally(){
       const confirmBtn = document.getElementById('confirm-btn');
       const btnMap = ['', '✓ Log This Burger', '✓ Log This Double', '✓ Log This Triple'];
       if (confirmBtn) confirmBtn.textContent = btnMap[savedPattyCount] || '✓ Log This Burger';
+    }
+  }
+  // Restore receipt if it was showing when the snapshot fired
+  if (savedReceiptShown && savedReceiptHTML) {
+    const r = document.getElementById('order-receipt');
+    if (r) {
+      r.innerHTML = savedReceiptHTML;
+      r.classList.add('show');
     }
   }
 }
