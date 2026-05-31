@@ -605,7 +605,17 @@ body.social-active .social-input-area{
   ─ value=5  → 150+11 = 161px = center of star 5 ✓
   Stars are shifted right 30px inside the 172px wrapper to align with values 1–5.
 */
-.rating-widget{display:flex;flex-direction:column;gap:4px;flex:1}
+.rating-widget{display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:16px;flex:1}
+.rating-score{
+  font-family:'Poppins',sans-serif;
+  font-size:1.8rem;
+  font-weight:800;
+  min-width:52px;
+  text-align:center;
+  line-height:1;
+  transition:color 0.2s ease;
+  flex-shrink:0;
+}
 .star-slider-wrap{
   display:inline-flex;
   flex-direction:column;
@@ -627,11 +637,7 @@ body.social-active .social-input-area{
   -webkit-text-fill-color:transparent;
   background-clip:text;
 }
-.rating-label{
-  font-size:10px;color:var(--muted2);font-weight:500;
-  letter-spacing:0.03em;height:14px;
-  margin-left:30px;    /* keep label visually under the star zone, not the 0-zone */
-}
+.rating-label{display:none}
 .rating-slider{
   -webkit-appearance:none;
   appearance:none;
@@ -1743,7 +1749,7 @@ function renderMyTally(){
                    class="rating-slider" id="rating-slider"
                    oninput="setRating(+this.value)"/>
           </div>
-          <div class="rating-label" id="rating-label">No rating</div>
+          <div class="rating-score" id="rating-score" style="color:var(--muted)">—</div>
         </div>
       </div>
       <button class="detail-confirm-btn" id="confirm-btn" onclick="confirmBurger()">✓ Log Burger</button>
@@ -2061,9 +2067,15 @@ window.setRating = function(val) {
     const thumbCenter = (val / 5) * 150 + 11; // px from track left
     slider.style.setProperty('--fill', (thumbCenter / 172 * 100).toFixed(2) + '%');
   }
-  // Update label
-  const lbl = document.getElementById('rating-label');
-  if (lbl) lbl.textContent = val > 0 ? `Rating: ${val} / 5` : 'No rating';
+  // Update score display — clean number only, red→amber→green
+  const score = document.getElementById('rating-score');
+  if (score) {
+    score.textContent = val > 0 ? val : '—';
+    score.style.color = val === 0   ? 'var(--muted)'
+                      : val <= 1.5  ? '#ff4d4d'
+                      : val <= 3.5  ? '#ffb300'
+                      :               '#2ecc71';
+  }
 };
 // Backwards compat for any lingering setStar(n) calls
 window.setStar = window.setRating;
