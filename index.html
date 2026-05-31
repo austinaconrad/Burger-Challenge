@@ -1551,6 +1551,12 @@ function startApp(){
   initSummerBanner();
   renderDailyCard(players);
   scheduleDailyReset();
+  // Re-render pace indicators every 60s so they drift in real-time between burger logs
+  setInterval(() => {
+    const sorted = [...players].sort((a,b) => b.count - a.count);
+    renderLeaderboard(sorted);
+    renderDailyCard(players);
+  }, 60000);
   if(spectatorMode){
     document.querySelectorAll('.tab-btn').forEach(b=>{
       const name=b.getAttribute('onclick')?.match(/'(\w+)'/)?.[1];
@@ -1846,8 +1852,11 @@ function renderSocialFeed() {
   }).join('');
   window._msgImages = {};
   messages.forEach(m => { if (m.imageBase64) window._msgImages[m.id] = m.imageBase64; });
-  // Defer scroll by one frame so the browser has finished layout after innerHTML write
-  requestAnimationFrame(() => { feed.scrollTop = feed.scrollHeight; });
+  // Double rAF: first frame lets the browser parse & layout the new innerHTML,
+  // second frame fires after the first paint — scrollHeight is real by then
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    feed.scrollTop = feed.scrollHeight;
+  }));
 }
 
 window.openLightbox = function(msgId) {
@@ -2246,8 +2255,9 @@ window.switchTab=function(name,btn){
     seenMessageCount = messages.length;
     const dot = document.getElementById('social-unread-dot');
     if(dot) dot.classList.remove('visible');
-    // Re-render while the tab is visible so the rAF scroll fires against real layout
-    renderSocialFeed();
+    // Defer render out of the click handler so the browser has laid out the
+    // newly-visible tab before we write innerHTML and measure scrollHeight
+    setTimeout(() => renderSocialFeed(), 0);
   }
   if(name==='map') setTimeout(() => {
     renderBurgerMap();
