@@ -895,6 +895,28 @@ body.social-active .social-input-area{
 }
 @keyframes buildingFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 @keyframes mainHallPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+/* Under-construction hammer bounce */
+@keyframes hammerSwing{0%,100%{transform:translateX(-50%) rotate(-20deg)}50%{transform:translateX(-50%) translateY(-4px) rotate(20deg)}}
+.v-hammer{
+  position:absolute;top:-10px;left:50%;
+  transform:translateX(-50%);
+  font-size:11px;line-height:1;pointer-events:none;z-index:10;
+  animation:hammerSwing 0.55s ease-in-out infinite;
+}
+/* Chief flag on Town Hall */
+.v-chief-flag{
+  position:absolute;top:-12px;right:-2px;
+  display:flex;flex-direction:column;align-items:center;
+  pointer-events:none;z-index:10;
+  animation:buildingFloat 2s ease-in-out infinite;
+}
+.v-chief-banner{
+  font-family:'Inter',sans-serif;font-size:6px;font-weight:800;
+  background:var(--amber);color:#000;
+  border-radius:2px 3px 0 0;
+  padding:1px 3px;line-height:1.4;white-space:nowrap;
+}
+.v-chief-pole{width:1.5px;height:9px;background:#888}
 .voyage-legend{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:4px 0}
 .voyage-legend-item{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--muted2);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:999px;padding:3px 10px}
 
@@ -2779,14 +2801,16 @@ function updateVillageBase() {
       const deco    = decoMap[key];
       const delay   = ((r * 5 + c) * 0.11).toFixed(2);
 
+      const nearUnlock = nextTier && total >= nextTier.minTotal - 10 && total < nextTier.minTotal;
       if (active) {
         cell.classList.add('has-building');
         cell.innerHTML = `<span class="v-building ${active.cls}" title="${active.label}" style="animation-delay:${delay}s">${active.e}</span>`;
         if (!legendBuildings.find(x => x.label === active.label)) legendBuildings.push(active);
       } else if (locked) {
         cell.classList.add('has-building', 'cell-locked');
-        const needed = nextTier ? nextTier.minTotal - total : 0;
+        const hammer = nearUnlock ? `<span class="v-hammer">🔨</span>` : '';
         cell.innerHTML = `
+          ${hammer}
           <span class="v-building" style="animation-delay:${delay}s">${locked.e}</span>
           <span class="v-lock-icon">🔒</span>
           <span class="v-unlock-label">${nextTier ? nextTier.minTotal : ''}🍔</span>`;
@@ -2795,6 +2819,19 @@ function updateVillageBase() {
       }
 
       lawn.appendChild(cell);
+    }
+  }
+
+  // Chief flag — crown the #1 player on the Town Hall (always r:2,c:2 = index 12)
+  const chief = [...players].sort((a,b) => b.count - a.count)[0];
+  if (chief && chief.count > 0) {
+    const thCell = lawn.children[12]; // row 2 × 5 + col 2
+    if (thCell) {
+      const flag = document.createElement('div');
+      flag.className = 'v-chief-flag';
+      flag.title = `Chief: ${chief.name}`;
+      flag.innerHTML = `<div class="v-chief-banner">👑${initials(chief.name)}</div><div class="v-chief-pole"></div>`;
+      thCell.appendChild(flag);
     }
   }
 
