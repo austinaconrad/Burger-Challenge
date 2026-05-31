@@ -2022,8 +2022,8 @@ function renderLeaderboard(sorted){
         ${(()=>{
           if(isDone) return `<div class="pace-indicator ahead">✅ Completed!</div>`;
           const delta = getPaceDelta(p.count);
-          if(delta > 0) return `<div class="pace-indicator ahead">📈 +${delta} Ahead</div>`;
-          if(delta < 0) return `<div class="pace-indicator behind">📉 ${delta} Behind</div>`;
+          if(delta > 1) return `<div class="pace-indicator ahead">📈 +${delta} Ahead</div>`;
+          if(delta < -1) return `<div class="pace-indicator behind">📉 ${delta} Behind</div>`;
           return `<div class="pace-indicator on-track">➡️ On Pace</div>`;
         })()}
       </div>
