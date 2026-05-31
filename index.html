@@ -1891,29 +1891,26 @@ function showReactionTray(msgId, anchorEl) {
 }
 
 async function toggleReaction(msgId, emoji) {
-  if (!myPlayerId || spectatorMode) return;
-  if (!db || !roomId) { showToast('⚠️ Not connected'); return; }
-  // Guard: both values must be non-empty strings before touching Firestore
-  if (!msgId || typeof msgId !== 'string') {
-    console.error('toggleReaction: bad msgId', msgId);
-    return;
-  }
-  if (!emoji || typeof emoji !== 'string') {
-    console.error('toggleReaction: bad emoji', emoji);
-    return;
-  }
+  console.log('[rxn] called — msgId:', msgId, '| emoji:', emoji, '| myPlayerId:', myPlayerId, '| spectator:', spectatorMode);
+  if (!myPlayerId || spectatorMode) { console.log('[rxn] blocked: no player ID or spectator mode'); return; }
+  if (!db || !roomId)               { console.log('[rxn] blocked: db or roomId missing'); showToast('⚠️ Not connected'); return; }
+  if (!msgId)                       { console.log('[rxn] blocked: msgId falsy'); return; }
+  if (!emoji)                       { console.log('[rxn] blocked: emoji falsy'); return; }
   try {
     const cached = messages.find(m => m.id === msgId);
+    console.log('[rxn] cached message:', cached ? 'found' : 'NOT FOUND — will still attempt write');
     const reactions = { ...(cached?.reactions || {}) };
     const current = Array.isArray(reactions[emoji]) ? reactions[emoji] : [];
     reactions[emoji] = current.includes(myPlayerId)
       ? current.filter(id => id !== myPlayerId)
       : [...current, myPlayerId];
     if (reactions[emoji].length === 0) delete reactions[emoji];
+    console.log('[rxn] writing reactions:', reactions, 'to message:', msgId);
     const msgRef = doc(db, 'rooms', roomId, 'messages', msgId);
     await updateDoc(msgRef, { reactions });
+    console.log('[rxn] write successful ✓');
   } catch(e) {
-    console.error('toggleReaction failed:', e.code, e.message);
+    console.error('[rxn] write failed:', e.code, e.message, e);
     showToast(`⚠️ Reaction failed (${e.code || e.message})`);
   }
 }
@@ -1937,11 +1934,16 @@ document.addEventListener('click', e => {
   }
   // Tray emoji pick
   const trayBtn = e.target.closest('.tray-emoji-btn');
-  if (trayBtn && _trayMsgId) {
-    const msgIdSnapshot = _trayMsgId; // capture before hideReactionTray nulls it
-    const emoji = trayBtn.dataset.emoji;
-    hideReactionTray();
-    if (emoji) toggleReaction(msgIdSnapshot, emoji);
+  if (trayBtn) {
+    console.log('[rxn] tray emoji clicked — _trayMsgId:', _trayMsgId, '| emoji:', trayBtn.dataset.emoji);
+    if (_trayMsgId) {
+      const msgIdSnapshot = _trayMsgId;
+      const emoji = trayBtn.dataset.emoji;
+      hideReactionTray();
+      if (emoji) toggleReaction(msgIdSnapshot, emoji);
+    } else {
+      console.log('[rxn] tray clicked but _trayMsgId is null/undefined');
+    }
     return;
   }
   // Pill toggle
