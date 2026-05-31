@@ -1938,9 +1938,10 @@ document.addEventListener('click', e => {
   // Tray emoji pick
   const trayBtn = e.target.closest('.tray-emoji-btn');
   if (trayBtn && _trayMsgId) {
+    const msgIdSnapshot = _trayMsgId; // capture before hideReactionTray nulls it
     const emoji = trayBtn.dataset.emoji;
     hideReactionTray();
-    if (emoji) toggleReaction(_trayMsgId, emoji);
+    if (emoji) toggleReaction(msgIdSnapshot, emoji);
     return;
   }
   // Pill toggle
