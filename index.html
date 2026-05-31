@@ -1072,12 +1072,85 @@ body.social-active .social-input-area{
   border-bottom-color: rgba(255,255,255,0.18);
 }
 
-/* Card body */
+/* Card body — flex row: content left, burger stack right */
 .grill-card-body {
   padding: 11px 14px 13px;
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+.grill-card-body-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+/* Restaurant name — neon-cream pop with player color */
+.grill-restaurant-name {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  filter: drop-shadow(0 0 6px currentColor);
+}
+
+/* Mini burger stack — right-aligned visual */
+.feed-card-burger-tally {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 0 2px 8px;
+}
+.mini-bun-top {
+  width: 44px;
+  height: 15px;
+  background: linear-gradient(160deg, #F59E0B 0%, #D97706 100%);
+  border-radius: 22px 22px 4px 4px;
+  box-shadow: 0 2px 5px rgba(217,119,6,0.35), inset 0 -2px 0 rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.2);
+  position: relative;
+}
+/* Sesame seeds */
+.mini-bun-top::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse 4.5px 2.5px at 24% 38%, rgba(255,255,255,0.38) 0%, transparent 100%),
+    radial-gradient(ellipse 4.5px 2.5px at 54% 28%, rgba(255,255,255,0.38) 0%, transparent 100%),
+    radial-gradient(ellipse 3.5px 2px   at 76% 42%, rgba(255,255,255,0.32) 0%, transparent 100%);
+}
+.mini-patty {
+  width: 42px;
+  height: 7px;
+  background: linear-gradient(180deg, #5C2800 0%, #3D1A00 100%);
+  border-radius: 3px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+  position: relative;
+}
+.mini-patty::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 6px; right: 6px;
+  height: 1.5px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 999px;
+}
+.mini-bun-bottom {
+  width: 46px;
+  height: 7px;
+  background: linear-gradient(180deg, #D97706 0%, #B45309 100%);
+  border-radius: 2px 2px 8px 8px;
+  box-shadow: 0 2px 5px rgba(217,119,6,0.2), inset 0 -1px 0 rgba(0,0,0,0.2);
 }
 
 /* Pills */
@@ -1200,7 +1273,7 @@ body.social-active .social-input-area{
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('leaderboard',this)">🏆 Ranks</button>
       <button class="tab-btn" onclick="switchTab('tally',this)">➕ Tally</button>
-      <button class="tab-btn" onclick="switchTab('social',this)" id="tab-btn-social">💬 Social<span class="tab-unread" id="social-unread-dot"></span></button>
+      <button class="tab-btn" onclick="switchTab('social',this)" id="tab-btn-social">💬 Chat<span class="tab-unread" id="social-unread-dot"></span></button>
       <button class="tab-btn" onclick="switchTab('feed',this)">🔥 Feed</button>
       <button class="tab-btn" onclick="switchTab('map',this)">🗺 Map</button>
       <button class="tab-btn" onclick="switchTab('highway',this)">🏁 Highway</button>
@@ -2429,7 +2502,23 @@ async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null
   let newLogs = [...currentLogs];
   if(delta > 0){
     const entry = {ts: new Date().toISOString(), restaurant, rating: rating||0, patties: patties||1};
-    if(gps) { entry.lat = gps.lat; entry.lng = gps.lng; }
+    if(gps) {
+      entry.lat = gps.lat;
+      entry.lng = gps.lng;
+      // Reverse-geocode to City, State — fire-and-forget with 5s cap
+      reverseGeocode(gps.lat, gps.lng).then(loc => {
+        if (!loc) return;
+        // Patch the saved log entry in Firestore with the resolved location string
+        const me2 = players.find(p => p.id === myPlayerId);
+        if (!me2) return;
+        const updatedLogs = (me2.logs || []).map(e => {
+          if (typeof e === 'object' && e.ts === entry.ts && !e.locationCityState)
+            return { ...e, locationCityState: loc };
+          return e;
+        });
+        updateDoc(doc(db,'rooms',roomId,'players',myPlayerId), {logs: updatedLogs}).catch(()=>{});
+      });
+    }
     newLogs.push(entry);
   } else if(delta < 0 && newLogs.length > 0) newLogs.pop();
   try{
@@ -2813,6 +2902,40 @@ function updateHighwayTokens() {
 
 // ── AMERICAN SMOKEHOUSE FEED ──────────────────────────────────────
 
+const STATE_ABBR = {
+  'Alabama':'AL','Alaska':'AK','Arizona':'AZ','Arkansas':'AR','California':'CA',
+  'Colorado':'CO','Connecticut':'CT','Delaware':'DE','Florida':'FL','Georgia':'GA',
+  'Hawaii':'HI','Idaho':'ID','Illinois':'IL','Indiana':'IN','Iowa':'IA',
+  'Kansas':'KS','Kentucky':'KY','Louisiana':'LA','Maine':'ME','Maryland':'MD',
+  'Massachusetts':'MA','Michigan':'MI','Minnesota':'MN','Mississippi':'MS',
+  'Missouri':'MO','Montana':'MT','Nebraska':'NE','Nevada':'NV','New Hampshire':'NH',
+  'New Jersey':'NJ','New Mexico':'NM','New York':'NY','North Carolina':'NC',
+  'North Dakota':'ND','Ohio':'OH','Oklahoma':'OK','Oregon':'OR','Pennsylvania':'PA',
+  'Rhode Island':'RI','South Carolina':'SC','South Dakota':'SD','Tennessee':'TN',
+  'Texas':'TX','Utah':'UT','Vermont':'VT','Virginia':'VA','Washington':'WA',
+  'West Virginia':'WV','Wisconsin':'WI','Wyoming':'WY','District of Columbia':'DC',
+};
+
+async function reverseGeocode(lat, lng) {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 5000);
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=en`,
+      { signal: controller.signal, headers: { 'Accept-Language': 'en' } }
+    );
+    clearTimeout(timer);
+    const data = await res.json();
+    const address = data.address || {};
+    const city  = address.city || address.town || address.village || address.suburb || '';
+    const rawState = address.state || '';
+    const state = STATE_ABBR[rawState] || rawState;
+    return city && state ? `${city}, ${state}` : (city || state || '');
+  } catch {
+    return '';
+  }
+}
+
 function ratingToFlames(rating) {
   if (!rating || rating <= 0) return '<span style="color:var(--muted);font-size:12px">— unrated</span>';
   let html = '';
@@ -2822,6 +2945,17 @@ function ratingToFlames(rating) {
     else                     html += '<span style="opacity:0.18;font-size:14px">🔥</span>';
   }
   return html;
+}
+
+function miniBurgerStack(pattyCount) {
+  const n = Math.max(1, Math.min(pattyCount || 1, 3));
+  let patties = '';
+  for (let i = 0; i < n; i++) patties += '<div class="mini-patty"></div>';
+  return `<div class="feed-card-burger-tally">
+    <div class="mini-bun-top"></div>
+    ${patties}
+    <div class="mini-bun-bottom"></div>
+  </div>`;
 }
 
 function renderGrillFeed() {
@@ -2835,13 +2969,14 @@ function renderGrillFeed() {
       const ts = logTs(entry);
       if (!ts) return;
       allEntries.push({
-        player:     p,
+        player:            p,
         ts,
-        restaurant: (typeof entry === 'object' && entry.restaurant) || 'Unknown Spot',
-        rating:     (typeof entry === 'object' && entry.rating)     || 0,
-        patties:    (typeof entry === 'object' && entry.patties)    || 1,
-        lat:        (typeof entry === 'object' && entry.lat)        || null,
-        lng:        (typeof entry === 'object' && entry.lng)        || null,
+        restaurant:        (typeof entry === 'object' && entry.restaurant)        || 'Unknown Spot',
+        rating:            (typeof entry === 'object' && entry.rating)            || 0,
+        patties:           (typeof entry === 'object' && entry.patties)           || 1,
+        lat:               (typeof entry === 'object' && entry.lat)               || null,
+        lng:               (typeof entry === 'object' && entry.lng)               || null,
+        locationCityState: (typeof entry === 'object' && entry.locationCityState) || '',
       });
     });
   });
@@ -2875,11 +3010,13 @@ function renderGrillFeed() {
       stampCls  = 'stamp-single';
     }
 
-    // ── Location pill
+    // ── Location pill — prefer resolved City, State; fall back to coords or off-grid
     let locPill;
     if (item.lat && item.lng) {
-      const coordStr = `${item.lat.toFixed(3)}°, ${item.lng.toFixed(3)}°`;
-      locPill = `<span class="grill-pill grill-pill-location has-gps">📍 DEVOURED AT: ${escHtml(item.restaurant)} (${coordStr})</span>`;
+      const locLabel = item.locationCityState
+        ? escHtml(item.locationCityState)
+        : `${item.lat.toFixed(2)}°N, ${Math.abs(item.lng).toFixed(2)}°W`;
+      locPill = `<span class="grill-pill grill-pill-location has-gps">📍 DEVOURED AT: ${escHtml(item.restaurant)} · ${locLabel}</span>`;
     } else {
       locPill = `<span class="grill-pill grill-pill-location no-gps">🕵️‍♂️ GRILL STATION: ${escHtml(item.restaurant)} (Off the Grid)</span>`;
     }
@@ -2893,18 +3030,18 @@ function renderGrillFeed() {
     const timePill = `<span class="grill-pill grill-pill-time">🔥 SEARED: ${month}/${day}/${year} @ ${timeStr}</span>`;
 
     // ── Flames
-    const flames   = ratingToFlames(item.rating);
+    const flames    = ratingToFlames(item.rating);
     const ratingTxt = item.rating > 0 ? `<span class="grill-rating-num">${item.rating}/5</span>` : '';
 
-    // ── Avatar color
-    const color  = RING_COLORS[item.player.colorIdx % RING_COLORS.length];
-    const cc     = colorClass(item.player.colorIdx);
-    const ini    = initials(item.player.name);
-    const isMe   = item.player.id === myPlayerId;
+    // ── Player color + avatar
+    const color = RING_COLORS[item.player.colorIdx % RING_COLORS.length];
+    const cc    = colorClass(item.player.colorIdx);
+    const ini   = initials(item.player.name);
+    const isMe  = item.player.id === myPlayerId;
 
-    // ── Burger number for this player (reverse: most recent = highest)
+    // ── Burger ordinal for this player
     const playerEntries = allEntries.filter(e => e.player.id === item.player.id);
-    const burgerNum = item.player.count - playerEntries.indexOf(item); // ordinal position
+    const burgerNum = item.player.count - playerEntries.indexOf(item);
 
     return `
 <div class="grill-feed-card ${p >= 3 ? 'triple-card' : ''}" style="animation-delay:${Math.min(idx * 0.04, 0.6)}s">
@@ -2919,14 +3056,18 @@ function renderGrillFeed() {
     <div class="grill-stripe"></div>
     <div class="grill-patty-stamp ${stampCls}">${stampText}</div>
     <div class="grill-card-body">
-      <div class="grill-pill-row">
-        ${locPill}
-        ${timePill}
+      <div class="grill-card-body-content">
+        <div class="grill-restaurant-name" style="color:${color}">${escHtml(item.restaurant)}</div>
+        <div class="grill-pill-row">
+          ${locPill}
+          ${timePill}
+        </div>
+        <div class="grill-rating-row">
+          <span class="grill-flames">${flames}</span>
+          ${ratingTxt}
+        </div>
       </div>
-      <div class="grill-rating-row">
-        <span class="grill-flames">${flames}</span>
-        ${ratingTxt}
-      </div>
+      ${miniBurgerStack(p)}
     </div>
   </div>
 </div>`.trim();
