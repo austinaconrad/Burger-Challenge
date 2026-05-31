@@ -807,6 +807,78 @@ body.social-active .social-input-area{
   border-radius:var(--radius-sm);
 }
 .hw-legend-item{display:flex;align-items:center;gap:6px;font-size:6px;font-weight:500;color:var(--muted2);font-family:'Press Start 2P',monospace;letter-spacing:0.02em}
+/* ── VOYAGE / CLAN BASE ── */
+.voyage-wrap{padding:4px 0 16px;display:flex;flex-direction:column;gap:14px}
+.voyage-progress-card{
+  background:rgba(255,255,255,0.035);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:var(--radius-sm);
+  padding:16px;
+  box-shadow:0 4px 24px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.voyage-tier-name{
+  font-family:'Press Start 2P',monospace;
+  font-size:7px;
+  color:var(--amber);
+  letter-spacing:0.06em;
+  margin-bottom:8px;
+  line-height:1.5;
+}
+.voyage-tier-desc{font-size:11px;color:var(--muted2);margin-bottom:12px;font-weight:400;line-height:1.5}
+.voyage-track{height:10px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden;margin-bottom:8px;box-shadow:inset 0 1px 3px rgba(0,0,0,0.3)}
+.voyage-fill{
+  height:100%;border-radius:999px;
+  background:linear-gradient(90deg,var(--amber-dark),var(--amber));
+  transition:width 0.7s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow:0 0 10px rgba(245,158,11,0.5);
+}
+.voyage-fill.maxed{background:linear-gradient(90deg,#FFD700,#fff176,#FFD700);animation:goldShimmer 2s linear infinite}
+@keyframes goldShimmer{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+.voyage-progress-label{font-size:10px;color:var(--muted2);text-align:center;font-weight:500}
+
+/* Grass lawn grid */
+.village-lawn{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  grid-template-rows:repeat(5,1fr);
+  aspect-ratio:1;
+  background:
+    repeating-linear-gradient(0deg,transparent,transparent 19%,rgba(0,0,0,0.06) 19%,rgba(0,0,0,0.06) 20%),
+    repeating-linear-gradient(90deg,transparent,transparent 19%,rgba(0,0,0,0.06) 19%,rgba(0,0,0,0.06) 20%),
+    linear-gradient(135deg,#3a7d3a 0%,#2a5e2a 100%);
+  border:3px solid #1c3d1c;
+  border-radius:14px;
+  padding:6px;
+  gap:4px;
+  box-shadow:0 6px 32px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.v-cell{
+  display:flex;align-items:center;justify-content:center;
+  border-radius:6px;
+  background:rgba(255,255,255,0.04);
+  position:relative;
+  min-height:0;
+  transition:background 0.3s;
+}
+.v-cell.has-building{background:rgba(0,0,0,0.18);box-shadow:inset 0 2px 4px rgba(0,0,0,0.3)}
+.v-building{
+  font-size:clamp(18px,5.5vw,32px);
+  line-height:1;
+  cursor:pointer;
+  user-select:none;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  animation:buildingFloat 3s ease-in-out infinite;
+}
+.v-building.main-hall{
+  font-size:clamp(26px,8vw,44px);
+  animation:mainHallPulse 2.5s ease-in-out infinite;
+  filter:drop-shadow(0 3px 8px rgba(245,158,11,0.5));
+}
+@keyframes buildingFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes mainHallPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.voyage-legend{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:4px 0}
+.voyage-legend-item{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--muted2);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:999px;padding:3px 10px}
+
 /* ── MAP FEED ── */
 .map-feed-wrap{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
 .map-feed-empty{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px}
@@ -973,6 +1045,7 @@ body.social-active .social-input-area{
       <button class="tab-btn" onclick="switchTab('social',this)" id="tab-btn-social">💬 Social<span class="tab-unread" id="social-unread-dot"></span></button>
       <button class="tab-btn" onclick="switchTab('players',this)">👥 Players</button>
       <button class="tab-btn" onclick="switchTab('map',this)">🗺 Map</button>
+      <button class="tab-btn" onclick="switchTab('base',this)">🏰 Base</button>
     </div>
 
     <!-- LEADERBOARD TAB -->
@@ -1048,6 +1121,17 @@ body.social-active .social-input-area{
     <div class="tab-panel" id="tab-highway">
       <div class="hw-board" id="highway-board">
         <div class="empty"><div class="e-icon">🏁</div><p>Switch to this tab to load the board.</p></div>
+      </div>
+    </div>
+
+    <!-- BASE / VOYAGE TAB -->
+    <div class="tab-panel" id="tab-base">
+      <div class="voyage-wrap">
+        <div class="voyage-progress-card" id="village-progress">
+          <div class="voyage-tier-name">⛺ Loading base…</div>
+        </div>
+        <div class="village-lawn" id="village-lawn"></div>
+        <div class="voyage-legend" id="voyage-legend"></div>
       </div>
     </div>
 
@@ -1606,6 +1690,7 @@ function render(){
   renderPlayersList();
   renderDailyCard(players);
   if(document.getElementById('hw-rows')) updateHighwayTokens();
+  if(document.getElementById('tab-base')?.classList.contains('active')) updateVillageBase();
 }
 
 function getThisMonday() {
@@ -2276,6 +2361,7 @@ window.switchTab=function(name,btn){
     if(!document.getElementById('hw-rows')) renderHighway();
     else setTimeout(updateHighwayTokens, 80);
   }
+  if(name==='base') updateVillageBase();
 };
 
 document.getElementById('setup-name').addEventListener('keydown',e=>{if(e.key==='Enter') document.getElementById('setup-room').value?joinRoom():createRoom()});
@@ -2547,6 +2633,148 @@ function updateHighwayTokens() {
   tokensDiv.querySelectorAll('.hw-token, .hw-overflow-bubble').forEach(el => {
     if (!seen.has(el.id)) el.remove();
   });
+}
+
+// ── VOYAGE / CLAN BASE ──────────────────────────────────────────────
+const VILLAGE_TIERS = [
+  {
+    minTotal: 0, nextAt: 100,
+    name: '⛺ Campsite  Lvl 1', icon: '⛺',
+    desc: 'A humble beginning. The crew gathers around a campfire.',
+    lawnClass: '',
+    buildings: [
+      { r:2,c:2, e:'⛺', cls:'main-hall', label:'Town Hall' },
+      { r:4,c:0, e:'🔥', cls:'',         label:'Campfire'  },
+      { r:0,c:4, e:'🧱', cls:'',         label:'Lonely Wall Piece' },
+    ],
+  },
+  {
+    minTotal: 100, nextAt: 150,
+    name: '🛖 Burger Fort  Lvl 2', icon: '🛖',
+    desc: '100 burgers deep. A real base takes shape.',
+    lawnClass: '',
+    buildings: [
+      { r:2,c:2, e:'🛖', cls:'main-hall', label:'Burger Fort'      },
+      { r:0,c:0, e:'🔥', cls:'',          label:'Campfire'          },
+      { r:4,c:2, e:'🍟', cls:'',          label:'Fry Stash Tower'   },
+      { r:0,c:4, e:'🧱', cls:'',          label:'Wall'              },
+      { r:4,c:4, e:'🧱', cls:'',          label:'Wall'              },
+    ],
+  },
+  {
+    minTotal: 150, nextAt: 200,
+    name: '🏰 Spatula Castle  Lvl 3', icon: '🏰',
+    desc: 'Legends are forged here. The ketchup turrets stand guard.',
+    lawnClass: '',
+    buildings: [
+      { r:2,c:2, e:'🏰', cls:'main-hall', label:'Spatula Castle'    },
+      { r:0,c:0, e:'🍅', cls:'',          label:'Ketchup Turret'    },
+      { r:0,c:4, e:'🍅', cls:'',          label:'Ketchup Turret'    },
+      { r:4,c:0, e:'🍟', cls:'',          label:'Fry Stash'         },
+      { r:4,c:4, e:'🍅', cls:'',          label:'Ketchup Turret'    },
+      { r:2,c:0, e:'🛡️', cls:'',          label:'Burger Barricade'  },
+      { r:0,c:2, e:'⚔️', cls:'',          label:'Spatula Armory'    },
+    ],
+  },
+  {
+    minTotal: 200, nextAt: null,
+    name: '👑 Flavor Metropolis  Lvl 4', icon: '👑',
+    desc: 'LEGENDARY STATUS ACHIEVED. The greatest burger empire ever assembled.',
+    lawnClass: 'village-lawn-gold',
+    buildings: [
+      { r:2,c:2, e:'👑', cls:'main-hall', label:'Flavor HQ'         },
+      { r:0,c:0, e:'🍅', cls:'',          label:'Ketchup Turret'    },
+      { r:0,c:4, e:'🍅', cls:'',          label:'Ketchup Turret'    },
+      { r:4,c:0, e:'🍅', cls:'',          label:'Ketchup Turret'    },
+      { r:4,c:4, e:'🍅', cls:'',          label:'Ketchup Turret'    },
+      { r:0,c:2, e:'🏰', cls:'',          label:'Castle Keep'       },
+      { r:4,c:2, e:'🍟', cls:'',          label:'Fry Tower'         },
+      { r:2,c:0, e:'🥇', cls:'',          label:'Trophy Hall'       },
+      { r:2,c:4, e:'🎆', cls:'',          label:'Victory Cannon'    },
+      { r:1,c:1, e:'🍔', cls:'',          label:'Burger Banner'     },
+      { r:1,c:3, e:'🍔', cls:'',          label:'Burger Banner'     },
+      { r:3,c:1, e:'🍔', cls:'',          label:'Burger Banner'     },
+      { r:3,c:3, e:'🍔', cls:'',          label:'Burger Banner'     },
+    ],
+  },
+];
+
+let _confettiBaseInterval = null;
+
+function updateVillageBase() {
+  const lawn        = document.getElementById('village-lawn');
+  const progressEl  = document.getElementById('village-progress');
+  const legendEl    = document.getElementById('voyage-legend');
+  if (!lawn || !progressEl) return;
+
+  const total = players.reduce((sum, p) => sum + (p.count || 0), 0);
+
+  // Find current tier
+  let tierIdx = 0;
+  for (let i = VILLAGE_TIERS.length - 1; i >= 0; i--) {
+    if (total >= VILLAGE_TIERS[i].minTotal) { tierIdx = i; break; }
+  }
+  const tier = VILLAGE_TIERS[tierIdx];
+
+  // Build grid
+  const bmap = {};
+  tier.buildings.forEach(b => { bmap[`${b.r},${b.c}`] = b; });
+  lawn.className = 'village-lawn' + (tier.lawnClass ? ' ' + tier.lawnClass : '');
+  lawn.innerHTML = '';
+  const legendBuildings = [];
+  for (let r = 0; r < 5; r++) {
+    for (let c = 0; c < 5; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'v-cell';
+      const b = bmap[`${r},${c}`];
+      if (b) {
+        cell.classList.add('has-building');
+        const delay = ((r * 5 + c) * 0.12).toFixed(2);
+        cell.innerHTML = `<span class="v-building ${b.cls}" title="${b.label}" style="animation-delay:${delay}s">${b.e}</span>`;
+        if (!legendBuildings.find(x => x.label === b.label)) legendBuildings.push(b);
+      }
+      lawn.appendChild(cell);
+    }
+  }
+
+  // Progress bar
+  const maxed = tier.nextAt === null;
+  let pct = 100, label = '👑 Maximum Level Achieved!';
+  if (!maxed) {
+    pct = Math.min(100, Math.round((total - tier.minTotal) / (tier.nextAt - tier.minTotal) * 100));
+    const needed = tier.nextAt - total;
+    const nextTier = VILLAGE_TIERS[tierIdx + 1];
+    label = needed > 0
+      ? `${total} / ${tier.nextAt} burgers &mdash; ${needed} more to unlock ${nextTier.name}!`
+      : 'Ready to upgrade!';
+  }
+  progressEl.innerHTML = `
+    <div class="voyage-tier-name">${tier.name}</div>
+    <div class="voyage-tier-desc">${tier.desc}</div>
+    <div class="voyage-track"><div class="voyage-fill${maxed?' maxed':''}" style="width:${pct}%"></div></div>
+    <div class="voyage-progress-label">${label}</div>
+  `;
+
+  // Legend
+  if (legendEl) {
+    legendEl.innerHTML = legendBuildings.map(b =>
+      `<div class="voyage-legend-item">${b.e} ${b.label}</div>`
+    ).join('');
+  }
+
+  // Tier 4: periodic confetti
+  if (tierIdx === 3) {
+    if (!_confettiBaseInterval) {
+      _confettiBaseInterval = setInterval(() => {
+        if (!document.getElementById('tab-base')?.classList.contains('active')) return;
+        confetti({ particleCount: 18, spread: 80, origin: { y: 0.5 },
+          colors: ['#FFD700','#F59E0B','#EF4444','#22C55E','#3B82F6'] });
+      }, 3500);
+    }
+  } else {
+    clearInterval(_confettiBaseInterval);
+    _confettiBaseInterval = null;
+  }
 }
 
 window.panMapToSpot = function(lat, lng) {
