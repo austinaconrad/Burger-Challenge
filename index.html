@@ -692,16 +692,21 @@ body.social-active .social-input-area{
 .map-popup-time{font-size:11px;color:var(--muted);font-weight:400}
 .map-section-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.10em;font-weight:600;margin:16px 0 8px}
 /* ── HIGHWAY BOARD ── */
-.hw-board{padding:4px 2px 16px}
-.hw-header{font-size:5px;color:var(--muted);text-align:center;margin-bottom:10px;letter-spacing:0.04em;font-weight:500;font-family:'Press Start 2P',monospace;line-height:1.8}
+.hw-board{
+  padding:4px 0 16px;
+  /* bleed to the wrapper edges — negative margin cancels the wrapper's 16px side padding */
+  margin-left:-16px;
+  margin-right:-16px;
+}
+.hw-header{font-size:5px;color:var(--muted);text-align:center;margin-bottom:10px;letter-spacing:0.04em;font-weight:500;font-family:'Press Start 2P',monospace;line-height:1.8;padding:0 16px}
 .hw-track{position:relative}
 .hw-rows{display:flex;flex-direction:column;gap:10px;overflow:visible}
-/* Road strip — flat pixel row, no pill rounding */
+/* Road strip — flat pixel row, no pill rounding, edge-to-edge */
 .hw-row{
   display:flex;flex-direction:row;gap:2px;
   background:rgba(255,255,255,0.04);
-  border-radius:3px;
-  padding:3px 4px;
+  border-radius:0;
+  padding:3px 8px;
   position:relative;
   overflow:visible;
 }
@@ -798,13 +803,15 @@ body.social-active .social-input-area{
   box-shadow:0 2px 8px rgba(0,0,0,0.6);
   transition:left 0.65s cubic-bezier(0.25,1,0.5,1),top 0.65s cubic-bezier(0.25,1,0.5,1);
 }
-/* Legend */
+/* Legend — full bleed strip */
 .hw-legend{
   display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;
   justify-content:center;align-items:center;
-  padding:10px 12px;
-  background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);
-  border-radius:var(--radius-sm);
+  padding:10px 16px;
+  background:rgba(255,255,255,0.03);
+  border-top:1px solid rgba(255,255,255,0.07);
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  border-radius:0;
 }
 .hw-legend-item{display:flex;align-items:center;gap:6px;font-size:6px;font-weight:500;color:var(--muted2);font-family:'Press Start 2P',monospace;letter-spacing:0.02em}
 
@@ -871,6 +878,21 @@ body.social-active .social-input-area{
   z-index: 3; /* sit above the dark overlay */
 }
 
+/* 3D pedestal shadow beneath occupied slots (tokens sitting on them) */
+.hw-space.hw-occupied::before {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 5px;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, transparent 75%);
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+}
+
 /* 2. Pixel font on node numbers */
 .hw-sn {
   font-family: 'Press Start 2P', monospace !important;
@@ -903,6 +925,9 @@ body.social-active .social-input-area{
   overflow: hidden;
   padding: 0 !important;
   font-size: 0 !important; /* hide text when img loads */
+  box-shadow:
+    0 4px 10px rgba(0,0,0,0.7),
+    0 1px 3px rgba(0,0,0,0.5) !important;
 }
 .hw-token img {
   width: 100%;
