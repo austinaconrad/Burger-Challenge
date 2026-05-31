@@ -1886,22 +1886,22 @@ function showReactionTray(msgId, anchorEl) {
 
 async function toggleReaction(msgId, emoji) {
   if (!myPlayerId || spectatorMode) return;
+  if (!db || !roomId) { showToast('⚠️ Not connected'); return; }
   try {
-    const msgRef = doc(db, 'rooms', roomId, 'messages', msgId);
-    const snap = await getDoc(msgRef);
-    if (!snap.exists()) return;
-    // Read the full reactions map, mutate the relevant key, write it back
-    // as a single top-level field. Avoids dot-notation field paths which
-    // break on multi-codepoint emoji (e.g. ❤️ = U+2764 + U+FE0F).
-    const reactions = { ...(snap.data().reactions || {}) };
-    const current = reactions[emoji] || [];
+    // Read reactions from the local messages cache — no extra Firestore read needed.
+    const cached = messages.find(m => m.id === msgId);
+    const reactions = { ...(cached?.reactions || {}) };
+    const current = Array.isArray(reactions[emoji]) ? reactions[emoji] : [];
     reactions[emoji] = current.includes(myPlayerId)
       ? current.filter(id => id !== myPlayerId)   // toggle off
       : [...current, myPlayerId];                 // toggle on
-    // Clean up empty arrays so Firestore doesn't accumulate dead keys
     if (reactions[emoji].length === 0) delete reactions[emoji];
+    const msgRef = doc(db, 'rooms', roomId, 'messages', msgId);
     await updateDoc(msgRef, { reactions });
-  } catch(e) { showToast('⚠️ Could not save reaction'); }
+  } catch(e) {
+    console.error('toggleReaction failed:', e);
+    showToast('⚠️ Could not save reaction');
+  }
 }
 
 // Single delegated listener — handles tray open, pill toggle, tray emoji pick
