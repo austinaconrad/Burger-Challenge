@@ -1894,19 +1894,35 @@ async function toggleReaction(msgId, emoji) {
   if (!myPlayerId || spectatorMode) return;
   if (!db || !roomId) { showToast('⚠️ Not connected'); return; }
   try {
-    // Read reactions from the local messages cache — no extra Firestore read needed.
     const cached = messages.find(m => m.id === msgId);
     const reactions = { ...(cached?.reactions || {}) };
     const current = Array.isArray(reactions[emoji]) ? reactions[emoji] : [];
     reactions[emoji] = current.includes(myPlayerId)
-      ? current.filter(id => id !== myPlayerId)   // toggle off
-      : [...current, myPlayerId];                 // toggle on
+      ? current.filter(id => id !== myPlayerId)
+      : [...current, myPlayerId];
     if (reactions[emoji].length === 0) delete reactions[emoji];
-    const msgRef = doc(db, 'rooms', roomId, 'messages', msgId);
-    await updateDoc(msgRef, { reactions });
+
+    // First try updating the message doc itself.
+    // If rules block it (e.g. only the author can update their message),
+    // fall back to a dedicated reactions doc that anyone in the room can write.
+    try {
+      const msgRef = doc(db, 'rooms', roomId, 'messages', msgId);
+      await updateDoc(msgRef, { reactions });
+    } catch(innerErr) {
+      if (innerErr.code === 'permission-denied' || innerErr.code === 'PERMISSION_DENIED') {
+        // Fallback: store reactions separately so message-doc write rules don't block us
+        await setDoc(
+          doc(db, 'rooms', roomId, 'reactions', msgId),
+          { reactions, msgId },
+          { merge: true }
+        );
+      } else {
+        throw innerErr; // re-throw non-permissions errors
+      }
+    }
   } catch(e) {
-    console.error('toggleReaction failed:', e);
-    showToast('⚠️ Could not save reaction');
+    console.error('toggleReaction failed:', e.code, e.message);
+    showToast(`⚠️ Reaction failed (${e.code || e.message})`);
   }
 }
 
