@@ -593,15 +593,32 @@ body.social-active .social-input-area{
 .burger-detail input[type=text]:focus{border-color:var(--amber)}
 .burger-detail input[type=text]::placeholder{color:var(--muted)}
 /* ── Half-star rating widget ── */
+/*
+  Alignment math (min=0, max=5, thumbW=22px):
+  ─ One star-unit = starW(22) + gap(8) = 30px
+  ─ Slider width  = 30px (zone-0 pre-star area) + 142px (star display) = 172px
+  ─ Thumb travel  = 172 − 22 = 150px  →  150/5 = 30px per value unit ✓
+  ─ Thumb inset   = thumbW/2 = 11px
+  ─ value=0  → 11px from left  = 11px before star 1 (star 1 left edge is at 30px) ✓
+  ─ value=1  → 30+11 = 41px   = center of star 1 ✓
+  ─ value=2  → 60+11 = 71px   = center of star 2 ✓  (etc.)
+  ─ value=5  → 150+11 = 161px = center of star 5 ✓
+  Stars are shifted right 30px inside the 172px wrapper to align with values 1–5.
+*/
 .rating-widget{display:flex;flex-direction:column;gap:4px;flex:1}
-/* Wrapper: column stack — stars on top, slider directly beneath, same width */
 .star-slider-wrap{
   display:inline-flex;
   flex-direction:column;
-  gap:6px;
-  width:fit-content;   /* shrink-wraps to the 114px star row */
+  gap:10px;            /* vertical gap: thumb is 22px tall, label needs clearance */
+  width:172px;         /* 30px zone-0 + 142px star display */
 }
-.star-display{display:flex;gap:8px;line-height:1}
+.star-display{
+  display:flex;
+  gap:8px;
+  line-height:1;
+  margin-left:30px;    /* shifts stars right so star 1 center = value=1 thumb pos */
+  width:142px;
+}
 .star-icon{font-size:22px;line-height:1;display:inline-block;color:#3A3A3A;transition:color 0.12s}
 .star-icon.full{color:#F59E0B}
 .star-icon.half{
@@ -610,20 +627,16 @@ body.social-active .social-input-area{
   -webkit-text-fill-color:transparent;
   background-clip:text;
 }
-.rating-label{font-size:10px;color:var(--muted2);font-weight:500;letter-spacing:0.03em;height:14px}
-/*
-  Alignment math:
-  Star display = 5×22px + 4×1px gap = 114px wide.
-  Thumb width = 22px (= one star width).
-  Browser inset = thumbW/2 = 11px on each side.
-  So thumb center travels from 11px (star 1 center) to 103px (star 5 center).
-  With min=0.5, max=5:  value 0.5 → star 1 center, value 5 → star 5 center. ✓
-*/
+.rating-label{
+  font-size:10px;color:var(--muted2);font-weight:500;
+  letter-spacing:0.03em;height:14px;
+  margin-left:30px;    /* keep label visually under the star zone, not the 0-zone */
+}
 .rating-slider{
   -webkit-appearance:none;
   appearance:none;
   display:block;
-  width:142px;        /* 5×22px stars + 4×8px gaps = exact star-row width */
+  width:172px;         /* full wrapper width */
   height:4px;
   margin:0;padding:0;
   box-sizing:border-box;
@@ -636,7 +649,7 @@ body.social-active .social-input-area{
 }
 .rating-slider::-webkit-slider-thumb{
   -webkit-appearance:none;
-  width:22px;height:22px;   /* = one star width → correct inset math */
+  width:22px;height:22px;
   border-radius:50%;
   background:#F59E0B;
   border:2px solid #D97706;
@@ -2042,9 +2055,12 @@ window.setRating = function(val) {
     if (val >= n)           el.classList.add('full');
     else if (val >= n - 0.5) el.classList.add('half');
   });
-  // Update track fill (0–5 range → 0–100%)
+  // Fill gradient: map thumb centre position (11px–161px) across the 172px track
   const slider = document.getElementById('rating-slider');
-  if (slider) slider.style.setProperty('--fill', (val / 5 * 100) + '%');
+  if (slider) {
+    const thumbCenter = (val / 5) * 150 + 11; // px from track left
+    slider.style.setProperty('--fill', (thumbCenter / 172 * 100).toFixed(2) + '%');
+  }
   // Update label
   const lbl = document.getElementById('rating-label');
   if (lbl) lbl.textContent = val > 0 ? `Rating: ${val} / 5` : 'No rating';
