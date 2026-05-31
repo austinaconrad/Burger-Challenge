@@ -255,7 +255,7 @@ button{transition:transform 0.1s ease}
 .bg-progress-fill{height:100%;border-radius:999px;transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1)}
 .bg-pct{font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;color:var(--av-text);flex-shrink:0;min-width:40px;text-align:right}
 .social-wrap{display:flex;flex-direction:column;height:calc(100dvh - 310px);min-height:360px}
-.social-feed{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding:4px 2px 10px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+.social-feed{flex:1;overflow-y:auto;display:flex;flex-direction:column-reverse;gap:6px;padding:4px 2px 10px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
 .social-feed::-webkit-scrollbar{width:4px}
 .social-feed::-webkit-scrollbar-track{background:transparent}
 .social-feed::-webkit-scrollbar-thumb{background:var(--border2);border-radius:999px}
@@ -1800,9 +1800,8 @@ function renderSocialFeed() {
     return;
   }
   if (empty) empty.style.display = 'none';
-  const prevScrollTop = feed.scrollTop;
-  const isNearBottom = feed.scrollHeight - prevScrollTop - feed.clientHeight < 80;
-  feed.innerHTML = messages.map(m => {
+  // Newest first — flex-direction:column-reverse keeps the latest message at the top
+  feed.innerHTML = [...messages].reverse().map(m => {
     const isMe = m.playerId === myPlayerId;
     const cc = colorClass(m.colorIdx ?? 0);
     const timeStr = formatTime(m.createdAt);
@@ -1848,14 +1847,6 @@ function renderSocialFeed() {
   }).join('');
   window._msgImages = {};
   messages.forEach(m => { if (m.imageBase64) window._msgImages[m.id] = m.imageBase64; });
-  if (_scrollFeedToBottom) {
-    _scrollFeedToBottom = false;
-    feed.scrollTop = feed.scrollHeight;
-  } else if (isNearBottom) {
-    feed.scrollTop = feed.scrollHeight;
-  } else {
-    feed.scrollTop = prevScrollTop;
-  }
 }
 
 window.openLightbox = function(msgId) {
@@ -2254,8 +2245,6 @@ window.switchTab=function(name,btn){
     seenMessageCount = messages.length;
     const dot = document.getElementById('social-unread-dot');
     if(dot) dot.classList.remove('visible');
-    _scrollFeedToBottom = true;
-    if(messages.length) renderSocialFeed();
   }
   if(name==='map') setTimeout(() => {
     renderBurgerMap();
