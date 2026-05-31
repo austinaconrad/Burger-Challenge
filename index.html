@@ -1119,6 +1119,7 @@ let players = [];
 let messages = [];
 let seenMessageCount = 0;
 let socialInitialLoadDone = false;
+let _scrollFeedToBottom = false; // set true when Social tab opens; consumed by renderSocialFeed
 let pendingImageBase64 = null, pendingImageName = '';
 
 function showConfigBanner() {
@@ -1847,10 +1848,12 @@ function renderSocialFeed() {
   }).join('');
   window._msgImages = {};
   messages.forEach(m => { if (m.imageBase64) window._msgImages[m.id] = m.imageBase64; });
-  if (isNearBottom) {
+  if (_scrollFeedToBottom) {
+    _scrollFeedToBottom = false;
+    feed.scrollTop = feed.scrollHeight;
+  } else if (isNearBottom) {
     feed.scrollTop = feed.scrollHeight;
   } else {
-    // Restore exact position — reaction/edit re-renders shouldn't move the user
     feed.scrollTop = prevScrollTop;
   }
 }
@@ -2251,14 +2254,8 @@ window.switchTab=function(name,btn){
     seenMessageCount = messages.length;
     const dot = document.getElementById('social-unread-dot');
     if(dot) dot.classList.remove('visible');
-    // Wait two animation frames so the social-active CSS (which changes the feed
-    // height to calc(100dvh - 130px)) has been fully laid out before we scroll.
-    // A single rAF queues before paint; the second rAF runs after the browser
-    // has committed the new geometry — scroll then lands at the true bottom.
-    setTimeout(() => {
-      const feed = document.getElementById('social-feed');
-      if (feed) feed.scrollTop = feed.scrollHeight;
-    }, 80);
+    _scrollFeedToBottom = true;
+    if(messages.length) renderSocialFeed();
   }
   if(name==='map') setTimeout(() => {
     renderBurgerMap();
