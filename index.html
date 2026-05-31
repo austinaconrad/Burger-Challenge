@@ -3021,6 +3021,41 @@ function updateVillageBase() {
   }
 }
 
+// One-time data fix — call from browser console: fixUnknownSpots()
+window.fixUnknownSpots = async function(restaurant = "Swenson's", n = 5) {
+  const candidates = [];
+  players.forEach(p => {
+    (p.logs || []).forEach((entry, idx) => {
+      const isUnknown = !entry || typeof entry === 'string' ||
+                        !entry.restaurant || entry.restaurant === 'Unknown spot';
+      if (isUnknown) candidates.push({ player: p, idx, ts: logTs(entry) || '' });
+    });
+  });
+  candidates.sort((a, b) => b.ts.localeCompare(a.ts));
+  const toFix = candidates.slice(0, n);
+  if (!toFix.length) { showToast('Nothing to fix!'); return; }
+
+  // Group fixes by player to minimise Firestore writes
+  const byPlayer = {};
+  toFix.forEach(c => {
+    if (!byPlayer[c.player.id]) byPlayer[c.player.id] = { player: c.player, indices: [] };
+    byPlayer[c.player.id].indices.push(c.idx);
+  });
+
+  for (const { player, indices } of Object.values(byPlayer)) {
+    const newLogs = [...(player.logs || [])];
+    indices.forEach(i => {
+      const entry = newLogs[i];
+      newLogs[i] = typeof entry === 'object'
+        ? { ...entry, restaurant }
+        : { ts: entry, restaurant };
+    });
+    await updateDoc(doc(db, 'rooms', roomId, 'players', player.id), { logs: newLogs });
+  }
+  showToast(`✅ Patched ${toFix.length} entries → ${restaurant}`);
+  console.log(`fixUnknownSpots: updated ${toFix.length} entries to "${restaurant}"`);
+};
+
 window.panMapToSpot = function(lat, lng) {
   // Switch to map tab
   const mapBtn = [...document.querySelectorAll('.tab-btn')].find(b => b.getAttribute('onclick')?.includes("'map'"));
