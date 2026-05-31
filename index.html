@@ -267,10 +267,102 @@ button{transition:transform 0.1s ease}
 .msg-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 13px;animation:slideIn 0.25s ease both;box-shadow:0 1px 4px rgba(0,0,0,0.05)}
 .msg-card.mine{background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.18)}
 .msg-header{display:flex;align-items:center;gap:8px;margin-bottom:5px}
-.msg-header-info{flex:1;min-width:0}
+/* Cinematic: name + timestamp on one line */
+.msg-header-info{flex:1;min-width:0;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .msg-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.msg-time{font-size:11px;color:var(--muted2);margin-top:1px;font-weight:400}
+.msg-time{font-size:10px;color:var(--muted2);font-weight:400;white-space:nowrap;margin-top:0}
+/* Cinematic: cap photo height so portraits don't swamp the feed */
+.msg-img-wrap img{max-height:240px;object-fit:cover;border-radius:12px;width:100%;display:block}
+/* ── Social compact / cinematic mode (active when Social tab is open) ── */
+body.social-active header .burger-deco,
+body.social-active header h1,
+body.social-active header .room-pill,
+body.social-active header #summer-banner,
+body.social-active header #spectator-pill{display:none!important}
+body.social-active header{padding:6px 0 0!important;gap:0!important}
+body.social-active .tabs{
+  position:sticky;top:0;z-index:20;
+  background:var(--bg);
+  padding-top:6px;
+  margin-bottom:10px;
+  box-shadow:0 2px 12px rgba(0,0,0,0.25);
+}
+/* Full-height scrollable feed */
+body.social-active .social-wrap{height:auto;min-height:0}
+body.social-active .social-feed{
+  height:calc(100dvh - 130px);
+  padding-bottom:90px; /* clear fixed input bar */
+  min-height:0;
+}
+/* Sticky input footer */
+body.social-active .social-input-area{
+  position:fixed;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:100%;
+  max-width:700px;
+  padding:8px 16px max(16px,env(safe-area-inset-bottom));
+  background:var(--bg);
+  border-top:1px solid var(--border);
+  z-index:100;
+  box-shadow:0 -4px 24px rgba(0,0,0,0.35);
+}
 .msg-mine-tag{font-size:9px;font-weight:700;background:rgba(217,119,6,0.10);color:var(--amber);border:1px solid rgba(217,119,6,0.22);padding:2px 7px;border-radius:999px;white-space:nowrap;flex-shrink:0;text-transform:uppercase;letter-spacing:0.04em}
+/* ── Tapback reaction trigger ── */
+.msg-react-btn{background:none;border:none;font-size:14px;color:var(--muted);cursor:pointer;padding:2px 5px;border-radius:999px;line-height:1;transition:color 0.15s,background 0.15s;flex-shrink:0;margin-left:auto}
+.msg-react-btn:hover{color:var(--text);background:rgba(255,255,255,0.08)}
+/* ── Floating reaction tray ── */
+#reaction-tray{
+  position:fixed;z-index:500;
+  background:rgba(28,28,28,0.92);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,0.13);
+  border-radius:22px;
+  padding:5px 6px;
+  display:flex;gap:2px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.55),0 2px 8px rgba(0,0,0,0.3);
+  opacity:0;
+  transform:scale(0.75) translateY(8px);
+  transform-origin:right bottom;
+  pointer-events:none;
+  transition:opacity 0.16s ease,transform 0.2s cubic-bezier(0.175,0.885,0.32,1.275);
+}
+#reaction-tray.open{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}
+.tray-emoji-btn{
+  background:none;border:none;
+  font-size:21px;line-height:1;
+  padding:5px 4px;
+  border-radius:13px;
+  cursor:pointer;
+  transition:transform 0.12s cubic-bezier(0.175,0.885,0.32,1.275),background 0.1s;
+}
+.tray-emoji-btn:hover{background:rgba(255,255,255,0.10);transform:scale(1.28)}
+.tray-emoji-btn:active{transform:scale(0.88)}
+/* ── Reaction pills below each post ── */
+.msg-reactions{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.msg-reactions:empty{display:none}
+.reaction-pill{
+  display:inline-flex;align-items:center;gap:3px;
+  background:rgba(255,255,255,0.07);
+  border:1.5px solid rgba(255,255,255,0.10);
+  border-radius:999px;
+  padding:3px 9px 3px 7px;
+  cursor:pointer;user-select:none;
+  transition:background 0.15s,border-color 0.15s,transform 0.1s;
+  animation:reactionPop 0.15s cubic-bezier(0.175,0.885,0.32,1.275) both;
+}
+.reaction-pill:hover{background:rgba(255,255,255,0.12)}
+.reaction-pill:active{transform:scale(0.92)}
+.reaction-pill.mine{background:rgba(245,158,11,0.13);border-color:rgba(245,158,11,0.55)}
+.rp-emoji{font-size:13px;line-height:1}
+.rp-count{font-size:11px;font-weight:700;color:var(--muted2);line-height:1}
+.reaction-pill.mine .rp-count{color:var(--amber)}
+@keyframes reactionPop{
+  0%  {transform:scale(0);opacity:0}
+  70% {transform:scale(1.15)}
+  100%{transform:scale(1);opacity:1}
+}
 .msg-text{font-size:14px;line-height:1.55;color:var(--text);word-break:break-word}
 .msg-img-wrap{margin-top:7px;border-radius:10px;overflow:hidden;border:1px solid rgba(0,0,0,0.06);box-shadow:0 1px 6px rgba(0,0,0,0.07);cursor:pointer;transition:opacity 0.2s}
 .msg-img-wrap:hover{opacity:0.92}
@@ -476,10 +568,52 @@ button{transition:transform 0.1s ease}
 .burger-detail input[type=text]{flex:1;background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-xs);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;outline:none;transition:border-color 0.2s}
 .burger-detail input[type=text]:focus{border-color:var(--amber)}
 .burger-detail input[type=text]::placeholder{color:var(--muted)}
-.star-row{display:flex;gap:4px}
-.star-btn{background:none;border:none;font-size:22px;cursor:pointer;padding:2px;line-height:1;transition:transform 0.1s;filter:grayscale(1) brightness(0.5)}
-.star-btn.active{filter:none}
-.star-btn:active{transform:scale(1.3)}
+/* ── Half-star rating widget ── */
+.rating-widget{display:flex;flex-direction:column;gap:7px;flex:1}
+.star-display{display:flex;gap:1px;line-height:1}
+.star-icon{font-size:22px;line-height:1;display:inline-block;color:#3A3A3A;transition:color 0.12s}
+.star-icon.full{color:#F59E0B}
+.star-icon.half{
+  background:linear-gradient(90deg,#F59E0B 50%,#3A3A3A 50%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.rating-label{font-size:10px;color:var(--muted2);font-weight:500;letter-spacing:0.03em;height:14px}
+/* Range slider — amber thumb, dark track */
+.rating-slider{
+  -webkit-appearance:none;
+  appearance:none;
+  width:100%;
+  height:3px;
+  border-radius:0;          /* pixel-flat */
+  background:#2A2A2A;
+  outline:none;
+  cursor:pointer;
+  margin:0;
+}
+.rating-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:14px;height:14px;
+  border-radius:50%;
+  background:#F59E0B;
+  border:2px solid #D97706;
+  box-shadow:0 1px 6px rgba(217,119,6,0.5);
+  cursor:pointer;
+  transition:transform 0.1s;
+}
+.rating-slider::-webkit-slider-thumb:active{transform:scale(1.25)}
+.rating-slider::-moz-range-thumb{
+  width:14px;height:14px;
+  border-radius:50%;
+  background:#F59E0B;
+  border:2px solid #D97706;
+  cursor:pointer;
+}
+/* Track fill colour is handled by a JS-updated CSS variable */
+.rating-slider{
+  background:linear-gradient(90deg,#F59E0B var(--fill,0%),#2A2A2A var(--fill,0%));
+}
 .quick-spots{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
 .quick-spot{background:var(--surface3);border:1px solid var(--border2);border-radius:999px;color:var(--muted2);font-size:11px;font-weight:500;padding:4px 10px;cursor:pointer;transition:border-color 0.15s,color 0.15s,background 0.15s}
 .quick-spot:hover{border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,0.07)}
@@ -873,6 +1007,14 @@ button{transition:transform 0.1s ease}
 </div>
 
 <div id="bdg-tip"></div>
+<div id="reaction-tray">
+  <button class="tray-emoji-btn" data-emoji="❤️">❤️</button>
+  <button class="tray-emoji-btn" data-emoji="👍">👍</button>
+  <button class="tray-emoji-btn" data-emoji="👎">👎</button>
+  <button class="tray-emoji-btn" data-emoji="😂">😂</button>
+  <button class="tray-emoji-btn" data-emoji="❗">❗</button>
+  <button class="tray-emoji-btn" data-emoji="❓">❓</button>
+</div>
 <div id="lightbox" onclick="closeLightbox()"><img id="lightbox-img" src="" alt=""/></div>
 <div class="toast" id="toast"></div>
 <div id="mc-advancement-toast">
@@ -1030,6 +1172,19 @@ function initJokeOfTheDay() {
   const joke = JOKES[getDayOfYear() % JOKES.length];
   document.getElementById('joke-q').textContent = joke.q;
   document.getElementById('joke-a').textContent = '👉 ' + joke.a;
+  // Also reset the revealed state so the new joke starts hidden
+  document.getElementById('joke-a').classList.remove('revealed');
+  document.getElementById('joke-hint').textContent = 'Tap for punchline 👆';
+  scheduleJokeMidnightRefresh();
+}
+
+function scheduleJokeMidnightRefresh() {
+  const now = new Date();
+  const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  const msUntilMidnight = nextMidnight - now;
+  setTimeout(() => {
+    initJokeOfTheDay(); // will also re-schedule for the next midnight
+  }, msUntilMidnight);
 }
 
 window.toggleJoke = function() {
@@ -1496,14 +1651,20 @@ function renderMyTally(){
         <input type="text" id="detail-restaurant" placeholder="Restaurant name…" maxlength="60"/>
       </div>
       <div class="quick-spots" id="quick-spots"></div>
-      <div class="burger-detail-row">
-        <label>Rating</label>
-        <div class="star-row" id="star-row">
-          <button class="star-btn" data-star="1" onclick="setStar(1)">⭐</button>
-          <button class="star-btn" data-star="2" onclick="setStar(2)">⭐</button>
-          <button class="star-btn" data-star="3" onclick="setStar(3)">⭐</button>
-          <button class="star-btn" data-star="4" onclick="setStar(4)">⭐</button>
-          <button class="star-btn" data-star="5" onclick="setStar(5)">⭐</button>
+      <div class="burger-detail-row" style="align-items:flex-start;gap:10px">
+        <label style="padding-top:4px">Rating</label>
+        <div class="rating-widget" id="rating-widget">
+          <div class="star-display" id="star-display">
+            <span class="star-icon" data-idx="1">★</span>
+            <span class="star-icon" data-idx="2">★</span>
+            <span class="star-icon" data-idx="3">★</span>
+            <span class="star-icon" data-idx="4">★</span>
+            <span class="star-icon" data-idx="5">★</span>
+          </div>
+          <input type="range" min="0" max="5" step="0.5" value="0"
+                 class="rating-slider" id="rating-slider"
+                 oninput="setRating(+this.value)"/>
+          <div class="rating-label" id="rating-label">No rating</div>
         </div>
       </div>
       <button class="detail-confirm-btn" id="confirm-btn" onclick="confirmBurger()">✓ Log Burger</button>
@@ -1564,6 +1725,18 @@ function renderSocialFeed() {
       ? `<div class="msg-img-wrap" onclick="openLightbox('${m.id}')"><img src="${escHtml(m.imageBase64)}" alt="photo"/></div>`
       : '';
     const textHtml = m.text ? `<div class="msg-text">${escHtml(m.text)}</div>` : '';
+    // Build reaction pills from stored reactions map {emoji: [playerIds]}
+    const reactions = m.reactions || {};
+    const pillsHtml = Object.entries(reactions)
+      .filter(([,ids]) => Array.isArray(ids) && ids.length > 0)
+      .map(([emoji, ids]) => {
+        const mine = ids.includes(myPlayerId);
+        return `<button class="reaction-pill${mine?' mine':''}" data-msg-id="${m.id}" data-emoji="${escHtml(emoji)}">
+          <span class="rp-emoji">${emoji}</span>
+          <span class="rp-count">${ids.length}</span>
+        </button>`;
+      }).join('');
+    const reactionsHtml = pillsHtml ? `<div class="msg-reactions">${pillsHtml}</div>` : '<div class="msg-reactions"></div>';
     return `<div class="msg-card ${isMe?'mine':''} ${cc}" data-id="${m.id}">
       <div class="msg-header">
         ${miniAvatarHTML(m.playerName||'?', m.colorIdx??0, 34)}
@@ -1572,9 +1745,11 @@ function renderSocialFeed() {
           <div class="msg-time">${timeStr}</div>
         </div>
         ${isMe ? '<span class="msg-mine-tag">You</span>' : ''}
+        <button class="msg-react-btn" data-msg-id="${m.id}" title="React">☺</button>
       </div>
       ${textHtml}
       ${imgHtml}
+      ${reactionsHtml}
     </div>`;
   }).join('');
   window._msgImages = {};
@@ -1589,6 +1764,76 @@ window.openLightbox = function(msgId) {
   document.getElementById('lightbox').classList.add('open');
 };
 window.closeLightbox = function() { document.getElementById('lightbox').classList.remove('open'); };
+
+// ── Tapback reactions ─────────────────────────────────────────────
+let _trayMsgId = null;
+
+function hideReactionTray() {
+  document.getElementById('reaction-tray').classList.remove('open');
+  _trayMsgId = null;
+}
+
+function showReactionTray(msgId, anchorEl) {
+  // Toggle if tapping the same post's button again
+  if (_trayMsgId === msgId) { hideReactionTray(); return; }
+  _trayMsgId = msgId;
+  const tray = document.getElementById('reaction-tray');
+  // Position above and right-aligned to the anchor button
+  const rect = anchorEl.getBoundingClientRect();
+  const trayW = 230; // approximate rendered width
+  let left = rect.right - trayW;
+  if (left < 8) left = 8;
+  const top = rect.top - 56;
+  tray.style.left = left + 'px';
+  tray.style.top  = Math.max(8, top) + 'px';
+  tray.classList.add('open');
+}
+
+async function toggleReaction(msgId, emoji) {
+  if (!myPlayerId || spectatorMode) return;
+  try {
+    const msgRef = doc(db, 'rooms', roomId, 'messages', msgId);
+    const snap = await getDoc(msgRef);
+    if (!snap.exists()) return;
+    const current = (snap.data().reactions || {})[emoji] || [];
+    const next = current.includes(myPlayerId)
+      ? current.filter(id => id !== myPlayerId)   // toggle off
+      : [...current, myPlayerId];                 // toggle on
+    // Use a plain object update; dot-notation field path handles nested write
+    await updateDoc(msgRef, { [`reactions.${emoji}`]: next });
+  } catch(e) { showToast('⚠️ Could not save reaction'); }
+}
+
+// Single delegated listener — handles tray open, pill toggle, tray emoji pick
+document.addEventListener('click', e => {
+  // Close tray on outside click
+  const tray = document.getElementById('reaction-tray');
+  if (tray.classList.contains('open')) {
+    if (!e.target.closest('#reaction-tray') && !e.target.closest('.msg-react-btn')) {
+      hideReactionTray();
+    }
+  }
+  // Open tray
+  const reactBtn = e.target.closest('.msg-react-btn');
+  if (reactBtn) {
+    e.stopPropagation();
+    showReactionTray(reactBtn.dataset.msgId, reactBtn);
+    return;
+  }
+  // Tray emoji pick
+  const trayBtn = e.target.closest('.tray-emoji-btn');
+  if (trayBtn && _trayMsgId) {
+    const emoji = trayBtn.dataset.emoji;
+    hideReactionTray();
+    toggleReaction(_trayMsgId, emoji);
+    return;
+  }
+  // Pill toggle
+  const pill = e.target.closest('.reaction-pill');
+  if (pill) {
+    toggleReaction(pill.dataset.msgId, pill.dataset.emoji);
+  }
+});
 
 window.sendSocialPost = async function() {
   const text = document.getElementById('social-text').value.trim();
@@ -1685,7 +1930,9 @@ window.selectPatties = function(n) {
     if (qs) qs.innerHTML = OHIO_SPOTS.slice(0,5).map(s =>
       `<button class="quick-spot" onclick="document.getElementById('detail-restaurant').value='${s}'">${s}</button>`
     ).join('');
-    setStar(0);
+    setRating(0);
+    const sliderEl = document.getElementById('rating-slider');
+    if (sliderEl) sliderEl.value = 0;
     document.getElementById('detail-restaurant').value = '';
     pendingGPS = null;
     if (navigator.geolocation) {
@@ -1699,10 +1946,24 @@ window.selectPatties = function(n) {
 // Keep openBurgerDetail as a no-op (called by changeMyCount +1 path)
 window.openBurgerDetail = function() {};
 
-window.setStar = function(n) {
-  pendingRating = n;
-  document.querySelectorAll('.star-btn').forEach(b => { b.classList.toggle('active', +b.dataset.star <= n); });
+window.setRating = function(val) {
+  pendingRating = val;
+  // Update star icons: full / half / empty
+  document.querySelectorAll('#star-display .star-icon').forEach((el, i) => {
+    const n = i + 1;
+    el.classList.remove('full', 'half');
+    if (val >= n)           el.classList.add('full');
+    else if (val >= n - 0.5) el.classList.add('half');
+  });
+  // Update slider fill gradient
+  const slider = document.getElementById('rating-slider');
+  if (slider) slider.style.setProperty('--fill', (val / 5 * 100) + '%');
+  // Update label
+  const lbl = document.getElementById('rating-label');
+  if (lbl) lbl.textContent = val > 0 ? `Rating: ${val} / 5` : 'No rating';
 };
+// Backwards compat for any lingering setStar(n) calls
+window.setStar = window.setRating;
 
 window.confirmBurger = async function() {
   const count = pendingPattyCount || 1;
@@ -1726,7 +1987,9 @@ window.confirmBurger = async function() {
     const now = new Date();
     const dateStr = (now.getMonth()+1).toString().padStart(2,'0') + '/' + now.getDate().toString().padStart(2,'0') + '/' + now.getFullYear();
     const timeStr = now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', hour12:true});
-    const starsDisplay = pendingRating ? '⭐'.repeat(pendingRating) + ' (' + pendingRating + '/5)' : 'No rating';
+    const starsDisplay = pendingRating > 0
+      ? '⭐'.repeat(Math.floor(pendingRating)) + (pendingRating % 1 ? '½' : '') + ' (' + pendingRating + '/5)'
+      : 'No rating';
     receipt.innerHTML = `
       <div class="receipt-title">100 BURGER CHALLENGE</div>
       <div class="receipt-subtitle">THE SUMMER GRIND<br>ROOM: ${escHtml(roomId)}</div>
@@ -1855,6 +2118,8 @@ window.switchTab=function(name,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
   btn.classList.add('active');
+  // Cinematic social mode: collapse header, fix input bar
+  document.body.classList.toggle('social-active', name==='social');
   if(name==='social'){
     setTimeout(()=>{ const feed=document.getElementById('social-feed'); feed.scrollTop=feed.scrollHeight; },50);
     seenMessageCount = messages.length;
@@ -2162,7 +2427,12 @@ let mapMarkers = [];
 const RING_COLORS = ['#F87171','#FCD34D','#4ADE80','#22D3EE','#60A5FA','#E879F9','#CBD5E1','#F472B6','#FB7185','#A78BFA','#FDB974','#5EEAD4'];
 
 function starsHtml(n) {
-  return Array.from({length:5}, (_,i) => `<span style="color:${i<n?'#F59E0B':'#444'};font-size:14px">★</span>`).join('');
+  const full = Math.floor(n), half = (n % 1) >= 0.5;
+  return Array.from({length:5}, (_,i) => {
+    if (i < full) return `<span style="color:#F59E0B;font-size:14px">★</span>`;
+    if (i === full && half) return `<span style="background:linear-gradient(90deg,#F59E0B 50%,#444 50%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:14px">★</span>`;
+    return `<span style="color:#444;font-size:14px">★</span>`;
+  }).join('');
 }
 
 function renderBurgerMap() {
@@ -2266,7 +2536,13 @@ function renderBurgerMap() {
   }
 
   function feedStars(n) {
-    return '⭐'.repeat(Math.max(0, Math.min(5, n || 0))) || '<span style="color:var(--muted);font-size:10px">No rating</span>';
+    if (!n) return '<span style="color:var(--muted);font-size:10px">No rating</span>';
+    const full = Math.floor(n), half = (n % 1) >= 0.5;
+    return Array.from({length:5}, (_,i) => {
+      if (i < full) return `<span style="color:#F59E0B;font-size:11px">★</span>`;
+      if (i === full && half) return `<span style="background:linear-gradient(90deg,#F59E0B 50%,#444 50%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:11px">★</span>`;
+      return `<span style="color:#3A3A3A;font-size:11px">★</span>`;
+    }).join('') + `<span style="font-size:9px;color:var(--muted2);margin-left:3px">${n}</span>`;
   }
 
   feedEl.innerHTML = feedItems.slice(0, 20).map((item, idx) => `
