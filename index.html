@@ -721,129 +721,6 @@ body.social-active .social-input-area{
 .map-popup-stars{font-size:15px;margin-bottom:6px}
 .map-popup-time{font-size:11px;color:var(--muted);font-weight:400}
 .map-section-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.10em;font-weight:600;margin:16px 0 8px}
-/* ── HIGHWAY BOARD ── */
-.hw-board{
-  padding:4px 0 16px;
-  /* bleed to the wrapper edges — negative margin cancels the wrapper's 16px side padding */
-  margin-left:-16px;
-  margin-right:-16px;
-}
-.hw-header{font-size:5px;color:var(--muted);text-align:center;margin-bottom:10px;letter-spacing:0.04em;font-weight:500;font-family:'Press Start 2P',monospace;line-height:1.8;padding:0 16px}
-.hw-track{position:relative}
-.hw-rows{display:flex;flex-direction:column;gap:10px;overflow:visible}
-/* Road strip — flat pixel row, no pill rounding, edge-to-edge */
-.hw-row{
-  display:flex;flex-direction:row;gap:2px;
-  background:rgba(255,255,255,0.04);
-  border-radius:0;
-  padding:3px 8px;
-  position:relative;
-  overflow:visible;
-}
-/* ::before — pixelated dashed horizontal road line */
-.hw-row::before{
-  content:'';
-  position:absolute;
-  top:50%;left:4px;right:4px;
-  height:2px;
-  background: repeating-linear-gradient(
-    90deg,
-    #444 0px, #444 4px,
-    transparent 4px, transparent 7px
-  );
-  border-radius:0;
-  transform:translateY(-50%);
-  z-index:0;
-  pointer-events:none;
-}
-/* Sharp 90° pixel connectors — solid 2px dark-border stub, no curves */
-.hw-row.hw-turn-right::after{
-  content:'';
-  position:absolute;
-  right:2px;
-  top:-10px;
-  width:2px;
-  height:10px;
-  background:#555;
-  border-left:1px solid #333;
-  border-right:1px solid #222;
-  border-radius:0;
-  z-index:0;
-  pointer-events:none;
-}
-.hw-row.hw-turn-left::after{
-  content:'';
-  position:absolute;
-  left:2px;
-  top:-10px;
-  width:2px;
-  height:10px;
-  background:#555;
-  border-left:1px solid #333;
-  border-right:1px solid #222;
-  border-radius:0;
-  z-index:0;
-  pointer-events:none;
-}
-.hw-row-rev{flex-direction:row-reverse}
-/* Spaces — solid background so dashed lane line doesn't bleed through */
-.hw-space{
-  flex:1;min-width:0;aspect-ratio:1;border-radius:50%;
-  background:#1C1C1C;border:1px solid rgba(255,255,255,0.12);
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Inter',sans-serif;font-size:6.5px;font-weight:600;color:var(--muted);
-  position:relative;z-index:1;transition:background 0.4s,border-color 0.4s,box-shadow 0.4s;
-}
-.hw-sn{line-height:1;text-align:center;user-select:none;transition:opacity 0.25s ease}
-.hw-space.hw-occupied .hw-sn{opacity:0}
-/* Conquered road — solid so dashed lane doesn't bleed through */
-.hw-space.hw-conquered{
-  background:#1A2A35;
-  border-color:rgba(56,189,248,0.35);
-  color:rgba(186,230,253,0.85);
-}
-/* Milestones — override conquered tint */
-.hw-ms{border-width:2px;z-index:2}
-.hw-ms-start{background:rgba(34,197,94,0.14)!important;border-color:rgba(34,197,94,0.6)!important;color:#4ADE80!important;box-shadow:0 0 10px rgba(34,197,94,0.22);font-size:5.5px}
-.hw-ms-blue{background:rgba(96,165,250,0.12)!important;border-color:rgba(96,165,250,0.55)!important;color:#60A5FA!important;box-shadow:0 0 8px rgba(96,165,250,0.18)}
-.hw-ms-gold{background:rgba(245,158,11,0.16)!important;border-color:rgba(245,158,11,0.65)!important;color:var(--amber)!important;box-shadow:0 0 14px rgba(245,158,11,0.25);font-size:5px}
-/* Patriotic milestone rings */
-.hw-ms-patriot-red{background:rgba(220,38,38,0.12)!important;border-color:rgba(220,38,38,0.65)!important;color:#F87171!important;box-shadow:0 0 10px rgba(220,38,38,0.22)}
-.hw-ms-patriot-white{background:rgba(240,240,240,0.1)!important;border-color:rgba(240,240,240,0.7)!important;color:#F5F5F5!important;box-shadow:0 0 12px rgba(255,255,255,0.18);font-size:5px}
-.hw-ms-patriot-blue{background:rgba(37,99,235,0.14)!important;border-color:rgba(59,130,246,0.7)!important;color:#93C5FD!important;box-shadow:0 0 10px rgba(59,130,246,0.22)}
-/* Tokens */
-.hw-tokens-overlay{position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:4}
-.hw-token{
-  position:absolute;transform:translate(-50%,-50%);
-  width:22px;height:22px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:7.5px;font-weight:900;font-family:'Inter',sans-serif;letter-spacing:-0.3px;
-  background:var(--av-bg);color:var(--av-text);
-  border:3px solid var(--ring-color);
-  box-shadow:0 2px 10px rgba(0,0,0,0.65),0 0 8px var(--ring-color),0 0 0 1px rgba(0,0,0,0.4);
-  transition:left 0.65s cubic-bezier(0.25,1,0.5,1),top 0.65s cubic-bezier(0.25,1,0.5,1);
-  z-index:5;
-}
-/* Overflow bubble for 5+ players on one space */
-.hw-overflow-bubble{
-  position:absolute;transform:translate(-50%,-50%);
-  background:rgba(28,28,28,0.95);border:1.5px solid rgba(255,255,255,0.28);
-  border-radius:999px;font-size:7px;font-weight:800;color:var(--text);
-  padding:2px 5px;white-space:nowrap;font-family:'Inter',sans-serif;
-  box-shadow:0 2px 8px rgba(0,0,0,0.6);
-  transition:left 0.65s cubic-bezier(0.25,1,0.5,1),top 0.65s cubic-bezier(0.25,1,0.5,1);
-}
-/* Legend — full bleed strip */
-.hw-legend{
-  display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;
-  justify-content:center;align-items:center;
-  padding:10px 16px;
-  background:rgba(255,255,255,0.03);
-  border-top:1px solid rgba(255,255,255,0.07);
-  border-bottom:1px solid rgba(255,255,255,0.07);
-  border-radius:0;
-}
-.hw-legend-item{display:flex;align-items:center;gap:6px;font-size:6px;font-weight:500;color:var(--muted2);font-family:'Press Start 2P',monospace;letter-spacing:0.02em}
 
 /* ══════════════════════════════════════════════
    📋 BENTO LIST TAB
@@ -1179,102 +1056,6 @@ body.social-active .social-input-area{
 .map-feed-arrow{font-size:14px;color:var(--muted);flex-shrink:0;transition:color 0.15s}
 .map-feed-card:hover .map-feed-arrow{color:var(--amber)}
 
-/* ══════════════════════════════════════════════
-   🎮 MINECRAFT HIGHWAY OVERHAUL
-   ══════════════════════════════════════════════ */
-
-/* 1. Inventory slot nodes — square chiseled boxes */
-.hw-space {
-  border-radius: 3px !important;
-  background: #2B2B2B !important;
-  border: 2px solid #555 !important;
-  box-shadow:
-    inset -2px -2px 0 0 #111,
-    inset  2px  2px 0 0 #444 !important;
-  image-rendering: pixelated;
-}
-
-/* Conquered spaces keep the square slot shape */
-.hw-space.hw-conquered {
-  background: #1A2D38 !important;
-  border-color: rgba(56,189,248,0.5) !important;
-}
-
-/* Locked advancement overlay — slots beyond the leader's progress */
-.hw-space.hw-locked::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.45);
-  border-radius: 2px;
-  z-index: 2;
-  pointer-events: none;
-}
-/* Keep locked slot numbers legible — crisp light silver */
-.hw-space.hw-locked .hw-sn {
-  color: rgba(220,220,220,0.75) !important;
-  position: relative;
-  z-index: 3; /* sit above the dark overlay */
-}
-
-/* 3D pedestal shadow beneath occupied slots (tokens sitting on them) */
-.hw-space.hw-occupied::before {
-  content: '';
-  position: absolute;
-  bottom: 3px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 70%;
-  height: 5px;
-  background: radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, transparent 75%);
-  border-radius: 50%;
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* 2. Pixel font on node numbers */
-.hw-sn {
-  font-family: 'Press Start 2P', monospace !important;
-  font-size: 4px !important;
-  line-height: 1.1;
-}
-
-/* Milestone nodes: keep square, override milestone colours */
-.hw-ms {
-  border-radius: 3px !important;
-}
-
-/* ── Glowing gold "Challenge Completed" borders for spaces 25, 50, 75 ── */
-#hw-space-25,
-#hw-space-50,
-#hw-space-75 {
-  background: rgba(255, 200, 0, 0.10) !important;
-  border-color: #FFD700 !important;
-  box-shadow:
-    inset -2px -2px 0 0 #8B6800,
-    inset  2px  2px 0 0 #FFE55C,
-    0 0 10px rgba(255, 215, 0, 0.55),
-    0 0 20px rgba(255, 215, 0, 0.25) !important;
-  color: #FFD700 !important;
-}
-
-/* 3. Tokens — square to sit cleanly on square slots */
-.hw-token {
-  border-radius: 3px !important;
-  overflow: hidden;
-  padding: 0 !important;
-  font-size: 0 !important; /* hide text when img loads */
-  box-shadow:
-    0 4px 10px rgba(0,0,0,0.7),
-    0 1px 3px rgba(0,0,0,0.5) !important;
-}
-.hw-token img {
-  width: 100%;
-  height: 100%;
-  display: block;
-  image-rendering: pixelated;
-  border-radius: 2px;
-}
 
 /* ── Players pill in header ── */
 .players-pill{
@@ -1595,19 +1376,7 @@ body.social-active .social-input-area{
   margin: 0;
 }
 
-/* Legend token square match */
-.hw-legend-item .hw-token {
-  border-radius: 3px !important;
-  overflow: hidden;
-  padding: 0 !important;
-  font-size: 0 !important;
-}
-.hw-legend-item .hw-token img {
-  width: 100%;
-  height: 100%;
-  display: block;
-  image-rendering: pixelated;
-}
+
 </style>
 </head>
 <body>
@@ -2357,7 +2126,6 @@ function render(){
   renderMyTally();
   renderPlayersList();
   renderDailyCard(players);
-  if(document.getElementById('hw-rows')) updateHighwayTokens();
   if(document.getElementById('tab-feed')?.classList.contains('active')) renderGrillFeed();
   if(document.getElementById('tab-list')?.classList.contains('active')) renderBentoList();
   // Update players pill count
@@ -3082,7 +2850,7 @@ let _calPlayerId = null;
 let _calYear = null;
 let _calMonth = null; // 0-indexed
 
-function openCalModal(playerId) {
+window.openCalModal = function(playerId) {
   const p = players.find(pl => pl.id === playerId);
   if (!p) return;
   _calPlayerId = playerId;
@@ -3279,10 +3047,6 @@ window.switchTab=function(name,btn){
     // Invalidate Leaflet size after the vh-based height is applied
     if(burgerMap) burgerMap.invalidateSize();
   }, 80);
-  if(name==='highway'){
-    if(!document.getElementById('hw-rows')) renderHighway();
-    else setTimeout(updateHighwayTokens, 80);
-  }
   if(name==='feed') renderGrillFeed();
   if(name==='list') renderBentoList();
 };
@@ -3394,178 +3158,7 @@ if(IS_CONFIGURED && loadSession()){initFirebase();startApp();}
   });
 })();
 
-// ── HIGHWAY BOARD ─────────────────────────────────────────────────
-const HW_MILESTONES = {
-  1:   { label:'🚦 GO!',        cls:'hw-ms-start' },
-  10:  { label:'10',             cls:'hw-ms-blue'  },
-  25:  { label:'25',             cls:'hw-ms-patriot-red'  },
-  50:  { label:'⚡ HALF WAY',   cls:'hw-ms-patriot-white'},
-  75:  { label:'75',             cls:'hw-ms-patriot-blue' },
-  100: { label:'🏆 FINISH',     cls:'hw-ms-gold'  },
-};
 
-function renderHighway() {
-  const board = document.getElementById('highway-board');
-  if (!board) return;
-
-  let rowsHtml = '';
-  // Build 10 rows top-to-bottom.
-  // Bottom row (vRow 9) = spaces 1-10 L→R.
-  // Each row above alternates direction (snake).
-  // rowFromBottom: 0=bottom(spaces 1-10), 9=top(spaces 91-100)
-  // L→R when rowFromBottom is EVEN, R→L when ODD.
-  for (let vRow = 0; vRow < 10; vRow++) {
-    const rowFromBottom = 9 - vRow;          // 9 at top, 0 at bottom
-    const startSpace = rowFromBottom * 10 + 1; // 91, 81, …, 1
-    const isRev = rowFromBottom % 2 === 1; // odd rows from bottom go R→L
-
-    // Every row except the top one gets a U-turn class on the appropriate edge.
-    // L→R rows (even rowFromBottom) exit on the RIGHT → hw-turn-right
-    // R→L rows (odd rowFromBottom) exit on the LEFT  → hw-turn-left
-    // Top row (rowFromBottom === 9) has no row above → no turn
-    let turnClass = '';
-    if (rowFromBottom < 9) {
-      turnClass = rowFromBottom % 2 === 0 ? ' hw-turn-right' : ' hw-turn-left';
-    }
-
-    rowsHtml += `<div class="hw-row${isRev ? ' hw-row-rev' : ''}${turnClass}">`;
-    for (let i = 0; i < 10; i++) {
-      const n = startSpace + i;
-      const ms = HW_MILESTONES[n];
-      rowsHtml += `<div class="hw-space${ms ? ' hw-ms ' + ms.cls : ''}" id="hw-space-${n}" data-n="${n}">
-        <span class="hw-sn">${ms ? ms.label : n}</span>
-      </div>`;
-    }
-    rowsHtml += '</div>';
-  }
-
-  // Player legend
-  const legendHtml = players.map(p => {
-    const cc = colorClass(p.colorIdx);
-    return `<div class="hw-legend-item">
-      <div class="hw-token ${cc}" style="position:static;transform:none;width:18px;height:18px;box-shadow:none;pointer-events:none"><img src="https://minotar.net/avatar/${encodeURIComponent(p.name.trim().split(/\s+/)[0])}/18" alt="${initials(p.name)}" style="width:100%;height:100%;display:block;image-rendering:pixelated" onerror="this.outerHTML='<span style=\\'font-size:6px;font-weight:900\\'>${initials(p.name)}</span>'"/></div>
-      <span>${escHtml(p.name)}</span>
-    </div>`;
-  }).join('');
-
-  board.innerHTML = `
-    <p class="hw-header">🚗 Start at the bottom &nbsp;·&nbsp; Race to 100 by Labor Day &nbsp;·&nbsp; 🏁</p>
-    <div class="hw-track" id="hw-track">
-      <div class="hw-rows" id="hw-rows">${rowsHtml}</div>
-      <div class="hw-tokens-overlay" id="hw-tokens"></div>
-    </div>
-    <div class="hw-legend">${legendHtml}</div>
-  `;
-
-  setTimeout(updateHighwayTokens, 120);
-}
-
-function updateHighwayTokens() {
-  const track = document.getElementById('hw-track');
-  const tokensDiv = document.getElementById('hw-tokens');
-  if (!track || !tokensDiv) return;
-  const trackRect = track.getBoundingClientRect();
-  if (!trackRect.width) return;
-
-  // Conquered road: highlight all spaces up to the leader's count
-  // Locked overlay: dim all spaces beyond the leader's count
-  const maxCount = players.reduce((m, p) => Math.max(m, p.count || 0), 0);
-  for (let n = 1; n <= 100; n++) {
-    const el = document.getElementById(`hw-space-${n}`);
-    if (!el) continue;
-    if (n <= maxCount) {
-      el.classList.add('hw-conquered');
-      el.classList.remove('hw-locked');
-    } else {
-      el.classList.remove('hw-conquered');
-      el.classList.add('hw-locked');
-    }
-  }
-
-  // Group players by clamped board position
-  const byPos = {};
-  players.forEach(p => {
-    const pos = Math.max(1, Math.min(100, p.count || 1));
-    if (!byPos[pos]) byPos[pos] = [];
-    byPos[pos].push(p);
-  });
-
-  // Clear all occupied flags, then re-apply only to spaces with players
-  document.querySelectorAll('.hw-space.hw-occupied').forEach(el => el.classList.remove('hw-occupied'));
-  Object.keys(byPos).forEach(pos => {
-    const el = document.getElementById(`hw-space-${pos}`);
-    if (el) el.classList.add('hw-occupied');
-  });
-
-  // Symmetrical offsets for 1–4 players on the same space
-  const CLUSTER_OFFSETS = {
-    1: [[0,    0   ]],
-    2: [[-9,   0   ], [9,    0   ]],
-    3: [[-9,  -6   ], [9,   -6   ], [0,    8   ]],
-    4: [[-9,  -7   ], [9,   -7   ], [-9,   7   ], [9,    7   ]],
-  };
-
-  const seen = new Set();
-
-  Object.entries(byPos).forEach(([posStr, group]) => {
-    const spaceEl = document.getElementById(`hw-space-${posStr}`);
-    if (!spaceEl) return;
-
-    const r   = spaceEl.getBoundingClientRect();
-    const cx  = r.left - trackRect.left + r.width  / 2;
-    const cy  = r.top  - trackRect.top  + r.height / 2;
-
-    const n       = group.length;
-    const maxShow = n > 4 ? 3 : n;
-    const offsets = CLUSTER_OFFSETS[maxShow] || CLUSTER_OFFSETS[3];
-
-    // Render up to maxShow tokens with cluster offsets
-    group.slice(0, maxShow).forEach((p, idx) => {
-      const [ox, oy] = offsets[idx] || [0, 0];
-      const tokenId  = `hw-token-${p.id}`;
-      seen.add(tokenId);
-
-      let el = document.getElementById(tokenId);
-      if (!el) {
-        el = document.createElement('div');
-        el.id        = tokenId;
-        el.className = `hw-token ${colorClass(p.colorIdx)}`;
-        tokensDiv.appendChild(el);
-      }
-      const mcUser = encodeURIComponent(p.name.trim().split(/\s+/)[0]);
-      el.innerHTML = `<img src="https://minotar.net/avatar/${mcUser}/22" alt="${initials(p.name)}" title="${p.name}: ${p.count} burgers" onerror="this.outerHTML='<span style=\\'font-size:7px;font-weight:900\\'>${initials(p.name)}</span>'"/>`;
-      el.title        = `${p.name}: ${p.count} burgers`;
-      el.style.left   = `${cx + ox}px`;
-      el.style.top    = `${cy + oy}px`;
-      el.style.zIndex = `${5 + idx}`;
-    });
-
-    // "+N" overflow bubble when > 4 players share a space
-    const bubbleId = `hw-bubble-${posStr}`;
-    if (n > 4) {
-      seen.add(bubbleId);
-      let bub = document.getElementById(bubbleId);
-      if (!bub) {
-        bub = document.createElement('div');
-        bub.id        = bubbleId;
-        bub.className = 'hw-overflow-bubble';
-        tokensDiv.appendChild(bub);
-      }
-      bub.textContent  = `+${n - 3}`;
-      bub.style.left   = `${cx + 18}px`;
-      bub.style.top    = `${cy - 10}px`;
-      bub.style.zIndex = '12';
-    } else {
-      const old = document.getElementById(bubbleId);
-      if (old) old.remove();
-    }
-  });
-
-  // Remove stale tokens and bubbles
-  tokensDiv.querySelectorAll('.hw-token, .hw-overflow-bubble').forEach(el => {
-    if (!seen.has(el.id)) el.remove();
-  });
-}
 
 // ── AMERICAN SMOKEHOUSE FEED ──────────────────────────────────────
 
