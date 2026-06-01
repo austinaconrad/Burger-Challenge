@@ -996,26 +996,44 @@ body.social-active .social-input-area{
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-card);
-  padding: 10px 12px;
+  overflow: hidden;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  height: 42px;
+  padding: 0 12px;
+  position: relative;
   transition: transform 0.2s ease;
 }
 .bento-compact:active { transform: scale(0.97); }
+.bento-compact-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  flex: 1;
+}
 .bento-compact-rank {
-  font-family: 'Poppins', sans-serif;
-  font-size: 11px; font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  font-size: 10px; font-weight: 700;
   color: #9CA3AF; flex-shrink: 0;
-  min-width: 16px;
+  text-transform: uppercase;
+}
+.bento-compact-avatar {
+  width: 24px; height: 24px;
+  border-radius: 6px;
+  font-size: 0.68rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-family: 'Inter', sans-serif;
 }
 .bento-compact-name {
-  font-size: 13px; font-weight: 600; color: var(--text);
-  flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-size: 12px; font-weight: 600; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .bento-compact-count {
   font-family: 'Poppins', sans-serif;
-  font-size: 15px; font-weight: 800;
+  font-size: 13px; font-weight: 800;
   letter-spacing: -0.02em; flex-shrink: 0;
 }
 
@@ -2984,9 +3002,12 @@ function renderBentoList() {
     rest.forEach((p, i) => {
       const c = colorFor(p);
       html += `
-        <div class="bento-compact">
-          <div class="bento-compact-rank">${i + 8}</div>
-          <div class="bento-compact-name">${escHtml(p.name)}${isMe(p) ? ' <span class="me-badge">You</span>' : ''}</div>
+        <div class="bento-compact" style="border-left:3px solid ${c}">
+          <div class="bento-compact-left">
+            <div class="bento-compact-rank">#${i + 8}</div>
+            <div class="bento-compact-avatar" style="background:${c}22;color:${c};border:1px solid ${c}44">${ini(p)}</div>
+            <div class="bento-compact-name">${escHtml(p.name)}${isMe(p) ? ' <span class="me-badge">You</span>' : ''}</div>
+          </div>
           <div class="bento-compact-count" style="color:${c}">${p.count} 🍔</div>
         </div>`;
     });
