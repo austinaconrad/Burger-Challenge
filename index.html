@@ -15,14 +15,14 @@
 :root {
   --amber:#F59E0B; --amber-dark:#D97706; --amber-mid:#F59E0B; --patty:#1C0A00;
   --bg:#0E0E0E; --bg2:#161616;
-  --surface:rgba(26,26,26,0.7); --surface2:rgba(36,36,36,0.75); --surface3:rgba(48,48,48,0.8);
-  --border:rgba(255,255,255,0.06); --border2:rgba(255,255,255,0.10); --border3:rgba(255,255,255,0.18);
+  --surface:rgba(38,38,38,0.75); --surface2:rgba(50,50,50,0.78); --surface3:rgba(62,62,62,0.82);
+  --border:rgba(255,255,255,0.10); --border2:rgba(255,255,255,0.16); --border3:rgba(255,255,255,0.26);
   --text:#EFEFEF; --muted:#555555; --muted2:#9CA3AF;
   --green:#22C55E; --red:#F87171;
   --cheese:#F59E0B; --bun-top:#D97706; --bun-mid:#F59E0B; --sesame:#EAB308;
   --radius:16px; --radius-sm:12px; --radius-xs:8px;
   --glass-blur:blur(10px);
-  --shadow-card:0 4px 24px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.05);
+  --shadow-card:0 4px 32px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.12);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 /* ── Global typographic meta-label token ── */
@@ -35,8 +35,10 @@
 .grill-banner-name,.setup-card h2{letter-spacing:-0.03em}
 body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
 body::before{content:'';position:fixed;inset:0;z-index:0;background:
-  radial-gradient(ellipse at 20% 0%,rgba(245,158,11,0.06) 0%,transparent 50%),
-  radial-gradient(ellipse at 85% 90%,rgba(217,119,6,0.04) 0%,transparent 50%);
+  radial-gradient(ellipse at 15% 0%,rgba(245,158,11,0.18) 0%,transparent 45%),
+  radial-gradient(ellipse at 85% 15%,rgba(217,119,6,0.10) 0%,transparent 40%),
+  radial-gradient(ellipse at 90% 80%,rgba(245,158,11,0.12) 0%,transparent 45%),
+  radial-gradient(ellipse at 10% 90%,rgba(180,83,9,0.08) 0%,transparent 40%);
   pointer-events:none}
 .wrapper{position:relative;z-index:1;max-width:700px;margin:0 auto;padding:0 16px calc(80px + env(safe-area-inset-bottom))}
 .burger-deco{font-size:80px;line-height:1;animation:wobble 1.6s ease-in-out infinite;filter:drop-shadow(0 4px 24px rgba(217,119,6,0.30));cursor:pointer;user-select:none}
@@ -102,7 +104,7 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 @keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeUp{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
 .lb-card{
-  background:rgba(26,26,26,0.7);
+  background:var(--surface);
   backdrop-filter:var(--glass-blur);
   -webkit-backdrop-filter:var(--glass-blur);
   border:1px solid var(--border);
@@ -833,7 +835,7 @@ body.social-active .social-input-area{
 .map-feed-wrap{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
 .map-feed-empty{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px}
 .map-feed-card{
-  background:rgba(26,26,26,0.7);
+  background:var(--surface);
   backdrop-filter:var(--glass-blur);
   -webkit-backdrop-filter:var(--glass-blur);
   border:1px solid var(--border);
@@ -1036,8 +1038,8 @@ body.social-active .social-input-area{
 
 /* ── Banner row ── */
 .grill-card-banner {
-  background: #1E1E1E;
-  border-bottom: 1px solid #252525;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
   padding: 9px 14px 9px 18px;
   display: flex;
   align-items: center;
@@ -1091,8 +1093,8 @@ body.social-active .social-input-area{
   font-size: 11px;
   font-weight: 600;
   color: #6B7280;
-  background: #161616;
-  border-bottom: 1px solid #252525;
+  background: rgba(0,0,0,0.2);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
   padding: 7px 14px 7px 18px;
   letter-spacing: 0.02em;
   line-height: 1.6;
