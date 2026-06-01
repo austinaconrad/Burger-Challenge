@@ -2947,8 +2947,9 @@ function _renderCalendar() {
   }
   document.getElementById('cal-days').innerHTML = html;
 
-  // Summary stats
-  const totalAll = (p.logs || []).filter(e => logTs(e)).length;
+  // Summary stats — use p.count as authoritative total (logs may not cover all burgers)
+  const totalAll = p.count || 0;
+  const loggedCount = (p.logs || []).filter(e => logTs(e)).length;
   const globalBest = Object.values(
     (p.logs || []).reduce((acc, e) => {
       const ts = logTs(e); if (!ts) return acc;
@@ -2960,6 +2961,10 @@ function _renderCalendar() {
 
   document.getElementById('cal-total').textContent      = totalAll;
   document.getElementById('cal-total').style.color      = color;
+  const totalLbl = document.getElementById('cal-total').closest('.cal-stat').querySelector('.cal-stat-lbl');
+  totalLbl.innerHTML = loggedCount < totalAll
+    ? `Total 🍔<br><span style="font-size:8px;color:#555;font-weight:400">${loggedCount} tracked</span>`
+    : 'Total 🍔';
   document.getElementById('cal-this-month').textContent = monthTotal;
   document.getElementById('cal-this-month').style.color = color;
   document.getElementById('cal-best-day').textContent   = globalBest;
