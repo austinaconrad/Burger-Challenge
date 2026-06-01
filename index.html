@@ -163,8 +163,8 @@ button{transition:transform 0.2s ease}
 .pace-indicator.ahead{color:#4ADE80;text-shadow:0 0 8px rgba(74,222,128,0.35)}
 .pace-indicator.behind{color:#F87171;text-shadow:0 0 8px rgba(248,113,113,0.25)}
 .pace-indicator.on-track{color:var(--muted2)}
-.badge-col{flex:1;display:flex;align-items:center;justify-content:center;min-width:0;padding:0 8px}
-.badge-row{display:grid;grid-template-columns:repeat(3,28px);gap:8px;justify-content:center}
+.badge-col{flex:1;display:flex;align-items:center;justify-content:center;min-width:0;padding:0 4px}
+.badge-row{display:grid;grid-template-columns:repeat(6,28px);gap:6px;justify-content:center}
 .lb-score{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;flex-shrink:0;text-align:right;gap:0}
 .lb-count{font-family:'Poppins',sans-serif;font-size:44px;font-weight:900;line-height:1;letter-spacing:-2px;color:#F5F5F5;text-shadow:0 0 20px rgba(255,255,255,0.15)}
 .lb-of{font-size:9px;color:#6B7280;font-weight:500;text-transform:uppercase;letter-spacing:0.09em;white-space:nowrap;margin-top:3px}
@@ -2937,7 +2937,7 @@ function renderBentoList() {
           ${isMe(hero) ? '<span class="me-badge">You</span>' : ''}
           ${hero.count >= 100 ? '<span class="done-badge">Done!</span>' : ''}
         </div>
-        <div class="bento-hero-sub">${paceLabel(hero)}</div>
+        <div class="bento-hero-sub">🏆 #1 Leader</div>
       </div>
       <div class="bento-hero-count">
         <div class="bento-hero-num" style="color:${hc}">${hero.count}</div>
@@ -2959,10 +2959,7 @@ function renderBentoList() {
             <div class="bento-cell-name">${escHtml(p.name)}${isMe(p) ? ' <span class="me-badge">You</span>' : ''}</div>
           </div>
           <div class="bento-cell-bottom">
-            <div>
-              <div class="bento-cell-count" style="color:${c}">${p.count}</div>
-              <div class="bento-cell-pace">${paceLabel(p)}</div>
-            </div>
+            <div class="bento-cell-count" style="color:${c}">${p.count}</div>
             <div class="bento-cell-burger">🍔</div>
           </div>
         </div>`;
