@@ -1233,6 +1233,7 @@ body.social-active .social-input-area{
 .grill-pill-location.has-gps,
 .grill-pill-location.no-gps,
 .grill-pill-time { color: #9CA3AF; background: rgba(255,255,255,0.04); border-color: #2A2A2A; }
+.grill-pill-weather { color: #7dd3fc; background: rgba(125,211,252,0.07); border-color: rgba(125,211,252,0.25); font-family: 'Press Start 2P', monospace; font-size: 7px; letter-spacing: 0.03em; }
 
 /* ── Flame rating ── */
 .grill-rating-row { display: flex; align-items: center; gap: 7px; }
@@ -2588,6 +2589,30 @@ async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null
         });
         updateDoc(doc(db,'rooms',roomId,'players',myPlayerId), {logs: updatedLogs}).catch(()=>{});
       });
+      // Weather stamp — fire-and-forget, silently fails if offline
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${gps.lat}&longitude=${gps.lng}&current_weather=true`)
+        .then(res => res.json())
+        .then(data => {
+          const tempC = data.current_weather.temperature;
+          const tempF = Math.round((tempC * 9/5) + 32);
+          const weatherCode = data.current_weather.weathercode;
+          let conditionLabel = 'GOOD GRILLING CONDITIONS';
+          if (weatherCode >= 61 && weatherCode <= 65)      conditionLabel = 'RAIN DETECTED (HARDCORE DEDICATION)';
+          else if (weatherCode >= 66 && weatherCode <= 67) conditionLabel = 'FREEZING RAIN (LEGENDARY DEDICATION)';
+          else if (weatherCode >= 71 && weatherCode <= 77) conditionLabel = 'SNOW ON THE GRILL';
+          else if (weatherCode >= 95)                      conditionLabel = 'THUNDERSTORM BURGER';
+          else if (tempF >= 90)                            conditionLabel = 'SCORCHING HEATPACK';
+          else if (tempF <= 45)                            conditionLabel = 'CHILLY SEAR';
+          const weatherStamp = `☀️ ${tempF}°F - ${conditionLabel}`;
+          const me3 = players.find(p => p.id === myPlayerId);
+          if (!me3) return;
+          const updatedLogs = (me3.logs || []).map(e => {
+            if (typeof e === 'object' && e.ts === entry.ts && !e.weatherStamp)
+              return { ...e, weatherStamp };
+            return e;
+          });
+          updateDoc(doc(db,'rooms',roomId,'players',myPlayerId), {logs: updatedLogs}).catch(()=>{});
+        }).catch(() => {});
     }
     newLogs.push(entry);
   } else if(delta < 0 && newLogs.length > 0) newLogs.pop();
@@ -3050,6 +3075,7 @@ function renderGrillFeed() {
         lat:               (typeof entry === 'object' && entry.lat)               || null,
         lng:               (typeof entry === 'object' && entry.lng)               || null,
         locationCityState: (typeof entry === 'object' && entry.locationCityState) || '',
+        weatherStamp:      (typeof entry === 'object' && entry.weatherStamp)      || '',
       });
     });
   });
@@ -3105,6 +3131,11 @@ function renderGrillFeed() {
     const timeStr = d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', hour12:true});
     const timePill = `<span class="grill-pill grill-pill-time">🔥 SEARED: ${month}/${day}/${year} @ ${timeStr}</span>`;
 
+    // ── Weather stamp
+    const weatherPill = item.weatherStamp
+      ? `<span class="grill-pill grill-pill-weather">${escHtml(item.weatherStamp)}</span>`
+      : '';
+
     // ── Flames
     const flames    = ratingToFlames(item.rating);
     const ratingTxt = item.rating > 0 ? `<span class="grill-rating-num">${item.rating}/5</span>` : '';
@@ -3137,6 +3168,7 @@ function renderGrillFeed() {
         <div class="grill-pill-row">
           ${locPill}
           ${timePill}
+          ${weatherPill}
         </div>
         <div class="grill-rating-row">
           <span class="grill-flames">${flames}</span>
