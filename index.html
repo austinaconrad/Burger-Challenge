@@ -831,6 +831,175 @@ body.social-active .social-input-area{
 }
 .hw-legend-item{display:flex;align-items:center;gap:6px;font-size:6px;font-weight:500;color:var(--muted2);font-family:'Press Start 2P',monospace;letter-spacing:0.02em}
 
+/* ══════════════════════════════════════════════
+   📋 BENTO LIST TAB
+   ══════════════════════════════════════════════ */
+.bento-list-wrap { display: flex; flex-direction: column; gap: 10px; padding: 4px 0 24px; }
+
+/* ── Hero card (#1) ── */
+.bento-hero {
+  position: relative;
+  border-radius: 18px;
+  background: var(--surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(245,158,11,0.35);
+  box-shadow: 0 0 0 1px rgba(245,158,11,0.12), var(--shadow-card), 0 0 28px rgba(245,158,11,0.10);
+  overflow: hidden;
+  padding: 20px 20px 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.bento-hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(245,158,11,0.7), transparent);
+}
+.bento-hero-rank {
+  font-family: 'Poppins', sans-serif;
+  font-size: 52px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--amber);
+  text-shadow: 0 0 24px rgba(245,158,11,0.4);
+  flex-shrink: 0;
+  min-width: 44px;
+}
+.bento-hero-avatar {
+  width: 64px; height: 64px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 800;
+  flex-shrink: 0;
+  font-family: 'Inter', sans-serif;
+  border: 2px solid rgba(255,255,255,0.12);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+.bento-hero-info { flex: 1; min-width: 0; }
+.bento-hero-name {
+  font-family: 'Poppins', sans-serif;
+  font-size: 22px; font-weight: 900;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  display: flex; align-items: center; gap: 8px;
+}
+.bento-hero-sub {
+  font-size: 12px; color: #9CA3AF; margin-top: 3px; font-weight: 400;
+}
+.bento-hero-count {
+  display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0;
+}
+.bento-hero-num {
+  font-family: 'Poppins', sans-serif;
+  font-size: 48px; font-weight: 900; line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--amber);
+}
+.bento-hero-label {
+  font-size: 10px; color: #9CA3AF; text-transform: uppercase;
+  letter-spacing: 0.08em; font-weight: 600; text-align: right; margin-top: 2px;
+}
+
+/* ── Mid-tier grid (#2–7) ── */
+.bento-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.bento-cell {
+  position: relative;
+  border-radius: 14px;
+  background: var(--surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  padding: 14px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform 0.2s ease, border-color 0.2s;
+}
+.bento-cell:active { transform: scale(0.97); }
+.bento-cell-top { display: flex; align-items: center; gap: 10px; }
+.bento-cell-rank {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px; font-weight: 800;
+  color: #9CA3AF; flex-shrink: 0;
+  letter-spacing: -0.02em; line-height: 1;
+}
+.bento-cell-avatar {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800;
+  flex-shrink: 0;
+  font-family: 'Inter', sans-serif;
+  border: 1.5px solid rgba(255,255,255,0.10);
+}
+.bento-cell-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 700;
+  color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  flex: 1;
+  letter-spacing: -0.01em;
+}
+.bento-cell-bottom { display: flex; align-items: center; justify-content: space-between; }
+.bento-cell-count {
+  font-family: 'Poppins', sans-serif;
+  font-size: 28px; font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1;
+}
+.bento-cell-burger { font-size: 18px; line-height: 1; }
+.bento-cell-pace { font-size: 10px; color: #9CA3AF; font-weight: 500; margin-top: 2px; }
+/* left color accent strip */
+.bento-cell::after {
+  content: ''; position: absolute;
+  left: 0; top: 0; bottom: 0; width: 3px;
+}
+
+/* ── Compact rows (#8+) ── */
+.bento-compact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.bento-compact {
+  border-radius: 12px;
+  background: var(--surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.2s ease;
+}
+.bento-compact:active { transform: scale(0.97); }
+.bento-compact-rank {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px; font-weight: 700;
+  color: #9CA3AF; flex-shrink: 0;
+  min-width: 16px;
+}
+.bento-compact-name {
+  font-size: 13px; font-weight: 600; color: var(--text);
+  flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.bento-compact-count {
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px; font-weight: 800;
+  letter-spacing: -0.02em; flex-shrink: 0;
+}
+
+/* ── Section labels ── */
+.bento-section-label {
+  font-size: 10px; font-weight: 700; color: #9CA3AF;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  margin: 6px 0 2px;
+}
+
 /* ── MAP FEED ── */
 .map-feed-wrap{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
 .map-feed-empty{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px}
@@ -1334,6 +1503,7 @@ body.social-active .social-input-area{
 
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('leaderboard',this)">🏆 Ranks</button>
+      <button class="tab-btn" onclick="switchTab('list',this)">📋 List</button>
       <button class="tab-btn" onclick="switchTab('feed',this)">🔥 Feed</button>
       <button class="tab-btn" onclick="switchTab('tally',this)">➕ Tally</button>
       <button class="tab-btn" onclick="switchTab('social',this)" id="tab-btn-social">💬 Chat<span class="tab-unread" id="social-unread-dot"></span></button>
@@ -1367,6 +1537,11 @@ body.social-active .social-input-area{
       <div class="section-label">Rankings</div>
       <div class="leaderboard" id="leaderboard"></div>
       <div id="lb-empty" class="empty" style="display:none"><div class="e-icon">🍔</div><p>No players yet!</p></div>
+    </div>
+
+    <!-- LIST TAB -->
+    <div class="tab-panel" id="tab-list">
+      <div id="bento-list"></div>
     </div>
 
     <!-- TALLY TAB -->
@@ -1982,6 +2157,7 @@ function render(){
   renderDailyCard(players);
   if(document.getElementById('hw-rows')) updateHighwayTokens();
   if(document.getElementById('tab-feed')?.classList.contains('active')) renderGrillFeed();
+  if(document.getElementById('tab-list')?.classList.contains('active')) renderBentoList();
   // Update players pill count
   const pill = document.getElementById('players-pill-btn');
   if(pill) pill.textContent = `👥 Players (${players.length})`;
@@ -2712,6 +2888,91 @@ window.removePlayer=async function(playerId){
   } catch(e){ alert('Error: '+e.message); }
 };
 
+function renderBentoList() {
+  const el = document.getElementById('bento-list');
+  if (!el) return;
+  const sorted = [...players].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+  if (!sorted.length) { el.innerHTML = '<div class="empty"><div class="e-icon">🍔</div><p>No players yet!</p></div>'; return; }
+
+  const hero = sorted[0];
+  const mid  = sorted.slice(1, 7);
+  const rest = sorted.slice(7);
+
+  const colorFor = p => RING_COLORS[p.colorIdx % RING_COLORS.length];
+  const ini = p => initials(p.name);
+  const isMe = p => p.id === myPlayerId;
+  const paceLabel = p => {
+    if (p.count >= 100) return '✅ Completed!';
+    const d = getPaceDelta(p.count);
+    if (d > 1)  return `📈 +${d} ahead`;
+    if (d < -1) return `📉 ${d} behind`;
+    return '➡️ On pace';
+  };
+
+  // ── Hero
+  const hc = colorFor(hero);
+  let html = `<div class="bento-list-wrap">
+    <div class="bento-hero">
+      <div class="bento-hero-rank">1</div>
+      <div class="bento-hero-avatar" style="background:${hc}22;color:${hc};border-color:${hc}44">${ini(hero)}</div>
+      <div class="bento-hero-info">
+        <div class="bento-hero-name">
+          ${escHtml(hero.name)}
+          ${isMe(hero) ? '<span class="me-badge">You</span>' : ''}
+          ${hero.count >= 100 ? '<span class="done-badge">Done!</span>' : ''}
+        </div>
+        <div class="bento-hero-sub">${paceLabel(hero)}</div>
+      </div>
+      <div class="bento-hero-count">
+        <div class="bento-hero-num" style="color:${hc}">${hero.count}</div>
+        <div class="bento-hero-label">🍔 burgers</div>
+      </div>
+    </div>`;
+
+  // ── Mid grid
+  if (mid.length) {
+    html += `<div class="bento-section-label">Rankings</div><div class="bento-grid">`;
+    mid.forEach((p, i) => {
+      const c = colorFor(p);
+      html += `
+        <div class="bento-cell" style="border-color:${c}30">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${c};border-radius:14px 0 0 14px"></div>
+          <div class="bento-cell-top">
+            <div class="bento-cell-rank">#${i + 2}</div>
+            <div class="bento-cell-avatar" style="background:${c}22;color:${c};border-color:${c}44">${ini(p)}</div>
+            <div class="bento-cell-name">${escHtml(p.name)}${isMe(p) ? ' <span class="me-badge">You</span>' : ''}</div>
+          </div>
+          <div class="bento-cell-bottom">
+            <div>
+              <div class="bento-cell-count" style="color:${c}">${p.count}</div>
+              <div class="bento-cell-pace">${paceLabel(p)}</div>
+            </div>
+            <div class="bento-cell-burger">🍔</div>
+          </div>
+        </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // ── Compact rows
+  if (rest.length) {
+    html += `<div class="bento-section-label">Also Grinding</div><div class="bento-compact-grid">`;
+    rest.forEach((p, i) => {
+      const c = colorFor(p);
+      html += `
+        <div class="bento-compact">
+          <div class="bento-compact-rank">${i + 8}</div>
+          <div class="bento-compact-name">${escHtml(p.name)}${isMe(p) ? ' <span class="me-badge">You</span>' : ''}</div>
+          <div class="bento-compact-count" style="color:${c}">${p.count} 🍔</div>
+        </div>`;
+    });
+    html += `</div>`;
+  }
+
+  html += `</div>`;
+  el.innerHTML = html;
+}
+
 window.switchTab=function(name,btn){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -2738,6 +2999,7 @@ window.switchTab=function(name,btn){
     else setTimeout(updateHighwayTokens, 80);
   }
   if(name==='feed') renderGrillFeed();
+  if(name==='list') renderBentoList();
 };
 
 window.switchToPlayers = function() {
