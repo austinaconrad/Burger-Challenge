@@ -1520,7 +1520,7 @@ body.social-active .social-input-area{
     </header>
 
     <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('leaderboard',this)">🏆 Ranks</button>
+      <button class="tab-btn active" onclick="switchTab('leaderboard',this)">🏅 Badges</button>
       <button class="tab-btn" onclick="switchTab('list',this)">📋 List</button>
       <button class="tab-btn" onclick="switchTab('feed',this)">🔥 Feed</button>
       <button class="tab-btn" onclick="switchTab('tally',this)">➕ Tally</button>
@@ -1532,7 +1532,7 @@ body.social-active .social-input-area{
     <!-- LEADERBOARD TAB -->
     <div class="tab-panel active" id="tab-leaderboard">
       <div id="winner-banner" class="winner-banner"></div>
-      <div class="section-label">Rankings</div>
+      <div class="section-label">Player Badges</div>
       <div class="leaderboard" id="leaderboard"></div>
       <div id="lb-empty" class="empty" style="display:none"><div class="e-icon">🍔</div><p>No players yet!</p></div>
     </div>
@@ -2211,28 +2211,15 @@ function renderLeaderboard(sorted){
     }).join('')}</div>`;
 
     return `<div class="lb-card ${cc} ${isFirst?'first-place':''} ${isDone?'complete':''} ${isMe?'is-me':''}">
-      <div class="rank-badge">${i<3&&p.count>0?ranks[i]:i+1}</div>
       ${ringAvatarHTML(p,48)}
-      <div class="player-info">
+      <div class="player-info" style="flex:1;width:auto">
         <div class="player-name">
           ${escHtml(p.name)}
           ${isMe?'<span class="me-badge">You</span>':''}
           ${isDone?'<span class="done-badge">Done!</span>':''}
         </div>
-        ${(()=>{
-          if(isDone) return `<div class="pace-indicator ahead">✅ Completed!</div>`;
-          const delta = getPaceDelta(p.count);
-          if(delta > 1) return `<div class="pace-indicator ahead">📈 +${delta} Ahead</div>`;
-          if(delta < -1) return `<div class="pace-indicator behind">📉 ${delta} Behind</div>`;
-          return `<div class="pace-indicator on-track">➡️ On Pace</div>`;
-        })()}
       </div>
-      <div class="badge-col">${badgesHtml}</div>
-      <div class="lb-score">
-        <div class="lb-count ${cc}">${p.count}</div>
-        <div class="lb-of">/ 100</div>
-        <div class="lb-of-label">burgers</div>
-      </div>
+      <div class="badge-col" style="flex:none">${badgesHtml}</div>
     </div>`;
   }).join('');
 
