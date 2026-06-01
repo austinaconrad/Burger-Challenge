@@ -174,17 +174,17 @@ button{transition:transform 0.1s ease}
 .my-tally-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,0.06),0 4px 24px rgba(0,0,0,0.04);position:relative}
 /* ── ORDER RECEIPT ── */
 .order-receipt{
-  position:absolute;top:0;left:0;right:0;z-index:10;
+  position:fixed;top:0;left:50%;transform:translateX(-50%) translateY(-110%);
+  width:100%;max-width:700px;z-index:500;
   background:#F5F0E8;
   border-bottom:3px solid #E8E0D0;
   padding:22px 22px 18px;
-  transform:translateY(-110%);
   transition:transform 0.42s cubic-bezier(0.34,1.15,0.64,1),opacity 0.3s ease;
   opacity:0;pointer-events:none;
   box-shadow:0 8px 32px rgba(0,0,0,0.45);
 }
-.order-receipt.show{transform:translateY(0);opacity:1}
-.order-receipt.hide{transform:translateY(-110%);opacity:0}
+.order-receipt.show{transform:translateX(-50%) translateY(0);opacity:1}
+.order-receipt.hide{transform:translateX(-50%) translateY(-110%);opacity:0}
 .receipt-title{font-family:monospace;font-size:17px;font-weight:900;color:#1A1A1A;letter-spacing:0.04em;margin-bottom:2px}
 .receipt-subtitle{font-family:monospace;font-size:10px;color:#666;letter-spacing:0.06em;line-height:1.6;margin-bottom:10px}
 .receipt-dash{border:none;border-top:1px dashed #BBBBBB;margin:10px 0}
@@ -1351,6 +1351,9 @@ body.social-active .social-input-area{
       <div id="my-tally-area"></div>
     </div>
 
+    <!-- ORDER RECEIPT — lives outside any re-rendered container so Firestore snapshots can't wipe it -->
+    <div class="order-receipt" id="order-receipt"></div>
+
     <!-- SOCIAL TAB -->
     <div class="tab-panel" id="tab-social">
       <div class="social-wrap">
@@ -2066,7 +2069,6 @@ function renderMyTally(){
   const cc=colorClass(me.colorIdx);
   const pct=Math.min(100,me.count), isDone=me.count>=100;
   area.innerHTML=`<div class="my-tally-card ${cc} ${isDone?'complete':''}">
-    <div class="order-receipt" id="order-receipt"></div>
     <div class="tally-bun-top"></div>
     <div class="tally-top">
       ${ringAvatarHTML(me,58)}
