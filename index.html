@@ -949,11 +949,10 @@ body.social-active .social-input-area{
   font-size: 6px; font-weight: 900; font-family: 'Inter', sans-serif;
   color: var(--av-text); background: var(--av-bg);
 }
-/* Scale down in crowded tiles */
-.multi-player-tile .hw-inline-token {
-  width: 14px;
-  height: 14px;
-}
+/* Scale down in crowded tiles — tiered density */
+.multi-player-tile .hw-inline-token { width: 14px; height: 14px; }
+.mini-pack .hw-inline-token          { width: 11px !important; height: 11px !important; }
+.super-pack .hw-inline-token         { width: 9px  !important; height: 9px  !important; font-size: 4px !important; }
 @keyframes tokenPop {
   from { opacity:0; transform: scale(0.4) rotate(-15deg); }
   to   { opacity:1; transform: scale(1)   rotate(0deg);   }
@@ -2997,15 +2996,22 @@ function renderHighway() {
   let rowsHtml = '';
   for (let vRow = 0; vRow < 10; vRow++) {
     const rowFromBottom = 9 - vRow;
-    const startSpace = rowFromBottom * 10 + 1;
-    const isRev = rowFromBottom % 2 === 1;
+    const startSpace    = rowFromBottom * 10 + 1;
+    const isOdd         = rowFromBottom % 2 === 1; // odd rows snake R→L
+
     let turnClass = '';
     if (rowFromBottom < 9) {
+      // Even rows exit on the RIGHT, odd rows exit on the LEFT
       turnClass = rowFromBottom % 2 === 0 ? ' hw-turn-right' : ' hw-turn-left';
     }
-    rowsHtml += `<div class="hw-row${isRev ? ' hw-row-rev' : ''}${turnClass}">`;
-    for (let i = 0; i < 10; i++) {
-      const n = startSpace + i;
+
+    // Build space numbers then PHYSICALLY REVERSE for odd rows so the DOM
+    // order matches the snake path — no flex-direction tricks needed.
+    const spaces = Array.from({length: 10}, (_, i) => startSpace + i);
+    if (isOdd) spaces.reverse();
+
+    rowsHtml += `<div class="hw-row${turnClass}">`; // NO hw-row-rev class
+    for (const n of spaces) {
       const ms = HW_MILESTONES[n];
       rowsHtml += `<div class="hw-space${ms ? ' hw-ms ' + ms.cls : ''}" id="hw-space-${n}" data-n="${n}">
         <span class="hw-sn">${ms ? ms.label : n}</span>
@@ -3073,12 +3079,10 @@ function updateHighwayTokens() {
 
   // ── Clear all existing inline tokens and space state ─────────────
   document.querySelectorAll('.hw-space').forEach(el => {
-    // Remove inline tokens
     el.querySelectorAll('.hw-inline-token').forEach(t => t.remove());
-    // Show the number label again
     const sn = el.querySelector('.hw-sn');
     if (sn) sn.style.display = '';
-    el.classList.remove('hw-occupied', 'multi-player-tile');
+    el.classList.remove('hw-occupied', 'multi-player-tile', 'mini-pack', 'super-pack');
   });
 
   // ── Group players by board position ──────────────────────────────
@@ -3095,8 +3099,10 @@ function updateHighwayTokens() {
     if (!spaceEl) return;
 
     spaceEl.classList.add('hw-occupied');
-    const isMulti = group.length > 1;
-    if (isMulti) spaceEl.classList.add('multi-player-tile');
+    const n = group.length;
+    if (n > 4)      spaceEl.classList.add('super-pack');
+    else if (n > 2) spaceEl.classList.add('mini-pack');
+    else if (n > 1) spaceEl.classList.add('multi-player-tile');
 
     // Hide number label when a player is on this tile
     const sn = spaceEl.querySelector('.hw-sn');
