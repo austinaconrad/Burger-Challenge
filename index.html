@@ -1216,24 +1216,23 @@ body.social-active .social-input-area{
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
   font-family: 'Inter', sans-serif;
-  padding: 3px 9px;
-  border-radius: 999px;
-  letter-spacing: 0.02em;
+  padding: 4px 10px;
+  border-radius: 12px;
   white-space: nowrap;
   line-height: 1;
-  background: rgba(255,255,255,0.04);
+  background: rgba(255,255,255,0.05);
   border: 1px solid #2A2A2A;
   color: #9CA3AF;
 }
-/* Flatten all pill variants to the same muted style */
+/* All pill variants share the same muted style */
 .grill-pill-location,
 .grill-pill-location.has-gps,
 .grill-pill-location.no-gps,
-.grill-pill-time { color: #9CA3AF; background: rgba(255,255,255,0.04); border-color: #2A2A2A; }
-.grill-pill-weather { color: #7dd3fc; background: rgba(125,211,252,0.07); border-color: rgba(125,211,252,0.25); font-family: 'Press Start 2P', monospace; font-size: 7px; letter-spacing: 0.03em; }
+.grill-pill-time,
+.grill-pill-weather { color: #9CA3AF; background: rgba(255,255,255,0.05); border-color: #2A2A2A; }
 
 /* ── Flame rating ── */
 .grill-rating-row { display: flex; align-items: center; gap: 7px; }
@@ -3103,16 +3102,14 @@ function renderGrillFeed() {
     }
 
     // ── Location pill
-    // If locationCityState is already resolved, render it directly.
-    // If lat/lng exist but no city string yet, show coords and tag the element for lazy geocoding.
     let locPill;
     if (item.lat && item.lng) {
       const resolved   = item.locationCityState ? escHtml(item.locationCityState) : null;
       const coordLabel = `${item.lat.toFixed(2)}°N, ${Math.abs(item.lng).toFixed(2)}°W`;
       const locText    = resolved || coordLabel;
-      locPill = `<span class="grill-pill grill-pill-location has-gps">📍 DEVOURED AT: ${escHtml(item.restaurant)} · <span id="geo-${idx}">${locText}</span></span>`;
+      locPill = `<span class="grill-pill grill-pill-location has-gps">📍: ${escHtml(item.restaurant)} (<span id="geo-${idx}">${locText}</span>)</span>`;
     } else {
-      locPill = `<span class="grill-pill grill-pill-location no-gps">🕵️‍♂️ GRILL STATION: ${escHtml(item.restaurant)} (Off the Grid)</span>`;
+      locPill = `<span class="grill-pill grill-pill-location no-gps">🕵️‍♂️: ${escHtml(item.restaurant)} (Off the Grid)</span>`;
     }
 
     // ── Time
@@ -3121,16 +3118,20 @@ function renderGrillFeed() {
     const day     = String(d.getDate()).padStart(2, '0');
     const year    = d.getFullYear();
     const timeStr = d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', hour12:true});
-    const timePill = `<span class="grill-pill grill-pill-time">🔥 SEARED: ${month}/${day}/${year} @ ${timeStr}</span>`;
+    const timePill = `<span class="grill-pill grill-pill-time">⏰: ${timeStr}, ${month}/${day}/${year}</span>`;
 
     // ── Weather stamp
     const weatherPill = item.weatherStamp
       ? `<span class="grill-pill grill-pill-weather">${escHtml(item.weatherStamp)}</span>`
       : '';
 
-    // ── Flames
-    const flames    = ratingToFlames(item.rating);
-    const ratingTxt = item.rating > 0 ? `<span class="grill-rating-num">${item.rating}/5</span>` : '';
+    // ── Stars
+    const ratingStars = (() => {
+      if (!item.rating || item.rating <= 0) return '<span style="color:var(--muted);font-size:12px">— unrated</span>';
+      let s = '';
+      for (let i = 1; i <= 5; i++) s += item.rating >= i ? '⭐' : '<span style="opacity:0.2">⭐</span>';
+      return `${s} <span class="grill-rating-num">${item.rating}/5</span>`;
+    })();
 
     // ── Player color + avatar
     const color = RING_COLORS[item.player.colorIdx % RING_COLORS.length];
@@ -3163,8 +3164,7 @@ function renderGrillFeed() {
           ${weatherPill}
         </div>
         <div class="grill-rating-row">
-          <span class="grill-flames">${flames}</span>
-          ${ratingTxt}
+          ${ratingStars}
         </div>
       </div>
       ${miniBurgerStack(pattyCount)}
