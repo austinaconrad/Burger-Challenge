@@ -1520,17 +1520,16 @@ body.social-active .social-input-area{
     </header>
 
     <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('leaderboard',this)">🏅 Badges</button>
-      <button class="tab-btn" onclick="switchTab('list',this)">📋 List</button>
+      <button class="tab-btn active" onclick="switchTab('list',this)">🏆 Ranks</button>
       <button class="tab-btn" onclick="switchTab('feed',this)">🔥 Feed</button>
       <button class="tab-btn" onclick="switchTab('tally',this)">➕ Tally</button>
       <button class="tab-btn" onclick="switchTab('social',this)" id="tab-btn-social">💬 Chat<span class="tab-unread" id="social-unread-dot"></span></button>
       <button class="tab-btn" onclick="switchTab('map',this)">🗺 Map</button>
-      <button class="tab-btn" onclick="switchTab('highway',this)">🏁 Highway</button>
+      <button class="tab-btn" onclick="switchTab('leaderboard',this)">🏅 Badges</button>
     </div>
 
     <!-- LEADERBOARD TAB -->
-    <div class="tab-panel active" id="tab-leaderboard">
+    <div class="tab-panel" id="tab-leaderboard">
       <div id="winner-banner" class="winner-banner"></div>
       <div class="section-label">Player Badges</div>
       <div class="leaderboard" id="leaderboard"></div>
@@ -1538,7 +1537,7 @@ body.social-active .social-input-area{
     </div>
 
     <!-- LIST TAB -->
-    <div class="tab-panel" id="tab-list">
+    <div class="tab-panel active" id="tab-list">
       <div id="bento-list"></div>
     </div>
 
@@ -1592,12 +1591,6 @@ body.social-active .social-input-area{
     </div>
 
     <!-- HIGHWAY TAB -->
-    <div class="tab-panel" id="tab-highway">
-      <div class="hw-board" id="highway-board">
-        <div class="empty"><div class="e-icon">🏁</div><p>Switch to this tab to load the board.</p></div>
-      </div>
-    </div>
-
     <!-- MAP TAB -->
     <div class="tab-panel" id="tab-map">
       <div class="map-wrap">
