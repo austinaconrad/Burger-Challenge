@@ -2980,34 +2980,39 @@ window.openDayDetail = function(year, month, day) {
     return d.getFullYear() === year && d.getMonth() === month && d.getDate() === day;
   });
 
-  // Build mini feed cards styled like the grill feed
-  const logsHtml = dayLogs.map(entry => {
+  // Build mini feed cards
+  const logsHtml = dayLogs.map((entry, idx) => {
     const ts = logTs(entry);
     const d = new Date(ts);
     const timeStr = d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', hour12:true});
-    const restaurant = (typeof entry === 'object' && entry.restaurant) || 'Unknown Spot';
-    const rating = (typeof entry === 'object' && entry.rating) || 0;
-    const patties = (typeof entry === 'object' && entry.patties) || 1;
+    const isObj = typeof entry === 'object';
+    const rawRestaurant = isObj ? (entry.restaurant || '') : '';
+    const restaurant = rawRestaurant && rawRestaurant !== 'Unknown spot' ? rawRestaurant : null;
+    const rating = isObj ? (entry.rating || 0) : 0;
+    const patties = isObj ? (entry.patties || 1) : 1;
     const pattyLabel = ['','Single','Double','Triple'][Math.min(patties,3)] || 'Single';
-    const weather = (typeof entry === 'object' && entry.weatherStamp) || '';
-    const location = (typeof entry === 'object' && entry.locationCityState) || '';
+    const weather = isObj ? (entry.weatherStamp || '') : '';
+    const location = isObj ? (entry.locationCityState || '') : '';
+    const pattyEmoji = patties >= 3 ? '🥩🥩🥩' : patties === 2 ? '🥩🥩' : '🥩';
 
     let stars = '';
     if (rating > 0) {
       for (let i = 1; i <= 5; i++) stars += rating >= i ? '⭐' : '<span style="opacity:0.2">⭐</span>';
       stars += ` <span style="font-size:11px;color:#9CA3AF">${rating}/5</span>`;
-    } else {
-      stars = '<span style="color:#555;font-size:12px">— unrated</span>';
     }
 
     return `
       <div style="background:var(--surface);border:1px solid ${color}22;border-left:3px solid ${color};border-radius:12px;padding:12px 14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-          <div style="font-family:'Poppins',sans-serif;font-size:15px;font-weight:800;color:${color};letter-spacing:-0.02em">${escHtml(restaurant)}</div>
-          <div style="font-size:10px;color:#9CA3AF;font-weight:500">⏰ ${timeStr}</div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:${stars||weather||location?'8px':'0'}">
+          <div>
+            <div style="font-family:'Poppins',sans-serif;font-size:15px;font-weight:800;color:${color};letter-spacing:-0.02em;line-height:1.2">
+              ${restaurant ? escHtml(restaurant) : `Burger #${idx + 1}`}
+            </div>
+            <div style="font-size:11px;color:#6B7280;font-weight:600;margin-top:3px">${pattyEmoji} ${pattyLabel}</div>
+          </div>
+          <div style="font-size:10px;color:#9CA3AF;font-weight:500;white-space:nowrap;flex-shrink:0">⏰ ${timeStr}</div>
         </div>
-        <div style="font-size:11px;color:#6B7280;font-weight:600;margin-bottom:6px">${pattyLabel} Burger</div>
-        <div style="margin-bottom:${weather||location?'6px':'0'}">${stars}</div>
+        ${stars ? `<div style="margin-bottom:${weather||location?'5px':'0'}">${stars}</div>` : ''}
         ${location ? `<div style="font-size:11px;color:#9CA3AF">📍 ${escHtml(location)}</div>` : ''}
         ${weather ? `<div style="font-size:11px;color:#9CA3AF;margin-top:3px">${escHtml(weather)}</div>` : ''}
       </div>`;
