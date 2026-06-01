@@ -2406,6 +2406,7 @@ const OHIO_SPOTS = ["Wendy's","McDonald's","Burger King","Buffalo Wild Wings","S
 let pendingRating = 0;
 let pendingGPS = null;
 let pendingPattyCount = 0;
+let receiptTimer = null;
 
 window.selectPatties = function(n) {
   pendingPattyCount = n;
@@ -2488,32 +2489,26 @@ window.setRating = function(val) {
 window.setStar = window.setRating;
 
 window.confirmBurger = async function() {
-  const count = pendingPattyCount || 1;
+  const count      = pendingPattyCount || 1;
   const restaurant = document.getElementById('detail-restaurant').value.trim() || 'Unknown spot';
-  const stars = '⭐'.repeat(Math.floor(pendingRating)) + (pendingRating % 1 ? '✨' : '') || '—';
   const pattyLabel = ['', 'Single', 'Double', 'Triple'][count] || 'Single';
+  // Snapshot these before resetting pending state
+  const snapshotRating = pendingRating;
+  const snapshotGPS    = pendingGPS;
+  const snapshotCount  = pendingPattyCount || 1;
 
-  await changeMyCountWithDetails(1, restaurant, pendingRating, pendingGPS, pendingPattyCount || 1);
-
-  // Reset builder
-  document.getElementById('burger-detail').classList.remove('open');
-  document.getElementById('pb-stack').innerHTML = '';
-  document.querySelectorAll('.pb-btn').forEach(b => b.classList.remove('selected'));
-  const lbl = document.getElementById('pb-label');
-  if (lbl) lbl.textContent = 'How many patties?';
-  pendingPattyCount = 0;
-
-  // Show order receipt
+  // ── 1. Show receipt immediately (before the async Firestore write)
+  //       so snapshot re-renders can't race against it
   const receipt = document.getElementById('order-receipt');
   if (receipt) {
     const now = new Date();
     const dateStr = (now.getMonth()+1).toString().padStart(2,'0') + '/' + now.getDate().toString().padStart(2,'0') + '/' + now.getFullYear();
     const timeStr = now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', hour12:true});
     const starsDisplay = (() => {
-      if (!pendingRating) return 'No rating';
-      const full = Math.floor(pendingRating);
-      const half = pendingRating % 1 !== 0;
-      return '⭐'.repeat(full) + (half ? '✨' : '') + ' (' + pendingRating + '/5)';
+      if (!snapshotRating) return 'No rating';
+      const full = Math.floor(snapshotRating);
+      const half = snapshotRating % 1 !== 0;
+      return '⭐'.repeat(full) + (half ? '✨' : '') + ' (' + snapshotRating + '/5)';
     })();
     receipt.innerHTML = `
       <div class="receipt-title">100 BURGER CHALLENGE</div>
@@ -2545,11 +2540,25 @@ window.confirmBurger = async function() {
     void receipt.offsetWidth;
     receipt.classList.add('show');
 
-    setTimeout(() => {
+    // Clear any existing timer before starting a new one
+    if (receiptTimer) clearTimeout(receiptTimer);
+    receiptTimer = setTimeout(() => {
       receipt.classList.remove('show');
       receipt.classList.add('hide');
+      receiptTimer = null;
     }, 6000);
   }
+
+  // ── 2. Reset builder UI
+  document.getElementById('burger-detail').classList.remove('open');
+  document.getElementById('pb-stack').innerHTML = '';
+  document.querySelectorAll('.pb-btn').forEach(b => b.classList.remove('selected'));
+  const lbl = document.getElementById('pb-label');
+  if (lbl) lbl.textContent = 'How many patties?';
+  pendingPattyCount = 0;
+
+  // ── 3. Write to Firestore (snapshot re-renders happen after receipt is already shown)
+  await changeMyCountWithDetails(1, restaurant, snapshotRating, snapshotGPS, snapshotCount);
 };
 
 async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null, patties=1) {
