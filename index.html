@@ -699,10 +699,11 @@ body.social-active .social-input-area{
   position:relative;
 }
 .hw-header{font-size:5px;color:var(--muted);text-align:center;margin-bottom:10px;letter-spacing:0.04em;font-weight:500;font-family:'Press Start 2P',monospace;line-height:1.8;padding:0 16px}
-.hw-track{position:relative}
+.hw-track{position:relative;width:100%}
 /* Scrollable rows — tall enough to breathe on mobile */
 .hw-rows{
   display:flex;flex-direction:column;gap:6px;
+  width:100%;
   overflow-y:auto;max-height:70vh;
   overflow-x:hidden;
   padding:0;
@@ -714,6 +715,7 @@ body.social-active .social-input-area{
 /* Road strip — chunky height, left/right padding clears the float strips */
 .hw-row{
   display:flex;flex-direction:row;gap:3px;
+  width:100%;
   background:rgba(255,255,255,0.04);
   border-radius:0;
   padding:4px 14px;
@@ -721,6 +723,7 @@ body.social-active .social-input-area{
   overflow:visible;
   min-height:44px;
   align-items:center;
+  box-sizing:border-box;
 }
 /* ::before — pixelated dashed horizontal road line */
 .hw-row::before{
@@ -770,7 +773,7 @@ body.social-active .social-input-area{
 .hw-row-rev{flex-direction:row-reverse}
 /* Spaces — solid background so dashed lane line doesn't bleed through */
 .hw-space{
-  flex:1;min-width:0;aspect-ratio:1;border-radius:50%;
+  flex:1;min-width:0;aspect-ratio:unset;border-radius:3px;
   background:#1C1C1C;border:1px solid rgba(255,255,255,0.12);
   display:flex;align-items:center;justify-content:center;
   font-family:'Inter',sans-serif;font-size:6.5px;font-weight:600;color:var(--muted);
@@ -893,9 +896,9 @@ body.social-active .social-input-area{
 
 /* ── Space tiles: flex container for inline tokens ── */
 .hw-space {
-  flex: 1;
-  min-width: 0;
-  /* Chunky fixed height from the row's min-height */
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  aspect-ratio: unset !important;  /* override base CSS aspect-ratio:1 that clips the grid */
   border-radius: 3px !important;
   background: #2B2B2B !important;
   border: 2px solid #555 !important;
