@@ -3121,9 +3121,9 @@ function renderGrillFeed() {
       const resolved   = item.locationCityState ? escHtml(item.locationCityState) : null;
       const coordLabel = `${item.lat.toFixed(2)}°N, ${Math.abs(item.lng).toFixed(2)}°W`;
       const locText    = resolved || coordLabel;
-      locPill = `<span class="grill-pill grill-pill-location has-gps">📍: ${escHtml(item.restaurant)} (<span id="geo-${idx}">${locText}</span>)</span>`;
+      locPill = `<span class="grill-pill grill-pill-location has-gps">📍: <span id="geo-${idx}">${locText}</span></span>`;
     } else {
-      locPill = `<span class="grill-pill grill-pill-location no-gps">🕵️‍♂️: ${escHtml(item.restaurant)} (Off the Grid)</span>`;
+      locPill = `<span class="grill-pill grill-pill-location no-gps">🕵️‍♂️: Off the Grid</span>`;
     }
 
     // ── Time
