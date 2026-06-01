@@ -1251,6 +1251,86 @@ body.social-active .social-input-area{
   margin: 0;
 }
 
+/* ── Animated dashes — scroll in driving direction ── */
+@keyframes hwDashRight {
+  to { background-position-x: 7px; }
+}
+@keyframes hwDashLeft {
+  to { background-position-x: -7px; }
+}
+.hw-row::before {
+  animation: hwDashRight 0.35s linear infinite !important;
+  will-change: background-position;
+}
+.hw-row.hw-row-rev::before {
+  animation: hwDashLeft 0.35s linear infinite !important;
+}
+
+/* ── Road scene: track flanked by grass shoulders ── */
+.hw-road-scene {
+  display: flex;
+  align-items: stretch;
+}
+.hw-shoulder {
+  width: 22px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: #0B1F0B;
+}
+.hw-shoulder-left  { border-right: 2px solid #555; }
+.hw-shoulder-right { border-left:  2px solid #555; }
+.hw-shoulder-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  line-height: 1;
+}
+/* Billboard structures */
+.hw-billboard-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+.hw-billboard-sign {
+  background: #1A1A00;
+  border: 1px solid #FFD700;
+  padding: 2px 2px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 3px;
+  color: #FFD700;
+  text-align: center;
+  white-space: pre;
+  line-height: 1.6;
+  min-width: 16px;
+  box-shadow: 0 0 4px rgba(255,215,0,0.3);
+}
+.hw-billboard-post {
+  width: 2px;
+  height: 5px;
+  background: #888;
+}
+
+/* ── Vehicle badge — floats below player token ── */
+.hw-vehicle {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 9px;
+  line-height: 1;
+  z-index: 6;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.9));
+  transition: left 0.8s ease-in-out, top 0.8s ease-in-out;
+}
+
+/* ── Smoother token drive animation ── */
+.hw-token {
+  transition: left 0.8s ease-in-out, top 0.8s ease-in-out !important;
+}
+
 /* Legend token square match */
 .hw-legend-item .hw-token {
   border-radius: 3px !important;
@@ -2807,30 +2887,56 @@ const HW_MILESTONES = {
   100: { label:'🏆 FINISH',     cls:'hw-ms-gold'  },
 };
 
+// ── Roadside decoration data (vRow 0=top/spaces91-100 → 9=bottom/spaces1-10) ──
+const HW_LEFT_DECOS = [
+  { e:'🏁', bill:null },
+  { e:'🪧', bill:'SPEED\nLIMIT\n100 MPH' },
+  { e:'🌲', bill:null },
+  { e:'⛽', bill:null },
+  { e:'🌲', bill:null },
+  { e:'🪧', bill:'CAUTION:\nFAT\nPATTIES' },
+  { e:'🌲', bill:null },
+  { e:'⛽', bill:null },
+  { e:'🌲', bill:null },
+  { e:'🚦', bill:null },
+];
+const HW_RIGHT_DECOS = [
+  { e:'🏆', bill:null },
+  { e:'🌲', bill:null },
+  { e:'🏪', bill:null },
+  { e:'🌲', bill:null },
+  { e:'🪧', bill:'NEXT STOP\n50\nBURGERS' },
+  { e:'🌲', bill:null },
+  { e:'🏪', bill:null },
+  { e:'🌲', bill:null },
+  { e:'🌲', bill:null },
+  { e:'🌲', bill:null },
+];
+function hwDecoHtml(d) {
+  if (d.bill) return `<div class="hw-shoulder-item"><div class="hw-billboard-wrap"><div class="hw-billboard-sign">${d.bill}</div><div class="hw-billboard-post"></div></div></div>`;
+  return `<div class="hw-shoulder-item">${d.e}</div>`;
+}
+
+function getVehicleEmoji(count) {
+  if (count >= 70) return '🚀';
+  if (count >= 36) return '🚛';
+  if (count >= 11) return '🏎️';
+  return '🛴';
+}
+
 function renderHighway() {
   const board = document.getElementById('highway-board');
   if (!board) return;
 
   let rowsHtml = '';
-  // Build 10 rows top-to-bottom.
-  // Bottom row (vRow 9) = spaces 1-10 L→R.
-  // Each row above alternates direction (snake).
-  // rowFromBottom: 0=bottom(spaces 1-10), 9=top(spaces 91-100)
-  // L→R when rowFromBottom is EVEN, R→L when ODD.
   for (let vRow = 0; vRow < 10; vRow++) {
-    const rowFromBottom = 9 - vRow;          // 9 at top, 0 at bottom
-    const startSpace = rowFromBottom * 10 + 1; // 91, 81, …, 1
-    const isRev = rowFromBottom % 2 === 1; // odd rows from bottom go R→L
-
-    // Every row except the top one gets a U-turn class on the appropriate edge.
-    // L→R rows (even rowFromBottom) exit on the RIGHT → hw-turn-right
-    // R→L rows (odd rowFromBottom) exit on the LEFT  → hw-turn-left
-    // Top row (rowFromBottom === 9) has no row above → no turn
+    const rowFromBottom = 9 - vRow;
+    const startSpace = rowFromBottom * 10 + 1;
+    const isRev = rowFromBottom % 2 === 1;
     let turnClass = '';
     if (rowFromBottom < 9) {
       turnClass = rowFromBottom % 2 === 0 ? ' hw-turn-right' : ' hw-turn-left';
     }
-
     rowsHtml += `<div class="hw-row${isRev ? ' hw-row-rev' : ''}${turnClass}">`;
     for (let i = 0; i < 10; i++) {
       const n = startSpace + i;
@@ -2842,20 +2948,26 @@ function renderHighway() {
     rowsHtml += '</div>';
   }
 
-  // Player legend
+  const leftHtml  = HW_LEFT_DECOS.map(hwDecoHtml).join('');
+  const rightHtml = HW_RIGHT_DECOS.map(hwDecoHtml).join('');
+
   const legendHtml = players.map(p => {
     const cc = colorClass(p.colorIdx);
     return `<div class="hw-legend-item">
       <div class="hw-token ${cc}" style="position:static;transform:none;width:18px;height:18px;box-shadow:none;pointer-events:none"><img src="https://minotar.net/avatar/${encodeURIComponent(p.name.trim().split(/\s+/)[0])}/18" alt="${initials(p.name)}" style="width:100%;height:100%;display:block;image-rendering:pixelated" onerror="this.outerHTML='<span style=\\'font-size:6px;font-weight:900\\'>${initials(p.name)}</span>'"/></div>
-      <span>${escHtml(p.name)}</span>
+      <span>${escHtml(p.name)} ${getVehicleEmoji(p.count)}</span>
     </div>`;
   }).join('');
 
   board.innerHTML = `
     <p class="hw-header">🚗 Start at the bottom &nbsp;·&nbsp; Race to 100 by Labor Day &nbsp;·&nbsp; 🏁</p>
-    <div class="hw-track" id="hw-track">
-      <div class="hw-rows" id="hw-rows">${rowsHtml}</div>
-      <div class="hw-tokens-overlay" id="hw-tokens"></div>
+    <div class="hw-road-scene">
+      <div class="hw-shoulder hw-shoulder-left">${leftHtml}</div>
+      <div class="hw-track" id="hw-track">
+        <div class="hw-rows" id="hw-rows">${rowsHtml}</div>
+        <div class="hw-tokens-overlay" id="hw-tokens"></div>
+      </div>
+      <div class="hw-shoulder hw-shoulder-right">${rightHtml}</div>
     </div>
     <div class="hw-legend">${legendHtml}</div>
   `;
@@ -2941,6 +3053,22 @@ function updateHighwayTokens() {
       el.style.left   = `${cx + ox}px`;
       el.style.top    = `${cy + oy}px`;
       el.style.zIndex = `${5 + idx}`;
+
+      // Vehicle badge — positioned just below the token
+      const vehicleId = `hw-vehicle-${p.id}`;
+      seen.add(vehicleId);
+      let vel = document.getElementById(vehicleId);
+      if (!vel) {
+        vel = document.createElement('div');
+        vel.id        = vehicleId;
+        vel.className = 'hw-vehicle';
+        tokensDiv.appendChild(vel);
+      }
+      vel.textContent = getVehicleEmoji(p.count);
+      vel.title       = `${p.name}: ${p.count} burgers`;
+      vel.style.left  = `${cx + ox}px`;
+      vel.style.top   = `${cy + oy + 16}px`;
+      vel.style.zIndex = `${6 + idx}`;
     });
 
     // "+N" overflow bubble when > 4 players share a space
@@ -2964,8 +3092,8 @@ function updateHighwayTokens() {
     }
   });
 
-  // Remove stale tokens and bubbles
-  tokensDiv.querySelectorAll('.hw-token, .hw-overflow-bubble').forEach(el => {
+  // Remove stale tokens, bubbles, and vehicle badges
+  tokensDiv.querySelectorAll('.hw-token, .hw-overflow-bubble, .hw-vehicle').forEach(el => {
     if (!seen.has(el.id)) el.remove();
   });
 }
