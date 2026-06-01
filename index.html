@@ -1044,6 +1044,114 @@ body.social-active .social-input-area{
   margin: 6px 0 2px;
 }
 
+/* ══════════════════════════════════════════════
+   📅 BURGER HISTORY CALENDAR MODAL
+   ══════════════════════════════════════════════ */
+.cal-modal-overlay {
+  position: fixed; inset: 0; z-index: 800;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+.cal-modal-overlay.open { opacity: 1; pointer-events: auto; }
+.cal-modal {
+  background: rgba(30,30,30,0.92);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.10);
+  width: 100%; max-width: 360px;
+  padding: 22px 20px 24px;
+  transform: scale(0.92) translateY(12px);
+  transition: transform 0.26s cubic-bezier(0.34,1.4,0.64,1), opacity 0.22s ease;
+  opacity: 0;
+}
+.cal-modal-overlay.open .cal-modal { transform: scale(1) translateY(0); opacity: 1; }
+.cal-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.cal-modal-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px; font-weight: 800;
+  letter-spacing: -0.03em; color: var(--text);
+}
+.cal-modal-close {
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+  color: var(--muted2); width: 30px; height: 30px; border-radius: 50%;
+  font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.cal-modal-close:hover { background: rgba(255,255,255,0.14); color: var(--text); }
+.cal-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.cal-nav-btn {
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.10);
+  color: var(--muted2); width: 30px; height: 30px; border-radius: 8px;
+  font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.cal-nav-btn:hover { background: rgba(255,255,255,0.13); color: var(--text); }
+.cal-month-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px; font-weight: 700; color: var(--text);
+  letter-spacing: -0.01em;
+}
+.cal-dow-row {
+  display: grid; grid-template-columns: repeat(7,1fr);
+  gap: 3px; margin-bottom: 4px;
+}
+.cal-dow {
+  text-align: center; font-size: 10px; font-weight: 700;
+  color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 2px 0;
+}
+.cal-days {
+  display: grid; grid-template-columns: repeat(7,1fr); gap: 3px;
+}
+.cal-day {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 500; color: #9CA3AF;
+  position: relative;
+  transition: background 0.15s;
+}
+.cal-day.empty { background: transparent; }
+.cal-day.normal { background: rgba(255,255,255,0.04); }
+.cal-day.burger-day {
+  font-weight: 800; color: #fff;
+}
+.cal-day-pip {
+  position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%);
+  width: 4px; height: 4px; border-radius: 50%;
+}
+.cal-day-count {
+  position: absolute; top: 1px; right: 3px;
+  font-size: 7px; font-weight: 800;
+  opacity: 0.9; line-height: 1;
+}
+.cal-summary {
+  margin-top: 14px; padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  display: flex; justify-content: space-around;
+}
+.cal-stat { text-align: center; }
+.cal-stat-val {
+  font-family: 'Poppins', sans-serif;
+  font-size: 22px; font-weight: 900; letter-spacing: -0.03em;
+  line-height: 1;
+}
+.cal-stat-lbl {
+  font-size: 9px; font-weight: 600; color: #9CA3AF;
+  text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px;
+}
+
 /* ── MAP FEED ── */
 .map-feed-wrap{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
 .map-feed-empty{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px}
@@ -1643,6 +1751,41 @@ body.social-active .social-input-area{
   <button class="tray-emoji-btn" data-emoji="❓">❓</button>
 </div>
 <div id="lightbox" onclick="closeLightbox()"><img id="lightbox-img" src="" alt=""/></div>
+
+<!-- BURGER HISTORY CALENDAR MODAL -->
+<div class="cal-modal-overlay" id="cal-modal-overlay" onclick="closeCalModal(event)">
+  <div class="cal-modal" id="cal-modal">
+    <div class="cal-modal-header">
+      <div class="cal-modal-title" id="cal-modal-title">Austin's Grilling History</div>
+      <button class="cal-modal-close" onclick="closeCalModal()">✕</button>
+    </div>
+    <div class="cal-nav">
+      <button class="cal-nav-btn" id="cal-prev">‹</button>
+      <div class="cal-month-label" id="cal-month-label">June 2026</div>
+      <button class="cal-nav-btn" id="cal-next">›</button>
+    </div>
+    <div class="cal-dow-row">
+      <div class="cal-dow">S</div><div class="cal-dow">M</div><div class="cal-dow">T</div>
+      <div class="cal-dow">W</div><div class="cal-dow">T</div><div class="cal-dow">F</div>
+      <div class="cal-dow">S</div>
+    </div>
+    <div class="cal-days" id="cal-days"></div>
+    <div class="cal-summary">
+      <div class="cal-stat">
+        <div class="cal-stat-val" id="cal-total">0</div>
+        <div class="cal-stat-lbl">Total 🍔</div>
+      </div>
+      <div class="cal-stat">
+        <div class="cal-stat-val" id="cal-this-month">0</div>
+        <div class="cal-stat-lbl">This Month</div>
+      </div>
+      <div class="cal-stat">
+        <div class="cal-stat-val" id="cal-best-day">0</div>
+        <div class="cal-stat-lbl">Best Day</div>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 <div id="mc-advancement-toast">
   <div class="mc-toast-header">⚡ Challenge Complete!</div>
@@ -2934,6 +3077,103 @@ window.removePlayer=async function(playerId){
   } catch(e){ alert('Error: '+e.message); }
 };
 
+// ── BURGER HISTORY CALENDAR ───────────────────
+let _calPlayerId = null;
+let _calYear = null;
+let _calMonth = null; // 0-indexed
+
+function openCalModal(playerId) {
+  const p = players.find(pl => pl.id === playerId);
+  if (!p) return;
+  _calPlayerId = playerId;
+  const now = new Date();
+  _calYear  = now.getFullYear();
+  _calMonth = now.getMonth();
+  const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
+  document.getElementById('cal-modal-title').textContent = `${p.name}'s Burger History`;
+  document.getElementById('cal-modal-title').style.color = color;
+  _renderCalendar();
+  document.getElementById('cal-modal-overlay').classList.add('open');
+}
+
+window.closeCalModal = function(e) {
+  if (e && e.target !== document.getElementById('cal-modal-overlay')) return;
+  document.getElementById('cal-modal-overlay').classList.remove('open');
+};
+
+document.getElementById('cal-prev').addEventListener('click', () => {
+  _calMonth--;
+  if (_calMonth < 0) { _calMonth = 11; _calYear--; }
+  _renderCalendar();
+});
+document.getElementById('cal-next').addEventListener('click', () => {
+  _calMonth++;
+  if (_calMonth > 11) { _calMonth = 0; _calYear++; }
+  _renderCalendar();
+});
+
+function _renderCalendar() {
+  const p = players.find(pl => pl.id === _calPlayerId);
+  if (!p) return;
+  const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
+
+  // Build day → count map from logs
+  const dayMap = {};
+  (p.logs || []).forEach(entry => {
+    const ts = logTs(entry);
+    if (!ts) return;
+    const d = new Date(ts);
+    const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    dayMap[key] = (dayMap[key] || 0) + 1;
+  });
+
+  // Month header
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-month-label').textContent = `${MONTHS[_calMonth]} ${_calYear}`;
+
+  // Calendar grid
+  const firstDay = new Date(_calYear, _calMonth, 1).getDay();
+  const daysInMonth = new Date(_calYear, _calMonth + 1, 0).getDate();
+  let html = '';
+  for (let i = 0; i < firstDay; i++) html += `<div class="cal-day empty"></div>`;
+  let monthTotal = 0;
+  let bestDay = 0;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const key = `${_calYear}-${_calMonth}-${d}`;
+    const count = dayMap[key] || 0;
+    monthTotal += count;
+    if (count > bestDay) bestDay = count;
+    if (count > 0) {
+      html += `<div class="cal-day burger-day" style="background:${color}33">
+        <span>${d}</span>
+        ${count > 1 ? `<span class="cal-day-count" style="color:${color}">×${count}</span>` : ''}
+        <span class="cal-day-pip" style="background:${color}"></span>
+      </div>`;
+    } else {
+      html += `<div class="cal-day normal"><span>${d}</span></div>`;
+    }
+  }
+  document.getElementById('cal-days').innerHTML = html;
+
+  // Summary stats
+  const totalAll = (p.logs || []).filter(e => logTs(e)).length;
+  const globalBest = Object.values(
+    (p.logs || []).reduce((acc, e) => {
+      const ts = logTs(e); if (!ts) return acc;
+      const d2 = new Date(ts);
+      const k = `${d2.getFullYear()}-${d2.getMonth()}-${d2.getDate()}`;
+      acc[k] = (acc[k] || 0) + 1; return acc;
+    }, {})
+  ).reduce((a, b) => Math.max(a, b), 0);
+
+  document.getElementById('cal-total').textContent      = totalAll;
+  document.getElementById('cal-total').style.color      = color;
+  document.getElementById('cal-this-month').textContent = monthTotal;
+  document.getElementById('cal-this-month').style.color = color;
+  document.getElementById('cal-best-day').textContent   = globalBest;
+  document.getElementById('cal-best-day').style.color   = color;
+}
+
 function renderBentoList() {
   const el = document.getElementById('bento-list');
   if (!el) return;
@@ -2958,7 +3198,7 @@ function renderBentoList() {
   // ── Hero
   const hc = colorFor(hero);
   let html = `<div class="bento-list-wrap">
-    <div class="bento-hero">
+    <div class="bento-hero" onclick="openCalModal('${hero.id}')" style="cursor:pointer">
       <div class="bento-hero-rank">1</div>
       <div class="bento-hero-avatar" style="background:${hc}22;color:${hc};border-color:${hc}44">${ini(hero)}</div>
       <div class="bento-hero-info">
@@ -2981,7 +3221,7 @@ function renderBentoList() {
     mid.forEach((p, i) => {
       const c = colorFor(p);
       html += `
-        <div class="bento-cell" style="border-color:${c}30;padding-bottom:44px">
+        <div class="bento-cell" onclick="openCalModal('${p.id}')" style="cursor:pointer;border-color:${c}30;padding-bottom:44px">
           <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${c};border-radius:14px 0 0 14px"></div>
           <div class="bento-cell-top">
             <div class="bento-cell-rank">#${i + 2}</div>
@@ -3002,7 +3242,7 @@ function renderBentoList() {
     rest.forEach((p, i) => {
       const c = colorFor(p);
       html += `
-        <div class="bento-compact" style="border-left:3px solid ${c}">
+        <div class="bento-compact" onclick="openCalModal('${p.id}')" style="cursor:pointer;border-left:3px solid ${c}">
           <div class="bento-compact-left">
             <div class="bento-compact-rank">#${i + 8}</div>
             <div class="bento-compact-avatar" style="background:${c}22;color:${c};border:1px solid ${c}44">${ini(p)}</div>
