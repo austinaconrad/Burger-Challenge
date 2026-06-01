@@ -288,12 +288,12 @@ button{transition:transform 0.2s ease}
 body.social-active header .burger-deco,
 body.social-active header h1,
 body.social-active header .room-pill,
-body.social-active header #summer-banner,
+body.social-active header #stat-pills-row,
 body.social-active header #spectator-pill,
 body.map-active header .burger-deco,
 body.map-active header h1,
 body.map-active header .room-pill,
-body.map-active header #summer-banner,
+body.map-active header #stat-pills-row,
 body.map-active header #spectator-pill{display:none!important}
 body.social-active header,
 body.map-active header{padding:6px 0 0!important;gap:0!important}
@@ -522,8 +522,22 @@ body.social-active .social-input-area{
 .ring-inner{background:var(--av-bg);color:var(--av-text)}
 .ring-fill{stroke:var(--ring-color)}
 .mini-bar-fill,.progress-fill,.bg-progress-fill{background:linear-gradient(90deg,#C8102E 0%,#E8E8E8 50%,#002868 100%)}
-#summer-banner{font-size:11px;font-weight:500;letter-spacing:0.01em;margin-top:4px;min-height:16px;display:flex;justify-content:center}
-#summer-banner span{display:inline-flex;align-items:center;gap:4px;background:rgba(125,211,252,0.18);border:1px solid rgba(125,211,252,0.45);border-radius:20px;padding:4px 14px;color:#7dd3fc;font-weight:600;font-size:11px;letter-spacing:0.02em;box-shadow:0 0 12px rgba(125,211,252,0.12)}
+#summer-banner{display:none}
+#stat-pills-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px;flex-wrap:wrap}
+.stat-pill{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,0.06);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius:999px;
+  padding:5px 14px;
+  font-size:12px;font-weight:600;
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  letter-spacing:0.01em;
+  box-shadow:0 2px 8px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.08);
+  white-space:nowrap;
+}
 .lb-count,.tally-count{color:var(--av-text)}
 /* ── PATTY STACK BUILDER ── */
 .patty-builder{padding:20px 16px 0;display:flex;flex-direction:column;align-items:center;gap:0}
@@ -1497,7 +1511,11 @@ body.social-active .social-input-area{
       <div class="burger-deco">🍔</div>
       <h1>100 Burger Challenge</h1>
       <div class="room-pill">Room: <span id="room-display">—</span></div>
-      <div id="summer-banner"></div>
+      <div id="stat-pills-row">
+        <div class="stat-pill">🗓 <span id="stat-days">--</span> days left</div>
+        <div class="stat-pill">🍔 <span id="stat-finished">0</span> total</div>
+        <div class="stat-pill" id="daily-pill">🔥 <span id="daily-count">0</span> today</div>
+      </div>
       <div id="spectator-pill" style="display:none;font-size:11px;font-weight:600;color:var(--muted2);background:rgba(255,255,255,0.05);border:1px solid var(--border2);padding:3px 12px;border-radius:999px;letter-spacing:0.04em">👁 Spectating</div>
     </header>
 
@@ -1513,26 +1531,6 @@ body.social-active .social-input-area{
 
     <!-- LEADERBOARD TAB -->
     <div class="tab-panel active" id="tab-leaderboard">
-      <div class="stat-grid">
-        <div class="stat-card">
-          <div class="stat-icon">🗓</div>
-          <div class="stat-val" id="stat-days">--</div>
-          <div class="stat-lbl">Days Left</div>
-          <div class="stat-sub">Until Labor Day</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">🫃🏼</div>
-          <div class="stat-val" id="stat-finished">0</div>
-          <div class="stat-lbl">Total Devoured</div>
-          <div class="stat-sub">Burgers eaten by the group</div>
-        </div>
-        <div class="stat-card" id="daily-card">
-          <div class="stat-icon" id="daily-icon">🍔</div>
-          <div class="stat-val" id="daily-count">0</div>
-          <div class="stat-lbl">Today's Haul</div>
-          <div class="stat-sub" id="daily-msg">Loading…</div>
-        </div>
-      </div>
       <div id="winner-banner" class="winner-banner"></div>
       <div class="section-label">Rankings</div>
       <div class="leaderboard" id="leaderboard"></div>
