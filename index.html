@@ -944,6 +944,7 @@ body.social-active .social-input-area{
   padding: 20px 16px max(20px, env(safe-area-inset-bottom));
   max-height: 92dvh;
   overflow-y: auto;
+  overflow-x: hidden;
   transform: translateY(100%);
   transition: transform 0.3s cubic-bezier(0.34,1.1,0.64,1), opacity 0.22s ease;
   opacity: 0;
@@ -1527,35 +1528,50 @@ body.social-active .social-input-area{
 <!-- BURGER HISTORY CALENDAR MODAL -->
 <div class="cal-modal-overlay" id="cal-modal-overlay" onclick="closeCalModal(event)">
   <div class="cal-modal" id="cal-modal">
-    <div class="cal-modal-header">
-      <div class="cal-modal-title" id="cal-modal-title">Austin's Grilling History</div>
-      <button class="cal-modal-close" onclick="closeCalModal()">✕</button>
-    </div>
-    <div class="cal-nav">
-      <button class="cal-nav-btn" id="cal-prev">‹</button>
-      <div class="cal-month-label" id="cal-month-label">June 2026</div>
-      <button class="cal-nav-btn" id="cal-next">›</button>
-    </div>
-    <div class="cal-dow-row">
-      <div class="cal-dow">S</div><div class="cal-dow">M</div><div class="cal-dow">T</div>
-      <div class="cal-dow">W</div><div class="cal-dow">T</div><div class="cal-dow">F</div>
-      <div class="cal-dow">S</div>
-    </div>
-    <div class="cal-days" id="cal-days"></div>
-    <div class="cal-summary">
-      <div class="cal-stat">
-        <div class="cal-stat-val" id="cal-total">0</div>
-        <div class="cal-stat-lbl">Total 🍔</div>
+
+    <!-- CALENDAR VIEW -->
+    <div id="cal-view">
+      <div class="cal-modal-header">
+        <div class="cal-modal-title" id="cal-modal-title">Austin's Burger History</div>
+        <button class="cal-modal-close" onclick="closeCalModal()">✕</button>
       </div>
-      <div class="cal-stat">
-        <div class="cal-stat-val" id="cal-this-month">0</div>
-        <div class="cal-stat-lbl">This Month</div>
+      <div class="cal-nav">
+        <button class="cal-nav-btn" id="cal-prev">‹</button>
+        <div class="cal-month-label" id="cal-month-label">June 2026</div>
+        <button class="cal-nav-btn" id="cal-next">›</button>
       </div>
-      <div class="cal-stat">
-        <div class="cal-stat-val" id="cal-best-day">0</div>
-        <div class="cal-stat-lbl">Best Day</div>
+      <div class="cal-dow-row">
+        <div class="cal-dow">S</div><div class="cal-dow">M</div><div class="cal-dow">T</div>
+        <div class="cal-dow">W</div><div class="cal-dow">T</div><div class="cal-dow">F</div>
+        <div class="cal-dow">S</div>
+      </div>
+      <div class="cal-days" id="cal-days"></div>
+      <div class="cal-summary">
+        <div class="cal-stat">
+          <div class="cal-stat-val" id="cal-total">0</div>
+          <div class="cal-stat-lbl">Total 🍔</div>
+        </div>
+        <div class="cal-stat">
+          <div class="cal-stat-val" id="cal-this-month">0</div>
+          <div class="cal-stat-lbl">This Month</div>
+        </div>
+        <div class="cal-stat">
+          <div class="cal-stat-val" id="cal-best-day">0</div>
+          <div class="cal-stat-lbl">Best Day</div>
+        </div>
       </div>
     </div>
+
+    <!-- DAY DETAIL VIEW (slides in on top) -->
+    <div id="cal-day-detail" style="display:none">
+      <div class="cal-modal-header">
+        <button class="cal-nav-btn" id="cal-detail-back" style="font-size:16px">←</button>
+        <div class="cal-modal-title" id="cal-detail-title"></div>
+        <button class="cal-modal-close" onclick="closeCalModal()">✕</button>
+      </div>
+      <div id="cal-detail-logs" style="display:flex;flex-direction:column;gap:10px;margin-top:4px"></div>
+    </div>
+
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -2863,6 +2879,11 @@ window.openCalModal = function(playerId) {
   const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
   document.getElementById('cal-modal-title').textContent = `${p.name}'s Burger History`;
   document.getElementById('cal-modal-title').style.color = color;
+  // Reset to calendar view
+  const calView = document.getElementById('cal-view');
+  const detailView = document.getElementById('cal-day-detail');
+  calView.style.cssText    = '';
+  detailView.style.display = 'none';
   _renderCalendar();
   document.getElementById('cal-modal-overlay').classList.add('open');
 }
@@ -2902,11 +2923,10 @@ function _renderCalendar() {
   const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   document.getElementById('cal-month-label').textContent = `${MONTHS[_calMonth]} ${_calYear}`;
 
-  // Calendar grid
+  // Calendar grid — use grid-column-start on day 1 so no empty-div rows appear
   const firstDay = new Date(_calYear, _calMonth, 1).getDay();
   const daysInMonth = new Date(_calYear, _calMonth + 1, 0).getDate();
   let html = '';
-  for (let i = 0; i < firstDay; i++) html += `<div class="cal-day empty"></div>`;
   let monthTotal = 0;
   let bestDay = 0;
   for (let d = 1; d <= daysInMonth; d++) {
@@ -2914,14 +2934,15 @@ function _renderCalendar() {
     const count = dayMap[key] || 0;
     monthTotal += count;
     if (count > bestDay) bestDay = count;
+    const colStart = d === 1 && firstDay > 0 ? `grid-column-start:${firstDay + 1};` : '';
     if (count > 0) {
-      html += `<div class="cal-day burger-day" style="background:${color}33">
+      html += `<div class="cal-day burger-day" style="${colStart}background:${color}33;cursor:pointer" onclick="openDayDetail(${_calYear},${_calMonth},${d})">
         <span>${d}</span>
         ${count > 1 ? `<span class="cal-day-count" style="color:${color}">×${count}</span>` : ''}
         <span class="cal-day-pip" style="background:${color}"></span>
       </div>`;
     } else {
-      html += `<div class="cal-day normal"><span>${d}</span></div>`;
+      html += `<div class="cal-day normal" style="${colStart}"><span>${d}</span></div>`;
     }
   }
   document.getElementById('cal-days').innerHTML = html;
@@ -2944,6 +2965,96 @@ function _renderCalendar() {
   document.getElementById('cal-best-day').textContent   = globalBest;
   document.getElementById('cal-best-day').style.color   = color;
 }
+
+window.openDayDetail = function(year, month, day) {
+  const p = players.find(pl => pl.id === _calPlayerId);
+  if (!p) return;
+  const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  // Filter logs for this specific day
+  const dayLogs = (p.logs || []).filter(entry => {
+    const ts = logTs(entry);
+    if (!ts) return false;
+    const d = new Date(ts);
+    return d.getFullYear() === year && d.getMonth() === month && d.getDate() === day;
+  });
+
+  // Build mini feed cards styled like the grill feed
+  const logsHtml = dayLogs.map(entry => {
+    const ts = logTs(entry);
+    const d = new Date(ts);
+    const timeStr = d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', hour12:true});
+    const restaurant = (typeof entry === 'object' && entry.restaurant) || 'Unknown Spot';
+    const rating = (typeof entry === 'object' && entry.rating) || 0;
+    const patties = (typeof entry === 'object' && entry.patties) || 1;
+    const pattyLabel = ['','Single','Double','Triple'][Math.min(patties,3)] || 'Single';
+    const weather = (typeof entry === 'object' && entry.weatherStamp) || '';
+    const location = (typeof entry === 'object' && entry.locationCityState) || '';
+
+    let stars = '';
+    if (rating > 0) {
+      for (let i = 1; i <= 5; i++) stars += rating >= i ? '⭐' : '<span style="opacity:0.2">⭐</span>';
+      stars += ` <span style="font-size:11px;color:#9CA3AF">${rating}/5</span>`;
+    } else {
+      stars = '<span style="color:#555;font-size:12px">— unrated</span>';
+    }
+
+    return `
+      <div style="background:var(--surface);border:1px solid ${color}22;border-left:3px solid ${color};border-radius:12px;padding:12px 14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <div style="font-family:'Poppins',sans-serif;font-size:15px;font-weight:800;color:${color};letter-spacing:-0.02em">${escHtml(restaurant)}</div>
+          <div style="font-size:10px;color:#9CA3AF;font-weight:500">⏰ ${timeStr}</div>
+        </div>
+        <div style="font-size:11px;color:#6B7280;font-weight:600;margin-bottom:6px">${pattyLabel} Burger</div>
+        <div style="margin-bottom:${weather||location?'6px':'0'}">${stars}</div>
+        ${location ? `<div style="font-size:11px;color:#9CA3AF">📍 ${escHtml(location)}</div>` : ''}
+        ${weather ? `<div style="font-size:11px;color:#9CA3AF;margin-top:3px">${escHtml(weather)}</div>` : ''}
+      </div>`;
+  }).join('');
+
+  document.getElementById('cal-detail-title').textContent = `${MONTHS[month]} ${day}`;
+  document.getElementById('cal-detail-title').style.color = color;
+  document.getElementById('cal-detail-logs').innerHTML = logsHtml || '<div style="color:#9CA3AF;font-size:13px;text-align:center;padding:20px 0">No logs found</div>';
+
+  // Slide to detail view
+  const calView    = document.getElementById('cal-view');
+  const detailView = document.getElementById('cal-day-detail');
+  calView.style.transition    = 'transform 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.22s ease';
+  calView.style.transform     = 'translateX(-100%)';
+  calView.style.opacity       = '0';
+  setTimeout(() => {
+    calView.style.display   = 'none';
+    detailView.style.display = 'block';
+    detailView.style.transform = 'translateX(100%)';
+    detailView.style.opacity   = '0';
+    detailView.style.transition = 'transform 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.22s ease';
+    requestAnimationFrame(() => {
+      detailView.style.transform = 'translateX(0)';
+      detailView.style.opacity   = '1';
+    });
+    document.getElementById('cal-modal').scrollTop = 0;
+  }, 220);
+};
+
+document.getElementById('cal-detail-back').addEventListener('click', () => {
+  const calView    = document.getElementById('cal-view');
+  const detailView = document.getElementById('cal-day-detail');
+  detailView.style.transition = 'transform 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.22s ease';
+  detailView.style.transform  = 'translateX(100%)';
+  detailView.style.opacity    = '0';
+  setTimeout(() => {
+    detailView.style.display = 'none';
+    calView.style.display    = 'block';
+    calView.style.transform  = 'translateX(-100%)';
+    calView.style.opacity    = '0';
+    calView.style.transition = 'transform 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.22s ease';
+    requestAnimationFrame(() => {
+      calView.style.transform = 'translateX(0)';
+      calView.style.opacity   = '1';
+    });
+  }, 220);
+});
 
 function renderBentoList() {
   const el = document.getElementById('bento-list');
