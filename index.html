@@ -841,100 +841,143 @@ body.social-active .social-input-area{
 .map-feed-card:hover .map-feed-arrow{color:var(--amber)}
 
 /* ══════════════════════════════════════════════
-   🎮 MINECRAFT HIGHWAY OVERHAUL
+   🎮 ARCADE HIGHWAY OVERHAUL
    ══════════════════════════════════════════════ */
 
-/* 1. Inventory slot nodes — square chiseled boxes */
+/* Road scene — track is full width; decorations float absolutely */
+.hw-road-scene {
+  position: relative;
+}
+/* Floating decoration strips on each side (in the 8px row padding zone) */
+.hw-float-strip {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  pointer-events: none;
+  z-index: 3;
+  font-size: 9px;
+  line-height: 1;
+}
+.hw-float-strip-left  { left:  1px; }
+.hw-float-strip-right { right: 1px; }
+.hw-float-item { display: flex; flex-direction: column; align-items: center; }
+.hw-billboard-sign {
+  background: #1A1A00;
+  border: 1px solid #FFD700;
+  padding: 1px 1px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 2.5px;
+  color: #FFD700;
+  text-align: center;
+  white-space: pre;
+  line-height: 1.6;
+  min-width: 8px;
+  box-shadow: 0 0 3px rgba(255,215,0,0.3);
+}
+.hw-billboard-post { width: 1px; height: 4px; background: #888; }
+
+/* Inventory slot nodes — square chiseled boxes */
 .hw-space {
   border-radius: 3px !important;
   background: #2B2B2B !important;
   border: 2px solid #555 !important;
-  box-shadow:
-    inset -2px -2px 0 0 #111,
-    inset  2px  2px 0 0 #444 !important;
+  box-shadow: inset -2px -2px 0 0 #111, inset 2px 2px 0 0 #444 !important;
   image-rendering: pixelated;
 }
-
-/* Conquered spaces keep the square slot shape */
 .hw-space.hw-conquered {
   background: #1A2D38 !important;
   border-color: rgba(56,189,248,0.5) !important;
 }
-
-/* Locked advancement overlay — slots beyond the leader's progress */
 .hw-space.hw-locked::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.45);
-  border-radius: 2px;
-  z-index: 2;
-  pointer-events: none;
+  content: ''; position: absolute; inset: 0;
+  background: rgba(0,0,0,0.45); border-radius: 2px; z-index: 2; pointer-events: none;
 }
-/* Keep locked slot numbers legible — crisp light silver */
 .hw-space.hw-locked .hw-sn {
-  color: rgba(220,220,220,0.75) !important;
-  position: relative;
-  z-index: 3; /* sit above the dark overlay */
+  color: rgba(220,220,220,0.75) !important; position: relative; z-index: 3;
 }
 
-/* 3D pedestal shadow beneath occupied slots (tokens sitting on them) */
+/* Pedestal shadow under occupied slots */
 .hw-space.hw-occupied::before {
-  content: '';
-  position: absolute;
-  bottom: 3px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 70%;
-  height: 5px;
+  content: ''; position: absolute; bottom: 3px; left: 50%;
+  transform: translateX(-50%); width: 70%; height: 5px;
   background: radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, transparent 75%);
-  border-radius: 50%;
-  z-index: 0;
-  pointer-events: none;
+  border-radius: 50%; z-index: 0; pointer-events: none;
 }
 
-/* 2. Pixel font on node numbers */
-.hw-sn {
-  font-family: 'Press Start 2P', monospace !important;
-  font-size: 4px !important;
-  line-height: 1.1;
-}
-
-/* Milestone nodes: keep square, override milestone colours */
-.hw-ms {
-  border-radius: 3px !important;
-}
-
-/* ── Glowing gold "Challenge Completed" borders for spaces 25, 50, 75 ── */
-#hw-space-25,
-#hw-space-50,
-#hw-space-75 {
-  background: rgba(255, 200, 0, 0.10) !important;
-  border-color: #FFD700 !important;
+/* Multi-player tile — subtle highlight when crowded */
+.hw-space.multi-player-tile {
   box-shadow:
-    inset -2px -2px 0 0 #8B6800,
-    inset  2px  2px 0 0 #FFE55C,
-    0 0 10px rgba(255, 215, 0, 0.55),
-    0 0 20px rgba(255, 215, 0, 0.25) !important;
+    inset -2px -2px 0 0 #111,
+    inset  2px  2px 0 0 #666,
+    0 0 6px rgba(255,255,255,0.15) !important;
+}
+
+/* Pixel font on node numbers */
+.hw-sn { font-family: 'Press Start 2P', monospace !important; font-size: 4px !important; line-height: 1.1; }
+.hw-ms { border-radius: 3px !important; }
+
+/* Milestone gold borders (25, 50, 75) */
+#hw-space-25, #hw-space-50, #hw-space-75 {
+  background: rgba(255,200,0,0.10) !important; border-color: #FFD700 !important;
+  box-shadow: inset -2px -2px 0 0 #8B6800, inset 2px 2px 0 0 #FFE55C,
+    0 0 10px rgba(255,215,0,0.55), 0 0 20px rgba(255,215,0,0.25) !important;
   color: #FFD700 !important;
 }
 
-/* 3. Tokens — square to sit cleanly on square slots */
+/* ── START LINE (Space 1) — construction stripes ── */
+#hw-space-1 {
+  background: repeating-linear-gradient(
+    45deg, #1A1A00 0px, #1A1A00 3px, #2A2A00 3px, #2A2A00 6px
+  ) !important;
+  border-color: #F59E0B !important;
+  box-shadow:
+    inset -2px -2px 0 0 #7A4A00,
+    inset  2px  2px 0 0 #FFCC44,
+    0 0 8px rgba(245,158,11,0.4) !important;
+  color: #F59E0B !important;
+}
+
+/* ── FINISH LINE (Space 100) — neon checkered glow ── */
+#hw-space-100 {
+  background: repeating-linear-gradient(
+    45deg, #0D0D0D 0px, #0D0D0D 3px, #1A1A1A 3px, #1A1A1A 6px
+  ) !important;
+  border-color: #00FFB2 !important;
+  box-shadow:
+    inset -2px -2px 0 0 #007A55,
+    inset  2px  2px 0 0 #66FFD6,
+    0 0 12px rgba(0,255,178,0.5),
+    0 0 24px rgba(0,255,178,0.2) !important;
+  color: #00FFB2 !important;
+}
+#hw-space-100 .hw-sn {
+  animation: neonPulse 1.6s ease-in-out infinite;
+}
+@keyframes neonPulse {
+  0%,100% { text-shadow: 0 0 4px #00FFB2, 0 0 8px #00FFB2; }
+  50%      { text-shadow: 0 0 2px #00FFB2; }
+}
+
+/* Tokens */
 .hw-token {
   border-radius: 3px !important;
   overflow: hidden;
   padding: 0 !important;
-  font-size: 0 !important; /* hide text when img loads */
-  box-shadow:
-    0 4px 10px rgba(0,0,0,0.7),
-    0 1px 3px rgba(0,0,0,0.5) !important;
+  font-size: 0 !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.7), 0 1px 3px rgba(0,0,0,0.5) !important;
 }
 .hw-token img {
-  width: 100%;
-  height: 100%;
-  display: block;
-  image-rendering: pixelated;
-  border-radius: 2px;
+  width: 100%; height: 100%; display: block;
+  image-rendering: pixelated; border-radius: 2px;
+}
+/* Smaller tokens when sharing a space */
+.hw-token.hw-token-multi {
+  width: 15px !important;
+  height: 15px !important;
 }
 
 /* ── Players pill in header ── */
@@ -2879,12 +2922,12 @@ if(IS_CONFIGURED && loadSession()){initFirebase();startApp();}
 
 // ── HIGHWAY BOARD ─────────────────────────────────────────────────
 const HW_MILESTONES = {
-  1:   { label:'🚦 GO!',        cls:'hw-ms-start' },
+  1:   { label:'🚧 START',      cls:'hw-ms-start' },
   10:  { label:'10',             cls:'hw-ms-blue'  },
   25:  { label:'25',             cls:'hw-ms-patriot-red'  },
-  50:  { label:'⚡ HALF WAY',   cls:'hw-ms-patriot-white'},
+  50:  { label:'⚡ HALFWAY',    cls:'hw-ms-patriot-white'},
   75:  { label:'75',             cls:'hw-ms-patriot-blue' },
-  100: { label:'🏆 FINISH',     cls:'hw-ms-gold'  },
+  100: { label:'🏁 FINISH',     cls:'hw-ms-gold'  },
 };
 
 // ── Roadside decoration data (vRow 0=top/spaces91-100 → 9=bottom/spaces1-10) ──
@@ -2948,8 +2991,27 @@ function renderHighway() {
     rowsHtml += '</div>';
   }
 
-  const leftHtml  = HW_LEFT_DECOS.map(hwDecoHtml).join('');
-  const rightHtml = HW_RIGHT_DECOS.map(hwDecoHtml).join('');
+  // Floating decoration strips — 6 items each side, top-to-bottom
+  const FL = [
+    { e:'🏁', b:null     }, { e:'🪧', b:'SPEED\nLMT\n100'  },
+    { e:'🌲', b:null     }, { e:'⛽', b:null                 },
+    { e:'🪧', b:'FAT\nPATTIES\nAHEAD'}, { e:'🌲', b:null   },
+    { e:'⛽', b:null     }, { e:'🌲', b:null                 },
+    { e:'🪧', b:'REST\nSTOP\n50'     }, { e:'🌲', b:null   },
+  ];
+  const FR = [
+    { e:'🏆', b:null     }, { e:'🌲', b:null                 },
+    { e:'🏪', b:null     }, { e:'🌲', b:null                 },
+    { e:'🌲', b:null     }, { e:'🪧', b:'NEXT\nSTOP\nAHEAD' },
+    { e:'🌲', b:null     }, { e:'🏪', b:null                 },
+    { e:'🌲', b:null     }, { e:'🌲', b:null                 },
+  ];
+  function floatItemHtml(d) {
+    if (d.b) return `<div class="hw-float-item"><div class="hw-billboard-sign">${d.b}</div><div class="hw-billboard-post"></div></div>`;
+    return `<div class="hw-float-item">${d.e}</div>`;
+  }
+  const floatLeftHtml  = FL.map(floatItemHtml).join('');
+  const floatRightHtml = FR.map(floatItemHtml).join('');
 
   const legendHtml = players.map(p => {
     const cc = colorClass(p.colorIdx);
@@ -2962,12 +3024,12 @@ function renderHighway() {
   board.innerHTML = `
     <p class="hw-header">🚗 Start at the bottom &nbsp;·&nbsp; Race to 100 by Labor Day &nbsp;·&nbsp; 🏁</p>
     <div class="hw-road-scene">
-      <div class="hw-shoulder hw-shoulder-left">${leftHtml}</div>
+      <div class="hw-float-strip hw-float-strip-left">${floatLeftHtml}</div>
       <div class="hw-track" id="hw-track">
         <div class="hw-rows" id="hw-rows">${rowsHtml}</div>
         <div class="hw-tokens-overlay" id="hw-tokens"></div>
       </div>
-      <div class="hw-shoulder hw-shoulder-right">${rightHtml}</div>
+      <div class="hw-float-strip hw-float-strip-right">${floatRightHtml}</div>
     </div>
     <div class="hw-legend">${legendHtml}</div>
   `;
@@ -3005,19 +3067,23 @@ function updateHighwayTokens() {
     byPos[pos].push(p);
   });
 
-  // Clear all occupied flags, then re-apply only to spaces with players
-  document.querySelectorAll('.hw-space.hw-occupied').forEach(el => el.classList.remove('hw-occupied'));
+  // Clear flags, then re-apply
+  document.querySelectorAll('.hw-space.hw-occupied, .hw-space.multi-player-tile').forEach(el => {
+    el.classList.remove('hw-occupied', 'multi-player-tile');
+  });
   Object.keys(byPos).forEach(pos => {
     const el = document.getElementById(`hw-space-${pos}`);
-    if (el) el.classList.add('hw-occupied');
+    if (!el) return;
+    el.classList.add('hw-occupied');
+    if (byPos[pos].length > 1) el.classList.add('multi-player-tile');
   });
 
-  // Symmetrical offsets for 1–4 players on the same space
+  // Cluster offsets — tighter spacing, scaled tokens for multi-player
   const CLUSTER_OFFSETS = {
     1: [[0,    0   ]],
-    2: [[-9,   0   ], [9,    0   ]],
-    3: [[-9,  -6   ], [9,   -6   ], [0,    8   ]],
-    4: [[-9,  -7   ], [9,   -7   ], [-9,   7   ], [9,    7   ]],
+    2: [[-7,  -3   ], [ 7,   3   ]],   // diagonal stagger
+    3: [[-7,  -5   ], [ 7,  -5   ], [0,    7   ]],
+    4: [[-6,  -6   ], [ 6,  -6   ], [-6,   6   ], [6,    6   ]],
   };
 
   const seen = new Set();
@@ -3047,6 +3113,9 @@ function updateHighwayTokens() {
         el.className = `hw-token ${colorClass(p.colorIdx)}`;
         tokensDiv.appendChild(el);
       }
+      // Scale down tokens when sharing a space
+      if (n > 1) el.classList.add('hw-token-multi');
+      else el.classList.remove('hw-token-multi');
       const mcUser = encodeURIComponent(p.name.trim().split(/\s+/)[0]);
       el.innerHTML = `<img src="https://minotar.net/avatar/${mcUser}/22" alt="${initials(p.name)}" title="${p.name}: ${p.count} burgers" onerror="this.outerHTML='<span style=\\'font-size:7px;font-weight:900\\'>${initials(p.name)}</span>'"/>`;
       el.title        = `${p.name}: ${p.count} burgers`;
