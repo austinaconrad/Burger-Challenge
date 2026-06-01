@@ -1652,6 +1652,12 @@ const ACHIEVEMENTS = {
     emoji:`<svg width="22" height="16" viewBox="0 0 22 16"><rect x="1" y="1.5" width="12" height="12" rx="2.5" fill="rgba(60,180,180,0.12)" stroke="rgba(60,180,180,0.6)" stroke-width="1.5"/><rect x="9" y="1.5" width="12" height="12" rx="2.5" fill="rgba(60,180,180,0.25)" stroke="rgba(60,180,180,0.9)" stroke-width="1.5"/></svg>`
   },
   weekend_warrior: { label:'The Weekend Warrior',   tip:'6 burgers in a single Fri–Sun window',   color:'rgba(180,90,230,0.7)',  glow:'rgba(180,90,230,0.2)', size:18, emoji:'⚔️' },
+  centennial_club: { label:'The Centennial Club',   tip:'Reached 100 burgers',                    color:'rgba(255,215,0,0.8)',   glow:'rgba(255,215,0,0.3)',  size:14, emoji:'🏁' },
+  halfway:         { label:'Halfway to Heartburn',  tip:'Crossed the 50-burger mark',             color:'rgba(220,80,60,0.7)',   glow:'rgba(220,80,60,0.2)',  size:14, emoji:'🥩' },
+  early_bird:      { label:'Early Bird Special',    tip:'Logged a burger before 10:30 AM',        color:'rgba(255,180,50,0.7)',  glow:'rgba(255,180,50,0.2)', size:14, emoji:'🌅' },
+  rain_or_shine:   { label:'Rain or Shine',         tip:'Ate a burger in rain or a thunderstorm', color:'rgba(80,150,230,0.7)',  glow:'rgba(80,150,230,0.2)', size:14, emoji:'⛈️' },
+  heat_wave:       { label:'Heat Wave',             tip:'Logged a burger in 90°F+ heat',          color:'rgba(255,100,30,0.7)',  glow:'rgba(255,100,30,0.2)', size:14, emoji:'🥵' },
+  clownin_around:  { label:"Clownin' Around",       tip:"Logged 3 burgers from McDonald's",       color:'rgba(220,50,50,0.7)',   glow:'rgba(220,50,50,0.2)',  size:14, emoji:'🤡' },
 };
 
 let app, db, unsubscribe, unsubMessages;
@@ -1966,6 +1972,38 @@ function computeAchievements(p, allPlayers) {
     (entry.lat < 38.4 || entry.lat > 42.3 || entry.lng < -84.8 || entry.lng > -80.5)
   );
   if (outsideOhio) earned.push('state_trooper');
+
+  // Centennial Club — 100 burgers
+  if (p.count >= 100) earned.push('centennial_club');
+
+  // Halfway to Heartburn — 50+ burgers
+  if (p.count >= 50) earned.push('halfway');
+
+  // Early Bird Special — any log before 10:30 AM
+  if (logs.some(ts => {
+    const d = new Date(ts);
+    return d.getHours() < 10 || (d.getHours() === 10 && d.getMinutes() < 30);
+  })) earned.push('early_bird');
+
+  // Rain or Shine — weatherStamp contains RAIN DETECTED or THUNDERSTORM
+  if ((p.logs || []).some(entry =>
+    typeof entry === 'object' && entry.weatherStamp &&
+    (entry.weatherStamp.includes('RAIN DETECTED') || entry.weatherStamp.includes('THUNDERSTORM'))
+  )) earned.push('rain_or_shine');
+
+  // Heat Wave — weatherStamp contains SCORCHING HEATPACK (temp >= 90°F)
+  if ((p.logs || []).some(entry =>
+    typeof entry === 'object' && entry.weatherStamp &&
+    entry.weatherStamp.includes('SCORCHING HEATPACK')
+  )) earned.push('heat_wave');
+
+  // Clownin' Around — 3+ logs from McDonald's (case-insensitive)
+  const mcdCount = (p.logs || []).filter(entry =>
+    typeof entry === 'object' && entry.restaurant &&
+    /mc\s*donald'?s?/i.test(entry.restaurant)
+  ).length;
+  if (mcdCount >= 3) earned.push('clownin_around');
+
   return earned;
 }
 
@@ -2909,7 +2947,7 @@ function renderBentoList() {
 
   // ── Mid grid
   if (mid.length) {
-    html += `<div class="bento-section-label">Rankings</div><div class="bento-grid">`;
+    html += `<div class="bento-grid">`;
     mid.forEach((p, i) => {
       const c = colorFor(p);
       html += `
