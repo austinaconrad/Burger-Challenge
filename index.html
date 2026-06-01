@@ -694,21 +694,33 @@ body.social-active .social-input-area{
 /* ── HIGHWAY BOARD ── */
 .hw-board{
   padding:4px 0 16px;
-  /* bleed to the wrapper edges — negative margin cancels the wrapper's 16px side padding */
   margin-left:-16px;
   margin-right:-16px;
+  position:relative;
 }
 .hw-header{font-size:5px;color:var(--muted);text-align:center;margin-bottom:10px;letter-spacing:0.04em;font-weight:500;font-family:'Press Start 2P',monospace;line-height:1.8;padding:0 16px}
 .hw-track{position:relative}
-.hw-rows{display:flex;flex-direction:column;gap:10px;overflow:visible}
-/* Road strip — flat pixel row, no pill rounding, edge-to-edge */
+/* Scrollable rows — tall enough to breathe on mobile */
+.hw-rows{
+  display:flex;flex-direction:column;gap:6px;
+  overflow-y:auto;max-height:70vh;
+  overflow-x:hidden;
+  padding:0;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.1) transparent;
+}
+.hw-rows::-webkit-scrollbar{width:3px}
+.hw-rows::-webkit-scrollbar-track{background:transparent}
+.hw-rows::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:999px}
+/* Road strip — chunky height, left/right padding clears the float strips */
 .hw-row{
-  display:flex;flex-direction:row;gap:2px;
+  display:flex;flex-direction:row;gap:3px;
   background:rgba(255,255,255,0.04);
   border-radius:0;
-  padding:3px 8px;
+  padding:4px 14px;
   position:relative;
   overflow:visible;
+  min-height:44px;
+  align-items:center;
 }
 /* ::before — pixelated dashed horizontal road line */
 .hw-row::before{
@@ -844,15 +856,14 @@ body.social-active .social-input-area{
    🎮 ARCADE HIGHWAY OVERHAUL
    ══════════════════════════════════════════════ */
 
-/* Road scene — track is full width; decorations float absolutely */
-.hw-road-scene {
-  position: relative;
-}
-/* Floating decoration strips on each side (in the 8px row padding zone) */
+/* Road scene — full width, decorations float on outer edges */
+.hw-road-scene { position: relative; }
+
+/* Float strips sit just outside the 14px row padding on each side */
 .hw-float-strip {
   position: absolute;
   top: 0; bottom: 0;
-  width: 10px;
+  width: 12px;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
@@ -868,25 +879,35 @@ body.social-active .social-input-area{
 .hw-billboard-sign {
   background: #1A1A00;
   border: 1px solid #FFD700;
-  padding: 1px 1px;
+  padding: 1px;
   font-family: 'Press Start 2P', monospace;
   font-size: 2.5px;
   color: #FFD700;
   text-align: center;
   white-space: pre;
   line-height: 1.6;
-  min-width: 8px;
+  min-width: 9px;
   box-shadow: 0 0 3px rgba(255,215,0,0.3);
 }
 .hw-billboard-post { width: 1px; height: 4px; background: #888; }
 
-/* Inventory slot nodes — square chiseled boxes */
+/* ── Space tiles: flex container for inline tokens ── */
 .hw-space {
+  flex: 1;
+  min-width: 0;
+  /* Chunky fixed height from the row's min-height */
   border-radius: 3px !important;
   background: #2B2B2B !important;
   border: 2px solid #555 !important;
   box-shadow: inset -2px -2px 0 0 #111, inset 2px 2px 0 0 #444 !important;
   image-rendering: pixelated;
+  /* Layout for inline player tokens */
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  overflow: hidden;
 }
 .hw-space.hw-conquered {
   background: #1A2D38 !important;
@@ -899,86 +920,85 @@ body.social-active .social-input-area{
 .hw-space.hw-locked .hw-sn {
   color: rgba(220,220,220,0.75) !important; position: relative; z-index: 3;
 }
-
-/* Pedestal shadow under occupied slots */
-.hw-space.hw-occupied::before {
-  content: ''; position: absolute; bottom: 3px; left: 50%;
-  transform: translateX(-50%); width: 70%; height: 5px;
-  background: radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, transparent 75%);
-  border-radius: 50%; z-index: 0; pointer-events: none;
-}
-
-/* Multi-player tile — subtle highlight when crowded */
 .hw-space.multi-player-tile {
-  box-shadow:
-    inset -2px -2px 0 0 #111,
-    inset  2px  2px 0 0 #666,
+  box-shadow: inset -2px -2px 0 0 #111, inset 2px 2px 0 0 #666,
     0 0 6px rgba(255,255,255,0.15) !important;
 }
 
-/* Pixel font on node numbers */
+/* ── Inline player token (lives inside the space div) ── */
+.hw-inline-token {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1.5px solid var(--ring-color, rgba(255,255,255,0.4));
+  box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+  animation: tokenPop 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+  font-size: 0; /* hide text fallback until img errors */
+}
+.hw-inline-token img {
+  width: 100%; height: 100%; display: block; image-rendering: pixelated;
+}
+.hw-inline-token span { /* fallback initials */
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%;
+  font-size: 6px; font-weight: 900; font-family: 'Inter', sans-serif;
+  color: var(--av-text); background: var(--av-bg);
+}
+/* Scale down in crowded tiles */
+.multi-player-tile .hw-inline-token {
+  width: 14px;
+  height: 14px;
+}
+@keyframes tokenPop {
+  from { opacity:0; transform: scale(0.4) rotate(-15deg); }
+  to   { opacity:1; transform: scale(1)   rotate(0deg);   }
+}
+
+/* Number label — only visible when no token is present */
 .hw-sn { font-family: 'Press Start 2P', monospace !important; font-size: 4px !important; line-height: 1.1; }
 .hw-ms { border-radius: 3px !important; }
 
-/* Milestone gold borders (25, 50, 75) */
+/* Milestone gold (25, 50, 75) */
 #hw-space-25, #hw-space-50, #hw-space-75 {
   background: rgba(255,200,0,0.10) !important; border-color: #FFD700 !important;
   box-shadow: inset -2px -2px 0 0 #8B6800, inset 2px 2px 0 0 #FFE55C,
     0 0 10px rgba(255,215,0,0.55), 0 0 20px rgba(255,215,0,0.25) !important;
   color: #FFD700 !important;
 }
-
-/* ── START LINE (Space 1) — construction stripes ── */
+/* Start line — amber construction stripes */
 #hw-space-1 {
   background: repeating-linear-gradient(
-    45deg, #1A1A00 0px, #1A1A00 3px, #2A2A00 3px, #2A2A00 6px
-  ) !important;
+    45deg, #1A1A00 0px, #1A1A00 3px, #2A2A00 3px, #2A2A00 6px) !important;
   border-color: #F59E0B !important;
-  box-shadow:
-    inset -2px -2px 0 0 #7A4A00,
-    inset  2px  2px 0 0 #FFCC44,
+  box-shadow: inset -2px -2px 0 0 #7A4A00, inset 2px 2px 0 0 #FFCC44,
     0 0 8px rgba(245,158,11,0.4) !important;
   color: #F59E0B !important;
 }
-
-/* ── FINISH LINE (Space 100) — neon checkered glow ── */
+/* Finish line — neon teal checkered glow */
 #hw-space-100 {
   background: repeating-linear-gradient(
-    45deg, #0D0D0D 0px, #0D0D0D 3px, #1A1A1A 3px, #1A1A1A 6px
-  ) !important;
+    45deg, #0D0D0D 0px, #0D0D0D 3px, #1A1A1A 3px, #1A1A1A 6px) !important;
   border-color: #00FFB2 !important;
-  box-shadow:
-    inset -2px -2px 0 0 #007A55,
-    inset  2px  2px 0 0 #66FFD6,
-    0 0 12px rgba(0,255,178,0.5),
-    0 0 24px rgba(0,255,178,0.2) !important;
+  box-shadow: inset -2px -2px 0 0 #007A55, inset 2px 2px 0 0 #66FFD6,
+    0 0 12px rgba(0,255,178,0.5), 0 0 24px rgba(0,255,178,0.2) !important;
   color: #00FFB2 !important;
 }
-#hw-space-100 .hw-sn {
-  animation: neonPulse 1.6s ease-in-out infinite;
-}
+#hw-space-100 .hw-sn { animation: neonPulse 1.6s ease-in-out infinite; }
 @keyframes neonPulse {
   0%,100% { text-shadow: 0 0 4px #00FFB2, 0 0 8px #00FFB2; }
   50%      { text-shadow: 0 0 2px #00FFB2; }
 }
 
-/* Tokens */
+/* Legend token (static, not on board) */
 .hw-token {
   border-radius: 3px !important;
   overflow: hidden;
   padding: 0 !important;
   font-size: 0 !important;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.7), 0 1px 3px rgba(0,0,0,0.5) !important;
 }
-.hw-token img {
-  width: 100%; height: 100%; display: block;
-  image-rendering: pixelated; border-radius: 2px;
-}
-/* Smaller tokens when sharing a space */
-.hw-token.hw-token-multi {
-  width: 15px !important;
-  height: 15px !important;
-}
+.hw-token img { width: 100%; height: 100%; display: block; image-rendering: pixelated; border-radius: 2px; }
 
 /* ── Players pill in header ── */
 .players-pill{
@@ -3017,7 +3037,7 @@ function renderHighway() {
     const cc = colorClass(p.colorIdx);
     return `<div class="hw-legend-item">
       <div class="hw-token ${cc}" style="position:static;transform:none;width:18px;height:18px;box-shadow:none;pointer-events:none"><img src="https://minotar.net/avatar/${encodeURIComponent(p.name.trim().split(/\s+/)[0])}/18" alt="${initials(p.name)}" style="width:100%;height:100%;display:block;image-rendering:pixelated" onerror="this.outerHTML='<span style=\\'font-size:6px;font-weight:900\\'>${initials(p.name)}</span>'"/></div>
-      <span>${escHtml(p.name)} ${getVehicleEmoji(p.count)}</span>
+      <span>${escHtml(p.name)}</span>
     </div>`;
   }).join('');
 
@@ -3027,7 +3047,6 @@ function renderHighway() {
       <div class="hw-float-strip hw-float-strip-left">${floatLeftHtml}</div>
       <div class="hw-track" id="hw-track">
         <div class="hw-rows" id="hw-rows">${rowsHtml}</div>
-        <div class="hw-tokens-overlay" id="hw-tokens"></div>
       </div>
       <div class="hw-float-strip hw-float-strip-right">${floatRightHtml}</div>
     </div>
@@ -3038,28 +3057,28 @@ function renderHighway() {
 }
 
 function updateHighwayTokens() {
-  const track = document.getElementById('hw-track');
-  const tokensDiv = document.getElementById('hw-tokens');
-  if (!track || !tokensDiv) return;
-  const trackRect = track.getBoundingClientRect();
-  if (!trackRect.width) return;
+  if (!document.getElementById('hw-rows')) return;
 
-  // Conquered road: highlight all spaces up to the leader's count
-  // Locked overlay: dim all spaces beyond the leader's count
+  // ── Conquered / locked coloring ──────────────────────────────────
   const maxCount = players.reduce((m, p) => Math.max(m, p.count || 0), 0);
   for (let n = 1; n <= 100; n++) {
     const el = document.getElementById(`hw-space-${n}`);
     if (!el) continue;
-    if (n <= maxCount) {
-      el.classList.add('hw-conquered');
-      el.classList.remove('hw-locked');
-    } else {
-      el.classList.remove('hw-conquered');
-      el.classList.add('hw-locked');
-    }
+    if (n <= maxCount) { el.classList.add('hw-conquered'); el.classList.remove('hw-locked'); }
+    else               { el.classList.remove('hw-conquered'); el.classList.add('hw-locked'); }
   }
 
-  // Group players by clamped board position
+  // ── Clear all existing inline tokens and space state ─────────────
+  document.querySelectorAll('.hw-space').forEach(el => {
+    // Remove inline tokens
+    el.querySelectorAll('.hw-inline-token').forEach(t => t.remove());
+    // Show the number label again
+    const sn = el.querySelector('.hw-sn');
+    if (sn) sn.style.display = '';
+    el.classList.remove('hw-occupied', 'multi-player-tile');
+  });
+
+  // ── Group players by board position ──────────────────────────────
   const byPos = {};
   players.forEach(p => {
     const pos = Math.max(1, Math.min(100, p.count || 1));
@@ -3067,103 +3086,43 @@ function updateHighwayTokens() {
     byPos[pos].push(p);
   });
 
-  // Clear flags, then re-apply
-  document.querySelectorAll('.hw-space.hw-occupied, .hw-space.multi-player-tile').forEach(el => {
-    el.classList.remove('hw-occupied', 'multi-player-tile');
-  });
-  Object.keys(byPos).forEach(pos => {
-    const el = document.getElementById(`hw-space-${pos}`);
-    if (!el) return;
-    el.classList.add('hw-occupied');
-    if (byPos[pos].length > 1) el.classList.add('multi-player-tile');
-  });
-
-  // Cluster offsets — tighter spacing, scaled tokens for multi-player
-  const CLUSTER_OFFSETS = {
-    1: [[0,    0   ]],
-    2: [[-7,  -3   ], [ 7,   3   ]],   // diagonal stagger
-    3: [[-7,  -5   ], [ 7,  -5   ], [0,    7   ]],
-    4: [[-6,  -6   ], [ 6,  -6   ], [-6,   6   ], [6,    6   ]],
-  };
-
-  const seen = new Set();
-
+  // ── Place inline tokens ──────────────────────────────────────────
   Object.entries(byPos).forEach(([posStr, group]) => {
     const spaceEl = document.getElementById(`hw-space-${posStr}`);
     if (!spaceEl) return;
 
-    const r   = spaceEl.getBoundingClientRect();
-    const cx  = r.left - trackRect.left + r.width  / 2;
-    const cy  = r.top  - trackRect.top  + r.height / 2;
+    spaceEl.classList.add('hw-occupied');
+    const isMulti = group.length > 1;
+    if (isMulti) spaceEl.classList.add('multi-player-tile');
 
-    const n       = group.length;
-    const maxShow = n > 4 ? 3 : n;
-    const offsets = CLUSTER_OFFSETS[maxShow] || CLUSTER_OFFSETS[3];
+    // Hide number label when a player is on this tile
+    const sn = spaceEl.querySelector('.hw-sn');
+    if (sn) sn.style.display = 'none';
 
-    // Render up to maxShow tokens with cluster offsets
-    group.slice(0, maxShow).forEach((p, idx) => {
-      const [ox, oy] = offsets[idx] || [0, 0];
-      const tokenId  = `hw-token-${p.id}`;
-      seen.add(tokenId);
-
-      let el = document.getElementById(tokenId);
-      if (!el) {
-        el = document.createElement('div');
-        el.id        = tokenId;
-        el.className = `hw-token ${colorClass(p.colorIdx)}`;
-        tokensDiv.appendChild(el);
-      }
-      // Scale down tokens when sharing a space
-      if (n > 1) el.classList.add('hw-token-multi');
-      else el.classList.remove('hw-token-multi');
+    // Cap visible tokens at 4; show +N for overflow
+    const maxShow = Math.min(group.length, 4);
+    group.slice(0, maxShow).forEach(p => {
+      const cc     = colorClass(p.colorIdx);
       const mcUser = encodeURIComponent(p.name.trim().split(/\s+/)[0]);
-      el.innerHTML = `<img src="https://minotar.net/avatar/${mcUser}/22" alt="${initials(p.name)}" title="${p.name}: ${p.count} burgers" onerror="this.outerHTML='<span style=\\'font-size:7px;font-weight:900\\'>${initials(p.name)}</span>'"/>`;
-      el.title        = `${p.name}: ${p.count} burgers`;
-      el.style.left   = `${cx + ox}px`;
-      el.style.top    = `${cy + oy}px`;
-      el.style.zIndex = `${5 + idx}`;
-
-      // Vehicle badge — positioned just below the token
-      const vehicleId = `hw-vehicle-${p.id}`;
-      seen.add(vehicleId);
-      let vel = document.getElementById(vehicleId);
-      if (!vel) {
-        vel = document.createElement('div');
-        vel.id        = vehicleId;
-        vel.className = 'hw-vehicle';
-        tokensDiv.appendChild(vel);
-      }
-      vel.textContent = getVehicleEmoji(p.count);
-      vel.title       = `${p.name}: ${p.count} burgers`;
-      vel.style.left  = `${cx + ox}px`;
-      vel.style.top   = `${cy + oy + 16}px`;
-      vel.style.zIndex = `${6 + idx}`;
+      const ini    = initials(p.name);
+      const token  = document.createElement('div');
+      token.className = `hw-inline-token ${cc}`;
+      token.title     = `${p.name}: ${p.count} burgers`;
+      token.innerHTML = `<img src="https://minotar.net/avatar/${mcUser}/20" alt="${ini}"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+        style="width:100%;height:100%;display:block;image-rendering:pixelated"/>
+        <span style="display:none;font-size:5px;font-weight:900;width:100%;height:100%;align-items:center;justify-content:center">${ini}</span>`;
+      spaceEl.appendChild(token);
     });
 
-    // "+N" overflow bubble when > 4 players share a space
-    const bubbleId = `hw-bubble-${posStr}`;
-    if (n > 4) {
-      seen.add(bubbleId);
-      let bub = document.getElementById(bubbleId);
-      if (!bub) {
-        bub = document.createElement('div');
-        bub.id        = bubbleId;
-        bub.className = 'hw-overflow-bubble';
-        tokensDiv.appendChild(bub);
-      }
-      bub.textContent  = `+${n - 3}`;
-      bub.style.left   = `${cx + 18}px`;
-      bub.style.top    = `${cy - 10}px`;
-      bub.style.zIndex = '12';
-    } else {
-      const old = document.getElementById(bubbleId);
-      if (old) old.remove();
+    // Overflow indicator for 5+
+    if (group.length > 4) {
+      const overflow = document.createElement('div');
+      overflow.className = 'hw-inline-token';
+      overflow.style.cssText = 'background:#333;border-color:rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:5px;font-weight:900;color:#fff;font-family:Inter,sans-serif';
+      overflow.textContent = `+${group.length - 4}`;
+      spaceEl.appendChild(overflow);
     }
-  });
-
-  // Remove stale tokens, bubbles, and vehicle badges
-  tokensDiv.querySelectorAll('.hw-token, .hw-overflow-bubble, .hw-vehicle').forEach(el => {
-    if (!seen.has(el.id)) el.remove();
   });
 }
 
