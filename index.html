@@ -3076,40 +3076,47 @@ function renderBentoList() {
   const sorted = [...players].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
   if (!sorted.length) { el.innerHTML = '<div class="empty"><div class="e-icon">🍔</div><p>No players yet!</p></div>'; return; }
 
-  const hero = sorted[0];
-  const mid  = sorted.slice(1, 7);
-  const rest = sorted.slice(7);
-
   const colorFor = p => RING_COLORS[p.colorIdx % RING_COLORS.length];
   const ini = p => initials(p.name);
   const isMe = p => p.id === myPlayerId;
-  const paceLabel = p => {
-    if (p.count >= 100) return '✅ Completed!';
-    const d = getPaceDelta(p.count);
-    if (d > 1)  return `📈 +${d} ahead`;
-    if (d < -1) return `📉 ${d} behind`;
-    return '➡️ On pace';
-  };
 
-  // ── Hero
-  const hc = colorFor(hero);
-  let html = `<div class="bento-list-wrap">
-    <div class="bento-hero" onclick="openCalModal('${hero.id}')" style="cursor:pointer">
-      <div class="bento-hero-rank">1</div>
-      <div class="bento-hero-avatar" style="background:${hc}22;color:${hc};border-color:${hc}44">${ini(hero)}</div>
+  // Detect tied leaders
+  const topCount = sorted[0].count;
+  const heroes = sorted.filter(p => p.count === topCount);
+  const mid    = sorted.slice(heroes.length, heroes.length + (heroes.length > 1 ? 6 : 6));
+  const rest   = sorted.slice(heroes.length + mid.length);
+
+  // ── Hero(es)
+  const heroCardHtml = p => {
+    const hc = colorFor(p);
+    return `<div class="bento-hero" onclick="openCalModal('${p.id}')" style="cursor:pointer;flex:1;min-width:0">
+      <div class="bento-hero-rank" style="font-size:${heroes.length > 1 ? '36px' : '52px'}">1</div>
+      <div class="bento-hero-avatar" style="width:${heroes.length > 1 ? '44px' : '64px'};height:${heroes.length > 1 ? '44px' : '64px'};background:${hc}22;color:${hc};border-color:${hc}44">${ini(p)}</div>
       <div class="bento-hero-info">
-        <div class="bento-hero-name">
-          ${escHtml(hero.name)}
-          ${isMe(hero) ? '<span class="me-badge">You</span>' : ''}
-          ${hero.count >= 100 ? '<span class="done-badge">Done!</span>' : ''}
+        <div class="bento-hero-name" style="font-size:${heroes.length > 1 ? '15px' : '22px'}">
+          ${escHtml(p.name)}
+          ${isMe(p) ? '<span class="me-badge">You</span>' : ''}
+          ${p.count >= 100 ? '<span class="done-badge">Done!</span>' : ''}
         </div>
-        <div class="bento-hero-sub">🏆 #1 Leader</div>
+        <div class="bento-hero-sub">${heroes.length > 1 ? '🤝 Tied #1' : '🏆 #1 Leader'}</div>
       </div>
       <div class="bento-hero-count">
-        <div class="bento-hero-num" style="color:${hc}">${hero.count}</div>
+        <div class="bento-hero-num" style="color:${hc};font-size:${heroes.length > 1 ? '32px' : '48px'}">${p.count}</div>
         <div class="bento-hero-label">🍔 burgers</div>
       </div>
     </div>`;
+  };
+
+  let html = `<div class="bento-list-wrap">`;
+
+  if (heroes.length === 1) {
+    html += heroCardHtml(heroes[0]);
+  } else {
+    // Split the hero zone into side-by-side cards with a shared tie banner
+    html += `<div style="display:flex;gap:8px;align-items:stretch">
+      ${heroes.map(heroCardHtml).join('')}
+    </div>`;
+  }
 
   // ── Mid grid
   if (mid.length) {
@@ -3120,7 +3127,7 @@ function renderBentoList() {
         <div class="bento-cell" onclick="openCalModal('${p.id}')" style="cursor:pointer;border-color:${c}30;padding-bottom:44px">
           <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${c};border-radius:14px 0 0 14px"></div>
           <div class="bento-cell-top">
-            <div class="bento-cell-rank">#${i + 2}</div>
+            <div class="bento-cell-rank">#${i + heroes.length + 1}</div>
             <div class="bento-cell-avatar" style="background:${c}22;color:${c};border-color:${c}44">${ini(p)}</div>
             <div class="bento-cell-name">${escHtml(p.name)}${isMe(p) ? ' <span class="me-badge">You</span>' : ''}</div>
           </div>
@@ -3140,7 +3147,7 @@ function renderBentoList() {
       html += `
         <div class="bento-compact" onclick="openCalModal('${p.id}')" style="cursor:pointer;border-left:3px solid ${c}">
           <div class="bento-compact-left">
-            <div class="bento-compact-rank">#${i + 8}</div>
+            <div class="bento-compact-rank">#${i + heroes.length + mid.length + 1}</div>
             <div class="bento-compact-avatar" style="background:${c}22;color:${c};border:1px solid ${c}44">${ini(p)}</div>
             <div class="bento-compact-name">${escHtml(p.name)}${isMe(p) ? ' <span class="me-badge">You</span>' : ''}</div>
           </div>
