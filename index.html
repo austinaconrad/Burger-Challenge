@@ -2335,7 +2335,7 @@ function renderMyTally(){
       const lblMap = ['', 'One patty — classic!', 'Two patties — serious.', 'Three patties — legend.'];
       if (lbl) lbl.textContent = lblMap[savedPattyCount] || '';
       const confirmBtn = document.getElementById('confirm-btn');
-      const btnMap = ['', '✓ Log This Burger', '✓ Log This Double', '✓ Log This Triple'];
+      const btnMap = ['', '✓ Log This Burger', '✓ Log This Double', '✓ Log The Holy Trinity'];
       if (confirmBtn) confirmBtn.textContent = btnMap[savedPattyCount] || '✓ Log This Burger';
     }
   }
@@ -2612,7 +2612,7 @@ window.selectPatties = function(n) {
   if (lbl) lbl.textContent = labels[n] || '';
 
   // Update confirm button text
-  const btnLabels = ['', '✓ Log This Burger', '✓ Log This Double', '✓ Log This Triple'];
+  const btnLabels = ['', '✓ Log This Burger', '✓ Log This Double', '✓ Log The Holy Trinity'];
   const confirmBtn = document.getElementById('confirm-btn');
   if (confirmBtn) confirmBtn.textContent = btnLabels[n] || '✓ Log This Burger';
 
@@ -2672,7 +2672,7 @@ window.setStar = window.setRating;
 window.confirmBurger = async function() {
   const count      = pendingPattyCount || 1;
   const restaurant = document.getElementById('detail-restaurant').value.trim() || 'Unknown spot';
-  const pattyLabel = ['', 'Single', 'Double', 'Triple'][count] || 'Single';
+  const pattyLabel = ['', 'Single', 'Double', 'The Holy Trinity'][count] || 'Single';
   // Snapshot these before resetting pending state
   const snapshotRating = pendingRating;
   const snapshotGPS    = pendingGPS;
@@ -2999,7 +2999,7 @@ window.openDayDetail = function(year, month, day) {
     const restaurant = rawRestaurant && rawRestaurant !== 'Unknown spot' ? rawRestaurant : null;
     const rating = isObj ? (entry.rating || 0) : 0;
     const patties = isObj ? (entry.patties || 1) : 1;
-    const pattyLabel = ['','Single','Double','Triple'][Math.min(patties,3)] || 'Single';
+    const pattyLabel = ['','Single','Double','The Holy Trinity'][Math.min(patties,3)] || 'Single';
     const weather = isObj ? (entry.weatherStamp || '') : '';
     const location = isObj ? (entry.locationCityState || '') : '';
     const pattyEmoji = patties >= 3 ? '🍔🍔🍔' : patties === 2 ? '🍔🍔' : '🍔';
@@ -3418,7 +3418,7 @@ function renderGrillFeed() {
     // ── Patty stamp — always show a pun, never "Burger Logged"
     let stampText, stampCls;
     if (pattyCount >= 3) {
-      stampText = '🇺🇸🚨 THE PATTIE MELTDOWN (Triple)';
+      stampText = '🙏 THE HOLY TRINITY';
       stampCls  = 'stamp-triple';
     } else if (pattyCount === 2) {
       stampText = '🥩 THE DOUBLE OR NOTHING (Double)';
