@@ -1891,7 +1891,8 @@ function computeAchievements(p, allPlayers) {
   const byDay = {};
   logs.forEach(ts => {
     const d = new Date(ts);
-    const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    // Zero-pad month and day so string sort works correctly across month/year boundaries
+    const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     byDay[key] = (byDay[key] || 0) + 1;
   });
   if (Object.values(byDay).some(v => v >= 2)) earned.push('double_down');
@@ -1899,8 +1900,11 @@ function computeAchievements(p, allPlayers) {
   const dayKeys = Object.keys(byDay).sort();
   let streak = 1, best = 1;
   for (let i = 1; i < dayKeys.length; i++) {
-    const prev = new Date(dayKeys[i-1].replace(/-/g, '/')).getTime();
-    const curr = new Date(dayKeys[i].replace(/-/g, '/')).getTime();
+    // Parse key parts and use Date(year, month, day) — month is 0-indexed, matching getMonth()
+    const [y1, m1, d1] = dayKeys[i-1].split('-').map(Number);
+    const [y2, m2, d2] = dayKeys[i].split('-').map(Number);
+    const prev = new Date(y1, m1, d1).getTime();
+    const curr = new Date(y2, m2, d2).getTime();
     const diffDays = Math.round((curr - prev) / 86400000);
     streak = diffDays === 1 ? streak + 1 : 1;
     best = Math.max(best, streak);
@@ -1921,7 +1925,7 @@ function computeAchievements(p, allPlayers) {
       const fri = new Date(d);
       if (dow === 0) fri.setDate(d.getDate() - 2);
       else if (dow === 6) fri.setDate(d.getDate() - 1);
-      const key = `${fri.getFullYear()}-${fri.getMonth()}-${fri.getDate()}`;
+      const key = `${fri.getFullYear()}-${String(fri.getMonth()).padStart(2,'0')}-${String(fri.getDate()).padStart(2,'0')}`;
       weekendCounts[key] = (weekendCounts[key] || 0) + 1;
     }
   });
@@ -2915,7 +2919,7 @@ function _renderCalendar() {
     const ts = logTs(entry);
     if (!ts) return;
     const d = new Date(ts);
-    const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     dayMap[key] = (dayMap[key] || 0) + 1;
   });
 
@@ -2930,7 +2934,7 @@ function _renderCalendar() {
   let monthTotal = 0;
   let bestDay = 0;
   for (let d = 1; d <= daysInMonth; d++) {
-    const key = `${_calYear}-${_calMonth}-${d}`;
+    const key = `${_calYear}-${String(_calMonth).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const count = dayMap[key] || 0;
     monthTotal += count;
     if (count > bestDay) bestDay = count;
@@ -2954,7 +2958,7 @@ function _renderCalendar() {
     (p.logs || []).reduce((acc, e) => {
       const ts = logTs(e); if (!ts) return acc;
       const d2 = new Date(ts);
-      const k = `${d2.getFullYear()}-${d2.getMonth()}-${d2.getDate()}`;
+      const k = `${d2.getFullYear()}-${String(d2.getMonth()).padStart(2,'0')}-${String(d2.getDate()).padStart(2,'0')}`;
       acc[k] = (acc[k] || 0) + 1; return acc;
     }, {})
   ).reduce((a, b) => Math.max(a, b), 0);
