@@ -3087,34 +3087,51 @@ function renderBentoList() {
   const rest   = sorted.slice(heroes.length + mid.length);
 
   // ── Hero(es)
-  const heroCardHtml = p => {
+  const soloHeroHtml = p => {
     const hc = colorFor(p);
-    return `<div class="bento-hero" onclick="openCalModal('${p.id}')" style="cursor:pointer;flex:1;min-width:0">
-      <div class="bento-hero-rank" style="font-size:${heroes.length > 1 ? '36px' : '52px'}">1</div>
-      <div class="bento-hero-avatar" style="width:${heroes.length > 1 ? '44px' : '64px'};height:${heroes.length > 1 ? '44px' : '64px'};background:${hc}22;color:${hc};border-color:${hc}44">${ini(p)}</div>
+    return `<div class="bento-hero" onclick="openCalModal('${p.id}')" style="cursor:pointer">
+      <div class="bento-hero-rank">1</div>
+      <div class="bento-hero-avatar" style="background:${hc}22;color:${hc};border-color:${hc}44">${ini(p)}</div>
       <div class="bento-hero-info">
-        <div class="bento-hero-name" style="font-size:${heroes.length > 1 ? '15px' : '22px'}">
+        <div class="bento-hero-name">
           ${escHtml(p.name)}
           ${isMe(p) ? '<span class="me-badge">You</span>' : ''}
           ${p.count >= 100 ? '<span class="done-badge">Done!</span>' : ''}
         </div>
-        <div class="bento-hero-sub">${heroes.length > 1 ? '🤝 Tied #1' : '🏆 #1 Leader'}</div>
+        <div class="bento-hero-sub">🏆 #1 Leader</div>
       </div>
       <div class="bento-hero-count">
-        <div class="bento-hero-num" style="color:${hc};font-size:${heroes.length > 1 ? '32px' : '48px'}">${p.count}</div>
+        <div class="bento-hero-num" style="color:${hc}">${p.count}</div>
         <div class="bento-hero-label">🍔 burgers</div>
       </div>
+    </div>`;
+  };
+
+  const tiedHeroHtml = p => {
+    const hc = colorFor(p);
+    return `<div onclick="openCalModal('${p.id}')" style="cursor:pointer;flex:1;min-width:0;
+      background:var(--surface);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+      border:1px solid rgba(245,158,11,0.35);border-radius:18px;
+      box-shadow:0 0 0 1px rgba(245,158,11,0.12),var(--shadow-card),0 0 28px rgba(245,158,11,0.10);
+      padding:16px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(245,158,11,0.7),transparent)"></div>
+      <div style="font-family:'Poppins',sans-serif;font-size:11px;font-weight:700;color:var(--amber);letter-spacing:0.06em;text-transform:uppercase">🤝 Tied #1</div>
+      <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;font-family:'Inter',sans-serif;background:${hc}22;color:${hc};border:2px solid ${hc}44">${ini(p)}</div>
+      <div style="font-family:'Poppins',sans-serif;font-size:14px;font-weight:800;color:var(--text);letter-spacing:-0.02em;text-align:center;line-height:1.2;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+        ${escHtml(p.name)}${isMe(p) ? ' <span class="me-badge">You</span>' : ''}
+      </div>
+      <div style="font-family:'Poppins',sans-serif;font-size:32px;font-weight:900;letter-spacing:-0.03em;line-height:1;color:${hc}">${p.count}</div>
+      <div style="font-size:10px;color:#9CA3AF;font-weight:600;text-transform:uppercase;letter-spacing:0.08em">🍔 burgers</div>
     </div>`;
   };
 
   let html = `<div class="bento-list-wrap">`;
 
   if (heroes.length === 1) {
-    html += heroCardHtml(heroes[0]);
+    html += soloHeroHtml(heroes[0]);
   } else {
-    // Split the hero zone into side-by-side cards with a shared tie banner
-    html += `<div style="display:flex;gap:8px;align-items:stretch">
-      ${heroes.map(heroCardHtml).join('')}
+    html += `<div style="display:flex;gap:10px;align-items:stretch">
+      ${heroes.map(tiedHeroHtml).join('')}
     </div>`;
   }
 
