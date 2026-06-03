@@ -1033,6 +1033,147 @@ body.social-active .social-input-area{
   text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px;
 }
 
+/* ══════════════════════════════════════════════
+   📒 STICKER BOOK — Badges Tab
+   ══════════════════════════════════════════════ */
+
+/* Closed album covers */
+.album-covers { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.album-cover {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--surface);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s;
+  box-shadow: var(--shadow-card);
+  position: relative; overflow: hidden;
+}
+.album-cover::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--album-color, rgba(255,255,255,0.2)), transparent);
+}
+.album-cover:active { transform: scale(0.98); }
+.album-cover.open {
+  border-color: var(--album-color, var(--amber));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--album-color, var(--amber)) 20%, transparent), var(--shadow-card);
+}
+.album-cover-rank {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px; font-weight: 700; color: #9CA3AF;
+  text-transform: uppercase; flex-shrink: 0; min-width: 20px;
+}
+.album-cover-avatar {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 800; font-family: 'Inter', sans-serif;
+  flex-shrink: 0;
+}
+.album-cover-info { flex: 1; min-width: 0; }
+.album-cover-name {
+  font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 700;
+  color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+}
+.album-cover-progress {
+  font-size: 11px; color: #9CA3AF; font-weight: 500; margin-top: 2px;
+}
+.album-cover-spine {
+  display: flex; gap: 3px; flex-shrink: 0; align-items: center;
+}
+.album-spine-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+}
+.album-spine-dot.earned { background: var(--album-color, var(--amber)); }
+
+/* Open album — sticker page */
+.sticker-book-open {
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 4px;
+  animation: stickerBookOpen 0.32s cubic-bezier(0.34,1.2,0.64,1) both;
+}
+@keyframes stickerBookOpen {
+  from { opacity: 0; transform: scaleY(0.85); transform-origin: top; }
+  to   { opacity: 1; transform: scaleY(1); }
+}
+.sticker-book-header {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border2);
+  border-bottom: none;
+  border-radius: 16px 16px 0 0;
+  padding: 10px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.sticker-book-title {
+  font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.sticker-book-count {
+  font-size: 11px; color: #9CA3AF; font-weight: 500;
+}
+.sticker-album-page {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px dashed rgba(255,255,255,0.12);
+  border-radius: 0 0 16px 16px;
+  padding: 20px 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 18px;
+}
+
+/* Individual sticker cells */
+.sticker-cell {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.badge-sticker {
+  display: flex; align-items: center; justify-content: center;
+  width: 64px; height: 64px;
+  position: relative;
+}
+/* Unlocked sticker */
+.badge-sticker.unlocked {
+  filter: drop-shadow(2px 3px 0px rgba(0,0,0,0.5));
+  transform: rotate(var(--skew, -2deg)) scale(1);
+  transition: transform 0.2s cubic-bezier(0.175,0.885,0.32,1.275), filter 0.2s;
+  cursor: pointer;
+}
+.badge-sticker.unlocked:hover {
+  transform: scale(1.18) rotate(0deg);
+  filter: drop-shadow(3px 5px 0px rgba(0,0,0,0.5));
+}
+.badge-sticker.unlocked:active { transform: scale(0.95) rotate(0deg); }
+.sticker-emoji {
+  font-size: 32px; line-height: 1;
+  background: #fff;
+  border-radius: 50%;
+  width: 56px; height: 56px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.15), 0 2px 0 rgba(255,255,255,0.8);
+}
+/* Locked placeholder */
+.badge-sticker.locked {
+  border: 2px dashed rgba(255,255,255,0.13);
+  background: rgba(0,0,0,0.25);
+  border-radius: 50%;
+  width: 56px; height: 56px;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.12);
+  font-size: 18px;
+  font-weight: 700;
+}
+.sticker-label {
+  font-size: 8px; font-weight: 700; color: #9CA3AF;
+  text-align: center; text-transform: uppercase; letter-spacing: 0.05em;
+  line-height: 1.3; max-width: 72px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.sticker-label.locked { color: rgba(255,255,255,0.15); }
+
 /* ── MAP FEED ── */
 .map-feed-wrap{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
 .map-feed-empty{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px}
@@ -2167,6 +2308,48 @@ function computeHeavyLifting(allPlayers) {
   return top > 0 ? { player: winner, count: top } : null;
 }
 
+let _openAlbumId = null; // tracks which player's album is open
+
+window.openAlbum = function(playerId) {
+  _openAlbumId = _openAlbumId === playerId ? null : playerId;
+  const sorted = [...players].sort((a,b) => b.count - a.count || a.name.localeCompare(b.name));
+  renderLeaderboard(sorted);
+};
+
+function renderStickerPage(p) {
+  const achievements = computeAchievements(p, players);
+  const total = Object.keys(ACHIEVEMENTS).length;
+  const earned = achievements.length;
+  const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
+  const skews = [-3,-1.5,2,1,-2,3,-1,2.5,-2.5,1.5,-3,2,-1,3,1.5];
+
+  const stickersHtml = Object.entries(ACHIEVEMENTS).map(([k, a], i) => {
+    const isEarned = achievements.includes(k);
+    const skew = skews[i % skews.length];
+    if (isEarned) {
+      return `<div class="sticker-cell" title="${a.label}: ${a.tip}">
+        <div class="badge-sticker unlocked" style="--skew:${skew}deg">
+          <div class="sticker-emoji">${a.emoji}</div>
+        </div>
+        <div class="sticker-label">${a.label}</div>
+      </div>`;
+    } else {
+      return `<div class="sticker-cell" title="Locked — ${a.tip}">
+        <div class="badge-sticker locked">?</div>
+        <div class="sticker-label locked">${a.label}</div>
+      </div>`;
+    }
+  }).join('');
+
+  return `<div class="sticker-book-open">
+    <div class="sticker-book-header">
+      <div class="sticker-book-title" style="color:${color}">${escHtml(p.name)}'s Album</div>
+      <div class="sticker-book-count">${earned} / ${total} collected</div>
+    </div>
+    <div class="sticker-album-page">${stickersHtml}</div>
+  </div>`;
+}
+
 function renderLeaderboard(sorted){
   const lb=document.getElementById('leaderboard');
   const empty=document.getElementById('lb-empty');
@@ -2174,36 +2357,48 @@ function renderLeaderboard(sorted){
   const winners=players.filter(p=>p.count>=100);
   banner.style.display=winners.length?'block':'none';
   if(winners.length) banner.textContent='🎉 '+winners.map(p=>p.name).join(', ')+(winners.length===1?' has':' have')+' crushed 100 burgers!';
-  const hl = null; // Heavy lifting award removed
 
   if(!sorted.length){lb.innerHTML='';empty.style.display='block';return;}
   empty.style.display='none';
-  const ranks=['👑','🥈','🥉'];
 
-  lb.innerHTML=sorted.map((p,i)=>{
-    const cc=colorClass(p.colorIdx);
-    const isFirst=i===0&&p.count>0, isDone=p.count>=100, isMe=p.id===myPlayerId;
-    const pct=Math.min(100,p.count);
-    const achievements=computeAchievements(p,players);
-    const badgesHtml=`<div class="badge-row">${Object.entries(ACHIEVEMENTS).map(([k,a])=>{
-      const earned=achievements.includes(k);
-      const tip=earned?`${a.label}: ${a.tip}`:`🔒 Locked — ${a.tip}`;
-      const sz=a.size?Math.round(a.size*0.72):null;
-      const st=`--bdg-color:${a.color};--bdg-glow:${a.glow};${sz?`font-size:${sz}px`:''}`;
-      return `<span class="ach-badge${earned?'':' locked'}" data-tip="${tip}" onclick="toggleTip(this)" style="${st}">${a.emoji}</span>`;
-    }).join('')}</div>`;
+  // Default open album to logged-in user on first render
+  if (_openAlbumId === null) {
+    const me = sorted.find(p => p.id === myPlayerId);
+    _openAlbumId = me ? me.id : (sorted[0]?.id || null);
+  }
 
-    return `<div class="lb-card ${cc} ${isFirst?'first-place':''} ${isDone?'complete':''} ${isMe?'is-me':''}">
-      ${ringAvatarHTML(p,48)}
-      <div class="player-info" style="flex:1;width:auto">
-        <div class="player-name">
-          ${escHtml(p.name)}
-          ${isMe?'<span class="me-badge">You</span>':''}
-          ${isDone?'<span class="done-badge">Done!</span>':''}
-        </div>
+  const totalBadges = Object.keys(ACHIEVEMENTS).length;
+
+  lb.innerHTML = sorted.map((p, i) => {
+    const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
+    const isMe = p.id === myPlayerId;
+    const achievements = computeAchievements(p, players);
+    const earned = achievements.length;
+    const isOpen = p.id === _openAlbumId;
+
+    // Spine dots — show up to 8 earned/locked indicators
+    const spineDots = Object.keys(ACHIEVEMENTS).slice(0, 8).map((k, di) => {
+      const got = achievements.includes(k);
+      return `<div class="album-spine-dot${got ? ' earned' : ''}" style="${got ? `background:${color}` : ''}"></div>`;
+    }).join('');
+
+    const cover = `<div class="album-cover${isOpen ? ' open' : ''}"
+        style="--album-color:${color}"
+        onclick="openAlbum('${p.id}')">
+      <div class="album-cover-rank">#${i+1}</div>
+      <div class="album-cover-avatar" style="background:${color}22;color:${color};border:1.5px solid ${color}44">
+        ${initials(p.name)}
       </div>
-      <div class="badge-col" style="flex:none">${badgesHtml}</div>
+      <div class="album-cover-info">
+        <div class="album-cover-name">
+          ${escHtml(p.name)}${isMe ? ' <span class="me-badge">You</span>' : ''}
+        </div>
+        <div class="album-cover-progress">${earned} / ${totalBadges} stickers</div>
+      </div>
+      <div class="album-cover-spine">${spineDots}</div>
     </div>`;
+
+    return cover + (isOpen ? renderStickerPage(p) : '');
   }).join('');
 
   // Staggered entrance animation
@@ -3190,6 +3385,7 @@ window.switchTab=function(name,btn){
   }, 80);
   if(name==='feed') renderGrillFeed();
   if(name==='list') renderBentoList();
+  if(name==='leaderboard') { _openAlbumId = null; const s=[...players].sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name)); renderLeaderboard(s); }
 };
 
 window.switchToPlayers = function() {
