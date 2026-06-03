@@ -1084,8 +1084,8 @@ body.social-active .social-input-area{
   display: flex; gap: 3px; flex-shrink: 0; align-items: center;
 }
 .album-spine-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: rgba(255,255,255,0.12);
+  width: 5px; height: 5px; border-radius: 50%;
+  background: rgba(255,255,255,0.12); flex-shrink: 0;
 }
 .album-spine-dot.earned { background: var(--album-color, var(--amber)); }
 
@@ -2483,7 +2483,7 @@ function renderLeaderboard(sorted){
     const isOpen = p.id === _openAlbumId;
 
     // Spine dots — show total badges as slots, fill by earned count so position doesn't matter
-    const spineDots = Array.from({length: Math.min(totalBadges, 8)}, (_, di) => {
+    const spineDots = Array.from({length: totalBadges}, (_, di) => {
       const got = di < earned;
       return `<div class="album-spine-dot${got ? ' earned' : ''}" style="${got ? `background:${color}` : ''}"></div>`;
     }).join('');
