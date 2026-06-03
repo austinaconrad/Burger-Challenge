@@ -2335,13 +2335,15 @@ window.openAlbum = function(playerId) {
   document.querySelectorAll('.album-cover').forEach(c => c.classList.remove('open'));
 
   if (isSame) {
-    // Toggling closed — just clear state after animation
+    // Toggling closed — clear state and dismiss any open badge popup
     setTimeout(() => { if (existing) existing.remove(); }, 220);
+    document.getElementById('badge-popup')?.remove();
     _openAlbumId = null;
     return;
   }
 
   _openAlbumId = playerId;
+  document.getElementById('badge-popup')?.remove();
   const p = players.find(pl => pl.id === playerId);
   if (!p) return;
 
