@@ -1133,7 +1133,7 @@ body.social-active .social-input-area{
 
 /* Individual sticker cells */
 .sticker-cell {
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
 }
 .badge-sticker {
   display: flex; align-items: center; justify-content: center;
@@ -1180,7 +1180,7 @@ body.social-active .social-input-area{
   line-height: 1.4; width: 100%;
   white-space: normal; word-break: break-word;
 }
-.sticker-label.locked { color: rgba(255,255,255,0.15); }
+.sticker-label.locked { color: rgba(255,255,255,0.45); }
 
 /* ── MAP FEED ── */
 .map-feed-wrap{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
@@ -2378,7 +2378,12 @@ window.openAlbum = function(playerId) {
   }, afterDelay);
 };
 
-window.showBadgePopup = function(label, tip, earned, color) {
+window._badgePopupData = {};
+
+window.showBadgePopup = function(key) {
+  const d = window._badgePopupData[key];
+  if (!d) return;
+  const {label, tip, earned, color} = d;
   const existing = document.getElementById('badge-popup');
   if (existing) existing.remove();
   const popup = document.createElement('div');
@@ -2424,20 +2429,18 @@ function renderStickerPage(p) {
     const glyphs = (!isSvg && typeof a.emoji === 'string') ? [...a.emoji].filter(c => c.trim()).length : 1;
     const isMulti = glyphs > 1;
     const emojiSize = isMulti ? 'font-size:16px;gap:3px;flex-direction:row;flex-wrap:nowrap;' : 'font-size:28px;';
-    const safeLabel = escHtml(a.label).replace(/'/g,"&apos;");
-    const safeTip   = escHtml(a.tip).replace(/'/g,"&apos;");
-    const safeColor = color.replace(/'/g,"");
-    const clickFn   = `showBadgePopup('${safeLabel}','${safeTip}',${isEarned},'${safeColor}')`;
+    // Store data by key to avoid apostrophe escaping issues in onclick
+    window._badgePopupData[k] = {label: a.label, tip: a.tip, earned: isEarned, color};
 
     if (isEarned) {
-      return `<div class="sticker-cell" onclick="${clickFn}" style="cursor:pointer">
+      return `<div class="sticker-cell" onclick="showBadgePopup('${k}')" style="cursor:pointer">
         <div class="badge-sticker unlocked" style="--skew:${skew}deg">
           <div class="sticker-emoji" style="${emojiSize}display:flex;align-items:center;justify-content:center;flex-wrap:nowrap">${a.emoji}</div>
         </div>
         <div class="sticker-label">${a.label}</div>
       </div>`;
     } else {
-      return `<div class="sticker-cell" onclick="${clickFn}" style="cursor:pointer">
+      return `<div class="sticker-cell" onclick="showBadgePopup('${k}')" style="cursor:pointer">
         <div class="badge-sticker locked">?</div>
         <div class="sticker-label locked">${a.label}</div>
       </div>`;
