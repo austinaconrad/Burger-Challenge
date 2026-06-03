@@ -2482,9 +2482,9 @@ function renderLeaderboard(sorted){
     const earned = achievements.length;
     const isOpen = p.id === _openAlbumId;
 
-    // Spine dots — show up to 8 earned/locked indicators
-    const spineDots = Object.keys(ACHIEVEMENTS).slice(0, 8).map((k, di) => {
-      const got = achievements.includes(k);
+    // Spine dots — show total badges as slots, fill by earned count so position doesn't matter
+    const spineDots = Array.from({length: Math.min(totalBadges, 8)}, (_, di) => {
+      const got = di < earned;
       return `<div class="album-spine-dot${got ? ' earned' : ''}" style="${got ? `background:${color}` : ''}"></div>`;
     }).join('');
 
