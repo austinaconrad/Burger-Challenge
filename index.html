@@ -1758,20 +1758,8 @@ function getDailyBurgerCount(allPlayers) {
 function renderDailyCard(allPlayers) {
   const count = getDailyBurgerCount(allPlayers);
   const countEl = document.getElementById('daily-count');
-  const msgEl   = document.getElementById('daily-msg');
-  const iconEl  = document.getElementById('daily-icon');
-  if (!countEl || !msgEl || !iconEl) return;
+  if (!countEl) return;
   countEl.textContent = count;
-  if (count === 0) {
-    iconEl.textContent = '🤫';
-    msgEl.textContent  = 'Nobody has logged one today. Who breaks the ice?';
-  } else if (count === 1) {
-    iconEl.textContent = '🔥';
-    msgEl.textContent  = 'One brave soul has started the day!';
-  } else {
-    iconEl.textContent = '🔥';
-    msgEl.textContent  = `The crew has crushed ${count} burgers today!`;
-  }
 }
 
 function scheduleDailyReset() {
