@@ -3537,7 +3537,6 @@ function renderBurgerMap() {
   if (!burgerMap) {
     burgerMap = L.map('burger-map', {
       center: [40.4173, -82.9071], zoom: 6,
-      maxBounds: [[36.5,-90],[44.5,-78]], maxBoundsViscosity: 0.85,
     });
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/">CARTO</a>',
@@ -3585,9 +3584,10 @@ function renderBurgerMap() {
       mapMarkers.push(marker);
     });
   });
-  if (mapMarkers.length > 0) {
+  if (mapMarkers.length > 0 && !burgerMap._hasInitialFit) {
     const group = L.featureGroup(mapMarkers);
-    burgerMap.fitBounds(group.getBounds().pad(0.25), {maxZoom:8});
+    burgerMap.fitBounds(group.getBounds().pad(0.25), {maxZoom: 8});
+    burgerMap._hasInitialFit = true;
   }
   burgerMap.invalidateSize();
 
