@@ -1094,6 +1094,7 @@ body.social-active .social-input-area{
   border-radius: 16px;
   overflow: hidden;
   margin-bottom: 4px;
+  transform-origin: top center;
   animation: stickerBookOpen 0.32s cubic-bezier(0.34,1.2,0.64,1) both;
 }
 @keyframes stickerBookOpen {
@@ -1122,8 +1123,8 @@ body.social-active .social-input-area{
   border-radius: 0 0 16px 16px;
   padding: 20px 16px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px 12px;
 }
 
 /* Individual sticker cells */
@@ -1132,7 +1133,7 @@ body.social-active .social-input-area{
 }
 .badge-sticker {
   display: flex; align-items: center; justify-content: center;
-  width: 64px; height: 64px;
+  width: 72px; height: 72px;
   position: relative;
 }
 /* Unlocked sticker */
@@ -1148,29 +1149,32 @@ body.social-active .social-input-area{
 }
 .badge-sticker.unlocked:active { transform: scale(0.95) rotate(0deg); }
 .sticker-emoji {
-  font-size: 32px; line-height: 1;
+  font-size: 30px; line-height: 1;
   background: #fff;
   border-radius: 50%;
-  width: 56px; height: 56px;
+  width: 64px; height: 64px;
   display: flex; align-items: center; justify-content: center;
   box-shadow: inset 0 0 6px rgba(0,0,0,0.15), 0 2px 0 rgba(255,255,255,0.8);
+  flex-shrink: 0;
+  padding: 8px;
+  box-sizing: border-box;
 }
 /* Locked placeholder */
 .badge-sticker.locked {
   border: 2px dashed rgba(255,255,255,0.13);
   background: rgba(0,0,0,0.25);
   border-radius: 50%;
-  width: 56px; height: 56px;
+  width: 64px; height: 64px;
   display: flex; align-items: center; justify-content: center;
   color: rgba(255,255,255,0.12);
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
 }
 .sticker-label {
-  font-size: 8px; font-weight: 700; color: #9CA3AF;
-  text-align: center; text-transform: uppercase; letter-spacing: 0.05em;
-  line-height: 1.3; max-width: 72px;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: 9px; font-weight: 700; color: #9CA3AF;
+  text-align: center; text-transform: uppercase; letter-spacing: 0.04em;
+  line-height: 1.4; width: 100%;
+  white-space: normal; word-break: break-word;
 }
 .sticker-label.locked { color: rgba(255,255,255,0.15); }
 
@@ -2311,9 +2315,63 @@ function computeHeavyLifting(allPlayers) {
 let _openAlbumId = null; // tracks which player's album is open
 
 window.openAlbum = function(playerId) {
-  _openAlbumId = _openAlbumId === playerId ? null : playerId;
-  const sorted = [...players].sort((a,b) => b.count - a.count || a.name.localeCompare(b.name));
-  renderLeaderboard(sorted);
+  const isSame = _openAlbumId === playerId;
+
+  // Collapse any currently open album
+  const existing = document.getElementById('sticker-book-active');
+  if (existing) {
+    existing.style.transition = 'opacity 0.18s ease, transform 0.2s ease, max-height 0.25s ease';
+    existing.style.opacity = '0';
+    existing.style.transform = 'scaleY(0.9)';
+    existing.style.maxHeight = '0';
+    existing.style.overflow = 'hidden';
+  }
+
+  // Remove open styling from all covers
+  document.querySelectorAll('.album-cover').forEach(c => c.classList.remove('open'));
+
+  if (isSame) {
+    // Toggling closed — just clear state after animation
+    setTimeout(() => { if (existing) existing.remove(); }, 220);
+    _openAlbumId = null;
+    return;
+  }
+
+  _openAlbumId = playerId;
+  const p = players.find(pl => pl.id === playerId);
+  if (!p) return;
+
+  // Mark the clicked cover as open
+  const clickedCover = document.querySelector(`.album-cover[data-pid="${playerId}"]`);
+  if (clickedCover) clickedCover.classList.add('open');
+
+  // Build the new sticker page
+  const newPage = document.createElement('div');
+  newPage.id = 'sticker-book-active';
+  newPage.innerHTML = renderStickerPage(p);
+  newPage.style.opacity = '0';
+  newPage.style.transform = 'scaleY(0.88)';
+  newPage.style.transformOrigin = 'top';
+  newPage.style.overflow = 'hidden';
+
+  // Insert after the clicked cover (removing old page first)
+  const afterDelay = existing ? 220 : 0;
+  setTimeout(() => {
+    if (existing) existing.remove();
+    if (clickedCover) {
+      clickedCover.insertAdjacentElement('afterend', newPage);
+    } else {
+      document.getElementById('leaderboard').appendChild(newPage);
+    }
+    // Trigger entrance animation
+    requestAnimationFrame(() => {
+      newPage.style.transition = 'opacity 0.25s ease, transform 0.28s cubic-bezier(0.34,1.2,0.64,1)';
+      newPage.style.opacity = '1';
+      newPage.style.transform = 'scaleY(1)';
+      // Scroll the new album into view smoothly
+      setTimeout(() => newPage.scrollIntoView({behavior:'smooth', block:'nearest'}), 100);
+    });
+  }, afterDelay);
 };
 
 function renderStickerPage(p) {
@@ -2383,6 +2441,7 @@ function renderLeaderboard(sorted){
     }).join('');
 
     const cover = `<div class="album-cover${isOpen ? ' open' : ''}"
+        data-pid="${p.id}"
         style="--album-color:${color}"
         onclick="openAlbum('${p.id}')">
       <div class="album-cover-rank">#${i+1}</div>
@@ -2398,7 +2457,7 @@ function renderLeaderboard(sorted){
       <div class="album-cover-spine">${spineDots}</div>
     </div>`;
 
-    return cover + (isOpen ? renderStickerPage(p) : '');
+    return cover + (isOpen ? `<div id="sticker-book-active">${renderStickerPage(p)}</div>` : '');
   }).join('');
 
   // Staggered entrance animation
