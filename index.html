@@ -1786,7 +1786,7 @@ const ACHIEVEMENTS = {
   rain_or_shine:   { label:'Rain or Shine',         tip:'Ate a burger in rain or a thunderstorm', color:'rgba(80,150,230,0.7)',  glow:'rgba(80,150,230,0.2)', size:14, emoji:'⛈️' },
   heat_wave:       { label:'Heat Wave',             tip:'Logged a burger in 90°F+ heat',          color:'rgba(255,100,30,0.7)',  glow:'rgba(255,100,30,0.2)', size:14, emoji:'🥵' },
   clownin_around:  { label:"Clownin' Around",       tip:"Logged 3 burgers from McDonald's",       color:'rgba(220,50,50,0.7)',   glow:'rgba(220,50,50,0.2)',  size:14, emoji:'🤡' },
-  all_the_way:     { label:'All The Way',            tip:'Log a Five Guys burger with all 9 toppings: Ketchup, Mustard, Mayo, Lettuce, Pickles, Tomatoes, Onions, Mushrooms & Green Peppers', color:'rgba(245,158,11,0.8)', glow:'rgba(245,158,11,0.3)', size:14, emoji:'🏆🍔' },
+  all_the_way:     { label:'All The Way',            tip:'Log a Five Guys burger with all 10 toppings: Ketchup, Mustard, Mayo, Cheese, Lettuce, Pickles, Tomatoes, Onions, Mushrooms & Green Peppers', color:'rgba(245,158,11,0.8)', glow:'rgba(245,158,11,0.3)', size:14, emoji:'🏆🍔' },
 };
 
 let app, db, unsubscribe, unsubMessages;
@@ -2126,10 +2126,10 @@ function computeAchievements(p, allPlayers) {
   if (mcdCount >= 3) earned.push('clownin_around');
 
   // All The Way — Five Guys burger with all 9 toppings
-  const REQUIRED_TOPPINGS = ['Ketchup','Mustard','Mayo','Lettuce','Pickles','Tomatoes','Onions','Mushrooms','Green Peppers'];
+  const REQUIRED_TOPPINGS = ['Ketchup','Mustard','Mayo','Cheese','Lettuce','Pickles','Tomatoes','Onions','Mushrooms','Green Peppers'];
   const hasAllTheWay = (p.logs || []).some(entry => {
     if (typeof entry !== 'object') return false;
-    if (!/five\s*guys/i.test(entry.restaurant || '')) return false;
+    if (!/five\s*guy'?s/i.test(entry.restaurant || '')) return false;
     const t = entry.toppings || [];
     return REQUIRED_TOPPINGS.every(req => t.includes(req));
   });
@@ -2978,7 +2978,7 @@ function fireConfetti(big = false) {
   }
 }
 
-const OHIO_SPOTS = ["Wendy's","McDonald's","Burger King","Buffalo Wild Wings","Swenson's","Shake Shack","Five Guys","Steak 'n Shake","Culver's"];
+const OHIO_SPOTS = ["Five Guys","Wendy's","McDonald's","Burger King","Buffalo Wild Wings","Swenson's","Shake Shack","Steak 'n Shake","Culver's"];
 let pendingRating = 0;
 let pendingGPS = null;
 let pendingPattyCount = 0;
