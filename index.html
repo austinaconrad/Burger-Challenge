@@ -3806,9 +3806,10 @@ const RACE_MILESTONE_NAMES = {25:'QUARTERWAY MARK', 50:'HALFWAY MARK', 75:'FINAL
 function racePosFor(count, ceiling) {
   return RACE_LEFT_START + (Math.min(count, ceiling) / ceiling) * RACE_LEFT_RANGE;
 }
-// Horses rest inside the gate (never overlap the start line)
+// Horses at 0 burgers sit BEHIND the start line; all others race normally
 function raceHorsePosFor(count, ceiling) {
-  return Math.max(RACE_LEFT_START + RACE_GATE_PAD, racePosFor(count, ceiling));
+  if (count === 0) return RACE_LEFT_START - 2.5;
+  return racePosFor(count, ceiling);
 }
 
 function renderRaceTrack() {
@@ -3839,7 +3840,7 @@ function renderRaceTrack() {
           background-color:rgba(255,255,255,0.55);
           background-image:linear-gradient(45deg,rgba(0,0,0,0.55) 25%,transparent 25%,transparent 75%,rgba(0,0,0,0.55) 75%),linear-gradient(45deg,rgba(0,0,0,0.55) 25%,transparent 25%,transparent 75%,rgba(0,0,0,0.55) 75%);
           background-size:6px 6px;background-position:0 0,3px 3px">
-          <div style="position:absolute;top:4px;left:50%;transform:translateX(-50%);
+          <div style="position:absolute;top:6px;left:50%;transform:translateX(-50%);
             background:rgba(20,20,20,0.85);border:1px solid rgba(255,255,255,0.3);border-radius:3px;
             padding:3px 6px;white-space:nowrap;font-family:'Press Start 2P',monospace;font-size:5px;
             color:rgba(255,255,255,0.9);letter-spacing:0.05em;box-shadow:0 2px 6px rgba(0,0,0,0.7);z-index:10">
@@ -3850,7 +3851,7 @@ function renderRaceTrack() {
           background-color:#FFD700;
           background-image:linear-gradient(45deg,#1C0A00 25%,transparent 25%,transparent 75%,#1C0A00 75%),linear-gradient(45deg,#1C0A00 25%,transparent 25%,transparent 75%,#1C0A00 75%);
           background-size:8px 8px;background-position:0 0,4px 4px">
-          <div style="position:absolute;top:4px;right:calc(100% + 4px);left:auto;
+          <div style="position:absolute;top:6px;right:calc(100% + 4px);left:auto;
             background:#FFD700;border:1.5px solid #1C0A00;border-radius:3px;
             padding:3px 7px;white-space:nowrap;font-family:'Press Start 2P',monospace;font-size:5px;
             color:#1C0A00;letter-spacing:0.05em;box-shadow:0 2px 8px rgba(0,0,0,0.8);z-index:10">
@@ -3867,7 +3868,8 @@ function renderRaceTrack() {
   const needsRebuild   = existingIds.join(',') !== currentIds.join(',');
 
   if (needsRebuild) {
-    lanesEl.innerHTML = laneOrder.map((p, i) => {
+    lanesEl.innerHTML = `<div style="flex:0 0 28px;position:relative;background:rgba(0,0,0,0.28);border-bottom:1px solid rgba(255,255,255,0.10);"></div>` +
+    laneOrder.map((p, i) => {
       const color    = RING_COLORS[p.colorIdx % RING_COLORS.length];
       const ini      = initials(p.name);
       const pct      = raceHorsePosFor(p.count, ceiling);
