@@ -1249,8 +1249,8 @@ body.social-active .social-input-area{
 .jockey-lane {
   flex: 1;
   position: relative;
-  border-right: 1px solid rgba(255,255,255,0.07);
-  min-width: 44px;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  min-width: 28px;
 }
 .jockey-lane:last-child { border-right: none; }
 .jockey-horse {
@@ -1261,20 +1261,46 @@ body.social-active .social-input-area{
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 0;
   z-index: 10;
   cursor: pointer;
 }
 .jockey-horse:hover { z-index: 20; }
+/* Inner wrapper gets the gallop bob animation */
+.horse-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  animation: gallopBob 0.7s ease-in-out infinite;
+}
+.leader-horse .horse-inner {
+  animation: gallopBob 0.45s ease-in-out infinite;
+}
+@keyframes gallopBob {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-4px); }
+}
 .horse-emoji {
-  font-size: 26px;
+  font-size: 22px;
   line-height: 1;
   display: block;
   transform: rotate(90deg);
   filter: drop-shadow(0 3px 6px rgba(0,0,0,0.7));
-  transition: transform 0.3s ease;
 }
-.jockey-horse:hover .horse-emoji { transform: rotate(90deg) scale(1.2); }
+.jockey-horse:hover .horse-emoji { filter: drop-shadow(0 3px 10px rgba(255,255,255,0.4)) drop-shadow(0 3px 6px rgba(0,0,0,0.7)); }
+/* Dust cloud trail for leader */
+.dust-trail {
+  font-size: 14px;
+  line-height: 1;
+  margin-bottom: -2px;
+  animation: dustFloat 0.8s ease-in-out infinite;
+  opacity: 0.75;
+}
+@keyframes dustFloat {
+  0%, 100% { transform: translateY(0) scale(1);   opacity: 0.75; }
+  50%       { transform: translateY(3px) scale(1.15); opacity: 0.4; }
+}
 .jockey-badge {
   color: #fff;
   font-size: 7px;
@@ -1791,8 +1817,7 @@ body.social-active .social-input-area{
           <div id="race-milestones"></div>
           <div id="race-lanes"></div>
         </div>
-        <div id="race-legend"></div>
-      </div>
+        </div>
     </div>
 
     <!-- LIST TAB -->
@@ -3782,85 +3807,90 @@ function renderBentoList() {
 
 // ── HORSE RACING ─────────────────────────────────────────────────
 
-const RACE_BOTTOM_PCT = 5;   // % from bottom for start line
-const RACE_TOP_PCT    = 87;  // % from bottom for finish line
+const RACE_BOTTOM_PCT = 5;
+const RACE_TOP_PCT    = 88;
 const RACE_RANGE      = RACE_TOP_PCT - RACE_BOTTOM_PCT;
+const RACE_CEILINGS   = [25, 50, 75, 100];
 
-function racePosFor(count) {
-  return RACE_BOTTOM_PCT + (Math.min(count, 100) / 100) * RACE_RANGE;
+function racePosFor(count, ceiling) {
+  return RACE_BOTTOM_PCT + (Math.min(count, ceiling) / ceiling) * RACE_RANGE;
 }
 
 function renderRaceTrack() {
   const lanesEl      = document.getElementById('race-lanes');
   const milestonesEl = document.getElementById('race-milestones');
-  const legendEl     = document.getElementById('race-legend');
   if (!lanesEl) return;
 
-  // Sort by count for legend/ranking, but shuffle lane order so horses aren't a diagonal line
   const sorted = [...players].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
-  // Stable shuffle by player ID hash so lane positions don't jump on re-render
   const laneOrder = [...players].sort((a, b) => {
     const ha = a.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
     const hb = b.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
     return ha - hb;
   });
 
-  // ── Milestone lines (built once, or rebuild on full render)
+  const topCount = sorted[0]?.count || 0;
+  const ceiling  = RACE_CEILINGS.find(c => c > topCount) || 100;
+  const leaderId = sorted[0]?.id || null;
+
+  // Rebuild milestones when ceiling changes
   if (milestonesEl) {
-    const milestones = [
-      { count: 25, label: '25 🍔' },
-      { count: 50, label: '50 🍔 · HALFWAY' },
-      { count: 75, label: '75 🍔' },
-    ];
-    milestonesEl.style.cssText = 'position:absolute;inset:0;z-index:5;pointer-events:none';
-    milestonesEl.innerHTML = milestones.map(m => `
-      <div class="race-milestone" style="bottom:${racePosFor(m.count)}%">
-        <div class="race-milestone-line">
-          <span class="race-milestone-label">${m.label}</span>
+    const prevCeiling = parseInt(milestonesEl.dataset.ceiling || '0');
+    if (prevCeiling !== ceiling) {
+      milestonesEl.dataset.ceiling = ceiling;
+      milestonesEl.style.cssText = 'position:absolute;inset:0;z-index:5;pointer-events:none';
+      const innerMilestones = RACE_CEILINGS.filter(m => m < ceiling);
+      milestonesEl.innerHTML = innerMilestones.map(m => `
+        <div class="race-milestone" style="bottom:${racePosFor(m, ceiling)}%">
+          <div class="race-milestone-line">
+            <span class="race-milestone-label">${m} 🍔${m === 50 ? ' · HALFWAY' : ''}</span>
+          </div>
+        </div>`).join('') +
+        `<div class="race-finish-line" style="bottom:${racePosFor(ceiling, ceiling)}%">
+          <span class="race-finish-label">🏁 ${ceiling === 100 ? 'FINISH — 100 BURGERS' : `MILESTONE — ${ceiling} 🍔`}</span>
         </div>
-      </div>`).join('') +
-      `<div class="race-finish-line" style="bottom:${racePosFor(100)}%">
-        <span class="race-finish-label">🏁 FINISH LINE — 100 BURGERS</span>
-      </div>
-      <div style="position:absolute;bottom:${RACE_BOTTOM_PCT}%;left:0;right:0;border-top:2px solid rgba(255,255,255,0.35);z-index:5;pointer-events:none"></div>`;
+        <div style="position:absolute;bottom:${RACE_BOTTOM_PCT}%;left:0;right:0;border-top:2px solid rgba(255,255,255,0.35);z-index:5;pointer-events:none"></div>`;
+    }
   }
 
-  // ── Check if lanes already match players (for smooth update vs full rebuild)
   const existingHorses = lanesEl.querySelectorAll('.jockey-horse');
   const existingIds    = [...existingHorses].map(h => h.dataset.pid);
   const currentIds     = laneOrder.map(p => p.id);
   const needsRebuild   = existingIds.join(',') !== currentIds.join(',');
 
   if (needsRebuild) {
-    lanesEl.innerHTML = laneOrder.map(p => {
-      const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
-      const ini   = initials(p.name);
-      const pct   = racePosFor(p.count);
-      return `<div class="jockey-lane">
-        <div class="jockey-horse" data-pid="${p.id}" style="bottom:${pct}%">
-          <div class="horse-emoji">🏇</div>
-          <div class="jockey-badge" style="background:${color}">${ini}</div>
+    lanesEl.innerHTML = laneOrder.map((p, i) => {
+      const color    = RING_COLORS[p.colorIdx % RING_COLORS.length];
+      const ini      = initials(p.name);
+      const pct      = racePosFor(p.count, ceiling);
+      const isLeader = p.id === leaderId && p.count > 0;
+      return `<div class="jockey-lane" style="background:${i%2===0?'rgba(0,0,0,0.07)':'rgba(255,255,255,0.04)'}">
+        <div class="jockey-horse${isLeader?' leader-horse':''}" data-pid="${p.id}" style="bottom:${pct}%">
+          ${isLeader ? '<div class="dust-trail">💨</div>' : ''}
+          <div class="horse-inner">
+            <div class="horse-emoji">🏇</div>
+            <div class="jockey-badge" style="background:${color}">${ini}</div>
+          </div>
         </div>
-        <div class="lane-start-label">${escHtml(p.name.split(' ')[0])}</div>
+        <div class="lane-start-label">${ini}</div>
       </div>`;
     }).join('');
   } else {
-    // Smooth update — just move existing horses
     existingHorses.forEach(horse => {
       const p = players.find(pl => pl.id === horse.dataset.pid);
-      if (p) horse.style.bottom = racePosFor(p.count) + '%';
+      if (!p) return;
+      horse.style.bottom = racePosFor(p.count, ceiling) + '%';
+      const isLeader = p.id === leaderId && p.count > 0;
+      horse.classList.toggle('leader-horse', isLeader);
+      let dust = horse.querySelector('.dust-trail');
+      if (isLeader && !dust) {
+        dust = document.createElement('div');
+        dust.className = 'dust-trail';
+        dust.textContent = '💨';
+        horse.insertBefore(dust, horse.firstChild);
+      } else if (!isLeader && dust) {
+        dust.remove();
+      }
     });
-  }
-
-  // ── Legend
-  if (legendEl) {
-    legendEl.innerHTML = sorted.map(p => {
-      const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
-      return `<div class="race-legend-item">
-        <div class="race-legend-dot" style="background:${color}"></div>
-        ${escHtml(p.name)} <span style="color:${color};font-weight:700">${p.count}</span>
-      </div>`;
-    }).join('');
   }
 }
 
