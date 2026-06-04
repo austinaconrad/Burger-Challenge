@@ -1125,6 +1125,7 @@ body.social-active .social-input-area{
   border: 1px solid rgba(255,255,255,0.1);
   border-top: 1px dashed rgba(255,255,255,0.12);
   border-radius: 0 0 16px 16px;
+  margin-top: 0;
   padding: 20px 16px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -2449,11 +2450,67 @@ function renderStickerPage(p) {
     }
   }).join('');
 
+  // ── Patty breakdown donut chart
+  const logs = (p.logs || []).filter(e => typeof e === 'object' && e.ts);
+  const singles  = logs.filter(e => !e.patties || e.patties === 1).length;
+  const doubles  = logs.filter(e => e.patties === 2).length;
+  const triples  = logs.filter(e => e.patties >= 3).length;
+  const logTotal = singles + doubles + triples;
+
+  let donutHtml = '';
+  if (logTotal > 0) {
+    const pctS = singles / logTotal, pctD = doubles / logTotal, pctT = triples / logTotal;
+    const r = 36, cx = 48, cy = 48, circ = 2 * Math.PI * r;
+    // SVG donut segments — draw clockwise from top
+    const seg = (pct, offset) => ({dash: pct * circ, offset: -offset * circ});
+    const offsetS = 0;
+    const offsetD = pctS;
+    const offsetT = pctS + pctD;
+    const sS = seg(pctS, offsetS), sD = seg(pctD, offsetD), sT = seg(pctT, offsetT);
+    const COLORS = { single: '#F59E0B', double: '#F97316', triple: '#EF4444' };
+
+    const arc = (pct, offset, col) => pct > 0 ? `
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${col}" stroke-width="14"
+        stroke-dasharray="${(pct*circ).toFixed(2)} ${circ.toFixed(2)}"
+        stroke-dashoffset="${(-offset*circ).toFixed(2)}"
+        transform="rotate(-90 ${cx} ${cy})" stroke-linecap="butt"/>` : '';
+
+    const legendRow = (emoji, label, count, pct, col) => count > 0 ? `
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px">
+        <div style="width:10px;height:10px;border-radius:2px;background:${col};flex-shrink:0"></div>
+        <div style="flex:1;font-size:11px;font-weight:600;color:var(--text)">${emoji} ${label}</div>
+        <div style="font-size:11px;color:#9CA3AF;font-weight:500">${count} <span style="color:#555">(${Math.round(pct*100)}%)</span></div>
+      </div>` : '';
+
+    donutHtml = `
+      <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px 16px;margin-bottom:0;display:flex;align-items:center;gap:18px">
+        <div style="flex-shrink:0">
+          <svg width="96" height="96" viewBox="0 0 96 96">
+            <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="14"/>
+            ${arc(pctS, offsetS, COLORS.single)}
+            ${arc(pctD, offsetD, COLORS.double)}
+            ${arc(pctT, offsetT, COLORS.triple)}
+            <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle"
+              font-family="Poppins,sans-serif" font-size="13" font-weight="800" fill="${color}">${logTotal}</text>
+            <text x="${cx}" y="${cy+14}" text-anchor="middle" dominant-baseline="middle"
+              font-family="Inter,sans-serif" font-size="7" font-weight="600" fill="#9CA3AF">LOGGED</text>
+          </svg>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">Patty Breakdown</div>
+          ${legendRow('🍔', 'Single', singles, pctS, COLORS.single)}
+          ${legendRow('🍔🍔', 'Double', doubles, pctD, COLORS.double)}
+          ${legendRow('🍔🍔🍔', 'The Holy Trinity', triples, pctT, COLORS.triple)}
+        </div>
+      </div>`;
+  }
+
   return `<div class="sticker-book-open">
     <div class="sticker-book-header">
       <div class="sticker-book-title" style="color:${color}">${escHtml(p.name)}'s Badges</div>
       <div class="sticker-book-count">${earned} / ${total} collected</div>
     </div>
+    ${donutHtml}
     <div class="sticker-album-page">${badgesHtml}</div>
   </div>`;
 }
