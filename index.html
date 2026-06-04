@@ -531,6 +531,12 @@ body.social-active .social-input-area{
 .c9{--av-bg:rgba(167,139,250,0.15);--av-text:#A78BFA;--bar:#7C3AED;--ring-color:#A78BFA}
 .c10{--av-bg:rgba(253,186,116,0.15);--av-text:#FDB974;--bar:#F97316;--ring-color:#FDB974}
 .c11{--av-bg:rgba(94,234,212,0.15);--av-text:#5EEAD4;--bar:#14B8A6;--ring-color:#5EEAD4}
+.c12{--av-bg:rgba(190,242,100,0.15);--av-text:#BEF264;--bar:#84CC16;--ring-color:#BEF264}
+.c13{--av-bg:rgba(251,146,60,0.15);--av-text:#FB923C;--bar:#EA580C;--ring-color:#FB923C}
+.c14{--av-bg:rgba(125,211,252,0.15);--av-text:#7DD3FC;--bar:#0EA5E9;--ring-color:#7DD3FC}
+.c15{--av-bg:rgba(129,140,248,0.15);--av-text:#818CF8;--bar:#4F46E5;--ring-color:#818CF8}
+.c16{--av-bg:rgba(253,224,71,0.15);--av-text:#FDE047;--bar:#CA8A04;--ring-color:#FDE047}
+.c17{--av-bg:rgba(226,232,240,0.15);--av-text:#E2E8F0;--bar:#94A3B8;--ring-color:#E2E8F0}
 .ring-inner{background:var(--av-bg);color:var(--av-text)}
 .ring-fill{stroke:var(--ring-color)}
 .mini-bar-fill,.progress-fill,.bg-progress-fill{background:linear-gradient(90deg,#C8102E 0%,#E8E8E8 50%,#002868 100%)}
@@ -1912,7 +1918,7 @@ const FIREBASE_CONFIG = {
   appId:             "1:245243594858:web:5281332310b1b78a382213"
 };
 
-const COLORS = ['c0','c1','c2','c3','c4','c5','c6','c7','c8','c9','c10','c11'];
+const COLORS = ['c0','c1','c2','c3','c4','c5','c6','c7','c8','c9','c10','c11','c12','c13','c14','c15','c16','c17'];
 const IS_CONFIGURED = !FIREBASE_CONFIG.apiKey.startsWith('YOUR_');
 const MAX_IMAGE_PX = 900;
 const JPEG_QUALITY = 0.72;
@@ -3793,10 +3799,16 @@ document.addEventListener('click', () => document.getElementById('race-popup')?.
 const RACE_LEFT_START = 8;   // % from left for start line
 const RACE_LEFT_END   = 93;  // % from left for finish line
 const RACE_LEFT_RANGE = RACE_LEFT_END - RACE_LEFT_START;
+const RACE_GATE_PAD   = 2;   // % gap between start line and resting horses
 const RACE_CEILINGS   = [25, 50, 75, 100];
+const RACE_MILESTONE_NAMES = {25:'QUARTERWAY MARK', 50:'HALFWAY MARK', 75:'THREE-QUARTER MARK', 100:'FINISH LINE'};
 
 function racePosFor(count, ceiling) {
   return RACE_LEFT_START + (Math.min(count, ceiling) / ceiling) * RACE_LEFT_RANGE;
+}
+// Horses rest inside the gate (never overlap the start line)
+function raceHorsePosFor(count, ceiling) {
+  return Math.max(RACE_LEFT_START + RACE_GATE_PAD, racePosFor(count, ceiling));
 }
 
 function renderRaceTrack() {
@@ -3823,14 +3835,26 @@ function renderRaceTrack() {
       milestonesEl.style.cssText = 'position:absolute;inset:0;z-index:5;pointer-events:none';
       const innerMilestones = RACE_CEILINGS.filter(m => m < ceiling);
       milestonesEl.innerHTML = innerMilestones.map(m => `
-        <div style="position:absolute;left:${racePosFor(m,ceiling)}%;top:0;bottom:0;border-left:1px dashed rgba(255,255,255,0.35);z-index:5;pointer-events:none">
-          <div style="position:absolute;top:0;bottom:0;left:-10px;width:20px;display:flex;align-items:center;justify-content:center;">
-            <span style="writing-mode:vertical-rl;font-family:'Press Start 2P',monospace;font-size:9px;color:rgba(255,255,255,0.95);white-space:nowrap;letter-spacing:3px;text-shadow:0 0 6px rgba(0,0,0,1),0 1px 3px rgba(0,0,0,1)">${m}</span>
+        <div style="position:absolute;left:${racePosFor(m,ceiling)}%;top:0;bottom:0;width:6px;z-index:5;pointer-events:none;
+          background-color:rgba(255,255,255,0.55);
+          background-image:linear-gradient(45deg,rgba(0,0,0,0.55) 25%,transparent 25%,transparent 75%,rgba(0,0,0,0.55) 75%),linear-gradient(45deg,rgba(0,0,0,0.55) 25%,transparent 25%,transparent 75%,rgba(0,0,0,0.55) 75%);
+          background-size:6px 6px;background-position:0 0,3px 3px">
+          <div style="position:absolute;top:4px;left:50%;transform:translateX(-50%);
+            background:rgba(20,20,20,0.85);border:1px solid rgba(255,255,255,0.3);border-radius:3px;
+            padding:3px 6px;white-space:nowrap;font-family:'Press Start 2P',monospace;font-size:5px;
+            color:rgba(255,255,255,0.9);letter-spacing:0.05em;box-shadow:0 2px 6px rgba(0,0,0,0.7);z-index:10">
+            ${m} ${RACE_MILESTONE_NAMES[m] || ''}
           </div>
         </div>`).join('') +
-        `<div style="position:absolute;left:${racePosFor(ceiling,ceiling)}%;top:0;bottom:0;width:3px;background:linear-gradient(180deg,gold,rgba(255,215,0,0.3));z-index:6;pointer-events:none;animation:finishGlow 2s ease-in-out infinite">
-          <div style="position:absolute;top:0;bottom:0;left:-10px;width:20px;display:flex;align-items:center;justify-content:center;">
-            <span style="writing-mode:vertical-rl;font-family:'Press Start 2P',monospace;font-size:9px;color:#1C0A00;white-space:nowrap;letter-spacing:3px;text-shadow:0 0 8px rgba(255,215,0,1)">${ceiling === 100 ? 'FINISH' : ceiling}</span>
+        `<div style="position:absolute;left:${racePosFor(ceiling,ceiling)}%;top:0;bottom:0;width:8px;z-index:6;pointer-events:none;animation:finishGlow 2s ease-in-out infinite;
+          background-color:#FFD700;
+          background-image:linear-gradient(45deg,#1C0A00 25%,transparent 25%,transparent 75%,#1C0A00 75%),linear-gradient(45deg,#1C0A00 25%,transparent 25%,transparent 75%,#1C0A00 75%);
+          background-size:8px 8px;background-position:0 0,4px 4px">
+          <div style="position:absolute;top:4px;left:50%;transform:translateX(-50%);
+            background:#FFD700;border:1.5px solid #1C0A00;border-radius:3px;
+            padding:3px 7px;white-space:nowrap;font-family:'Press Start 2P',monospace;font-size:5px;
+            color:#1C0A00;letter-spacing:0.05em;box-shadow:0 2px 8px rgba(0,0,0,0.8);z-index:10">
+            🏁 ${ceiling} ${RACE_MILESTONE_NAMES[ceiling] || ''}
           </div>
         </div>
         <div style="position:absolute;left:${RACE_LEFT_START}%;top:0;bottom:0;border-left:2px solid rgba(255,255,255,0.35);z-index:5;pointer-events:none"></div>`;
@@ -3846,7 +3870,7 @@ function renderRaceTrack() {
     lanesEl.innerHTML = laneOrder.map((p, i) => {
       const color    = RING_COLORS[p.colorIdx % RING_COLORS.length];
       const ini      = initials(p.name);
-      const pct      = racePosFor(p.count, ceiling);
+      const pct      = raceHorsePosFor(p.count, ceiling);
       const isLeader = p.id === leaderId && p.count > 0;
       // Stagger delays and vary durations so horses bob independently
       const delay = ((i * 137) % 1400) / 1000; // prime step gives varied spread
@@ -3857,7 +3881,7 @@ function renderRaceTrack() {
           ${isLeader ? '<div class="dust-trail">💨</div>' : ''}
           <div class="horse-inner" style="--gallop-dur:${dur.toFixed(2)}s;--gallop-delay:-${delay.toFixed(2)}s">
             <div class="horse-emoji">🏇</div>
-            <div class="jockey-badge" style="background:${color}">${ini}</div>
+            <div class="jockey-badge" style="background:${color}">${ini} (${p.count})</div>
           </div>
         </div>
       </div>`;
@@ -3866,7 +3890,9 @@ function renderRaceTrack() {
     existingHorses.forEach(horse => {
       const p = players.find(pl => pl.id === horse.dataset.pid);
       if (!p) return;
-      horse.style.left = racePosFor(p.count, ceiling) + '%';
+      horse.style.left = raceHorsePosFor(p.count, ceiling) + '%';
+      const badge = horse.querySelector('.jockey-badge');
+      if (badge) badge.textContent = initials(p.name) + ' (' + p.count + ')';
       const isLeader = p.id === leaderId && p.count > 0;
       horse.classList.toggle('leader-horse', isLeader);
       let dust = horse.querySelector('.dust-trail');
@@ -4241,7 +4267,7 @@ window.panMapToSpot = function(lat, lng) {
 
 let burgerMap = null;
 let mapMarkers = [];
-const RING_COLORS = ['#F87171','#FCD34D','#4ADE80','#22D3EE','#60A5FA','#E879F9','#CBD5E1','#F472B6','#FB7185','#A78BFA','#FDB974','#5EEAD4'];
+const RING_COLORS = ['#F87171','#FCD34D','#4ADE80','#22D3EE','#60A5FA','#E879F9','#CBD5E1','#F472B6','#FB7185','#A78BFA','#FDB974','#5EEAD4','#BEF264','#FB923C','#7DD3FC','#818CF8','#FDE047','#E2E8F0'];
 
 function starsHtml(n) {
   const full = Math.floor(n), half = (n % 1) >= 0.5;
