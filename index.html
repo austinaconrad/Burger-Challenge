@@ -294,16 +294,28 @@ body.map-active header .burger-deco,
 body.map-active header h1,
 body.map-active header .room-pill,
 body.map-active header #stat-pills-row,
-body.map-active header #spectator-pill{display:none!important}
+body.map-active header #spectator-pill,
+body.racing-active header .burger-deco,
+body.racing-active header h1,
+body.racing-active header .room-pill,
+body.racing-active header #stat-pills-row,
+body.racing-active header #spectator-pill{display:none!important}
 body.social-active header,
-body.map-active header{padding:6px 0 0!important;gap:0!important}
+body.map-active header,
+body.racing-active header{padding:6px 0 0!important;gap:0!important}
 body.social-active .tabs,
-body.map-active .tabs{
+body.map-active .tabs,
+body.racing-active .tabs{
   position:sticky;top:0;z-index:20;
   background:var(--bg);
   padding-top:6px;
   margin-bottom:10px;
   box-shadow:0 2px 12px rgba(0,0,0,0.25);
+}
+/* ── Racing-specific expansion ── */
+body.racing-active #race-track-container {
+  height: calc(100dvh - 130px - 90px);
+  min-height: 400px;
 }
 /* ── Map-specific expansions ── */
 body.map-active .map-wrap{
@@ -3859,8 +3871,9 @@ window.switchTab=function(name,btn){
   document.getElementById('tab-'+name).classList.add('active');
   btn.classList.add('active');
   // Compact header for Social + Map; restore for all other tabs
-  document.body.classList.toggle('social-active', name==='social');
-  document.body.classList.toggle('map-active',    name==='map');
+  document.body.classList.toggle('social-active',  name==='social');
+  document.body.classList.toggle('map-active',     name==='map');
+  document.body.classList.toggle('racing-active',  name==='racing');
   // Clear players pill active state when switching via tabs
   document.getElementById('players-pill-btn')?.classList.remove('active');
   if(name==='social'){
@@ -3884,7 +3897,7 @@ window.switchToPlayers = function() {
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-players').classList.add('active');
-  document.body.classList.remove('social-active','map-active');
+  document.body.classList.remove('social-active','map-active','racing-active');
   const pill = document.getElementById('players-pill-btn');
   if(pill) pill.classList.add('active');
 };
