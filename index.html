@@ -314,8 +314,8 @@ body.racing-active .tabs{
 }
 /* ── Racing-specific expansion ── */
 body.racing-active #race-track-container {
-  height: calc(100dvh - 130px - 90px);
-  min-height: 400px;
+  height: calc(100dvh - 130px - 80px);
+  min-height: 320px;
 }
 /* ── Map-specific expansions ── */
 body.map-active .map-wrap{
@@ -1223,25 +1223,25 @@ body.social-active .social-input-area{
   overflow: hidden;
   border: 1px solid rgba(255,255,255,0.1);
   box-shadow: var(--shadow-card);
-  background:
-    linear-gradient(180deg, #0a2e10 0%, #0f3d18 15%, #1a5c28 40%, #226e32 65%, #2a7a3c 85%, #1a5c28 100%);
+  background: linear-gradient(90deg, #0a2e10 0%, #1a5c28 35%, #226e32 65%, #1a5c28 100%);
   margin-bottom: 12px;
 }
-/* Grass texture stripes */
+/* Horizontal grass texture stripes */
 #race-track-container::before {
   content: '';
   position: absolute;
   inset: 0;
   background: repeating-linear-gradient(
-    180deg,
-    transparent 0px, transparent 18px,
-    rgba(0,0,0,0.06) 18px, rgba(0,0,0,0.06) 36px
+    90deg,
+    transparent 0px, transparent 22px,
+    rgba(0,0,0,0.05) 22px, rgba(0,0,0,0.05) 44px
   );
   pointer-events: none;
   z-index: 0;
 }
 #race-lanes {
   display: flex;
+  flex-direction: column;
   position: absolute;
   inset: 0;
   z-index: 2;
@@ -1249,153 +1249,90 @@ body.social-active .social-input-area{
 .jockey-lane {
   flex: 1;
   position: relative;
-  border-right: 1px solid rgba(255,255,255,0.06);
-  min-width: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  min-height: 0;
   overflow: visible;
 }
-.jockey-lane:last-child { border-right: none; }
+.jockey-lane:last-child { border-bottom: none; }
+/* Horse moves left → right */
 .jockey-horse {
   position: absolute;
-  left: 50%;
-  transform: translate(-50%, 50%);
-  transition: bottom 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: left 1.5s cubic-bezier(0.25, 1, 0.5, 1);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 0;
+  gap: 2px;
   z-index: 10;
   cursor: pointer;
 }
 .jockey-horse:hover { z-index: 20; }
-/* Inner wrapper gets the gallop bob animation — delay/duration set inline per horse */
+/* Gallop bob — vertical */
 .horse-inner {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 1px;
   animation: gallopBob var(--gallop-dur, 1.4s) ease-in-out infinite var(--gallop-delay, 0s);
 }
 @keyframes gallopBob {
   0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-4px); }
+  50%       { transform: translateY(-3px); }
 }
+/* Horse faces right — flip the naturally-left emoji */
 .horse-emoji {
-  font-size: 22px;
+  font-size: 20px;
   line-height: 1;
   display: block;
-  transform: rotate(90deg);
-  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.7));
+  transform: scaleX(-1);
+  filter: drop-shadow(0 2px 5px rgba(0,0,0,0.7));
 }
-.jockey-horse:hover .horse-emoji { filter: drop-shadow(0 3px 10px rgba(255,255,255,0.4)) drop-shadow(0 3px 6px rgba(0,0,0,0.7)); }
-/* Dust cloud trail for leader — sits below horse, rotated to blow downward */
+.jockey-horse:hover .horse-emoji { filter: drop-shadow(0 2px 10px rgba(255,255,255,0.4)) drop-shadow(0 2px 5px rgba(0,0,0,0.7)); }
+/* Dust — appears to the LEFT (behind horse going right), order:-1 forces it first in flex row */
 .dust-trail {
-  font-size: 14px;
+  font-size: 12px;
   line-height: 1;
-  margin-top: -2px;
-  transform: rotate(90deg);
+  transform: scaleX(-1);
+  order: -1;
   animation: dustFloat 0.7s ease-in-out infinite;
   opacity: 0.8;
 }
 @keyframes dustFloat {
-  0%, 100% { transform: rotate(90deg) scale(1);    opacity: 0.8; }
-  50%       { transform: rotate(90deg) scale(1.2);  opacity: 0.35; }
+  0%, 100% { transform: scaleX(-1) scale(1);   opacity: 0.8; }
+  50%       { transform: scaleX(-1) scale(1.2); opacity: 0.35; }
 }
 .jockey-badge {
   color: #fff;
+  font-size: 6px;
+  font-weight: 800;
+  padding: 1px 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.02em;
+}
+/* Player initial label pinned on left edge */
+.lane-player-label {
+  position: absolute;
+  left: 3px;
+  top: 50%;
+  transform: translateY(-50%);
   font-size: 7px;
   font-weight: 800;
-  padding: 2px 5px;
-  border-radius: 4px;
-  white-space: nowrap;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
   font-family: 'Inter', sans-serif;
-  letter-spacing: 0.03em;
-}
-.lane-start-label {
-  position: absolute;
-  bottom: 2px;
-  left: 0; right: 0;
-  text-align: center;
-  font-size: 8px;
-  color: rgba(255,255,255,0.55);
-  font-weight: 600;
-  font-family: 'Inter', sans-serif;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding: 0 2px;
   pointer-events: none;
-}
-/* Milestone overlays */
-.race-milestone {
-  position: absolute;
-  left: 0; right: 0;
-  z-index: 5;
-  pointer-events: none;
-}
-.race-milestone-line {
-  width: 100%;
-  border-top: 1px dashed rgba(255,255,255,0.22);
-  display: flex;
-  align-items: center;
-  padding-left: 8px;
-}
-.race-milestone-label {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 5.5px;
-  color: rgba(255,255,255,0.45);
-  white-space: nowrap;
-  padding: 2px 0;
-}
-.race-finish-line {
-  position: absolute;
-  left: 0; right: 0;
-  z-index: 6;
-  height: 28px;
-  background: rgba(255,215,0,0.12);
-  border-top: 2px solid gold;
-  border-bottom: 1px solid rgba(255,215,0,0.3);
-  display: flex;
-  align-items: center;
-  padding: 0 10px;
-  pointer-events: none;
-  animation: finishGlow 2s ease-in-out infinite;
+  z-index: 8;
+  opacity: 0.65;
 }
 @keyframes racePopupIn {
   from { opacity: 0; transform: scale(0.85) translateY(6px); }
   to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 @keyframes finishGlow {
-  0%,100% { box-shadow: 0 0 8px rgba(255,215,0,0.2); }
-  50%      { box-shadow: 0 0 20px rgba(255,215,0,0.45); }
-}
-.race-finish-label {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  color: gold;
-  letter-spacing: 0.08em;
-}
-/* Legend row */
-#race-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 4px 2px;
-  justify-content: center;
-}
-.race-legend-item {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--muted2);
-  font-family: 'Inter', sans-serif;
-}
-.race-legend-dot {
-  width: 10px; height: 10px;
-  border-radius: 3px;
-  flex-shrink: 0;
+  0%,100% { box-shadow: 2px 0 8px rgba(255,215,0,0.2); }
+  50%      { box-shadow: 2px 0 20px rgba(255,215,0,0.5); }
 }
 
 /* ── MAP FEED ── */
@@ -3853,13 +3790,13 @@ window.showRacePopup = function(pid, evt) {
 // Dismiss race popup on any tap outside
 document.addEventListener('click', () => document.getElementById('race-popup')?.remove());
 
-const RACE_BOTTOM_PCT = 5;
-const RACE_TOP_PCT    = 88;
-const RACE_RANGE      = RACE_TOP_PCT - RACE_BOTTOM_PCT;
+const RACE_LEFT_START = 8;   // % from left for start line
+const RACE_LEFT_END   = 93;  // % from left for finish line
+const RACE_LEFT_RANGE = RACE_LEFT_END - RACE_LEFT_START;
 const RACE_CEILINGS   = [25, 50, 75, 100];
 
 function racePosFor(count, ceiling) {
-  return RACE_BOTTOM_PCT + (Math.min(count, ceiling) / ceiling) * RACE_RANGE;
+  return RACE_LEFT_START + (Math.min(count, ceiling) / ceiling) * RACE_LEFT_RANGE;
 }
 
 function renderRaceTrack() {
@@ -3886,15 +3823,13 @@ function renderRaceTrack() {
       milestonesEl.style.cssText = 'position:absolute;inset:0;z-index:5;pointer-events:none';
       const innerMilestones = RACE_CEILINGS.filter(m => m < ceiling);
       milestonesEl.innerHTML = innerMilestones.map(m => `
-        <div class="race-milestone" style="bottom:${racePosFor(m, ceiling)}%">
-          <div class="race-milestone-line">
-            <span class="race-milestone-label">${m} 🍔${m === 50 ? ' · HALFWAY' : ''}</span>
-          </div>
+        <div style="position:absolute;left:${racePosFor(m,ceiling)}%;top:0;bottom:0;border-left:1px dashed rgba(255,255,255,0.25);z-index:5;pointer-events:none">
+          <span style="position:absolute;top:4px;left:3px;font-family:'Press Start 2P',monospace;font-size:5px;color:rgba(255,255,255,0.45);white-space:nowrap">${m}🍔</span>
         </div>`).join('') +
-        `<div class="race-finish-line" style="bottom:${racePosFor(ceiling, ceiling)}%">
-          <span class="race-finish-label">🏁 ${ceiling === 100 ? 'FINISH — 100 BURGERS' : `MILESTONE — ${ceiling} 🍔`}</span>
+        `<div style="position:absolute;left:${racePosFor(ceiling,ceiling)}%;top:0;bottom:0;width:3px;background:linear-gradient(180deg,gold,rgba(255,215,0,0.3));z-index:6;pointer-events:none;animation:finishGlow 2s ease-in-out infinite">
+          <span style="position:absolute;top:4px;left:5px;font-family:'Press Start 2P',monospace;font-size:5px;color:gold;white-space:nowrap">🏁 ${ceiling === 100 ? 'FINISH' : ceiling + '🍔'}</span>
         </div>
-        <div style="position:absolute;bottom:${RACE_BOTTOM_PCT}%;left:0;right:0;border-top:2px solid rgba(255,255,255,0.35);z-index:5;pointer-events:none"></div>`;
+        <div style="position:absolute;left:${RACE_LEFT_START}%;top:0;bottom:0;border-left:2px solid rgba(255,255,255,0.35);z-index:5;pointer-events:none"></div>`;
     }
   }
 
@@ -3913,21 +3848,21 @@ function renderRaceTrack() {
       const delay = ((i * 137) % 1400) / 1000; // prime step gives varied spread
       const dur   = isLeader ? (1.0 + (i % 3) * 0.15) : (1.2 + (i % 5) * 0.12);
       return `<div class="jockey-lane" style="background:${i%2===0?'rgba(0,0,0,0.07)':'rgba(255,255,255,0.04)'}">
-        <div class="jockey-horse${isLeader?' leader-horse':''}" data-pid="${p.id}" style="bottom:${pct}%" onclick="showRacePopup('${p.id}',event)">
+        <div class="lane-player-label" style="color:${color}">${ini}</div>
+        <div class="jockey-horse${isLeader?' leader-horse':''}" data-pid="${p.id}" style="left:${pct}%" onclick="showRacePopup('${p.id}',event)">
+          ${isLeader ? '<div class="dust-trail">💨</div>' : ''}
           <div class="horse-inner" style="--gallop-dur:${dur.toFixed(2)}s;--gallop-delay:-${delay.toFixed(2)}s">
             <div class="horse-emoji">🏇</div>
             <div class="jockey-badge" style="background:${color}">${ini}</div>
           </div>
-          ${isLeader ? '<div class="dust-trail">💨</div>' : ''}
         </div>
-        <div class="lane-start-label">${ini}</div>
       </div>`;
     }).join('');
   } else {
     existingHorses.forEach(horse => {
       const p = players.find(pl => pl.id === horse.dataset.pid);
       if (!p) return;
-      horse.style.bottom = racePosFor(p.count, ceiling) + '%';
+      horse.style.left = racePosFor(p.count, ceiling) + '%';
       const isLeader = p.id === leaderId && p.count > 0;
       horse.classList.toggle('leader-horse', isLeader);
       let dust = horse.querySelector('.dust-trail');
