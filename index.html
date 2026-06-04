@@ -1258,11 +1258,11 @@ body.social-active .social-input-area{
   font-size: 26px;
   line-height: 1;
   display: block;
-  transform: rotate(-90deg);
+  transform: rotate(90deg);
   filter: drop-shadow(0 3px 6px rgba(0,0,0,0.7));
   transition: transform 0.3s ease;
 }
-.jockey-horse:hover .horse-emoji { transform: rotate(-90deg) scale(1.2); }
+.jockey-horse:hover .horse-emoji { transform: rotate(90deg) scale(1.2); }
 .jockey-badge {
   color: #fff;
   font-size: 7px;
@@ -3784,7 +3784,14 @@ function renderRaceTrack() {
   const legendEl     = document.getElementById('race-legend');
   if (!lanesEl) return;
 
+  // Sort by count for legend/ranking, but shuffle lane order so horses aren't a diagonal line
   const sorted = [...players].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+  // Stable shuffle by player ID hash so lane positions don't jump on re-render
+  const laneOrder = [...players].sort((a, b) => {
+    const ha = a.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    const hb = b.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    return ha - hb;
+  });
 
   // ── Milestone lines (built once, or rebuild on full render)
   if (milestonesEl) {
@@ -3809,11 +3816,11 @@ function renderRaceTrack() {
   // ── Check if lanes already match players (for smooth update vs full rebuild)
   const existingHorses = lanesEl.querySelectorAll('.jockey-horse');
   const existingIds    = [...existingHorses].map(h => h.dataset.pid);
-  const currentIds     = sorted.map(p => p.id);
+  const currentIds     = laneOrder.map(p => p.id);
   const needsRebuild   = existingIds.join(',') !== currentIds.join(',');
 
   if (needsRebuild) {
-    lanesEl.innerHTML = sorted.map(p => {
+    lanesEl.innerHTML = laneOrder.map(p => {
       const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
       const ini   = initials(p.name);
       const pct   = racePosFor(p.count);
