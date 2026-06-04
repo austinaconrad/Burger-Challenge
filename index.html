@@ -1200,6 +1200,163 @@ body.social-active .social-input-area{
 }
 .sticker-label.locked { color: rgba(255,255,255,0.45); }
 
+/* ══════════════════════════════════════════════
+   🏇 RACING TAB
+   ══════════════════════════════════════════════ */
+#race-track-wrap { padding: 4px 0 16px; }
+#race-track-container {
+  position: relative;
+  height: 600px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: var(--shadow-card);
+  background:
+    linear-gradient(180deg, #0a2e10 0%, #0f3d18 15%, #1a5c28 40%, #226e32 65%, #2a7a3c 85%, #1a5c28 100%);
+  margin-bottom: 12px;
+}
+/* Grass texture stripes */
+#race-track-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0px, transparent 18px,
+    rgba(0,0,0,0.06) 18px, rgba(0,0,0,0.06) 36px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+#race-lanes {
+  display: flex;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+.jockey-lane {
+  flex: 1;
+  position: relative;
+  border-right: 1px solid rgba(255,255,255,0.07);
+  min-width: 44px;
+}
+.jockey-lane:last-child { border-right: none; }
+.jockey-horse {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  transition: bottom 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  z-index: 10;
+  cursor: pointer;
+}
+.jockey-horse:hover { z-index: 20; }
+.horse-emoji {
+  font-size: 26px;
+  line-height: 1;
+  display: block;
+  transform: rotate(-90deg);
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.7));
+  transition: transform 0.3s ease;
+}
+.jockey-horse:hover .horse-emoji { transform: rotate(-90deg) scale(1.2); }
+.jockey-badge {
+  color: #fff;
+  font-size: 7px;
+  font-weight: 800;
+  padding: 2px 5px;
+  border-radius: 4px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.03em;
+}
+.lane-start-label {
+  position: absolute;
+  bottom: 2px;
+  left: 0; right: 0;
+  text-align: center;
+  font-size: 8px;
+  color: rgba(255,255,255,0.55);
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 2px;
+  pointer-events: none;
+}
+/* Milestone overlays */
+.race-milestone {
+  position: absolute;
+  left: 0; right: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+.race-milestone-line {
+  width: 100%;
+  border-top: 1px dashed rgba(255,255,255,0.22);
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+}
+.race-milestone-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 5.5px;
+  color: rgba(255,255,255,0.45);
+  white-space: nowrap;
+  padding: 2px 0;
+}
+.race-finish-line {
+  position: absolute;
+  left: 0; right: 0;
+  z-index: 6;
+  height: 28px;
+  background: rgba(255,215,0,0.12);
+  border-top: 2px solid gold;
+  border-bottom: 1px solid rgba(255,215,0,0.3);
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  pointer-events: none;
+  animation: finishGlow 2s ease-in-out infinite;
+}
+@keyframes finishGlow {
+  0%,100% { box-shadow: 0 0 8px rgba(255,215,0,0.2); }
+  50%      { box-shadow: 0 0 20px rgba(255,215,0,0.45); }
+}
+.race-finish-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: gold;
+  letter-spacing: 0.08em;
+}
+/* Legend row */
+#race-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 2px;
+  justify-content: center;
+}
+.race-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted2);
+  font-family: 'Inter', sans-serif;
+}
+.race-legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
 /* ── MAP FEED ── */
 .map-feed-wrap{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
 .map-feed-empty{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px}
@@ -1604,6 +1761,7 @@ body.social-active .social-input-area{
       <button class="tab-btn" onclick="switchTab('social',this)" id="tab-btn-social">💬 Chat<span class="tab-unread" id="social-unread-dot"></span></button>
       <button class="tab-btn" onclick="switchTab('map',this)">🗺 Map</button>
       <button class="tab-btn" onclick="switchTab('leaderboard',this)">🏅 Badges</button>
+      <button class="tab-btn" onclick="switchTab('racing',this)">🏇 Racing</button>
     </div>
 
     <!-- LEADERBOARD TAB -->
@@ -1612,6 +1770,17 @@ body.social-active .social-input-area{
       <div class="section-label">Player Badges</div>
       <div class="leaderboard" id="leaderboard"></div>
       <div id="lb-empty" class="empty" style="display:none"><div class="e-icon">🍔</div><p>No players yet!</p></div>
+    </div>
+
+    <!-- RACING TAB -->
+    <div class="tab-panel" id="tab-racing">
+      <div id="race-track-wrap">
+        <div id="race-track-container">
+          <div id="race-milestones"></div>
+          <div id="race-lanes"></div>
+        </div>
+        <div id="race-legend"></div>
+      </div>
     </div>
 
     <!-- LIST TAB -->
@@ -2317,6 +2486,7 @@ function render(){
   renderDailyCard(players);
   if(document.getElementById('tab-feed')?.classList.contains('active')) renderGrillFeed();
   if(document.getElementById('tab-list')?.classList.contains('active')) renderBentoList();
+  if(document.getElementById('tab-racing')?.classList.contains('active')) renderRaceTrack();
   // Update players pill count
   const pill = document.getElementById('players-pill-btn');
   if(pill) pill.textContent = `👥 Players (${players.length})`;
@@ -3598,6 +3768,83 @@ function renderBentoList() {
   el.innerHTML = html;
 }
 
+// ── HORSE RACING ─────────────────────────────────────────────────
+
+const RACE_BOTTOM_PCT = 5;   // % from bottom for start line
+const RACE_TOP_PCT    = 87;  // % from bottom for finish line
+const RACE_RANGE      = RACE_TOP_PCT - RACE_BOTTOM_PCT;
+
+function racePosFor(count) {
+  return RACE_BOTTOM_PCT + (Math.min(count, 100) / 100) * RACE_RANGE;
+}
+
+function renderRaceTrack() {
+  const lanesEl      = document.getElementById('race-lanes');
+  const milestonesEl = document.getElementById('race-milestones');
+  const legendEl     = document.getElementById('race-legend');
+  if (!lanesEl) return;
+
+  const sorted = [...players].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+
+  // ── Milestone lines (built once, or rebuild on full render)
+  if (milestonesEl) {
+    const milestones = [
+      { count: 25, label: '25 🍔' },
+      { count: 50, label: '50 🍔 · HALFWAY' },
+      { count: 75, label: '75 🍔' },
+    ];
+    milestonesEl.style.cssText = 'position:absolute;inset:0;z-index:5;pointer-events:none';
+    milestonesEl.innerHTML = milestones.map(m => `
+      <div class="race-milestone" style="bottom:${racePosFor(m.count)}%">
+        <div class="race-milestone-line">
+          <span class="race-milestone-label">${m.label}</span>
+        </div>
+      </div>`).join('') +
+      `<div class="race-finish-line" style="bottom:${racePosFor(100)}%">
+        <span class="race-finish-label">🏁 FINISH LINE — 100 BURGERS</span>
+      </div>
+      <div style="position:absolute;bottom:${RACE_BOTTOM_PCT}%;left:0;right:0;border-top:2px solid rgba(255,255,255,0.35);z-index:5;pointer-events:none"></div>`;
+  }
+
+  // ── Check if lanes already match players (for smooth update vs full rebuild)
+  const existingHorses = lanesEl.querySelectorAll('.jockey-horse');
+  const existingIds    = [...existingHorses].map(h => h.dataset.pid);
+  const currentIds     = sorted.map(p => p.id);
+  const needsRebuild   = existingIds.join(',') !== currentIds.join(',');
+
+  if (needsRebuild) {
+    lanesEl.innerHTML = sorted.map(p => {
+      const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
+      const ini   = initials(p.name);
+      const pct   = racePosFor(p.count);
+      return `<div class="jockey-lane">
+        <div class="jockey-horse" data-pid="${p.id}" style="bottom:${pct}%">
+          <div class="horse-emoji">🏇</div>
+          <div class="jockey-badge" style="background:${color}">${ini}</div>
+        </div>
+        <div class="lane-start-label">${escHtml(p.name.split(' ')[0])}</div>
+      </div>`;
+    }).join('');
+  } else {
+    // Smooth update — just move existing horses
+    existingHorses.forEach(horse => {
+      const p = players.find(pl => pl.id === horse.dataset.pid);
+      if (p) horse.style.bottom = racePosFor(p.count) + '%';
+    });
+  }
+
+  // ── Legend
+  if (legendEl) {
+    legendEl.innerHTML = sorted.map(p => {
+      const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
+      return `<div class="race-legend-item">
+        <div class="race-legend-dot" style="background:${color}"></div>
+        ${escHtml(p.name)} <span style="color:${color};font-weight:700">${p.count}</span>
+      </div>`;
+    }).join('');
+  }
+}
+
 window.switchTab=function(name,btn){
   document.getElementById('badge-popup')?.remove();
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
@@ -3623,6 +3870,7 @@ window.switchTab=function(name,btn){
   if(name==='feed') renderGrillFeed();
   if(name==='list') renderBentoList();
   if(name==='leaderboard') { _openAlbumId = null; const s=[...players].sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name)); renderLeaderboard(s); }
+  if(name==='racing') renderRaceTrack();
 };
 
 window.switchToPlayers = function() {
