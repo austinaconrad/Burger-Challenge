@@ -1267,16 +1267,13 @@ body.social-active .social-input-area{
   cursor: pointer;
 }
 .jockey-horse:hover { z-index: 20; }
-/* Inner wrapper gets the gallop bob animation */
+/* Inner wrapper gets the gallop bob animation — delay/duration set inline per horse */
 .horse-inner {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  animation: gallopBob 0.7s ease-in-out infinite;
-}
-.leader-horse .horse-inner {
-  animation: gallopBob 0.45s ease-in-out infinite;
+  animation: gallopBob var(--gallop-dur, 1.4s) ease-in-out infinite var(--gallop-delay, 0s);
 }
 @keyframes gallopBob {
   0%, 100% { transform: translateY(0); }
@@ -1363,6 +1360,10 @@ body.social-active .social-input-area{
   padding: 0 10px;
   pointer-events: none;
   animation: finishGlow 2s ease-in-out infinite;
+}
+@keyframes racePopupIn {
+  from { opacity: 0; transform: scale(0.85) translateY(6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 @keyframes finishGlow {
   0%,100% { box-shadow: 0 0 8px rgba(255,215,0,0.2); }
@@ -3809,6 +3810,49 @@ function renderBentoList() {
 
 // ── HORSE RACING ─────────────────────────────────────────────────
 
+window.showRacePopup = function(pid, evt) {
+  evt.stopPropagation();
+  const p = players.find(pl => pl.id === pid);
+  if (!p) return;
+  const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
+  const sorted = [...players].sort((a, b) => b.count - a.count);
+  const rank = sorted.findIndex(pl => pl.id === pid) + 1;
+
+  // Remove any existing race popup
+  document.getElementById('race-popup')?.remove();
+
+  const popup = document.createElement('div');
+  popup.id = 'race-popup';
+
+  // Position near the click, staying within viewport
+  const x = Math.min(evt.clientX, window.innerWidth - 160);
+  const y = Math.max(evt.clientY - 80, 10);
+
+  popup.style.cssText = `
+    position:fixed;left:${x}px;top:${y}px;z-index:950;
+    background:rgba(22,22,22,0.96);
+    border:1px solid ${color}55;
+    border-radius:12px;
+    padding:10px 14px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.6),0 0 0 1px ${color}22;
+    min-width:130px;
+    animation:racePopupIn 0.2s cubic-bezier(0.34,1.2,0.64,1) both;
+    pointer-events:none;
+  `;
+  popup.innerHTML = `
+    <div style="font-family:'Poppins',sans-serif;font-size:14px;font-weight:800;color:${color};letter-spacing:-0.02em;margin-bottom:4px">${escHtml(p.name)}</div>
+    <div style="font-size:12px;color:#9CA3AF;font-weight:500">🏇 Rank #${rank}</div>
+    <div style="font-size:22px;font-weight:900;font-family:'Poppins',sans-serif;color:#fff;letter-spacing:-0.03em;line-height:1.2;margin-top:4px">${p.count} <span style="font-size:13px;color:#9CA3AF;font-weight:500">/ 100 🍔</span></div>
+  `;
+  document.body.appendChild(popup);
+
+  // Auto-dismiss after 2.5s
+  setTimeout(() => popup.remove(), 2500);
+};
+
+// Dismiss race popup on any tap outside
+document.addEventListener('click', () => document.getElementById('race-popup')?.remove());
+
 const RACE_BOTTOM_PCT = 5;
 const RACE_TOP_PCT    = 88;
 const RACE_RANGE      = RACE_TOP_PCT - RACE_BOTTOM_PCT;
@@ -3865,9 +3909,12 @@ function renderRaceTrack() {
       const ini      = initials(p.name);
       const pct      = racePosFor(p.count, ceiling);
       const isLeader = p.id === leaderId && p.count > 0;
+      // Stagger delays and vary durations so horses bob independently
+      const delay = ((i * 137) % 1400) / 1000; // prime step gives varied spread
+      const dur   = isLeader ? (1.0 + (i % 3) * 0.15) : (1.2 + (i % 5) * 0.12);
       return `<div class="jockey-lane" style="background:${i%2===0?'rgba(0,0,0,0.07)':'rgba(255,255,255,0.04)'}">
-        <div class="jockey-horse${isLeader?' leader-horse':''}" data-pid="${p.id}" style="bottom:${pct}%">
-          <div class="horse-inner">
+        <div class="jockey-horse${isLeader?' leader-horse':''}" data-pid="${p.id}" style="bottom:${pct}%" onclick="showRacePopup('${p.id}',event)">
+          <div class="horse-inner" style="--gallop-dur:${dur.toFixed(2)}s;--gallop-delay:-${delay.toFixed(2)}s">
             <div class="horse-emoji">🏇</div>
             <div class="jockey-badge" style="background:${color}">${ini}</div>
           </div>
