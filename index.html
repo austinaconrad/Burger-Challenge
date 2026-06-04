@@ -3824,10 +3824,10 @@ function renderRaceTrack() {
       const innerMilestones = RACE_CEILINGS.filter(m => m < ceiling);
       milestonesEl.innerHTML = innerMilestones.map(m => `
         <div style="position:absolute;left:${racePosFor(m,ceiling)}%;top:0;bottom:0;border-left:1px dashed rgba(255,255,255,0.25);z-index:5;pointer-events:none">
-          <span style="position:absolute;top:4px;left:3px;font-family:'Press Start 2P',monospace;font-size:5px;color:rgba(255,255,255,0.45);white-space:nowrap">${m}🍔</span>
+          <span style="position:absolute;top:6px;left:50%;transform:translateX(-50%);writing-mode:vertical-rl;font-family:'Press Start 2P',monospace;font-size:5px;color:rgba(255,255,255,0.45);white-space:nowrap;letter-spacing:1px">${m}🍔</span>
         </div>`).join('') +
         `<div style="position:absolute;left:${racePosFor(ceiling,ceiling)}%;top:0;bottom:0;width:3px;background:linear-gradient(180deg,gold,rgba(255,215,0,0.3));z-index:6;pointer-events:none;animation:finishGlow 2s ease-in-out infinite">
-          <span style="position:absolute;top:4px;left:5px;font-family:'Press Start 2P',monospace;font-size:5px;color:gold;white-space:nowrap">🏁 ${ceiling === 100 ? 'FINISH' : ceiling + '🍔'}</span>
+          <span style="position:absolute;top:6px;left:50%;transform:translateX(-50%);writing-mode:vertical-rl;font-family:'Press Start 2P',monospace;font-size:5px;color:gold;white-space:nowrap;letter-spacing:1px">${ceiling === 100 ? '🏁FINISH' : ceiling + '🍔'}</span>
         </div>
         <div style="position:absolute;left:${RACE_LEFT_START}%;top:0;bottom:0;border-left:2px solid rgba(255,255,255,0.35);z-index:5;pointer-events:none"></div>`;
     }
