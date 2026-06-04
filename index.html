@@ -703,6 +703,23 @@ body.social-active .social-input-area{
   cursor:pointer;
 }
 .quick-spots{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+/* ── Burger topping visuals ── */
+.pb-sauce {
+  border-radius: 3px; margin: 1px auto;
+  animation: pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both;
+}
+.pb-ketchup  { width:120px; height:5px; background:linear-gradient(180deg,#EF4444,#B91C1C); }
+.pb-mustard  { width:120px; height:4px; background:linear-gradient(180deg,#EAB308,#CA8A04); }
+.pb-mayo     { width:120px; height:4px; background:linear-gradient(180deg,#FEF3C7,#FDE68A); box-shadow:0 1px 3px rgba(0,0,0,0.2); }
+.pb-pickles  { width:125px; height:7px; background:repeating-linear-gradient(90deg,#4ADE80 0,#16A34A 11px,#4ADE80 11px,#4ADE80 13px); border-radius:4px; margin:1px auto; animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+.pb-onions   { width:122px; height:6px; background:repeating-linear-gradient(90deg,rgba(255,255,255,0.7) 0,rgba(200,200,220,0.5) 10px,rgba(255,255,255,0.7) 10px,rgba(255,255,255,0.7) 12px); border-radius:3px; margin:1px auto; animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+.pb-mushrooms { width:118px; height:9px; background:linear-gradient(180deg,#92400E,#78350F); border-radius:5px 5px 2px 2px; margin:1px auto; box-shadow:0 2px 4px rgba(0,0,0,0.4); animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+.pb-green-peppers { width:120px; height:7px; background:repeating-linear-gradient(90deg,#22C55E 0,#15803D 9px,#22C55E 9px,#22C55E 11px); border-radius:3px; margin:1px auto; animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+
+.topping-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.topping-btn{background:var(--surface3);border:1px solid var(--border2);border-radius:999px;color:var(--muted2);font-size:11px;font-weight:500;padding:5px 11px;cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif}
+.topping-btn:hover{border-color:var(--amber);color:var(--amber)}
+.topping-btn.topping-active{background:rgba(245,158,11,0.15);border-color:var(--amber);color:var(--amber);font-weight:700}
 .quick-spot{background:var(--surface3);border:1px solid var(--border2);border-radius:999px;color:var(--muted2);font-size:11px;font-weight:500;padding:4px 10px;cursor:pointer;transition:border-color 0.15s,color 0.15s,background 0.15s}
 .quick-spot:hover{border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,0.07)}
 .detail-confirm-btn{background:linear-gradient(135deg,var(--amber),var(--amber-dark));color:#fff;border:none;border-radius:var(--radius-xs);font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;padding:10px;cursor:pointer;width:100%;margin-top:4px;transition:opacity 0.15s}
@@ -1769,6 +1786,7 @@ const ACHIEVEMENTS = {
   rain_or_shine:   { label:'Rain or Shine',         tip:'Ate a burger in rain or a thunderstorm', color:'rgba(80,150,230,0.7)',  glow:'rgba(80,150,230,0.2)', size:14, emoji:'⛈️' },
   heat_wave:       { label:'Heat Wave',             tip:'Logged a burger in 90°F+ heat',          color:'rgba(255,100,30,0.7)',  glow:'rgba(255,100,30,0.2)', size:14, emoji:'🥵' },
   clownin_around:  { label:"Clownin' Around",       tip:"Logged 3 burgers from McDonald's",       color:'rgba(220,50,50,0.7)',   glow:'rgba(220,50,50,0.2)',  size:14, emoji:'🤡' },
+  all_the_way:     { label:'All The Way',            tip:'Log a Five Guys burger with all 9 toppings: Ketchup, Mustard, Mayo, Lettuce, Pickles, Tomatoes, Onions, Mushrooms & Green Peppers', color:'rgba(245,158,11,0.8)', glow:'rgba(245,158,11,0.3)', size:14, emoji:'🏆🍔' },
 };
 
 let app, db, unsubscribe, unsubMessages;
@@ -2106,6 +2124,16 @@ function computeAchievements(p, allPlayers) {
     /mc\s*donald'?s?/i.test(entry.restaurant)
   ).length;
   if (mcdCount >= 3) earned.push('clownin_around');
+
+  // All The Way — Five Guys burger with all 9 toppings
+  const REQUIRED_TOPPINGS = ['Ketchup','Mustard','Mayo','Lettuce','Pickles','Tomatoes','Onions','Mushrooms','Green Peppers'];
+  const hasAllTheWay = (p.logs || []).some(entry => {
+    if (typeof entry !== 'object') return false;
+    if (!/five\s*guys/i.test(entry.restaurant || '')) return false;
+    const t = entry.toppings || [];
+    return REQUIRED_TOPPINGS.every(req => t.includes(req));
+  });
+  if (hasAllTheWay) earned.push('all_the_way');
 
   return earned;
 }
@@ -2611,10 +2639,17 @@ function renderMyTally(){
     <!-- Patty Stack Builder -->
     <div class="patty-builder">
       <div class="pb-bun-top"></div>
-      <div class="pb-lettuce"></div>
-      <div class="pb-tomato"></div>
+      <div id="pb-top-Mayo"         class="pb-sauce pb-mayo"         style="display:none"></div>
+      <div id="pb-top-Ketchup"      class="pb-sauce pb-ketchup"      style="display:none"></div>
+      <div id="pb-top-Mustard"      class="pb-sauce pb-mustard"      style="display:none"></div>
+      <div id="pb-top-Lettuce"      class="pb-lettuce"               style="display:none"></div>
+      <div id="pb-top-Tomatoes"     class="pb-tomato"                style="display:none"></div>
+      <div id="pb-top-Pickles"      class="pb-pickles"               style="display:none"></div>
+      <div id="pb-top-Green-Peppers" class="pb-green-peppers"        style="display:none"></div>
+      <div id="pb-top-Mushrooms"    class="pb-mushrooms"             style="display:none"></div>
+      <div id="pb-top-Onions"       class="pb-onions"                style="display:none"></div>
+      <div id="pb-top-Cheese"       class="pb-cheese"                style="display:none"></div>
       <div class="pb-stack" id="pb-stack"></div>
-      <div class="pb-cheese"></div>
       <div class="pb-bun-bottom"></div>
       <div class="pb-selector">
         <button class="pb-btn" onclick="selectPatties(1)">Single</button>
@@ -2646,6 +2681,12 @@ function renderMyTally(){
                    oninput="setRating(+this.value)"/>
           </div>
           <div class="rating-score" id="rating-score" style="color:var(--muted)">—</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <label style="font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em;font-weight:600">Toppings</label>
+        <div class="topping-grid" id="topping-grid">
+          ${ALL_TOPPINGS.map(t => `<button class="topping-btn" data-topping="${t}" onclick="toggleTopping('${t}')">${t}</button>`).join('')}
         </div>
       </div>
       <button class="detail-confirm-btn" id="confirm-btn" onclick="confirmBurger()">✓ Log Burger</button>
@@ -2688,6 +2729,11 @@ function renderMyTally(){
       if (confirmBtn) confirmBtn.textContent = btnMap[savedPattyCount] || '✓ Log This Burger';
     }
   }
+  // Restore topping visuals and button states
+  updateBurgerToppingVisuals();
+  document.querySelectorAll('.topping-btn').forEach(btn => {
+    btn.classList.toggle('topping-active', pendingToppings.includes(btn.dataset.topping));
+  });
   // Receipt is ephemeral — intentionally not restored after re-render
   // (restoring without restarting the dismiss timer caused it to stick permanently)
 }
@@ -2936,7 +2982,28 @@ const OHIO_SPOTS = ["Wendy's","McDonald's","Burger King","Buffalo Wild Wings","S
 let pendingRating = 0;
 let pendingGPS = null;
 let pendingPattyCount = 0;
+let pendingToppings = [];
 let receiptTimer = null;
+
+const ALL_TOPPINGS = ['Ketchup','Mustard','Mayo','Cheese','Lettuce','Pickles','Tomatoes','Onions','Mushrooms','Green Peppers'];
+
+window.toggleTopping = function(topping) {
+  const idx = pendingToppings.indexOf(topping);
+  if (idx === -1) pendingToppings.push(topping);
+  else pendingToppings.splice(idx, 1);
+  document.querySelectorAll('.topping-btn').forEach(btn => {
+    btn.classList.toggle('topping-active', pendingToppings.includes(btn.dataset.topping));
+  });
+  updateBurgerToppingVisuals();
+};
+
+function updateBurgerToppingVisuals() {
+  ALL_TOPPINGS.forEach(t => {
+    const id = 'pb-top-' + t.replace(/\s+/g, '-');
+    const el = document.getElementById(id);
+    if (el) el.style.display = pendingToppings.includes(t) ? '' : 'none';
+  });
+}
 
 window.selectPatties = function(n) {
   pendingPattyCount = n;
@@ -3023,9 +3090,10 @@ window.confirmBurger = async function() {
   const restaurant = document.getElementById('detail-restaurant').value.trim() || 'Unknown spot';
   const pattyLabel = ['', 'Single', 'Double', 'The Holy Trinity'][count] || 'Single';
   // Snapshot these before resetting pending state
-  const snapshotRating = pendingRating;
-  const snapshotGPS    = pendingGPS;
-  const snapshotCount  = pendingPattyCount || 1;
+  const snapshotRating   = pendingRating;
+  const snapshotGPS      = pendingGPS;
+  const snapshotCount    = pendingPattyCount || 1;
+  const snapshotToppings = [...pendingToppings];
 
   // ── 1. Show receipt immediately (before the async Firestore write)
   //       so snapshot re-renders can't race against it
@@ -3086,12 +3154,14 @@ window.confirmBurger = async function() {
   const lbl = document.getElementById('pb-label');
   if (lbl) lbl.textContent = 'How many patties?';
   pendingPattyCount = 0;
+  pendingToppings = [];
+  document.querySelectorAll('.topping-btn').forEach(b => b.classList.remove('topping-active'));
 
   // ── 3. Write to Firestore (snapshot re-renders happen after receipt is already shown)
-  await changeMyCountWithDetails(1, restaurant, snapshotRating, snapshotGPS, snapshotCount);
+  await changeMyCountWithDetails(1, restaurant, snapshotRating, snapshotGPS, snapshotCount, snapshotToppings);
 };
 
-async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null, patties=1) {
+async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null, patties=1, toppings=[]) {
   const me=players.find(p=>p.id===myPlayerId);
   if(!me) return;
   const newCount=Math.max(0,Math.min(999,me.count+delta));
@@ -3102,7 +3172,7 @@ async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null
   const currentLogs = me.logs || [];
   let newLogs = [...currentLogs];
   if(delta > 0){
-    const entry = {ts: new Date().toISOString(), restaurant, rating: rating||0, patties: patties||1};
+    const entry = {ts: new Date().toISOString(), restaurant, rating: rating||0, patties: patties||1, toppings: toppings||[]};
     if(gps) {
       entry.lat = gps.lat;
       entry.lng = gps.lng;
