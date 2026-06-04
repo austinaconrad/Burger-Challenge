@@ -3801,7 +3801,7 @@ const RACE_LEFT_END   = 93;  // % from left for finish line
 const RACE_LEFT_RANGE = RACE_LEFT_END - RACE_LEFT_START;
 const RACE_GATE_PAD   = 2;   // % gap between start line and resting horses
 const RACE_CEILINGS   = [25, 50, 75, 100];
-const RACE_MILESTONE_NAMES = {25:'QUARTERWAY MARK', 50:'HALFWAY MARK', 75:'THREE-QUARTER MARK', 100:'FINISH LINE'};
+const RACE_MILESTONE_NAMES = {25:'QUARTERWAY MARK', 50:'HALFWAY MARK', 75:'FINAL STRETCH', 100:'FINISH LINE'};
 
 function racePosFor(count, ceiling) {
   return RACE_LEFT_START + (Math.min(count, ceiling) / ceiling) * RACE_LEFT_RANGE;
