@@ -2093,7 +2093,7 @@ const ACHIEVEMENTS = {
   heat_wave:       { label:'Heat Wave',             tip:'Logged a burger in 90°F+ heat',          color:'rgba(255,100,30,0.7)',  glow:'rgba(255,100,30,0.2)', size:14, emoji:'🥵' },
   clownin_around:  { label:"Clownin' Around",       tip:"Logged 3 burgers from McDonald's",       color:'rgba(220,50,50,0.7)',   glow:'rgba(220,50,50,0.2)',  size:14, emoji:'🤡' },
   all_the_way:     { label:'All The Way',            tip:'Log a Five Guys burger with all 10 toppings: Ketchup, Mustard, Mayo, Cheese, Lettuce, Pickles, Tomatoes, Onions, Mushrooms & Green Peppers', color:'rgba(245,158,11,0.8)', glow:'rgba(245,158,11,0.3)', size:14, emoji:'🏆🍔' },
-  ooh_baby_triple: { label:'Ooh Baby A Triple',      tip:'Log a triple burger (3 patties) to unlock', color:'rgba(59,130,246,0.8)', glow:'rgba(59,130,246,0.3)', size:null, emoji:`<svg width="44" height="40" viewBox="0 0 44 40"><text x="22" y="17" text-anchor="middle" font-size="18">🍔</text><text x="6" y="37" text-anchor="middle" font-size="18">🍔</text><text x="38" y="37" text-anchor="middle" font-size="18">🍔</text></svg>` },
+  ooh_baby_triple: { label:'Ooh Baby A Triple',      tip:'Log a triple burger (3 patties) to unlock', color:'rgba(59,130,246,0.8)', glow:'rgba(59,130,246,0.3)', size:null, emoji:`<span style="display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1"><span style="font-size:16px">🍔</span><span style="display:flex;gap:2px;font-size:16px"><span>🍔</span><span>🍔</span></span></span>` },
 };
 
 let app, db, unsubscribe, unsubMessages;
@@ -3883,7 +3883,7 @@ function renderBentoList() {
     const totalBadges=Object.keys(ACHIEVEMENTS).length;
     return `
       <div class="podium-col">
-        <div class="podium-flip-wrap" id="flip-${p.id}" onclick="toggleCardFlip('${p.id}',event)">
+        <div class="podium-flip-wrap" id="flip-${p.id}" onclick="toggleCardFlip('${p.id}')">
           <div class="podium-card podium-face-front ${cls}">
             ${youBadge}
             <div class="podium-medal">${medal}</div>
@@ -3909,10 +3909,10 @@ function renderBentoList() {
               </div>
             </div>
             <div style="font-size:9px;color:#9CA3AF;font-weight:500">🏅 ${badgeCount} / ${totalBadges} badges</div>
-            <button onclick="openPlayerHistory(event,'${p.id}')" style="background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.16);border-radius:999px;color:#fff;font-size:10px;font-weight:600;padding:4px 12px;cursor:pointer;font-family:'Inter',sans-serif;margin-top:4px">📅 History</button>
+            <button onclick="openPlayerHistory('${p.id}')" style="background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.16);border-radius:999px;color:#fff;font-size:10px;font-weight:600;padding:4px 12px;cursor:pointer;font-family:'Inter',sans-serif;margin-top:4px">📅 History</button>
           </div>
         </div>
-        <div class="podium-step ${cls}" onclick="toggleCardFlip('${p.id}',event)">
+        <div class="podium-step ${cls}" onclick="toggleCardFlip('${p.id}')">
           <span class="podium-step-ordinal">${ordinal}</span>
           <span class="podium-step-label">PLACE</span>
         </div>
@@ -3976,10 +3976,11 @@ function renderBentoList() {
   el.innerHTML=`<div class="podium-wrap"><div class="podium-row">${podiumHtml}</div>${challengerHtml}</div>`;
 }
 
-window.toggleCardFlip=function(pid,e){
-  if(e && e.target && e.target.closest('button')) return;
+window.toggleCardFlip=function(pid){
   const w=document.getElementById('flip-'+pid);
-  if(w) w.classList.toggle('flipped');
+  if(!w) return;
+  if(w.dataset.historyTap==='1'){ delete w.dataset.historyTap; return; }
+  w.classList.toggle('flipped');
 };
 window.toggleChallengerDrawer=function(pid){
   const drawer=document.getElementById('drawer-'+pid);
@@ -3988,10 +3989,13 @@ window.toggleChallengerDrawer=function(pid){
   const open=drawer.classList.toggle('open');
   if(chev) chev.style.transform=open?'rotate(180deg)':'rotate(0deg)';
 };
-window.openPlayerHistory=function(e,pid){
-  if(e){e.stopPropagation();e.preventDefault();}
+window.openPlayerHistory=function(pid){
+  // Set a flag on the flip wrapper so toggleCardFlip ignores the next event
+  const w=document.getElementById('flip-'+pid);
+  if(w) w.dataset.historyTap='1';
   openCalModal(pid);
 };
+
 
 // ── HORSE RACING ─────────────────────────────────────────────────
 
