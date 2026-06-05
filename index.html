@@ -1427,10 +1427,20 @@ body.social-active .social-input-area{
   from { opacity:0; transform: translateY(8px); }
   to   { opacity:1; transform: translateY(0); }
 }
-/* Perfect 5-star rating — subtle golden masterpiece glow */
+/* Perfect 5-star rating — subtle USA red/white/blue gradient border */
 .grill-feed-card.perfect-rating {
-  border-color: rgba(250, 204, 21, 0.45);
-  box-shadow: 0 0 0 1px rgba(250,204,21,0.12), 0 0 18px rgba(250,204,21,0.12), var(--shadow-card);
+  border-color: transparent;
+  background:
+    linear-gradient(rgba(26,26,26,0.85), rgba(26,26,26,0.85)) padding-box,
+    linear-gradient(135deg,
+      rgba(185,28,28,0.85)   0%,
+      rgba(220,38,38,0.7)   25%,
+      rgba(255,255,255,0.7) 45%,
+      rgba(255,255,255,0.7) 55%,
+      rgba(29,78,216,0.7)   75%,
+      rgba(30,64,175,0.85) 100%
+    ) border-box;
+  box-shadow: 0 0 10px rgba(185,28,28,0.1), 0 0 10px rgba(29,78,216,0.1), var(--shadow-card);
 }
 /* Triple gets amber fire accent instead of gradient border */
 .grill-feed-card.triple-card {
@@ -1497,7 +1507,7 @@ body.social-active .social-input-area{
   font-weight: 600;
   background: rgba(255,255,255,0.05);
   color: #9CA3AF;
-  border: 1px solid #2A2A2A;
+  border: 1.5px solid transparent; /* overridden inline with player color */
   padding: 2px 8px;
   border-radius: 999px;
   white-space: nowrap;
@@ -4223,7 +4233,7 @@ function renderGrillFeed() {
         <div class="grill-banner-avatar" style="background:${color}1A;color:${color};border:1.5px solid ${color}55">${ini}</div>
         <div class="grill-banner-name">${escHtml(item.player.name)}${isMe ? ' <span class="grill-banner-you">(you)</span>' : ''}</div>
       </div>
-      <div class="grill-banner-badge">🍔 #${burgerNum > 0 ? burgerNum : '?'}</div>
+      <div class="grill-banner-badge" style="border-color:${color}55">🍔 #${burgerNum > 0 ? burgerNum : '?'}</div>
     </div>
     <div class="grill-stripe"></div>
     <div class="grill-patty-stamp ${stampCls}">${stampText}</div>
