@@ -1009,7 +1009,7 @@ body.social-active .social-input-area{
   transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease;
   opacity: 0;
 }
-.challenger-drawer.open { max-height: 90px; opacity: 1; }
+.challenger-drawer.open { max-height: 160px; opacity: 1; }
 .challenger-drawer-inner {
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.07); border-top: none;
@@ -3894,11 +3894,11 @@ function renderBentoList() {
               </div>
               <div style="flex:1;text-align:center">
                 <div style="font-family:'Poppins',sans-serif;font-size:20px;font-weight:900;color:#3B82F6;line-height:1">${triples}</div>
-                <div style="font-size:7px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Trinity</div>
+                <div style="font-size:7px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Triples</div>
               </div>
             </div>
             <div style="font-size:9px;color:#9CA3AF;font-weight:500">🏅 ${badgeCount} / ${totalBadges} badges</div>
-            <button onclick="event.stopPropagation();openCalModal('${p.id}')" style="background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.16);border-radius:999px;color:#fff;font-size:10px;font-weight:600;padding:4px 12px;cursor:pointer;font-family:'Inter',sans-serif;margin-top:4px">📅 History</button>
+            <button onclick="openPlayerHistory(event,'${p.id}')" style="background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.16);border-radius:999px;color:#fff;font-size:10px;font-weight:600;padding:4px 12px;cursor:pointer;font-family:'Inter',sans-serif;margin-top:4px">📅 History</button>
           </div>
         </div>
         <div class="podium-step ${cls}" onclick="toggleCardFlip('${p.id}')">
@@ -3914,6 +3914,10 @@ function renderBentoList() {
     <div class="challenger-list">
       ${challengers.map((p,i)=>{
         const c=colorFor(p);
+        const ol=(p.logs||[]).filter(e=>typeof e==='object'&&e.ts);
+        const cs=ol.filter(e=>!e.patties||e.patties===1).length;
+        const cd=ol.filter(e=>e.patties===2).length;
+        const ct=ol.filter(e=>e.patties>=3).length;
         return `
           <div class="challenger-item">
             <div class="challenger-row" onclick="toggleChallengerDrawer('${p.id}')" style="border-left:3px solid ${c}">
@@ -3925,13 +3929,31 @@ function renderBentoList() {
               <div class="challenger-chevron" id="chev-${p.id}">▾</div>
             </div>
             <div class="challenger-drawer" id="drawer-${p.id}">
-              <div class="challenger-drawer-inner">
-                ${miniDonut(p)}
-                <div style="flex:1;min-width:0">
-                  <div style="font-size:9px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px">Latest</div>
-                  <div style="font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${latestBurger(p)}</div>
+              <div class="challenger-drawer-inner" style="flex-direction:column;gap:8px;align-items:stretch">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:9px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px">Latest</div>
+                    <div style="font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${latestBurger(p)}</div>
+                  </div>
+                  <button onclick="openPlayerHistory(event,'${p.id}')" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:var(--text);font-size:18px;padding:5px 8px;cursor:pointer;flex-shrink:0;line-height:1">📅</button>
                 </div>
-                <button onclick="event.stopPropagation();openCalModal('${p.id}')" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:var(--text);font-size:18px;padding:5px 8px;cursor:pointer;flex-shrink:0;line-height:1">📅</button>
+                <div style="display:flex;align-items:center;gap:10px">
+                  ${miniDonut(p)}
+                  <div style="display:flex;flex:1;gap:0">
+                    <div style="flex:1;text-align:center;border-right:1px solid rgba(255,255,255,0.07)">
+                      <div style="font-family:'Poppins',sans-serif;font-size:16px;font-weight:900;color:#EF4444;line-height:1">${cs}</div>
+                      <div style="font-size:8px;color:#9CA3AF;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Single</div>
+                    </div>
+                    <div style="flex:1;text-align:center;border-right:1px solid rgba(255,255,255,0.07)">
+                      <div style="font-family:'Poppins',sans-serif;font-size:16px;font-weight:900;color:#E5E5E5;line-height:1">${cd}</div>
+                      <div style="font-size:8px;color:#9CA3AF;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Double</div>
+                    </div>
+                    <div style="flex:1;text-align:center">
+                      <div style="font-family:'Poppins',sans-serif;font-size:16px;font-weight:900;color:#3B82F6;line-height:1">${ct}</div>
+                      <div style="font-size:8px;color:#9CA3AF;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Triples</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>`;
@@ -3951,6 +3973,10 @@ window.toggleChallengerDrawer=function(pid){
   if(!drawer) return;
   const open=drawer.classList.toggle('open');
   if(chev) chev.style.transform=open?'rotate(180deg)':'rotate(0deg)';
+};
+window.openPlayerHistory=function(e,pid){
+  if(e){e.stopPropagation();e.preventDefault();}
+  openCalModal(pid);
 };
 
 // ── HORSE RACING ─────────────────────────────────────────────────
