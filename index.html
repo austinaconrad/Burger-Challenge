@@ -2672,18 +2672,18 @@ function renderStickerPage(p) {
   const doubles  = logs.filter(e => e.patties === 2).length;
   const triples  = logs.filter(e => e.patties >= 3).length;
   const logTotal = singles + doubles + triples;
+  const grandTotal = p.count || logTotal;
+  const unlogged = Math.max(0, grandTotal - logTotal);
 
   let donutHtml = '';
-  if (logTotal > 0) {
-    const pctS = singles / logTotal, pctD = doubles / logTotal, pctT = triples / logTotal;
+  if (grandTotal > 0) {
+    const pctS = singles / grandTotal, pctD = doubles / grandTotal, pctT = triples / grandTotal, pctU = unlogged / grandTotal;
     const r = 36, cx = 48, cy = 48, circ = 2 * Math.PI * r;
-    // SVG donut segments — draw clockwise from top
-    const seg = (pct, offset) => ({dash: pct * circ, offset: -offset * circ});
     const offsetS = 0;
     const offsetD = pctS;
     const offsetT = pctS + pctD;
-    const sS = seg(pctS, offsetS), sD = seg(pctD, offsetD), sT = seg(pctT, offsetT);
-    const COLORS = { single: '#EF4444', double: '#F5F5F5', triple: '#3B82F6' };
+    const offsetU = pctS + pctD + pctT;
+    const COLORS = { single: '#EF4444', double: '#F5F5F5', triple: '#3B82F6', unlogged: '#374151' };
 
     const arc = (pct, offset, col) => pct > 0 ? `
       <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${col}" stroke-width="14"
@@ -2706,10 +2706,11 @@ function renderStickerPage(p) {
             ${arc(pctS, offsetS, COLORS.single)}
             ${arc(pctD, offsetD, COLORS.double)}
             ${arc(pctT, offsetT, COLORS.triple)}
+            ${arc(pctU, offsetU, COLORS.unlogged)}
             <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle"
-              font-family="Poppins,sans-serif" font-size="13" font-weight="800" fill="${color}">${logTotal}</text>
+              font-family="Poppins,sans-serif" font-size="13" font-weight="800" fill="${color}">${grandTotal}</text>
             <text x="${cx}" y="${cy+14}" text-anchor="middle" dominant-baseline="middle"
-              font-family="Inter,sans-serif" font-size="7" font-weight="600" fill="#9CA3AF">LOGGED</text>
+              font-family="Inter,sans-serif" font-size="7" font-weight="600" fill="#9CA3AF">TOTAL</text>
           </svg>
         </div>
         <div style="flex:1;min-width:0">
@@ -2717,6 +2718,7 @@ function renderStickerPage(p) {
           ${legendRow('🍔', 'Single', singles, pctS, COLORS.single)}
           ${legendRow('🍔🍔', 'Double', doubles, pctD, COLORS.double)}
           ${legendRow('🍔🍔🍔', 'The Holy Trinity', triples, pctT, COLORS.triple)}
+          ${legendRow('•', 'No detail', unlogged, pctU, COLORS.unlogged)}
         </div>
       </div>`;
   }
