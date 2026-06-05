@@ -3888,7 +3888,7 @@ function renderBentoList() {
             <div class="podium-count ${cls}">${p.count}</div>
             <div class="podium-burger-label">🍔 burgers</div>
           </div>
-          <div class="podium-card podium-face-back ${cls}" style="padding:10px 6px 12px">
+          <div class="podium-card podium-face-back ${cls}" onclick="openCalModal('${p.id}')" style="padding:10px 6px 12px;cursor:pointer">
             <div style="font-size:9px;font-weight:700;color:${c};text-transform:uppercase;letter-spacing:0.1em">${escHtml(p.name)}</div>
             <div style="display:flex;gap:6px;width:100%;padding:0 4px;box-sizing:border-box;margin:4px 0">
               <div style="flex:1;text-align:center">
@@ -3905,7 +3905,7 @@ function renderBentoList() {
               </div>
             </div>
             <div style="font-size:9px;color:#9CA3AF;font-weight:500">🏅 ${badgeCount} / ${totalBadges} badges</div>
-            <button onclick="openPlayerHistory('${p.id}')" style="background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.16);border-radius:999px;color:#fff;font-size:10px;font-weight:600;padding:4px 12px;cursor:pointer;font-family:'Inter',sans-serif;margin-top:4px">📅 History</button>
+            <div style="background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.16);border-radius:999px;color:#fff;font-size:10px;font-weight:600;padding:4px 12px;font-family:'Inter',sans-serif;margin-top:4px">📅 History</div>
           </div>
         </div>
         <div class="podium-step ${cls}" onclick="toggleCardFlip('${p.id}')">
