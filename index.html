@@ -3879,7 +3879,7 @@ function renderBentoList() {
     const totalBadges=Object.keys(ACHIEVEMENTS).length;
     return `
       <div class="podium-col">
-        <div class="podium-flip-wrap" id="flip-${p.id}" onclick="handlePodiumTap('${p.id}')" style="cursor:pointer">
+        <div class="podium-flip-wrap" id="flip-${p.id}" onclick="handlePodiumTap('${p.id}',event)" style="cursor:pointer">
           <div class="podium-card podium-face-front ${cls}">
             ${youBadge}
             <div class="podium-medal">${medal}</div>
@@ -3905,7 +3905,7 @@ function renderBentoList() {
               </div>
             </div>
             <div style="font-size:9px;color:#9CA3AF;font-weight:500">🏅 ${badgeCount} / ${totalBadges} badges</div>
-            <div style="background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.16);border-radius:999px;color:#fff;font-size:10px;font-weight:600;padding:4px 12px;font-family:'Inter',sans-serif;margin-top:4px">📅 History</div>
+            <div data-history="1" style="background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.16);border-radius:999px;color:#fff;font-size:10px;font-weight:600;padding:4px 12px;font-family:'Inter',sans-serif;margin-top:4px">📅 History</div>
           </div>
         </div>
         <div class="podium-step ${cls}" onclick="toggleCardFlip('${p.id}')">
@@ -3972,12 +3972,19 @@ function renderBentoList() {
   el.innerHTML=`<div class="podium-wrap"><div class="podium-row">${podiumHtml}</div>${challengerHtml}</div>`;
 }
 
-// Tap the card body: front → flip to back; back → open calendar
-window.handlePodiumTap=function(pid){
+// Tap the card: front → flip to back; back → flip back (unless history pill tapped)
+window.handlePodiumTap=function(pid,e){
   const w=document.getElementById('flip-'+pid);
   if(!w) return;
-  if(w.classList.contains('flipped')){ openCalModal(pid); }
-  else { w.classList.add('flipped'); }
+  if(w.classList.contains('flipped')){
+    if(e && e.target && e.target.closest && e.target.closest('[data-history]')){
+      openCalModal(pid);
+    } else {
+      w.classList.remove('flipped');
+    }
+  } else {
+    w.classList.add('flipped');
+  }
 };
 // Tap the step: always toggle flip direction
 window.toggleCardFlip=function(pid){
