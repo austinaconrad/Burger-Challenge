@@ -1427,20 +1427,16 @@ body.social-active .social-input-area{
   from { opacity:0; transform: translateY(8px); }
   to   { opacity:1; transform: translateY(0); }
 }
-/* Perfect 5-star rating — subtle USA red/white/blue gradient border */
+/* Perfect 5-star rating — USA red/white/blue glowing border rings */
 .grill-feed-card.perfect-rating {
-  border-color: transparent;
-  background:
-    linear-gradient(rgba(26,26,26,0.85), rgba(26,26,26,0.85)) padding-box,
-    linear-gradient(135deg,
-      rgba(185,28,28,0.85)   0%,
-      rgba(220,38,38,0.7)   25%,
-      rgba(255,255,255,0.7) 45%,
-      rgba(255,255,255,0.7) 55%,
-      rgba(29,78,216,0.7)   75%,
-      rgba(30,64,175,0.85) 100%
-    ) border-box;
-  box-shadow: 0 0 10px rgba(185,28,28,0.1), 0 0 10px rgba(29,78,216,0.1), var(--shadow-card);
+  border-color: rgba(185,28,28,0.7);
+  box-shadow:
+    0 0 0 1px rgba(185,28,28,0.7),
+    0 0 0 2.5px rgba(240,240,240,0.55),
+    0 0 0 4px rgba(29,78,216,0.7),
+    0 0 10px rgba(185,28,28,0.25),
+    0 0 14px rgba(29,78,216,0.2),
+    var(--shadow-card);
 }
 /* Triple gets amber fire accent instead of gradient border */
 .grill-feed-card.triple-card {
