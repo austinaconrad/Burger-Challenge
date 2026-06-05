@@ -3778,15 +3778,13 @@ function renderBentoList() {
     if (!p) return `<div class="podium-col" style="visibility:hidden;pointer-events:none"></div>`;
     const { cls, medal, ordinal } = PODIUM[rank];
     const c = colorFor(p);
-    const youBadge = isMe(p) ? `<span class="me-badge" style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);white-space:nowrap;z-index:2">You</span>` : '';
+    const youBadge = isMe(p) ? `<span class="me-badge" style="position:absolute;top:8px;right:8px;z-index:2;white-space:nowrap">You</span>` : '';
     return `
       <div class="podium-col" onclick="openCalModal('${p.id}')">
         <div class="podium-card ${cls}">
+          ${youBadge}
           <div class="podium-medal">${medal}</div>
-          <div style="position:relative;display:inline-flex;align-items:center;justify-content:center;margin-bottom:2px">
-            ${youBadge}
-            <div class="podium-avatar" style="background:${c}22;color:${c};border-color:${c}55">${ini(p)}</div>
-          </div>
+          <div class="podium-avatar" style="background:${c}22;color:${c};border-color:${c}55">${ini(p)}</div>
           <div class="podium-name">${escHtml(p.name)}${p.count>=100?' <span class="done-badge">✓</span>':''}</div>
           <div class="podium-count ${cls}">${p.count}</div>
           <div class="podium-burger-label">🍔 burgers</div>
