@@ -981,9 +981,10 @@ body.social-active .social-input-area{
   perspective: 900px;
 }
 
-/* 3D flip wrapper */
+/* 3D flip wrapper — grid-stack keeps both faces in flow, no absolute needed */
 .podium-flip-wrap {
-  width: 100%; position: relative;
+  width: 100%;
+  display: grid;
   transform-style: preserve-3d;
   transition: transform 0.55s cubic-bezier(0.4,0,0.2,1);
   cursor: pointer;
@@ -991,14 +992,14 @@ body.social-active .social-input-area{
 .podium-flip-wrap:active { opacity: 0.9; }
 .podium-flip-wrap.flipped { transform: rotateY(180deg); }
 .podium-face-front, .podium-face-back {
+  grid-area: 1 / 1;   /* stack both faces in the same cell */
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }
 .podium-face-back {
-  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
   transform: rotateY(180deg);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 6px; border-radius: 14px 14px 0 0; overflow: hidden;
+  gap: 6px;
 }
 
 /* Challenger accordion */
