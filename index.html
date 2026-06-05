@@ -996,6 +996,10 @@ body.social-active .social-input-area{
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }
+/* Only the visible face receives pointer events */
+.podium-face-back  { pointer-events: none; }
+.podium-flip-wrap.flipped .podium-face-front { pointer-events: none; }
+.podium-flip-wrap.flipped .podium-face-back  { pointer-events: auto; }
 .podium-face-back {
   transform: rotateY(180deg);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -2089,7 +2093,7 @@ const ACHIEVEMENTS = {
   heat_wave:       { label:'Heat Wave',             tip:'Logged a burger in 90°F+ heat',          color:'rgba(255,100,30,0.7)',  glow:'rgba(255,100,30,0.2)', size:14, emoji:'🥵' },
   clownin_around:  { label:"Clownin' Around",       tip:"Logged 3 burgers from McDonald's",       color:'rgba(220,50,50,0.7)',   glow:'rgba(220,50,50,0.2)',  size:14, emoji:'🤡' },
   all_the_way:     { label:'All The Way',            tip:'Log a Five Guys burger with all 10 toppings: Ketchup, Mustard, Mayo, Cheese, Lettuce, Pickles, Tomatoes, Onions, Mushrooms & Green Peppers', color:'rgba(245,158,11,0.8)', glow:'rgba(245,158,11,0.3)', size:14, emoji:'🏆🍔' },
-  ooh_baby_triple: { label:'Ooh Baby A Triple',      tip:'Log a triple burger (3 patties) to unlock', color:'rgba(59,130,246,0.8)', glow:'rgba(59,130,246,0.3)', size:11, emoji:'🍔🍔🍔' },
+  ooh_baby_triple: { label:'Ooh Baby A Triple',      tip:'Log a triple burger (3 patties) to unlock', color:'rgba(59,130,246,0.8)', glow:'rgba(59,130,246,0.3)', size:null, emoji:`<svg width="44" height="40" viewBox="0 0 44 40"><text x="22" y="17" text-anchor="middle" font-size="18">🍔</text><text x="6" y="37" text-anchor="middle" font-size="18">🍔</text><text x="38" y="37" text-anchor="middle" font-size="18">🍔</text></svg>` },
 };
 
 let app, db, unsubscribe, unsubMessages;
