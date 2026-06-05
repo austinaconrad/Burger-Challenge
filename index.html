@@ -1427,6 +1427,11 @@ body.social-active .social-input-area{
   from { opacity:0; transform: translateY(8px); }
   to   { opacity:1; transform: translateY(0); }
 }
+/* Perfect 5-star rating — subtle golden masterpiece glow */
+.grill-feed-card.perfect-rating {
+  border-color: rgba(250, 204, 21, 0.45);
+  box-shadow: 0 0 0 1px rgba(250,204,21,0.12), 0 0 18px rgba(250,204,21,0.12), var(--shadow-card);
+}
 /* Triple gets amber fire accent instead of gradient border */
 .grill-feed-card.triple-card {
   border-color: var(--amber, #F59E0B);
@@ -1535,7 +1540,7 @@ body.social-active .social-input-area{
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 5px;
 }
 
 /* Restaurant name */
@@ -1546,7 +1551,6 @@ body.social-active .social-input-area{
   color: #F59E0B;
   letter-spacing: -0.02em;
   line-height: 1.2;
-  margin-bottom: 8px;
   text-shadow: 0 2px 4px rgba(0,0,0,0.3);
   white-space: nowrap;
   overflow: hidden;
@@ -1647,19 +1651,25 @@ body.social-active .social-input-area{
   margin-bottom: 1px; /* tiny breath before first patty */
 }
 
-/* ── Pills — unified muted silver ── */
-.grill-pill-row { display: flex; flex-wrap: wrap; gap: 5px; }
+/* ── Pills — compact horizontal data strip ── */
+.grill-pill-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
 .grill-pill {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 12px;
+  gap: 3px;
+  font-size: 10px;
   font-weight: 500;
   font-family: 'Inter', sans-serif;
-  padding: 4px 10px;
-  border-radius: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
   white-space: nowrap;
-  line-height: 1;
+  line-height: 1.4;
   background: rgba(255,255,255,0.05);
   border: 1px solid #2A2A2A;
   color: #9CA3AF;
@@ -4205,7 +4215,7 @@ function renderGrillFeed() {
     const burgerNum = item.player.count - playerEntries.indexOf(item);
 
     return `
-<div class="grill-feed-card ${pattyCount >= 3 ? 'triple-card' : ''}" style="animation-delay:${Math.min(idx * 0.04, 0.6)}s">
+<div class="grill-feed-card ${pattyCount >= 3 ? 'triple-card' : ''}${item.rating === 5 ? ' perfect-rating' : ''}" style="animation-delay:${Math.min(idx * 0.04, 0.6)}s">
   <div class="grill-card-inner">
     <div class="grill-left-accent" style="background:${color}"></div>
     <div class="grill-card-banner">
