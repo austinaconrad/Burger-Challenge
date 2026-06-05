@@ -3883,8 +3883,8 @@ function renderBentoList() {
     const totalBadges=Object.keys(ACHIEVEMENTS).length;
     return `
       <div class="podium-col">
-        <div class="podium-flip-wrap" id="flip-${p.id}" onclick="toggleCardFlip('${p.id}')">
-          <div class="podium-card podium-face-front ${cls}">
+        <div class="podium-flip-wrap" id="flip-${p.id}">
+          <div class="podium-card podium-face-front ${cls}" onclick="toggleCardFlip('${p.id}')" style="cursor:pointer">
             ${youBadge}
             <div class="podium-medal">${medal}</div>
             <div class="podium-avatar" style="background:${c}22;color:${c};border-color:${c}55">${ini(p)}</div>
