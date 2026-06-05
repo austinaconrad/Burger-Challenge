@@ -3879,7 +3879,7 @@ function renderBentoList() {
     const totalBadges=Object.keys(ACHIEVEMENTS).length;
     return `
       <div class="podium-col">
-        <div class="podium-flip-wrap" id="flip-${p.id}" onclick="handlePodiumTap('${p.id}',event)" style="cursor:pointer">
+        <div class="podium-flip-wrap" id="flip-${p.id}" style="cursor:pointer">
           <div class="podium-card podium-face-front ${cls}">
             ${youBadge}
             <div class="podium-medal">${medal}</div>
@@ -3970,6 +3970,25 @@ function renderBentoList() {
     </div>`:''  ;
 
   el.innerHTML=`<div class="podium-wrap"><div class="podium-row">${podiumHtml}</div>${challengerHtml}</div>`;
+
+  // iOS Safari: touchstart.target is reliable inside preserve-3d; click.target is not.
+  // Store the touchstart target and use it in the click handler.
+  [p1,p2,p3].filter(Boolean).forEach(p=>{
+    const wrap=document.getElementById('flip-'+p.id);
+    if(!wrap) return;
+    let _touchTarget=null;
+    wrap.addEventListener('touchstart',e=>{_touchTarget=e.target;},{passive:true});
+    wrap.addEventListener('click',()=>{
+      if(!wrap.classList.contains('flipped')){
+        wrap.classList.add('flipped');
+      } else if(_touchTarget && _touchTarget.closest && _touchTarget.closest('[data-history]')){
+        openCalModal(p.id);
+      } else {
+        wrap.classList.remove('flipped');
+      }
+      _touchTarget=null;
+    });
+  });
 }
 
 // Tap the card: front → flip to back; back → flip back (unless history pill tapped)
