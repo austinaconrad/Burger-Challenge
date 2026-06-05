@@ -3944,7 +3944,7 @@ function renderBentoList() {
                     <div style="font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${lb.restaurant}</div>
                     ${lb.when?`<div style="font-size:9px;color:#6B7280;font-weight:500;margin-top:2px">${lb.when}</div>`:''}
                   </div>
-                  <button onclick="openPlayerHistory(event,'${p.id}')" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:var(--text);font-size:18px;padding:5px 8px;cursor:pointer;flex-shrink:0;line-height:1">📅</button>
+                  <button onclick="openCalModal('${p.id}')" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:var(--text);font-size:18px;padding:5px 8px;cursor:pointer;flex-shrink:0;line-height:1">📅</button>
                 </div>
                 <div style="display:flex;align-items:center;gap:10px">
                   ${miniDonut(p)}
@@ -3977,7 +3977,12 @@ function renderBentoList() {
     const wrap=document.getElementById('flip-'+p.id);
     if(!wrap) return;
     let _touchTarget=null;
-    wrap.addEventListener('touchstart',e=>{_touchTarget=e.target;},{passive:true});
+    wrap.addEventListener('touchstart',e=>{
+      _touchTarget=e.target;
+      if(_touchTarget&&_touchTarget.closest&&_touchTarget.closest('[data-history]')){
+        e.preventDefault(); // stops scroll jank / tap highlight on the pill
+      }
+    },{passive:false});
     wrap.addEventListener('click',()=>{
       if(!wrap.classList.contains('flipped')){
         wrap.classList.add('flipped');
