@@ -978,9 +978,47 @@ body.social-active .social-input-area{
 
 .podium-col {
   flex: 1; display: flex; flex-direction: column; align-items: center;
-  cursor: pointer; transition: transform 0.2s ease;
+  perspective: 900px;
 }
-.podium-col:active { transform: scale(0.97); }
+
+/* 3D flip wrapper */
+.podium-flip-wrap {
+  width: 100%; position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.4,0,0.2,1);
+  cursor: pointer;
+}
+.podium-flip-wrap:active { opacity: 0.9; }
+.podium-flip-wrap.flipped { transform: rotateY(180deg); }
+.podium-face-front, .podium-face-back {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.podium-face-back {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  transform: rotateY(180deg);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; border-radius: 14px 14px 0 0; overflow: hidden;
+}
+
+/* Challenger accordion */
+.challenger-item { display: flex; flex-direction: column; }
+.challenger-drawer {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease;
+  opacity: 0;
+}
+.challenger-drawer.open { max-height: 90px; opacity: 1; }
+.challenger-drawer-inner {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07); border-top: none;
+  border-radius: 0 0 12px 12px;
+  padding: 10px 14px; display: flex; align-items: center; gap: 12px;
+}
+.challenger-chevron {
+  font-size: 12px; color: var(--muted2); flex-shrink: 0;
+  transition: transform 0.25s ease; line-height: 1;
+}
 
 .podium-card {
   width: 100%; border-radius: 14px 14px 0 0;
@@ -2822,69 +2860,11 @@ function renderStickerPage(p) {
     }
   }).join('');
 
-  // ── Patty breakdown donut chart
-  const logs = (p.logs || []).filter(e => typeof e === 'object' && e.ts);
-  const singles  = logs.filter(e => !e.patties || e.patties === 1).length;
-  const doubles  = logs.filter(e => e.patties === 2).length;
-  const triples  = logs.filter(e => e.patties >= 3).length;
-  const logTotal = singles + doubles + triples;
-  const grandTotal = p.count || logTotal;
-  const unlogged = Math.max(0, grandTotal - logTotal);
-
-  let donutHtml = '';
-  if (grandTotal > 0) {
-    const pctS = singles / grandTotal, pctD = doubles / grandTotal, pctT = triples / grandTotal, pctU = unlogged / grandTotal;
-    const r = 36, cx = 48, cy = 48, circ = 2 * Math.PI * r;
-    const offsetS = 0;
-    const offsetD = pctS;
-    const offsetT = pctS + pctD;
-    const offsetU = pctS + pctD + pctT;
-    const COLORS = { single: '#EF4444', double: '#F5F5F5', triple: '#3B82F6', unlogged: '#374151' };
-
-    const arc = (pct, offset, col) => pct > 0 ? `
-      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${col}" stroke-width="14"
-        stroke-dasharray="${(pct*circ).toFixed(2)} ${circ.toFixed(2)}"
-        stroke-dashoffset="${(-offset*circ).toFixed(2)}"
-        transform="rotate(-90 ${cx} ${cy})" stroke-linecap="butt"/>` : '';
-
-    const legendRow = (emoji, label, count, pct, col) => count > 0 ? `
-      <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px">
-        <div style="width:10px;height:10px;border-radius:2px;background:${col};flex-shrink:0"></div>
-        <div style="flex:1;font-size:11px;font-weight:600;color:var(--text)">${emoji} ${label}</div>
-        <div style="font-size:11px;color:#9CA3AF;font-weight:500">${count} <span style="color:#555">(${Math.round(pct*100)}%)</span></div>
-      </div>` : '';
-
-    donutHtml = `
-      <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px 16px;margin-bottom:0;display:flex;align-items:center;gap:18px">
-        <div style="flex-shrink:0">
-          <svg width="96" height="96" viewBox="0 0 96 96">
-            <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="14"/>
-            ${arc(pctS, offsetS, COLORS.single)}
-            ${arc(pctD, offsetD, COLORS.double)}
-            ${arc(pctT, offsetT, COLORS.triple)}
-            ${arc(pctU, offsetU, COLORS.unlogged)}
-            <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle"
-              font-family="Poppins,sans-serif" font-size="13" font-weight="800" fill="${color}">${grandTotal}</text>
-            <text x="${cx}" y="${cy+14}" text-anchor="middle" dominant-baseline="middle"
-              font-family="Inter,sans-serif" font-size="7" font-weight="600" fill="#9CA3AF">TOTAL</text>
-          </svg>
-        </div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">Patty Breakdown</div>
-          ${legendRow('🍔', 'Single', singles, pctS, COLORS.single)}
-          ${legendRow('🍔🍔', 'Double', doubles, pctD, COLORS.double)}
-          ${legendRow('🍔🍔🍔', 'The Holy Trinity', triples, pctT, COLORS.triple)}
-          ${legendRow('•', 'No detail', unlogged, pctU, COLORS.unlogged)}
-        </div>
-      </div>`;
-  }
-
   return `<div class="sticker-book-open">
     <div class="sticker-book-header">
       <div class="sticker-book-title" style="color:${color}">${escHtml(p.name)}'s Badges</div>
       <div class="sticker-book-count">${earned} / ${total} collected</div>
     </div>
-    ${donutHtml}
     <div class="sticker-album-page">${badgesHtml}</div>
   </div>`;
 }
@@ -3838,67 +3818,139 @@ document.getElementById('cal-detail-back').addEventListener('click', () => {
 function renderBentoList() {
   const el = document.getElementById('bento-list');
   if (!el) return;
-  const sorted = [...players].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+  const sorted = [...players].sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name));
   if (!sorted.length) { el.innerHTML = '<div class="empty"><div class="e-icon">🍔</div><p>No players yet!</p></div>'; return; }
 
   const colorFor = p => RING_COLORS[p.colorIdx % RING_COLORS.length];
   const ini = p => initials(p.name);
   const isMe = p => p.id === myPlayerId;
 
-  const p1 = sorted[0], p2 = sorted[1] || null, p3 = sorted[2] || null;
-  const challengers = sorted.slice(3);
-
-  const PODIUM = {
-    1: { cls:'p1', medal:'🥇', ordinal:'1st' },
-    2: { cls:'p2', medal:'🥈', ordinal:'2nd' },
-    3: { cls:'p3', medal:'🥉', ordinal:'3rd' },
+  // Mini 40px donut SVG for challenger drawer
+  const miniDonut = p => {
+    const ol = (p.logs||[]).filter(e=>typeof e==='object'&&e.ts);
+    const s=ol.filter(e=>!e.patties||e.patties===1).length;
+    const d=ol.filter(e=>e.patties===2).length;
+    const t=ol.filter(e=>e.patties>=3).length;
+    const tot=s+d+t||1;
+    const r=14,cx=20,cy=20,circ=2*Math.PI*r;
+    const arc=(pct,off,col)=>pct>0?`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${col}" stroke-width="5" stroke-dasharray="${(pct*circ).toFixed(2)} ${circ.toFixed(2)}" stroke-dashoffset="${(-off*circ).toFixed(2)}" transform="rotate(-90 ${cx} ${cy})" stroke-linecap="butt"/>`:'';
+    return `<svg width="40" height="40" viewBox="0 0 40 40" style="flex-shrink:0">
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="5"/>
+      ${arc(s/tot,0,'#EF4444')}${arc(d/tot,s/tot,'#E5E5E5')}${arc(t/tot,(s+d)/tot,'#3B82F6')}
+    </svg>`;
   };
 
-  const podiumCol = (p, rank) => {
+  // Latest burger string
+  const latestBurger = p => {
+    const ol=(p.logs||[]).filter(e=>typeof e==='object'&&e.ts).sort((a,b)=>new Date(b.ts)-new Date(a.ts));
+    if (!ol.length) return 'No logs yet';
+    const l=ol[0];
+    const stars=l.rating?` — ${'⭐'.repeat(Math.floor(l.rating))}${l.rating%1>=0.5?'½':''} ${l.rating}/5`:'';
+    return `${escHtml(l.restaurant||'Unknown spot')}${stars}`;
+  };
+
+  const p1=sorted[0], p2=sorted[1]||null, p3=sorted[2]||null;
+  const challengers=sorted.slice(3);
+
+  const PODIUM={
+    1:{cls:'p1',medal:'🥇',ordinal:'1st'},
+    2:{cls:'p2',medal:'🥈',ordinal:'2nd'},
+    3:{cls:'p3',medal:'🥉',ordinal:'3rd'},
+  };
+
+  const podiumCol=(p,rank)=>{
     if (!p) return `<div class="podium-col" style="visibility:hidden;pointer-events:none"></div>`;
-    const { cls, medal, ordinal } = PODIUM[rank];
-    const c = colorFor(p);
-    const youBadge = isMe(p) ? `<span class="me-badge" style="position:absolute;top:8px;right:8px;z-index:2;white-space:nowrap">You</span>` : '';
+    const {cls,medal,ordinal}=PODIUM[rank];
+    const c=colorFor(p);
+    const youBadge=isMe(p)?`<span class="me-badge" style="position:absolute;top:8px;right:8px;z-index:2;white-space:nowrap">You</span>`:'';
+    const ol=(p.logs||[]).filter(e=>typeof e==='object'&&e.ts);
+    const singles=ol.filter(e=>!e.patties||e.patties===1).length;
+    const doubles=ol.filter(e=>e.patties===2).length;
+    const triples=ol.filter(e=>e.patties>=3).length;
+    const badgeCount=computeAchievements(p,players).length;
+    const totalBadges=Object.keys(ACHIEVEMENTS).length;
     return `
-      <div class="podium-col" onclick="openCalModal('${p.id}')">
-        <div class="podium-card ${cls}">
-          ${youBadge}
-          <div class="podium-medal">${medal}</div>
-          <div class="podium-avatar" style="background:${c}22;color:${c};border-color:${c}55">${ini(p)}</div>
-          <div class="podium-name">${escHtml(p.name)}${p.count>=100?' <span class="done-badge">✓</span>':''}</div>
-          <div class="podium-count ${cls}">${p.count}</div>
-          <div class="podium-burger-label">🍔 burgers</div>
+      <div class="podium-col">
+        <div class="podium-flip-wrap" id="flip-${p.id}" onclick="toggleCardFlip('${p.id}')">
+          <div class="podium-card podium-face-front ${cls}">
+            ${youBadge}
+            <div class="podium-medal">${medal}</div>
+            <div class="podium-avatar" style="background:${c}22;color:${c};border-color:${c}55">${ini(p)}</div>
+            <div class="podium-name">${escHtml(p.name)}${p.count>=100?' <span class="done-badge">✓</span>':''}</div>
+            <div class="podium-count ${cls}">${p.count}</div>
+            <div class="podium-burger-label">🍔 burgers</div>
+          </div>
+          <div class="podium-card podium-face-back ${cls}" style="padding:10px 6px 12px">
+            <div style="font-size:9px;font-weight:700;color:${c};text-transform:uppercase;letter-spacing:0.1em">${escHtml(p.name)}</div>
+            <div style="display:flex;gap:6px;width:100%;padding:0 4px;box-sizing:border-box;margin:4px 0">
+              <div style="flex:1;text-align:center">
+                <div style="font-family:'Poppins',sans-serif;font-size:20px;font-weight:900;color:#EF4444;line-height:1">${singles}</div>
+                <div style="font-size:7px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Single</div>
+              </div>
+              <div style="flex:1;text-align:center">
+                <div style="font-family:'Poppins',sans-serif;font-size:20px;font-weight:900;color:#F5F5F5;line-height:1">${doubles}</div>
+                <div style="font-size:7px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Double</div>
+              </div>
+              <div style="flex:1;text-align:center">
+                <div style="font-family:'Poppins',sans-serif;font-size:20px;font-weight:900;color:#3B82F6;line-height:1">${triples}</div>
+                <div style="font-size:7px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Trinity</div>
+              </div>
+            </div>
+            <div style="font-size:9px;color:#9CA3AF;font-weight:500">🏅 ${badgeCount} / ${totalBadges} badges</div>
+            <button onclick="event.stopPropagation();openCalModal('${p.id}')" style="background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.16);border-radius:999px;color:#fff;font-size:10px;font-weight:600;padding:4px 12px;cursor:pointer;font-family:'Inter',sans-serif;margin-top:4px">📅 History</button>
+          </div>
         </div>
-        <div class="podium-step ${cls}">
+        <div class="podium-step ${cls}" onclick="toggleCardFlip('${p.id}')">
           <span class="podium-step-ordinal">${ordinal}</span>
           <span class="podium-step-label">PLACE</span>
         </div>
       </div>`;
   };
 
-  // Podium order: 2nd left, 1st center, 3rd right
-  const podiumHtml = podiumCol(p2, 2) + podiumCol(p1, 1) + podiumCol(p3, 3);
+  const podiumHtml=podiumCol(p2,2)+podiumCol(p1,1)+podiumCol(p3,3);
 
-  const challengerHtml = challengers.length ? `
+  const challengerHtml=challengers.length?`
     <div class="challenger-list">
-      ${challengers.map((p, i) => {
-        const c = colorFor(p);
+      ${challengers.map((p,i)=>{
+        const c=colorFor(p);
         return `
-          <div class="challenger-row" onclick="openCalModal('${p.id}')" style="border-left:3px solid ${c}">
-            <div class="challenger-rank">#${i + 4}</div>
-            <div class="challenger-avatar" style="background:${c}1A;color:${c};border-color:${c}55">${ini(p)}</div>
-            <div class="challenger-name">${escHtml(p.name)}${isMe(p) ? ' <span class="me-badge">You</span>' : ''}</div>
-            <div class="challenger-count" style="color:${c}">${p.count}</div>
-            <div class="challenger-emoji">🍔</div>
+          <div class="challenger-item">
+            <div class="challenger-row" onclick="toggleChallengerDrawer('${p.id}')" style="border-left:3px solid ${c}">
+              <div class="challenger-rank">#${i+4}</div>
+              <div class="challenger-avatar" style="background:${c}1A;color:${c};border-color:${c}55">${ini(p)}</div>
+              <div class="challenger-name">${escHtml(p.name)}${isMe(p)?' <span class="me-badge">You</span>':''}</div>
+              <div class="challenger-count" style="color:${c}">${p.count}</div>
+              <div class="challenger-emoji">🍔</div>
+              <div class="challenger-chevron" id="chev-${p.id}">▾</div>
+            </div>
+            <div class="challenger-drawer" id="drawer-${p.id}">
+              <div class="challenger-drawer-inner">
+                ${miniDonut(p)}
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:9px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px">Latest</div>
+                  <div style="font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${latestBurger(p)}</div>
+                </div>
+                <button onclick="event.stopPropagation();openCalModal('${p.id}')" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:var(--text);font-size:18px;padding:5px 8px;cursor:pointer;flex-shrink:0;line-height:1">📅</button>
+              </div>
+            </div>
           </div>`;
       }).join('')}
-    </div>` : '';
+    </div>`:''  ;
 
-  el.innerHTML = `<div class="podium-wrap">
-    <div class="podium-row">${podiumHtml}</div>
-    ${challengerHtml}
-  </div>`;
+  el.innerHTML=`<div class="podium-wrap"><div class="podium-row">${podiumHtml}</div>${challengerHtml}</div>`;
 }
+
+window.toggleCardFlip=function(pid){
+  const w=document.getElementById('flip-'+pid);
+  if(w) w.classList.toggle('flipped');
+};
+window.toggleChallengerDrawer=function(pid){
+  const drawer=document.getElementById('drawer-'+pid);
+  const chev=document.getElementById('chev-'+pid);
+  if(!drawer) return;
+  const open=drawer.classList.toggle('open');
+  if(chev) chev.style.transform=open?'rotate(180deg)':'rotate(0deg)';
+};
 
 // ── HORSE RACING ─────────────────────────────────────────────────
 
