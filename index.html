@@ -994,12 +994,12 @@ body.social-active .social-input-area{
 .podium-card::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
 }
-.podium-card.p1 { background: rgba(245,158,11,0.10); border-color: rgba(245,158,11,0.4); box-shadow: 0 0 22px rgba(245,158,11,0.14), var(--shadow-card); }
+.podium-card.p1 { background: rgba(245,158,11,0.10); border-color: #F59E0B; box-shadow: 0 0 22px rgba(245,158,11,0.14), var(--shadow-card); }
 .podium-card.p1::before { background: linear-gradient(90deg, transparent, rgba(245,158,11,0.9), transparent); }
-.podium-card.p2 { background: rgba(167,139,250,0.08); border-color: rgba(167,139,250,0.3); }
-.podium-card.p2::before { background: linear-gradient(90deg, transparent, rgba(167,139,250,0.7), transparent); }
-.podium-card.p3 { background: rgba(110,231,183,0.07); border-color: rgba(110,231,183,0.25); }
-.podium-card.p3::before { background: linear-gradient(90deg, transparent, rgba(110,231,183,0.6), transparent); }
+.podium-card.p2 { background: rgba(167,139,250,0.08); border-color: #9CA3AF; }
+.podium-card.p2::before { background: linear-gradient(90deg, transparent, rgba(156,163,175,0.8), transparent); }
+.podium-card.p3 { background: rgba(180,83,9,0.07); border-color: #B45309; }
+.podium-card.p3::before { background: linear-gradient(90deg, transparent, rgba(180,83,9,0.8), transparent); }
 
 .podium-medal { font-size: 22px; line-height: 1; }
 .podium-avatar {
@@ -1020,16 +1020,17 @@ body.social-active .social-input-area{
 .podium-burger-label { font-size: 9px; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
 
 .podium-step {
-  width: 100%; display: flex; align-items: center; justify-content: center;
-  font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 900;
+  width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
   border-radius: 0 0 10px 10px;
 }
-.podium-step.p1 { height: 38px; background: linear-gradient(180deg, rgba(245,158,11,0.28), rgba(245,158,11,0.10)); color: rgba(245,158,11,0.8); }
-.podium-step.p2 { height: 24px; background: linear-gradient(180deg, rgba(167,139,250,0.22), rgba(167,139,250,0.08)); color: rgba(167,139,250,0.7); }
-.podium-step.p3 { height: 14px; background: linear-gradient(180deg, rgba(110,231,183,0.18), rgba(110,231,183,0.06)); color: rgba(110,231,183,0.6); }
+.podium-step-ordinal { font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 900; color: #fff; line-height: 1; }
+.podium-step-label { font-family: 'Inter', sans-serif; font-size: 7px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.55); line-height: 1; }
+.podium-step.p1 { height: 46px; background: linear-gradient(180deg, rgba(245,158,11,0.35), rgba(245,158,11,0.12)); }
+.podium-step.p2 { height: 34px; background: linear-gradient(180deg, rgba(156,163,175,0.30), rgba(156,163,175,0.10)); }
+.podium-step.p3 { height: 24px; background: linear-gradient(180deg, rgba(180,83,9,0.30), rgba(180,83,9,0.10)); }
 
 /* Challenger Pack */
-.challenger-list { display: flex; flex-direction: column; gap: 6px; }
+.challenger-list { display: flex; flex-direction: column; gap: 10px; }
 .challenger-row {
   display: flex; align-items: center; gap: 12px;
   background: var(--surface); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
@@ -3768,25 +3769,32 @@ function renderBentoList() {
   const challengers = sorted.slice(3);
 
   const PODIUM = {
-    1: { cls:'p1', medal:'🥇', stepH:38 },
-    2: { cls:'p2', medal:'🥈', stepH:24 },
-    3: { cls:'p3', medal:'🥉', stepH:14 },
+    1: { cls:'p1', medal:'🥇', ordinal:'1st' },
+    2: { cls:'p2', medal:'🥈', ordinal:'2nd' },
+    3: { cls:'p3', medal:'🥉', ordinal:'3rd' },
   };
 
   const podiumCol = (p, rank) => {
     if (!p) return `<div class="podium-col" style="visibility:hidden;pointer-events:none"></div>`;
-    const { cls, medal } = PODIUM[rank];
+    const { cls, medal, ordinal } = PODIUM[rank];
     const c = colorFor(p);
+    const youBadge = isMe(p) ? `<span class="me-badge" style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);white-space:nowrap;z-index:2">You</span>` : '';
     return `
       <div class="podium-col" onclick="openCalModal('${p.id}')">
         <div class="podium-card ${cls}">
           <div class="podium-medal">${medal}</div>
-          <div class="podium-avatar" style="background:${c}22;color:${c};border-color:${c}55">${ini(p)}</div>
-          <div class="podium-name">${escHtml(p.name)}${isMe(p) ? ' <span class="me-badge">You</span>' : ''}${p.count>=100?'<span class="done-badge">✓</span>':''}</div>
+          <div style="position:relative;display:inline-flex;align-items:center;justify-content:center;margin-bottom:2px">
+            ${youBadge}
+            <div class="podium-avatar" style="background:${c}22;color:${c};border-color:${c}55">${ini(p)}</div>
+          </div>
+          <div class="podium-name">${escHtml(p.name)}${p.count>=100?' <span class="done-badge">✓</span>':''}</div>
           <div class="podium-count ${cls}">${p.count}</div>
           <div class="podium-burger-label">🍔 burgers</div>
         </div>
-        <div class="podium-step ${cls}">${rank}</div>
+        <div class="podium-step ${cls}">
+          <span class="podium-step-ordinal">${ordinal}</span>
+          <span class="podium-step-label">PLACE</span>
+        </div>
       </div>`;
   };
 
