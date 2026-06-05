@@ -3879,8 +3879,8 @@ function renderBentoList() {
     const totalBadges=Object.keys(ACHIEVEMENTS).length;
     return `
       <div class="podium-col">
-        <div class="podium-flip-wrap" id="flip-${p.id}">
-          <div class="podium-card podium-face-front ${cls}" onclick="toggleCardFlip('${p.id}')" style="cursor:pointer">
+        <div class="podium-flip-wrap" id="flip-${p.id}" onclick="handlePodiumTap('${p.id}')" style="cursor:pointer">
+          <div class="podium-card podium-face-front ${cls}">
             ${youBadge}
             <div class="podium-medal">${medal}</div>
             <div class="podium-avatar" style="background:${c}22;color:${c};border-color:${c}55">${ini(p)}</div>
@@ -3888,7 +3888,7 @@ function renderBentoList() {
             <div class="podium-count ${cls}">${p.count}</div>
             <div class="podium-burger-label">🍔 burgers</div>
           </div>
-          <div class="podium-card podium-face-back ${cls}" onclick="openCalModal('${p.id}')" style="padding:10px 6px 12px;cursor:pointer">
+          <div class="podium-card podium-face-back ${cls}" style="padding:10px 6px 12px">
             <div style="font-size:9px;font-weight:700;color:${c};text-transform:uppercase;letter-spacing:0.1em">${escHtml(p.name)}</div>
             <div style="display:flex;gap:6px;width:100%;padding:0 4px;box-sizing:border-box;margin:4px 0">
               <div style="flex:1;text-align:center">
@@ -3972,11 +3972,17 @@ function renderBentoList() {
   el.innerHTML=`<div class="podium-wrap"><div class="podium-row">${podiumHtml}</div>${challengerHtml}</div>`;
 }
 
-window.toggleCardFlip=function(pid){
+// Tap the card body: front → flip to back; back → open calendar
+window.handlePodiumTap=function(pid){
   const w=document.getElementById('flip-'+pid);
   if(!w) return;
-  if(w.dataset.historyTap==='1'){ delete w.dataset.historyTap; return; }
-  w.classList.toggle('flipped');
+  if(w.classList.contains('flipped')){ openCalModal(pid); }
+  else { w.classList.add('flipped'); }
+};
+// Tap the step: always toggle flip direction
+window.toggleCardFlip=function(pid){
+  const w=document.getElementById('flip-'+pid);
+  if(w) w.classList.toggle('flipped');
 };
 window.toggleChallengerDrawer=function(pid){
   const drawer=document.getElementById('drawer-'+pid);
