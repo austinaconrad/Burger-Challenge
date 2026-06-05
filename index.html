@@ -3977,12 +3977,7 @@ function renderBentoList() {
     const wrap=document.getElementById('flip-'+p.id);
     if(!wrap) return;
     let _touchTarget=null;
-    wrap.addEventListener('touchstart',e=>{
-      _touchTarget=e.target;
-      if(_touchTarget&&_touchTarget.closest&&_touchTarget.closest('[data-history]')){
-        e.preventDefault(); // stops scroll jank / tap highlight on the pill
-      }
-    },{passive:false});
+    wrap.addEventListener('touchstart',e=>{_touchTarget=e.target;},{passive:true});
     wrap.addEventListener('click',()=>{
       if(!wrap.classList.contains('flipped')){
         wrap.classList.add('flipped');
