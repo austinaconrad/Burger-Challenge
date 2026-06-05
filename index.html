@@ -2089,6 +2089,7 @@ const ACHIEVEMENTS = {
   heat_wave:       { label:'Heat Wave',             tip:'Logged a burger in 90°F+ heat',          color:'rgba(255,100,30,0.7)',  glow:'rgba(255,100,30,0.2)', size:14, emoji:'🥵' },
   clownin_around:  { label:"Clownin' Around",       tip:"Logged 3 burgers from McDonald's",       color:'rgba(220,50,50,0.7)',   glow:'rgba(220,50,50,0.2)',  size:14, emoji:'🤡' },
   all_the_way:     { label:'All The Way',            tip:'Log a Five Guys burger with all 10 toppings: Ketchup, Mustard, Mayo, Cheese, Lettuce, Pickles, Tomatoes, Onions, Mushrooms & Green Peppers', color:'rgba(245,158,11,0.8)', glow:'rgba(245,158,11,0.3)', size:14, emoji:'🏆🍔' },
+  ooh_baby_triple: { label:'Ooh Baby A Triple',      tip:'Log a triple burger (3 patties) to unlock', color:'rgba(59,130,246,0.8)', glow:'rgba(59,130,246,0.3)', size:11, emoji:'🍔🍔🍔' },
 };
 
 let app, db, unsubscribe, unsubMessages;
@@ -2436,6 +2437,9 @@ function computeAchievements(p, allPlayers) {
     return REQUIRED_TOPPINGS.every(req => t.includes(req));
   });
   if (hasAllTheWay) earned.push('all_the_way');
+
+  // Ooh Baby A Triple — logged at least one triple (3+ patties)
+  if ((p.logs || []).some(entry => typeof entry === 'object' && entry.patties >= 3)) earned.push('ooh_baby_triple');
 
   return earned;
 }
@@ -3841,13 +3845,16 @@ function renderBentoList() {
     </svg>`;
   };
 
-  // Latest burger string
+  // Latest burger string with date/time
   const latestBurger = p => {
     const ol=(p.logs||[]).filter(e=>typeof e==='object'&&e.ts).sort((a,b)=>new Date(b.ts)-new Date(a.ts));
-    if (!ol.length) return 'No logs yet';
+    if (!ol.length) return {restaurant:'No logs yet', when:''};
     const l=ol[0];
     const stars=l.rating?` — ${'⭐'.repeat(Math.floor(l.rating))}${l.rating%1>=0.5?'½':''} ${l.rating}/5`:'';
-    return `${escHtml(l.restaurant||'Unknown spot')}${stars}`;
+    const d=new Date(l.ts);
+    const timeStr=d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+    const dateStr=`${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)}`;
+    return {restaurant:`${escHtml(l.restaurant||'Unknown spot')}${stars}`, when:`${timeStr} · ${dateStr}`};
   };
 
   const p1=sorted[0], p2=sorted[1]||null, p3=sorted[2]||null;
@@ -3872,7 +3879,7 @@ function renderBentoList() {
     const totalBadges=Object.keys(ACHIEVEMENTS).length;
     return `
       <div class="podium-col">
-        <div class="podium-flip-wrap" id="flip-${p.id}" onclick="toggleCardFlip('${p.id}')">
+        <div class="podium-flip-wrap" id="flip-${p.id}" onclick="toggleCardFlip('${p.id}',event)">
           <div class="podium-card podium-face-front ${cls}">
             ${youBadge}
             <div class="podium-medal">${medal}</div>
@@ -3901,7 +3908,7 @@ function renderBentoList() {
             <button onclick="openPlayerHistory(event,'${p.id}')" style="background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.16);border-radius:999px;color:#fff;font-size:10px;font-weight:600;padding:4px 12px;cursor:pointer;font-family:'Inter',sans-serif;margin-top:4px">📅 History</button>
           </div>
         </div>
-        <div class="podium-step ${cls}" onclick="toggleCardFlip('${p.id}')">
+        <div class="podium-step ${cls}" onclick="toggleCardFlip('${p.id}',event)">
           <span class="podium-step-ordinal">${ordinal}</span>
           <span class="podium-step-label">PLACE</span>
         </div>
@@ -3918,6 +3925,7 @@ function renderBentoList() {
         const cs=ol.filter(e=>!e.patties||e.patties===1).length;
         const cd=ol.filter(e=>e.patties===2).length;
         const ct=ol.filter(e=>e.patties>=3).length;
+        const lb=latestBurger(p);
         return `
           <div class="challenger-item">
             <div class="challenger-row" onclick="toggleChallengerDrawer('${p.id}')" style="border-left:3px solid ${c}">
@@ -3933,7 +3941,8 @@ function renderBentoList() {
                 <div style="display:flex;align-items:center;gap:10px">
                   <div style="flex:1;min-width:0">
                     <div style="font-size:9px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px">Latest</div>
-                    <div style="font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${latestBurger(p)}</div>
+                    <div style="font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${lb.restaurant}</div>
+                    ${lb.when?`<div style="font-size:9px;color:#6B7280;font-weight:500;margin-top:2px">${lb.when}</div>`:''}
                   </div>
                   <button onclick="openPlayerHistory(event,'${p.id}')" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:var(--text);font-size:18px;padding:5px 8px;cursor:pointer;flex-shrink:0;line-height:1">📅</button>
                 </div>
@@ -3963,7 +3972,8 @@ function renderBentoList() {
   el.innerHTML=`<div class="podium-wrap"><div class="podium-row">${podiumHtml}</div>${challengerHtml}</div>`;
 }
 
-window.toggleCardFlip=function(pid){
+window.toggleCardFlip=function(pid,e){
+  if(e && e.target && e.target.closest('button')) return;
   const w=document.getElementById('flip-'+pid);
   if(w) w.classList.toggle('flipped');
 };
