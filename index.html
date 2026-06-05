@@ -548,13 +548,27 @@ body.social-active .social-input-area{
   backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
   border:1px solid rgba(255,255,255,0.10);
   border-radius:999px;
-  padding:5px 14px;
-  font-size:12px;font-weight:600;
-  color:var(--text);
+  padding:6px 16px;
+  font-size:11px;
+  color:var(--muted2);
   font-family:'Inter',sans-serif;
   letter-spacing:0.01em;
   box-shadow:0 2px 8px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.08);
   white-space:nowrap;
+}
+.stat-num{
+  font-family:'Poppins',sans-serif;
+  font-size:20px;
+  font-weight:900;
+  color:#FFFFFF;
+  letter-spacing:-0.5px;
+  line-height:1;
+}
+.stat-label{
+  font-size:10px;
+  color:var(--muted2);
+  font-weight:500;
+  letter-spacing:0.03em;
 }
 .lb-count,.tally-count{color:var(--av-text)}
 /* ── PATTY STACK BUILDER ── */
@@ -1752,9 +1766,9 @@ body.social-active .social-input-area{
       <h1>100 Burger Challenge</h1>
       <div class="room-pill">Room: <span id="room-display">—</span></div>
       <div id="stat-pills-row">
-        <div class="stat-pill">🗓 <span id="stat-days">--</span> days left</div>
-        <div class="stat-pill">🍔 <span id="stat-finished">0</span> total</div>
-        <div class="stat-pill" id="daily-pill">🔥 <span id="daily-count">0</span> today</div>
+        <div class="stat-pill">🗓 <span id="stat-days" class="stat-num">--</span><span class="stat-label">days left</span></div>
+        <div class="stat-pill">🍔 <span id="stat-finished" class="stat-num">0</span><span class="stat-label">total</span></div>
+        <div class="stat-pill" id="daily-pill">🔥 <span id="daily-count" class="stat-num">0</span><span class="stat-label">today</span></div>
       </div>
       <div id="spectator-pill" style="display:none;font-size:11px;font-weight:600;color:var(--muted2);background:rgba(255,255,255,0.05);border:1px solid var(--border2);padding:3px 12px;border-radius:999px;letter-spacing:0.04em">👁 Spectating</div>
     </header>
