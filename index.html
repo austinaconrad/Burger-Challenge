@@ -2678,7 +2678,7 @@ window._badgePopupData = {};
 window.showBadgePopup = function(key) {
   const d = window._badgePopupData[key];
   if (!d) return;
-  const {label, tip, earned, color} = d;
+  const {label, tip, earned, color, progStat} = d;
   const existing = document.getElementById('badge-popup');
   if (existing) existing.remove();
   const popup = document.createElement('div');
@@ -2703,6 +2703,16 @@ window.showBadgePopup = function(key) {
           <div style="font-size:10px;font-weight:600;padding:3px 10px;border-radius:999px;${earned ? `background:${color}22;color:${color};border:1px solid ${color}44` : 'background:rgba(255,255,255,0.05);color:#9CA3AF;border:1px solid rgba(255,255,255,0.1)'}">${earned ? '✅ Earned' : '🔒 Locked'}</div>
         </div>
         <div style="font-size:14px;color:var(--text);line-height:1.6">${escHtml(tip)}</div>
+        ${progStat ? `
+        <div style="margin-top:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
+            <span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.08em">Progress</span>
+            <span style="font-size:11px;font-weight:700;color:${color}">${progStat.text}</span>
+          </div>
+          <div style="height:4px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden">
+            <div style="height:100%;width:${Math.round(progStat.pct*100)}%;background:${color};border-radius:999px;transition:width 0.4s ease"></div>
+          </div>
+        </div>` : ''}
         <div style="font-size:10px;color:#555;text-align:center;margin-top:12px">Tap to dismiss</div>
       </div>
     </div>`;
@@ -2777,7 +2787,19 @@ function renderStickerPage(p) {
     const glyphs = (!isSvg && typeof a.emoji === 'string') ? [...a.emoji].filter(c => c.trim()).length : 1;
     const isMulti = glyphs > 1;
     const emojiSize = isMulti ? 'font-size:16px;gap:3px;flex-direction:row;flex-wrap:nowrap;' : 'font-size:28px;';
-    window._badgePopupData[k] = {label: a.label, tip: a.tip, earned: isEarned, color};
+    const PROG_LABELS = {
+      clownin_around:   (c,m)=>`${c} / ${m} McDonald's Burgers`,
+      centennial_club:  (c,m)=>`${c} / ${m} Burgers Logged`,
+      halfway:          (c,m)=>`${c} / ${m} Burgers Logged`,
+      vegans_nightmare: (c,m)=>`${c} / ${m} Day Streak`,
+      double_down:      (c,m)=>`${c} / ${m} Burgers In One Day`,
+      weekend_warrior:  (c,m)=>`${c} / ${m} Weekend Burgers`,
+    };
+    const prog = progress[k];
+    const progStat = (!isEarned && prog && prog.current > 0 && PROG_LABELS[k])
+      ? { current: prog.current, max: prog.max, text: PROG_LABELS[k](prog.current, prog.max), pct: Math.min(prog.current / prog.max, 1) }
+      : null;
+    window._badgePopupData[k] = {label: a.label, tip: a.tip, earned: isEarned, color, progStat};
 
     if (isEarned) {
       return `<div class="sticker-cell" onclick="showBadgePopup('${k}')" style="cursor:pointer">
