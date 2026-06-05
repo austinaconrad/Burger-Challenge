@@ -1433,15 +1433,23 @@ body.social-active .social-input-area{
 }
 .perfect-star {
   position: absolute;
-  bottom: 6px;
-  right: 10px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   font-size: 72px;
   line-height: 1;
-  opacity: 0.12;
+  opacity: 0.13;
   z-index: 0;
   pointer-events: none;
   user-select: none;
   filter: drop-shadow(0 0 8px rgba(255,215,0,0.5));
+}
+.burger-stack-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 /* Triple card — no special border, inherits standard card style */
 .grill-feed-card.triple-card {}
@@ -4220,7 +4228,6 @@ function renderGrillFeed() {
     return `
 <div class="grill-feed-card ${pattyCount >= 3 ? 'triple-card' : ''}${item.rating === 5 ? ' perfect-rating' : ''}" style="animation-delay:${Math.min(idx * 0.04, 0.6)}s">
   <div class="grill-card-inner">
-    ${item.rating === 5 ? '<div class="perfect-star">⭐</div>' : ''}
     <div class="grill-left-accent" style="background:${color}"></div>
     <div class="grill-card-banner">
       <div class="grill-banner-left">
@@ -4243,7 +4250,10 @@ function renderGrillFeed() {
           ${ratingStars}
         </div>
       </div>
-      ${miniBurgerStack(pattyCount)}
+      <div class="burger-stack-wrap">
+        ${item.rating === 5 ? '<div class="perfect-star">⭐</div>' : ''}
+        ${miniBurgerStack(pattyCount)}
+      </div>
     </div>
   </div>
 </div>`.trim();
