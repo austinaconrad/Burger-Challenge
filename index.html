@@ -1433,26 +1433,18 @@ body.social-active .social-input-area{
 }
 .perfect-star {
   position: absolute;
-  top: -8px;
-  right: 2px;
-  font-size: 80px;
+  bottom: 6px;
+  right: 10px;
+  font-size: 72px;
   line-height: 1;
-  opacity: 0.08;
+  opacity: 0.12;
   z-index: 0;
   pointer-events: none;
   user-select: none;
-  filter: drop-shadow(0 0 8px rgba(255,215,0,0.6));
+  filter: drop-shadow(0 0 8px rgba(255,215,0,0.5));
 }
-/* Triple gets amber fire accent instead of gradient border */
-.grill-feed-card.triple-card {
-  border-color: var(--amber, #F59E0B);
-  box-shadow: 0 4px 20px rgba(245,158,11,0.08);
-  animation: grillCardIn 0.28s ease both, tripleGlow 2.8s ease-in-out infinite;
-}
-@keyframes tripleGlow {
-  0%,100% { box-shadow: 0 4px 20px rgba(245,158,11,0.08); }
-  50%      { box-shadow: 0 4px 28px rgba(245,158,11,0.18), 0 0 14px rgba(245,158,11,0.10); }
-}
+/* Triple card — no special border, inherits standard card style */
+.grill-feed-card.triple-card {}
 
 /* Inner wrapper — just for positioning the accent strip */
 .grill-card-inner { position: relative; }
