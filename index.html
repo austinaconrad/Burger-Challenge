@@ -1427,16 +1427,21 @@ body.social-active .social-input-area{
   from { opacity:0; transform: translateY(8px); }
   to   { opacity:1; transform: translateY(0); }
 }
-/* Perfect 5-star rating — USA red/white/blue glowing border rings */
+/* Perfect 5-star rating — standard border, big watermark star */
 .grill-feed-card.perfect-rating {
-  border-color: rgba(185,28,28,0.7);
-  box-shadow:
-    0 0 0 1px rgba(185,28,28,0.7),
-    0 0 0 2.5px rgba(240,240,240,0.55),
-    0 0 0 4px rgba(29,78,216,0.7),
-    0 0 10px rgba(185,28,28,0.25),
-    0 0 14px rgba(29,78,216,0.2),
-    var(--shadow-card);
+  border-color: var(--border);
+}
+.perfect-star {
+  position: absolute;
+  top: -8px;
+  right: 2px;
+  font-size: 80px;
+  line-height: 1;
+  opacity: 0.08;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(0 0 8px rgba(255,215,0,0.6));
 }
 /* Triple gets amber fire accent instead of gradient border */
 .grill-feed-card.triple-card {
@@ -4223,6 +4228,7 @@ function renderGrillFeed() {
     return `
 <div class="grill-feed-card ${pattyCount >= 3 ? 'triple-card' : ''}${item.rating === 5 ? ' perfect-rating' : ''}" style="animation-delay:${Math.min(idx * 0.04, 0.6)}s">
   <div class="grill-card-inner">
+    ${item.rating === 5 ? '<div class="perfect-star">⭐</div>' : ''}
     <div class="grill-left-accent" style="background:${color}"></div>
     <div class="grill-card-banner">
       <div class="grill-banner-left">
