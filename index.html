@@ -971,6 +971,81 @@ body.social-active .social-input-area{
 }
 
 /* ══════════════════════════════════════════════
+   🏆 ARCADE PODIUM — Ranks Tab
+   ══════════════════════════════════════════════ */
+.podium-wrap { padding: 4px 0 24px; }
+.podium-row { display: flex; align-items: flex-end; gap: 6px; margin-bottom: 14px; }
+
+.podium-col {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  cursor: pointer; transition: transform 0.2s ease;
+}
+.podium-col:active { transform: scale(0.97); }
+
+.podium-card {
+  width: 100%; border-radius: 14px 14px 0 0;
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid; border-bottom: none;
+  box-shadow: var(--shadow-card);
+  padding: 12px 6px 14px;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  position: relative; overflow: hidden; text-align: center;
+}
+.podium-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+}
+.podium-card.p1 { background: rgba(245,158,11,0.10); border-color: rgba(245,158,11,0.4); box-shadow: 0 0 22px rgba(245,158,11,0.14), var(--shadow-card); }
+.podium-card.p1::before { background: linear-gradient(90deg, transparent, rgba(245,158,11,0.9), transparent); }
+.podium-card.p2 { background: rgba(167,139,250,0.08); border-color: rgba(167,139,250,0.3); }
+.podium-card.p2::before { background: linear-gradient(90deg, transparent, rgba(167,139,250,0.7), transparent); }
+.podium-card.p3 { background: rgba(110,231,183,0.07); border-color: rgba(110,231,183,0.25); }
+.podium-card.p3::before { background: linear-gradient(90deg, transparent, rgba(110,231,183,0.6), transparent); }
+
+.podium-medal { font-size: 22px; line-height: 1; }
+.podium-avatar {
+  width: 46px; height: 46px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 800; font-family: 'Inter', sans-serif;
+  border: 2px solid; flex-shrink: 0;
+}
+.podium-name {
+  font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
+  color: var(--text); white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; width: 100%; padding: 0 4px;
+}
+.podium-count { font-family: 'Poppins', sans-serif; font-weight: 900; line-height: 1; letter-spacing: -0.03em; }
+.podium-count.p1 { font-size: 42px; color: #F59E0B; }
+.podium-count.p2 { font-size: 34px; color: #A78BFA; }
+.podium-count.p3 { font-size: 28px; color: #6EE7B7; }
+.podium-burger-label { font-size: 9px; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+
+.podium-step {
+  width: 100%; display: flex; align-items: center; justify-content: center;
+  font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 900;
+  border-radius: 0 0 10px 10px;
+}
+.podium-step.p1 { height: 38px; background: linear-gradient(180deg, rgba(245,158,11,0.28), rgba(245,158,11,0.10)); color: rgba(245,158,11,0.8); }
+.podium-step.p2 { height: 24px; background: linear-gradient(180deg, rgba(167,139,250,0.22), rgba(167,139,250,0.08)); color: rgba(167,139,250,0.7); }
+.podium-step.p3 { height: 14px; background: linear-gradient(180deg, rgba(110,231,183,0.18), rgba(110,231,183,0.06)); color: rgba(110,231,183,0.6); }
+
+/* Challenger Pack */
+.challenger-list { display: flex; flex-direction: column; gap: 6px; }
+.challenger-row {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--surface); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border); border-radius: 12px;
+  padding: 10px 14px; cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s;
+  box-shadow: var(--shadow-card); overflow: hidden;
+}
+.challenger-row:active { transform: scale(0.98); }
+.challenger-rank { font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 900; color: var(--muted2); min-width: 28px; text-align: center; flex-shrink: 0; }
+.challenger-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; font-family: 'Inter', sans-serif; border: 1.5px solid; flex-shrink: 0; }
+.challenger-name { flex: 1; font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.challenger-count { font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 900; letter-spacing: -0.5px; line-height: 1; flex-shrink: 0; }
+.challenger-emoji { font-size: 13px; flex-shrink: 0; }
+
+/* ══════════════════════════════════════════════
    📅 BURGER HISTORY CALENDAR MODAL
    ══════════════════════════════════════════════ */
 .cal-modal-overlay {
@@ -3689,103 +3764,54 @@ function renderBentoList() {
   const ini = p => initials(p.name);
   const isMe = p => p.id === myPlayerId;
 
-  // Detect tied leaders
-  const topCount = sorted[0].count;
-  const heroes = sorted.filter(p => p.count === topCount);
-  const mid    = sorted.slice(heroes.length, heroes.length + (heroes.length > 1 ? 6 : 6));
-  const rest   = sorted.slice(heroes.length + mid.length);
+  const p1 = sorted[0], p2 = sorted[1] || null, p3 = sorted[2] || null;
+  const challengers = sorted.slice(3);
 
-  // ── Hero(es)
-  const soloHeroHtml = p => {
-    const hc = colorFor(p);
-    return `<div class="bento-hero" onclick="openCalModal('${p.id}')" style="cursor:pointer">
-      <div class="bento-hero-rank">1</div>
-      <div class="bento-hero-avatar" style="background:${hc}22;color:${hc};border-color:${hc}44">${ini(p)}</div>
-      <div class="bento-hero-info">
-        <div class="bento-hero-name">
-          ${escHtml(p.name)}
-          ${isMe(p) ? '<span class="me-badge">You</span>' : ''}
-          ${p.count >= 100 ? '<span class="done-badge">Done!</span>' : ''}
+  const PODIUM = {
+    1: { cls:'p1', medal:'🥇', stepH:38 },
+    2: { cls:'p2', medal:'🥈', stepH:24 },
+    3: { cls:'p3', medal:'🥉', stepH:14 },
+  };
+
+  const podiumCol = (p, rank) => {
+    if (!p) return `<div class="podium-col" style="visibility:hidden;pointer-events:none"></div>`;
+    const { cls, medal } = PODIUM[rank];
+    const c = colorFor(p);
+    return `
+      <div class="podium-col" onclick="openCalModal('${p.id}')">
+        <div class="podium-card ${cls}">
+          <div class="podium-medal">${medal}</div>
+          <div class="podium-avatar" style="background:${c}22;color:${c};border-color:${c}55">${ini(p)}</div>
+          <div class="podium-name">${escHtml(p.name)}${isMe(p) ? ' <span class="me-badge">You</span>' : ''}${p.count>=100?'<span class="done-badge">✓</span>':''}</div>
+          <div class="podium-count ${cls}">${p.count}</div>
+          <div class="podium-burger-label">🍔 burgers</div>
         </div>
-        <div class="bento-hero-sub">🏆 #1 Leader</div>
-      </div>
-      <div class="bento-hero-count">
-        <div class="bento-hero-num" style="color:${hc}">${p.count}</div>
-        <div class="bento-hero-label">🍔 burgers</div>
-      </div>
-    </div>`;
+        <div class="podium-step ${cls}">${rank}</div>
+      </div>`;
   };
 
-  const tiedHeroHtml = p => {
-    const hc = colorFor(p);
-    return `<div onclick="openCalModal('${p.id}')" style="cursor:pointer;flex:1;min-width:0;
-      background:var(--surface);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
-      border:1px solid rgba(245,158,11,0.35);border-radius:18px;
-      box-shadow:0 0 0 1px rgba(245,158,11,0.12),var(--shadow-card),0 0 28px rgba(245,158,11,0.10);
-      padding:16px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;overflow:hidden">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(245,158,11,0.7),transparent)"></div>
-      <div style="font-family:'Poppins',sans-serif;font-size:11px;font-weight:700;color:var(--amber);letter-spacing:0.06em;text-transform:uppercase">🤝 Tied #1</div>
-      <div style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;font-family:'Inter',sans-serif;background:${hc}22;color:${hc};border:2px solid ${hc}44">${ini(p)}</div>
-      <div style="font-family:'Poppins',sans-serif;font-size:14px;font-weight:800;color:var(--text);letter-spacing:-0.02em;text-align:center;line-height:1.3;max-width:100%;display:flex;flex-direction:column;align-items:center;gap:4px">
-        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%">${escHtml(p.name)}</span>
-        ${isMe(p) ? '<span class="me-badge">You</span>' : ''}
-      </div>
-      <div style="font-family:'Poppins',sans-serif;font-size:32px;font-weight:900;letter-spacing:-0.03em;line-height:1;color:${hc}">${p.count}</div>
-      <div style="font-size:10px;color:#9CA3AF;font-weight:600;text-transform:uppercase;letter-spacing:0.08em">🍔 burgers</div>
-    </div>`;
-  };
+  // Podium order: 2nd left, 1st center, 3rd right
+  const podiumHtml = podiumCol(p2, 2) + podiumCol(p1, 1) + podiumCol(p3, 3);
 
-  let html = `<div class="bento-list-wrap">`;
+  const challengerHtml = challengers.length ? `
+    <div class="challenger-list">
+      ${challengers.map((p, i) => {
+        const c = colorFor(p);
+        return `
+          <div class="challenger-row" onclick="openCalModal('${p.id}')" style="border-left:3px solid ${c}">
+            <div class="challenger-rank">#${i + 4}</div>
+            <div class="challenger-avatar" style="background:${c}1A;color:${c};border-color:${c}55">${ini(p)}</div>
+            <div class="challenger-name">${escHtml(p.name)}${isMe(p) ? ' <span class="me-badge">You</span>' : ''}</div>
+            <div class="challenger-count" style="color:${c}">${p.count}</div>
+            <div class="challenger-emoji">🍔</div>
+          </div>`;
+      }).join('')}
+    </div>` : '';
 
-  if (heroes.length === 1) {
-    html += soloHeroHtml(heroes[0]);
-  } else {
-    html += `<div style="display:flex;gap:10px;align-items:stretch">
-      ${heroes.map(tiedHeroHtml).join('')}
-    </div>`;
-  }
-
-  // ── Mid grid
-  if (mid.length) {
-    html += `<div class="bento-grid">`;
-    mid.forEach((p, i) => {
-      const c = colorFor(p);
-      html += `
-        <div class="bento-cell" onclick="openCalModal('${p.id}')" style="cursor:pointer;border-color:${c}30;padding-bottom:44px">
-          <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${c};border-radius:14px 0 0 14px"></div>
-          <div class="bento-cell-top">
-            <div class="bento-cell-rank">#${i + heroes.length + 1}</div>
-            <div class="bento-cell-avatar" style="background:${c}22;color:${c};border-color:${c}44">${ini(p)}</div>
-            <div class="bento-cell-name">${escHtml(p.name)}${isMe(p) ? ' <span class="me-badge">You</span>' : ''}</div>
-          </div>
-          <div class="bento-score-display">
-            <span style="color:${c}">${p.count}</span><span style="font-size:1.1rem">🍔</span>
-          </div>
-        </div>`;
-    });
-    html += `</div>`;
-  }
-
-  // ── Compact rows
-  if (rest.length) {
-    html += `<div class="bento-section-label">Also Grinding</div><div class="bento-compact-grid">`;
-    rest.forEach((p, i) => {
-      const c = colorFor(p);
-      html += `
-        <div class="bento-compact" onclick="openCalModal('${p.id}')" style="cursor:pointer;border-left:3px solid ${c}">
-          <div class="bento-compact-left">
-            <div class="bento-compact-rank">#${i + heroes.length + mid.length + 1}</div>
-            <div class="bento-compact-avatar" style="background:${c}22;color:${c};border:1px solid ${c}44">${ini(p)}</div>
-            <div class="bento-compact-name">${escHtml(p.name)}${isMe(p) ? ' <span class="me-badge">You</span>' : ''}</div>
-          </div>
-          <div class="bento-compact-count" style="color:${c}">${p.count} 🍔</div>
-        </div>`;
-    });
-    html += `</div>`;
-  }
-
-  html += `</div>`;
-  el.innerHTML = html;
+  el.innerHTML = `<div class="podium-wrap">
+    <div class="podium-row">${podiumHtml}</div>
+    ${challengerHtml}
+  </div>`;
 }
 
 // ── HORSE RACING ─────────────────────────────────────────────────
