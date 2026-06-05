@@ -2709,22 +2709,74 @@ window.showBadgePopup = function(key) {
   document.body.appendChild(popup);
 };
 
+function computeBadgeProgress(p) {
+  const objLogs = (p.logs || []).filter(e => typeof e === 'object' && e.ts);
+  const byDay = {};
+  objLogs.forEach(e => {
+    const d = new Date(e.ts);
+    const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    byDay[key] = (byDay[key] || 0) + 1;
+  });
+  const dayKeys = Object.keys(byDay).sort();
+  let streak = 1, best = 1;
+  for (let i = 1; i < dayKeys.length; i++) {
+    const [y1,m1,d1] = dayKeys[i-1].split('-').map(Number);
+    const [y2,m2,d2] = dayKeys[i].split('-').map(Number);
+    const diff = Math.round((new Date(y2,m2,d2) - new Date(y1,m1,d1)) / 86400000);
+    streak = diff === 1 ? streak + 1 : 1;
+    best = Math.max(best, streak);
+  }
+  const mcdCount = objLogs.filter(e => /mc\s*donald'?s?/i.test(e.restaurant||'')).length;
+  const maxInDay = Math.max(0, ...Object.values(byDay), 0);
+  const weekendCounts = {};
+  objLogs.forEach(e => {
+    const d = new Date(e.ts), dow = d.getDay();
+    if (dow===0||dow===5||dow===6) {
+      const fri = new Date(d);
+      if (dow===0) fri.setDate(d.getDate()-2);
+      else if (dow===6) fri.setDate(d.getDate()-1);
+      const key = `${fri.getFullYear()}-${String(fri.getMonth()).padStart(2,'0')}-${String(fri.getDate()).padStart(2,'0')}`;
+      weekendCounts[key] = (weekendCounts[key]||0)+1;
+    }
+  });
+  const maxWeekend = Math.max(0, ...Object.values(weekendCounts), 0);
+  return {
+    clownin_around:   { current: mcdCount,        max: 3   },
+    centennial_club:  { current: p.count || 0,    max: 100 },
+    halfway:          { current: p.count || 0,    max: 50  },
+    vegans_nightmare: { current: best,             max: 5   },
+    double_down:      { current: maxInDay,         max: 2   },
+    weekend_warrior:  { current: maxWeekend,       max: 6   },
+  };
+}
+
+function progressRingSvg(pct, colorStr) {
+  const s = 76, r = 35, cx = 38, cy = 38, circ = 2 * Math.PI * r;
+  const dash = Math.min(pct, 1) * circ;
+  return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}"
+    style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-90deg);pointer-events:none;z-index:1">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="2.5"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${colorStr}" stroke-width="2.5"
+      stroke-dasharray="${dash.toFixed(2)} ${circ.toFixed(2)}"
+      stroke-linecap="round" opacity="0.65"/>
+  </svg>`;
+}
+
 function renderStickerPage(p) {
   const achievements = computeAchievements(p, players);
   const total = Object.keys(ACHIEVEMENTS).length;
   const earned = achievements.length;
   const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
   const skews = [-3,-1.5,2,1,-2,3,-1,2.5,-2.5,1.5,-3,2,-1,3,1.5];
+  const progress = computeBadgeProgress(p);
 
   const badgesHtml = Object.entries(ACHIEVEMENTS).map(([k, a], i) => {
     const isEarned = achievements.includes(k);
     const skew = skews[i % skews.length];
-    // Detect multi-glyph emoji to shrink font so they sit side-by-side
     const isSvg = typeof a.emoji === 'string' && a.emoji.includes('<svg');
     const glyphs = (!isSvg && typeof a.emoji === 'string') ? [...a.emoji].filter(c => c.trim()).length : 1;
     const isMulti = glyphs > 1;
     const emojiSize = isMulti ? 'font-size:16px;gap:3px;flex-direction:row;flex-wrap:nowrap;' : 'font-size:28px;';
-    // Store data by key to avoid apostrophe escaping issues in onclick
     window._badgePopupData[k] = {label: a.label, tip: a.tip, earned: isEarned, color};
 
     if (isEarned) {
@@ -2735,8 +2787,14 @@ function renderStickerPage(p) {
         <div class="sticker-label">${a.label}</div>
       </div>`;
     } else {
+      const prog = progress[k];
+      const pct = prog ? Math.min(prog.current / prog.max, 1) : 0;
+      const ring = (prog && pct > 0) ? progressRingSvg(pct, a.color) : '';
       return `<div class="sticker-cell" onclick="showBadgePopup('${k}')" style="cursor:pointer">
-        <div class="badge-sticker locked">?</div>
+        <div style="position:relative;display:inline-flex;align-items:center;justify-content:center">
+          ${ring}
+          <div class="badge-sticker locked">?</div>
+        </div>
         <div class="sticker-label locked">${a.label}</div>
       </div>`;
     }
