@@ -3862,6 +3862,8 @@ function renderBentoList() {
   };
 
   const p1=sorted[0], p2=sorted[1]||null, p3=sorted[2]||null;
+  const topTieCount = p1?.count || 0;
+  const isTied = (p) => p && topTieCount > 0 && p.count === topTieCount;
   const challengers=sorted.slice(3);
 
   const PODIUM={
@@ -3922,7 +3924,7 @@ function renderBentoList() {
       </div>`;
   };
 
-  const podiumHtml=podiumCol(p2,2)+podiumCol(p1,1)+podiumCol(p3,3);
+  const podiumHtml=podiumCol(p2,isTied(p2)?1:2)+podiumCol(p1,1)+podiumCol(p3,isTied(p3)?1:3);
 
   const challengerHtml=challengers.length?`
     <div class="challenger-list">
@@ -4205,7 +4207,7 @@ function renderRaceTrack() {
       const color    = RING_COLORS[p.colorIdx % RING_COLORS.length];
       const ini      = initials(p.name);
       const pct      = raceHorsePosFor(p.count, ceiling);
-      const isLeader = p.id === leaderId && p.count > 0;
+      const isLeader = p.count > 0 && p.count === topCount;
       // Stagger delays and vary durations so horses bob independently
       const delay = ((i * 137) % 1400) / 1000; // prime step gives varied spread
       const dur   = isLeader ? (1.0 + (i % 3) * 0.15) : (1.2 + (i % 5) * 0.12);
@@ -4227,7 +4229,7 @@ function renderRaceTrack() {
       horse.style.left = raceHorsePosFor(p.count, ceiling) + '%';
       const badge = horse.querySelector('.jockey-badge');
       if (badge) badge.textContent = initials(p.name) + ' (' + p.count + ')';
-      const isLeader = p.id === leaderId && p.count > 0;
+      const isLeader = p.count > 0 && p.count === topCount;
       horse.classList.toggle('leader-horse', isLeader);
       let dust = horse.querySelector('.dust-trail');
       if (isLeader && !dust) {
