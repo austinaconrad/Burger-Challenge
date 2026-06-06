@@ -3883,6 +3883,8 @@ function renderBentoList() {
     const singles=ol.filter(e=>!e.patties||e.patties===1).length;
     const doubles=ol.filter(e=>e.patties===2).length;
     const triples=ol.filter(e=>e.patties>=3).length;
+    const untracked=Math.max(0, p.count-(singles+doubles+triples));
+    const untrackedPill=untracked>0?`<span style="position:absolute;top:8px;right:8px;z-index:2;font-size:8px;font-weight:700;color:#9CA3AF;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:999px;padding:2px 7px;white-space:nowrap;font-family:'Inter',sans-serif">${untracked} untracked</span>`:'';
     const badgeCount=computeAchievements(p,players).length;
     const totalBadges=Object.keys(ACHIEVEMENTS).length;
     return `
@@ -3898,6 +3900,7 @@ function renderBentoList() {
             <div class="podium-burger-label">🍔 burgers</div>
           </div>
           <div class="podium-card podium-face-back ${cls}" style="padding:10px 6px 12px">
+            ${untrackedPill}
             <div style="font-size:9px;font-weight:700;color:${c};text-transform:uppercase;letter-spacing:0.1em">${escHtml(p.name)}</div>
             <div style="display:flex;gap:6px;width:100%;padding:0 4px;box-sizing:border-box;margin:4px 0">
               <div style="flex:1;text-align:center">
@@ -3934,6 +3937,7 @@ function renderBentoList() {
         const cs=ol.filter(e=>!e.patties||e.patties===1).length;
         const cd=ol.filter(e=>e.patties===2).length;
         const ct=ol.filter(e=>e.patties>=3).length;
+        const cu=Math.max(0, p.count-(cs+cd+ct));
         const lb=latestBurger(p);
         const lastSeen=timeAgo(p);
         return `
@@ -3970,10 +3974,14 @@ function renderBentoList() {
                       <div style="font-family:'Poppins',sans-serif;font-size:16px;font-weight:900;color:#E5E5E5;line-height:1">${cd}</div>
                       <div style="font-size:8px;color:#9CA3AF;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Double</div>
                     </div>
-                    <div style="flex:1;text-align:center">
+                    <div style="flex:1;text-align:center;border-right:${cu>0?'1px solid rgba(255,255,255,0.07)':'none'}">
                       <div style="font-family:'Poppins',sans-serif;font-size:16px;font-weight:900;color:#3B82F6;line-height:1">${ct}</div>
                       <div style="font-size:8px;color:#9CA3AF;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Triples</div>
                     </div>
+                    ${cu>0?`<div style="flex:1;text-align:center">
+                      <div style="font-family:'Poppins',sans-serif;font-size:16px;font-weight:900;color:#6B7280;line-height:1">${cu}</div>
+                      <div style="font-size:8px;color:#6B7280;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Untracked</div>
+                    </div>`:''}
                   </div>
                 </div>
               </div>
