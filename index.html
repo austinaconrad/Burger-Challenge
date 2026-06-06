@@ -3539,13 +3539,20 @@ async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null
           const tempF = Math.round((tempC * 9/5) + 32);
           const weatherCode = data.current_weather.weathercode;
           let conditionLabel = 'GOOD GRILLING CONDITIONS';
-          if (weatherCode >= 61 && weatherCode <= 65)      conditionLabel = 'RAIN DETECTED (HARDCORE DEDICATION)';
-          else if (weatherCode >= 66 && weatherCode <= 67) conditionLabel = 'FREEZING RAIN (LEGENDARY DEDICATION)';
-          else if (weatherCode >= 71 && weatherCode <= 77) conditionLabel = 'SNOW ON THE GRILL';
-          else if (weatherCode >= 95)                      conditionLabel = 'THUNDERSTORM BURGER';
-          else if (tempF >= 90)                            conditionLabel = 'SCORCHING HEATPACK';
-          else if (tempF <= 45)                            conditionLabel = 'CHILLY SEAR';
-          const weatherStamp = `☀️ ${tempF}°F - ${conditionLabel}`;
+          let weatherEmoji = '☀️';
+          if (weatherCode >= 95)                            { conditionLabel = 'THUNDERSTORM BURGER';                weatherEmoji = '⛈️'; }
+          else if (weatherCode >= 80 && weatherCode <= 82) { conditionLabel = 'RAIN SHOWER (HARDCORE DEDICATION)';  weatherEmoji = '🌦️'; }
+          else if (weatherCode >= 85 && weatherCode <= 86) { conditionLabel = 'SNOW SHOWER ON THE GRILL';           weatherEmoji = '🌨️'; }
+          else if (weatherCode >= 71 && weatherCode <= 77) { conditionLabel = 'SNOW ON THE GRILL';                  weatherEmoji = '❄️'; }
+          else if (weatherCode >= 66 && weatherCode <= 67) { conditionLabel = 'FREEZING RAIN (LEGENDARY DEDICATION)'; weatherEmoji = '🌧️'; }
+          else if (weatherCode >= 61 && weatherCode <= 65) { conditionLabel = 'RAIN DETECTED (HARDCORE DEDICATION)'; weatherEmoji = '🌧️'; }
+          else if (weatherCode >= 51 && weatherCode <= 57) { conditionLabel = 'DRIZZLE BURGER';                     weatherEmoji = '🌦️'; }
+          else if (weatherCode >= 45 && weatherCode <= 48) { conditionLabel = 'FOGGY GRILL';                        weatherEmoji = '🌫️'; }
+          else if (weatherCode === 3)                       { conditionLabel = 'OVERCAST CONDITIONS';                weatherEmoji = '☁️'; }
+          else if (weatherCode === 2)                       { conditionLabel = 'PARTLY CLOUDY';                     weatherEmoji = '⛅'; }
+          else if (tempF >= 90)                             { conditionLabel = 'SCORCHING HEATPACK';                weatherEmoji = '🔥'; }
+          else if (tempF <= 45)                             { conditionLabel = 'CHILLY SEAR';                       weatherEmoji = '🥶'; }
+          const weatherStamp = `${weatherEmoji} ${tempF}°F - ${conditionLabel}`;
           const me3 = players.find(p => p.id === myPlayerId);
           if (!me3) return;
           const updatedLogs = (me3.logs || []).map(e => {
