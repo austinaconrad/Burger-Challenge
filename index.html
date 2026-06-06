@@ -3977,22 +3977,21 @@ function renderBentoList() {
     const wrap=document.getElementById('flip-'+p.id);
     if(!wrap) return;
     let _touchTarget=null;
-    wrap.addEventListener('touchstart',e=>{
-      _touchTarget=e.target;
-      if(_touchTarget&&_touchTarget.closest&&_touchTarget.closest('[data-history]')){
-        e.preventDefault(); // stops scroll jank / tap highlight on the pill
-      }
-    },{passive:false});
-    wrap.addEventListener('click',()=>{
+    // touchstart (passive) — reliably records the tapped element on iOS
+    wrap.addEventListener('touchstart',e=>{ _touchTarget=e.target; },{passive:true});
+    // touchend handles all logic and suppresses the follow-up click
+    wrap.addEventListener('touchend',e=>{
+      if(!_touchTarget) return;
+      e.preventDefault(); // block the ghost click that iOS fires after touchend
       if(!wrap.classList.contains('flipped')){
         wrap.classList.add('flipped');
-      } else if(_touchTarget && _touchTarget.closest && _touchTarget.closest('[data-history]')){
+      } else if(_touchTarget.closest&&_touchTarget.closest('[data-history]')){
         openCalModal(p.id);
       } else {
         wrap.classList.remove('flipped');
       }
       _touchTarget=null;
-    });
+    },{passive:false});
   });
 }
 
