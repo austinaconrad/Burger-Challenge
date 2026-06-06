@@ -226,8 +226,12 @@ button{transition:transform 0.2s ease}
 .tally-sub{font-size:12px;color:var(--muted2);margin-top:2px;font-weight:400}
 .tally-count{font-family:'Poppins',sans-serif;font-size:56px;font-weight:900;line-height:1;letter-spacing:-2px;transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1)}
 .tally-count.pop{transform:scale(1.3)}
-.progress-track{height:6px;background:rgba(255,255,255,0.08);margin:0 16px;border-radius:999px;overflow:hidden}
-.progress-fill{height:100%;border-radius:999px;transition:width 0.5s cubic-bezier(0.34,1.56,0.64,1)}
+.progress-track{height:16px;background:rgba(255,255,255,0.07);margin:0 16px;border-radius:999px;overflow:visible;position:relative;box-shadow:inset 0 2px 4px rgba(0,0,0,0.35)}
+.progress-fill{height:100%;border-radius:999px;transition:width 0.5s cubic-bezier(0.34,1.56,0.64,1);position:relative;overflow:hidden;box-shadow:0 0 12px rgba(245,158,11,0.30),0 2px 6px rgba(0,0,0,0.30),inset 0 1px 0 rgba(255,255,255,0.18)}
+.progress-fill::before{content:'';position:absolute;top:0;bottom:0;width:40%;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.28) 50%,transparent 100%);animation:barShimmer 2.6s ease-in-out infinite}
+@keyframes barShimmer{0%{left:-40%}100%{left:130%}}
+.progress-burger{position:absolute;top:50%;transform:translate(-50%,-50%);font-size:20px;line-height:1;transition:left 0.5s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;z-index:2;filter:drop-shadow(0 1px 5px rgba(245,158,11,0.55));display:none}
+.progress-burger.visible{display:block}
 .tally-bun-bottom{height:3px;background:linear-gradient(90deg,var(--amber-dark),var(--sesame),var(--amber-dark));margin:12px 16px 0;border-radius:999px;opacity:0.4}
 .tally-controls{display:grid;grid-template-columns:60px 1fr 60px;margin-top:12px;border-top:1px solid var(--border)}
 .ctrl-btn{background:none;border:none;color:var(--muted2);font-size:24px;cursor:pointer;padding:14px;transition:color 0.15s,background 0.15s;display:flex;align-items:center;justify-content:center}
@@ -2969,7 +2973,7 @@ function renderMyTally(){
       </div>
       <div class="tally-count ${cc}" id="my-count">${me.count}</div>
     </div>
-    <div class="progress-track"><div class="progress-fill ${cc}" id="my-bar" style="width:${pct}%"></div></div>
+    <div class="progress-track"><div class="progress-fill ${cc}" id="my-bar" style="width:${pct}%"></div><div class="progress-burger${pct>0?' visible':''}" id="my-burger" style="left:${pct}%">🍔</div></div>
     <div class="tally-bun-bottom"></div>
     <!-- Patty Stack Builder -->
     <div class="patty-builder">
@@ -3502,8 +3506,11 @@ async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null
   const newCount=Math.max(0,Math.min(999,me.count+delta));
   const cntEl=document.getElementById('my-count');
   const barEl=document.getElementById('my-bar');
+  const burgerEl=document.getElementById('my-burger');
   if(cntEl){cntEl.textContent=newCount;cntEl.classList.remove('pop');void cntEl.offsetWidth;cntEl.classList.add('pop');setTimeout(()=>cntEl.classList.remove('pop'),200)}
-  if(barEl) barEl.style.width=Math.min(100,newCount)+'%';
+  const barPct=Math.min(100,newCount);
+  if(barEl) barEl.style.width=barPct+'%';
+  if(burgerEl){burgerEl.style.left=barPct+'%';burgerEl.classList.toggle('visible',newCount>0);}
   const currentLogs = me.logs || [];
   let newLogs = [...currentLogs];
   if(delta > 0){
