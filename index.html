@@ -3541,15 +3541,12 @@ window.selectPatties = function(n) {
   const d = document.getElementById('burger-detail');
   if (d && !d.classList.contains('open')) {
     d.classList.add('open');
-    // Seed quick spots & GPS
-    const qs = document.getElementById('quick-spots');
-    if (qs) qs.innerHTML = OHIO_SPOTS.slice(0,5).map(s =>
-      `<button class="quick-spot" data-spot="${escHtml(s)}" onclick="document.getElementById('detail-restaurant').value=this.dataset.spot">${escHtml(s)}</button>`
-    ).join('');
-    setRating(0);
-    const sliderEl = document.getElementById('rating-slider');
-    if (sliderEl) sliderEl.value = 0;
-    document.getElementById('detail-restaurant').value = '';
+    // Only reset rating if no critic score was pre-filled (selectMenuItem sets it after this)
+    if (!pendingMenuItemName) {
+      setRating(0);
+      const sliderEl = document.getElementById('rating-slider');
+      if (sliderEl) sliderEl.value = 0;
+    }
     pendingGPS = null;
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(pos => {
