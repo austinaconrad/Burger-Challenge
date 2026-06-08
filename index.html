@@ -4223,6 +4223,7 @@ window.showRacePopup = function(pid, evt) {
 document.addEventListener('click', () => document.getElementById('race-popup')?.remove());
 
 const RACE_LEFT_START = 8;   // % from left for start line
+let _raceAnimateFromStart = false;
 const RACE_LEFT_END   = 93;  // % from left for finish line
 const RACE_LEFT_RANGE = RACE_LEFT_END - RACE_LEFT_START;
 const RACE_GATE_PAD   = 2;   // % gap between start line and resting horses
@@ -4334,6 +4335,24 @@ function renderRaceTrack() {
       }
     });
   }
+
+  // ── Gate-break animation: snap to start, then run to real positions ──
+  if (_raceAnimateFromStart) {
+    _raceAnimateFromStart = false;
+    const allHorses = lanesEl.querySelectorAll('.jockey-horse');
+    // Snapshot the real target positions that were just set
+    const targets = new Map();
+    allHorses.forEach(h => targets.set(h, h.style.left));
+    // Snap all horses to the starting gate with no transition
+    allHorses.forEach(h => { h.style.transition = 'none'; h.style.left = (RACE_LEFT_START - 2.5) + '%'; });
+    // Two rAFs guarantees the browser has painted the gate position before we restore the transition
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      allHorses.forEach(h => {
+        h.style.transition = ''; // restore CSS transition
+        h.style.left = targets.get(h) || h.style.left;
+      });
+    }));
+  }
 }
 
 window.switchTab=function(name,btn){
@@ -4362,7 +4381,7 @@ window.switchTab=function(name,btn){
   if(name==='feed') renderGrillFeed();
   if(name==='list') renderBentoList();
   if(name==='leaderboard') { _openAlbumId = null; const s=[...players].sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name)); renderLeaderboard(s); }
-  if(name==='racing') renderRaceTrack();
+  if(name==='racing') { _raceAnimateFromStart = true; renderRaceTrack(); }
 };
 
 window.switchToPlayers = function() {
@@ -4566,9 +4585,9 @@ function renderTopRated() {
     const half = item.rating % 1 >= 0.5;
     let stars = '';
     for (let s = 1; s <= 5; s++) {
-      if (item.rating >= s)          stars += '🔥';
-      else if (item.rating >= s-0.5) stars += '♨️';
-      else                           stars += '<span style="opacity:0.15;font-size:13px">🔥</span>';
+      if (item.rating >= s)          stars += '⭐';
+      else if (item.rating >= s-0.5) stars += '<span style="font-size:13px">✨</span>';
+      else                           stars += '<span style="opacity:0.15;font-size:13px">⭐</span>';
     }
     return `<div class="tr-card" style="animation-delay:${Math.min(i*0.04,0.5)}s">
       <div class="tr-rank ${rankCls(i)}">#${i+1}</div>
