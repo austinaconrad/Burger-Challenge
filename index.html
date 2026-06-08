@@ -766,6 +766,10 @@ body.social-active .social-input-area{
 .pb-blue-cheese { width:120px; height:6px; background:radial-gradient(circle 2px at 12% 50%,#818CF8 0%,transparent 100%),radial-gradient(circle 2px at 38% 30%,#6366F1 0%,transparent 100%),radial-gradient(circle 2px at 62% 70%,#818CF8 0%,transparent 100%),radial-gradient(circle 2px at 85% 40%,#6366F1 0%,transparent 100%),linear-gradient(180deg,#F8FAFC 0%,#E2E8F0 100%); border-radius:3px; margin:1px auto; box-shadow:0 1px 3px rgba(0,0,0,0.2); animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
 .pb-special-sauce { width:120px; height:4px; background:linear-gradient(180deg,#FB923C 0%,#C2410C 100%); border-radius:3px; margin:1px auto; box-shadow:0 1px 4px rgba(194,65,12,0.4); animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
 
+/* Prevent iOS Safari zoom-on-focus by forcing 16px min on touch devices */
+@media (hover:none) and (pointer:coarse) {
+  input[type="text"],input[type="number"],input[type="email"],input[type="password"],input[type="search"],textarea,select { font-size:16px !important; }
+}
 .topping-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
 .topping-btn{background:var(--surface3);border:1px solid var(--border2);border-radius:999px;color:var(--muted2);font-size:11px;font-weight:500;padding:5px 11px;cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif}
 @media(hover:hover)and(pointer:fine){.topping-btn:hover{border-color:var(--amber);color:var(--amber)}}
