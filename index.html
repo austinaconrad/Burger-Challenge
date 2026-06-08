@@ -289,11 +289,11 @@ button{transition:transform 0.2s ease}
 /* Cinematic: cap photo height so portraits don't swamp the feed */
 .msg-img-wrap img{max-height:240px;object-fit:cover;border-radius:12px;width:100%;display:block}
 /* ── Compact header: shared rules for Social + Map + Base tabs ── */
-body.social-active header .burger-deco,
-body.social-active header h1,
-body.social-active header .room-pill,
-body.social-active header #stat-pills-row,
-body.social-active header #spectator-pill,
+body.feed-active header .burger-deco,
+body.feed-active header h1,
+body.feed-active header .room-pill,
+body.feed-active header #stat-pills-row,
+body.feed-active header #spectator-pill,
 body.map-active header .burger-deco,
 body.map-active header h1,
 body.map-active header .room-pill,
@@ -304,10 +304,10 @@ body.racing-active header h1,
 body.racing-active header .room-pill,
 body.racing-active header #stat-pills-row,
 body.racing-active header #spectator-pill{display:none!important}
-body.social-active header,
+body.feed-active header,
 body.map-active header,
 body.racing-active header{padding:6px 0 0!important;gap:0!important}
-body.social-active .tabs,
+body.feed-active .tabs,
 body.map-active .tabs,
 body.racing-active .tabs{
   position:sticky;top:0;z-index:20;
@@ -331,15 +331,15 @@ body.map-active #burger-map{
   min-height:280px;
 }
 /* Full-height scrollable feed */
-body.social-active .social-wrap{height:auto;min-height:0}
-body.social-active .social-feed{
+body.feed-active .social-wrap{height:auto;min-height:0}
+body.feed-active .social-feed{
   /* 130px = compact header + tabs; 80px = input bar + safe area — feed never reaches the input bar */
   height:calc(100dvh - 130px - 80px);
   padding-bottom:16px;
   min-height:0;
 }
 /* Sticky input footer */
-body.social-active .social-input-area{
+body.feed-active .social-input-area{
   position:fixed;
   bottom:0;
   left:50%;
@@ -352,6 +352,32 @@ body.social-active .social-input-area{
   z-index:100;
   box-shadow:0 -4px 24px rgba(0,0,0,0.35);
 }
+/* ── Unified feed: burger card action bar + comment threads ── */
+.feed-card-actions{display:flex;align-items:center;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)}
+.feed-react-btn{background:none;border:none;padding:4px 7px;border-radius:999px;cursor:pointer;flex-shrink:0;color:rgba(255,255,255,0.28);display:flex;align-items:center;justify-content:center;transition:color 0.2s ease,transform 0.2s ease,background 0.2s ease;line-height:0}
+.feed-react-btn:hover,.feed-react-btn:focus-visible{color:#fff;transform:scale(1.15);background:rgba(255,255,255,0.08);outline:none}
+.feed-react-btn:active{transform:scale(0.92)}
+.feed-comment-btn{background:none;border:none;color:rgba(255,255,255,0.35);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;transition:background 0.15s,color 0.15s;font-family:'Inter',sans-serif}
+.feed-comment-btn:hover{background:rgba(255,255,255,0.07);color:var(--text)}
+.feed-comment-btn .comment-count{font-size:11px;color:var(--muted2)}
+.feed-comment-thread{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)}
+.feed-comment-list{display:flex;flex-direction:column;gap:7px;margin-bottom:9px}
+.feed-comment{display:flex;gap:8px;align-items:flex-start}
+.comment-avatar{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;margin-top:1px}
+.comment-body{flex:1;min-width:0}
+.comment-meta{display:flex;align-items:baseline;gap:5px;margin-bottom:1px}
+.comment-name{font-size:11px;font-weight:700;color:var(--muted2)}
+.comment-time{font-size:9px;color:var(--muted);font-weight:400}
+.comment-text{font-size:13px;color:var(--text);word-break:break-word;line-height:1.45}
+.comment-input-row{display:flex;gap:6px;align-items:center}
+.comment-input-row input{flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.10);border-radius:20px;padding:6px 13px;color:var(--text);font-size:13px;outline:none;font-family:'Inter',sans-serif;transition:border-color 0.2s}
+.comment-input-row input:focus{border-color:rgba(245,158,11,0.45)}
+.comment-input-row input::placeholder{color:var(--muted)}
+.comment-send-btn{background:linear-gradient(135deg,var(--amber),var(--amber-dark));color:#fff;border:none;width:30px;height:30px;border-radius:50%;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity 0.15s,transform 0.1s}
+.comment-send-btn:hover{opacity:0.9;transform:scale(1.05)}
+.comment-send-btn:active{transform:scale(0.92)}
+/* Feed sub-tabs: hide when in full-height feed mode (feed sub-tab active) */
+body.feed-active .feed-sub-tabs{display:none}
 .msg-mine-tag{font-size:9px;font-weight:700;background:rgba(217,119,6,0.10);color:var(--amber);border:1px solid rgba(217,119,6,0.22);padding:2px 7px;border-radius:999px;white-space:nowrap;flex-shrink:0;text-transform:uppercase;letter-spacing:0.04em}
 /* ── Tapback reaction trigger ── */
 .msg-react-btn{
@@ -825,6 +851,20 @@ body.social-active .social-input-area{
 .map-popup-stars{font-size:15px;margin-bottom:6px}
 .map-popup-time{font-size:11px;color:var(--muted);font-weight:400}
 .map-section-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.10em;font-weight:600;margin:16px 0 8px}
+/* ── Player stats drawer cells ── */
+.ps-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.ps-cell{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:7px 10px;text-align:center}
+.ps-cell .ps-val{font-family:'Poppins',sans-serif;font-size:18px;font-weight:800;color:var(--text);line-height:1}
+.ps-cell .ps-lbl{font-size:8px;color:#9CA3AF;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-top:3px}
+.ps-row{display:flex;align-items:baseline;gap:6px;padding:5px 8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:7px;min-width:0}
+.ps-tag{font-size:8px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap;flex-shrink:0}
+.ps-val-sm{font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+/* ── Burger photo in tally + feed ── */
+.burger-photo-btn{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--muted2);font-size:13px;font-weight:600;padding:7px 12px;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s;display:flex;align-items:center;gap:5px}
+.burger-photo-btn:hover{border-color:var(--amber);color:var(--amber)}
+.burger-photo-btn.has-photo{border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,0.08)}
+.burger-photo-preview{width:44px;height:44px;border-radius:8px;object-fit:cover;border:1.5px solid rgba(245,158,11,0.4);flex-shrink:0}
+.grill-photo-strip{width:100%;max-height:160px;object-fit:cover;display:block;border-radius:0}
 
 /* ══════════════════════════════════════════════
    📋 BENTO LIST TAB
@@ -1974,9 +2014,8 @@ body.social-active .social-input-area{
 
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('list',this)">🏆 Ranks</button>
-      <button class="tab-btn" onclick="switchTab('feed',this)">🔥 Feed</button>
+      <button class="tab-btn" onclick="switchTab('feed',this)">🔥 Feed<span class="tab-unread" id="social-unread-dot"></span></button>
       <button class="tab-btn" onclick="switchTab('tally',this)">➕ Tally</button>
-      <button class="tab-btn" onclick="switchTab('social',this)" id="tab-btn-social">💬 Chat<span class="tab-unread" id="social-unread-dot"></span></button>
       <button class="tab-btn" onclick="switchTab('map',this)">🗺 Map</button>
       <button class="tab-btn" onclick="switchTab('leaderboard',this)">🏅 Badges</button>
       <button class="tab-btn" onclick="switchTab('racing',this)">🏇 Racing</button>
@@ -2013,37 +2052,36 @@ body.social-active .social-input-area{
     <!-- ORDER RECEIPT — lives outside any re-rendered container so Firestore snapshots can't wipe it -->
     <div class="order-receipt" id="order-receipt"></div>
 
-    <!-- SOCIAL TAB -->
-    <div class="tab-panel" id="tab-social">
-      <div class="social-wrap">
-        <div class="social-empty" id="social-empty" style="display:none">
-          <div class="e-icon">🍔💬</div>
-          <p>No posts yet — share your first burger!</p>
-        </div>
-        <div class="social-feed" id="social-feed"></div>
-        <div class="social-input-area">
-          <div class="img-preview-bar" id="img-preview-bar">
-            <img class="img-preview-thumb" id="img-preview-thumb" src="" alt=""/>
-            <span class="img-preview-name" id="img-preview-name"></span>
-            <button class="img-preview-remove" onclick="clearPendingImage()" title="Remove">✕</button>
-          </div>
-          <div class="social-capsule">
-            <button class="social-capsule-cam" id="photo-btn" onclick="document.getElementById('photo-input').click()" title="Add photo">📷</button>
-            <input type="file" id="photo-input" accept="image/*" onchange="handleImageSelect(event)"/>
-            <textarea id="social-text" placeholder="Share a burger update…" rows="1" onkeydown="socialKeydown(event)" oninput="autoResize(this)"></textarea>
-            <button class="send-btn" id="send-btn" onclick="sendSocialPost()" title="Send">➤</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- FEED TAB -->
+    <!-- FEED TAB (unified: burger cards + messages) -->
     <div class="tab-panel" id="tab-feed">
-      <div class="feed-sub-tabs">
+      <div class="feed-sub-tabs" id="feed-sub-tabs">
         <button class="feed-sub-tab active" onclick="switchFeedTab('feed',this)">🔥 Feed</button>
         <button class="feed-sub-tab" onclick="switchFeedTab('rated',this)">⭐ Top Rated</button>
       </div>
-      <div class="grill-feed-wrap" id="grill-feed"></div>
+      <!-- Unified feed panel -->
+      <div id="unified-feed-panel">
+        <div class="social-wrap">
+          <div class="social-empty" id="social-empty" style="display:none">
+            <div class="e-icon">🍔💬</div>
+            <p>No activity yet — log your first burger!</p>
+          </div>
+          <div class="social-feed" id="unified-feed"></div>
+          <div class="social-input-area">
+            <div class="img-preview-bar" id="img-preview-bar">
+              <img class="img-preview-thumb" id="img-preview-thumb" src="" alt=""/>
+              <span class="img-preview-name" id="img-preview-name"></span>
+              <button class="img-preview-remove" onclick="clearPendingImage()" title="Remove">✕</button>
+            </div>
+            <div class="social-capsule">
+              <button class="social-capsule-cam" id="photo-btn" onclick="document.getElementById('photo-input').click()" title="Add photo">📷</button>
+              <input type="file" id="photo-input" accept="image/*" onchange="handleImageSelect(event)"/>
+              <textarea id="social-text" placeholder="Share a burger update…" rows="1" onkeydown="socialKeydown(event)" oninput="autoResize(this)"></textarea>
+              <button class="send-btn" id="send-btn" onclick="sendSocialPost()" title="Send">➤</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Top rated panel -->
       <div class="top-rated-wrap" id="top-rated-wrap" style="display:none"></div>
     </div>
 
@@ -2182,13 +2220,15 @@ const ACHIEVEMENTS = {
   ooh_baby_triple: { label:'Ooh Baby A Triple',      tip:'Log a triple burger (3 patties) to unlock', color:'rgba(59,130,246,0.8)', glow:'rgba(59,130,246,0.3)', size:null, emoji:`<span style="display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1"><span style="font-size:16px">🍔</span><span style="display:flex;gap:2px;font-size:16px"><span>🍔</span><span>🍔</span></span></span>` },
 };
 
-let app, db, unsubscribe, unsubMessages;
+let app, db, unsubscribe, unsubMessages, unsubComments, unsubBurgerReactions;
 let myPlayerId = null, myName = '', roomId = '', spectatorMode = false;
 let players = [];
 let messages = [];
+let comments = [];
+let burgerReactions = {}; // { burgerId: {emoji: [playerIds]} }
+const openComments = new Set(); // targetIds whose comment thread is open
 let seenMessageCount = 0;
 let socialInitialLoadDone = false;
-let _scrollFeedToBottom = false; // set true when Social tab opens; consumed by renderSocialFeed
 let pendingImageBase64 = null, pendingImageName = '';
 
 function showConfigBanner() {
@@ -2667,7 +2707,7 @@ function startApp(){
   if(spectatorMode){
     document.querySelectorAll('.tab-btn').forEach(b=>{
       const name=b.getAttribute('onclick')?.match(/'(\w+)'/)?.[1];
-      if(['tally','social'].includes(name)) b.style.display='none';
+      if(['tally'].includes(name)) b.style.display='none';
     });
     document.getElementById('players-pill-btn').style.display='none';
     document.getElementById('add-player-form').style.display='none';
@@ -2678,6 +2718,8 @@ function startApp(){
     document.getElementById('spectator-pill').style.display='none';
     subscribeToRoom();
     subscribeToMessages();
+    subscribeToComments();
+    subscribeToBurgerReactions();
   }
 }
 
@@ -2701,7 +2743,24 @@ function subscribeToMessages(){
   unsubMessages = onSnapshot(q, snap => {
     messages = [];
     snap.forEach(d => messages.push({id:d.id,...d.data()}));
-    renderSocialFeed();
+    renderUnifiedFeed();
+  }, () => {});
+}
+
+function subscribeToComments(){
+  const q = query(collection(db,'rooms',roomId,'comments'),orderBy('createdAt','asc'),limit(500));
+  unsubComments = onSnapshot(q, snap => {
+    comments = [];
+    snap.forEach(d => comments.push({id:d.id,...d.data()}));
+    renderUnifiedFeed();
+  }, () => {});
+}
+
+function subscribeToBurgerReactions(){
+  unsubBurgerReactions = onSnapshot(collection(db,'rooms',roomId,'burgerReactions'), snap => {
+    burgerReactions = {};
+    snap.forEach(d => { burgerReactions[d.id] = d.data().reactions || {}; });
+    renderUnifiedFeed();
   }, () => {});
 }
 
@@ -2713,7 +2772,7 @@ function render(){
   renderMyTally();
   renderPlayersList();
   renderDailyCard(players);
-  if(document.getElementById('tab-feed')?.classList.contains('active')) renderGrillFeed();
+  if(document.getElementById('tab-feed')?.classList.contains('active')) renderUnifiedFeed();
   if(document.getElementById('tab-list')?.classList.contains('active')) renderBentoList();
   if(document.getElementById('tab-racing')?.classList.contains('active')) renderRaceTrack();
   // Update players pill count
@@ -3143,6 +3202,15 @@ function renderMyTally(){
           ${ALL_TOPPINGS.map(t => `<button class="topping-btn" data-topping="${t}" onclick="toggleTopping('${t}')">${t}</button>`).join('')}
         </div>
       </div>
+      <!-- Burger photo -->
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="burger-photo-btn" id="burger-photo-btn" onclick="document.getElementById('burger-photo-input').click()">
+          📸 Add Photo
+        </button>
+        <img id="burger-photo-thumb" class="burger-photo-preview" style="display:none" alt="burger preview"/>
+        <button id="burger-photo-clear" onclick="clearBurgerPhoto()" style="display:none;background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:4px;line-height:1">✕</button>
+      </div>
+      <input type="file" id="burger-photo-input" accept="image/*" capture="environment" style="display:none" onchange="onBurgerPhotoSelected(this)"/>
       <button class="detail-confirm-btn" id="confirm-btn" onclick="confirmBurger()">✓ Log Burger</button>
     </div>
     <!-- Undo strip -->
@@ -3226,75 +3294,224 @@ function renderPlayersList(){
   }).join('');
 }
 
-function renderSocialFeed() {
-  const feed = document.getElementById('social-feed');
+const _REACT_SVG = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <path d="M8 1.5C4.41 1.5 1.5 4.41 1.5 8C1.5 11.59 4.41 14.5 8 14.5C11.59 14.5 14.5 11.59 14.5 8C14.5 4.41 11.59 1.5 8 1.5Z" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
+  <circle cx="5.5" cy="7.5" r="0.85" fill="currentColor"/>
+  <circle cx="10.5" cy="7.5" r="0.85" fill="currentColor"/>
+  <path d="M5.5 10C6.1 11 9.9 11 10.5 10" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
+  <circle cx="12.5" cy="3.5" r="2" fill="var(--bg)"/>
+  <path d="M12.5 2.25V4.75M11.25 3.5H13.75" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+</svg>`;
+
+function buildReactionPills(reactions, targetId, targetType) {
+  return Object.entries(reactions || {})
+    .filter(([,ids]) => Array.isArray(ids) && ids.length > 0)
+    .map(([emoji, ids]) => {
+      const mine = ids.includes(myPlayerId);
+      return `<button class="reaction-pill${mine?' mine':''}" data-target-id="${targetId}" data-target-type="${targetType}" data-emoji="${escHtml(emoji)}">
+        <span class="rp-emoji">${emoji}</span>
+        <span class="rp-count">${ids.length}</span>
+      </button>`;
+    }).join('');
+}
+
+function renderUnifiedFeed() {
+  const feed = document.getElementById('unified-feed');
   const empty = document.getElementById('social-empty');
+  if (!feed) return;
+
+  // Unread dot — only show when feed tab is not visible/active
   if (!socialInitialLoadDone) {
     seenMessageCount = messages.length;
     socialInitialLoadDone = true;
   } else {
-    const socialTabActive = document.getElementById('tab-social')?.classList.contains('active');
-    if (!socialTabActive && messages.length > seenMessageCount) {
+    const feedTabActive = document.getElementById('tab-feed')?.classList.contains('active');
+    const unifiedPanelVisible = document.getElementById('unified-feed-panel')?.style.display !== 'none';
+    if ((!feedTabActive || !unifiedPanelVisible) && messages.length > seenMessageCount) {
       const dot = document.getElementById('social-unread-dot');
       if (dot) dot.classList.add('visible');
     }
   }
-  if (!messages.length) {
+
+  // Build burger entries from all players
+  const burgerItems = [];
+  players.forEach(p => {
+    (p.logs || []).forEach(entry => {
+      const ts = logTs(entry);
+      if (!ts) return;
+      const burgerId = (p.id + '_' + ts).replace(/[^a-zA-Z0-9_]/g, '_');
+      burgerItems.push({
+        type: 'burger', ts, sortTs: new Date(ts), burgerId, player: p,
+        restaurant:        (typeof entry==='object' && entry.restaurant)        || 'Unknown Spot',
+        rating:            (typeof entry==='object' && entry.rating)            || 0,
+        patties:           (typeof entry==='object' && entry.patties > 0) ? entry.patties : null,
+        lat:               (typeof entry==='object' && entry.lat)               || null,
+        lng:               (typeof entry==='object' && entry.lng)               || null,
+        locationCityState: (typeof entry==='object' && entry.locationCityState) || '',
+        weatherStamp:      (typeof entry==='object' && entry.weatherStamp)      || '',
+        menuItem:          (typeof entry==='object' && entry.menuItem)           || '',
+        menuEmoji:         (typeof entry==='object' && entry.menuEmoji)          || '',
+        photo:             (typeof entry==='object' && entry.photo)              || '',
+      });
+    });
+  });
+
+  // Build message items
+  const msgItems = messages.map(m => ({
+    type: 'message',
+    ts: m.createdAt?.toDate?.()?.toISOString() || '',
+    sortTs: m.createdAt?.toDate?.() || new Date(0),
+    data: m,
+  }));
+
+  // Merge: oldest first so column-reverse CSS shows newest at top
+  const allItems = [...burgerItems, ...msgItems];
+  allItems.sort((a, b) => a.sortTs - b.sortTs);
+
+  if (!allItems.length) {
     feed.innerHTML = '';
     if (empty) empty.style.display = 'flex';
     return;
   }
   if (empty) empty.style.display = 'none';
-  feed.innerHTML = messages.map(m => {
-    const isMe = m.playerId === myPlayerId;
-    const cc = colorClass(m.colorIdx ?? 0);
-    const timeStr = formatTime(m.createdAt);
-    const imgHtml = m.imageBase64
-      ? `<div class="msg-img-wrap" onclick="openLightbox('${m.id}')"><img src="${escHtml(m.imageBase64)}" alt="photo"/></div>`
-      : '';
-    const textHtml = m.text ? `<div class="msg-text">${escHtml(m.text)}</div>` : '';
-    // Build reaction pills from stored reactions map {emoji: [playerIds]}
-    const reactions = m.reactions || {};
-    const pillsHtml = Object.entries(reactions)
-      .filter(([,ids]) => Array.isArray(ids) && ids.length > 0)
-      .map(([emoji, ids]) => {
-        const mine = ids.includes(myPlayerId);
-        return `<button class="reaction-pill${mine?' mine':''}" data-msg-id="${m.id}" data-emoji="${escHtml(emoji)}">
-          <span class="rp-emoji">${emoji}</span>
-          <span class="rp-count">${ids.length}</span>
-        </button>`;
-      }).join('');
-    const reactionsHtml = pillsHtml ? `<div class="msg-reactions">${pillsHtml}</div>` : '<div class="msg-reactions"></div>';
-    return `<div class="msg-card ${isMe?'mine':''} ${cc}" data-id="${m.id}">
-      <div class="msg-header">
-        ${miniAvatarHTML(m.playerName||'?', m.colorIdx??0, 34)}
-        <div class="msg-header-info">
-          <div class="msg-name">${escHtml(m.playerName||'?')}</div>
-          <div class="msg-time">${timeStr}</div>
-        </div>
-        ${isMe ? '<span class="msg-mine-tag">You</span>' : ''}
-        <button class="msg-react-btn" data-msg-id="${m.id}" title="Add reaction">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M8 1.5C4.41 1.5 1.5 4.41 1.5 8C1.5 11.59 4.41 14.5 8 14.5C11.59 14.5 14.5 11.59 14.5 8C14.5 4.41 11.59 1.5 8 1.5Z" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
-            <circle cx="5.5" cy="7.5" r="0.85" fill="currentColor"/>
-            <circle cx="10.5" cy="7.5" r="0.85" fill="currentColor"/>
-            <path d="M5.5 10C6.1 11 9.9 11 10.5 10" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
-            <circle cx="12.5" cy="3.5" r="2" fill="var(--bg)"/>
-            <path d="M12.5 2.25V4.75M11.25 3.5H13.75" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-          </svg>
-        </button>
-      </div>
-      ${textHtml}
-      ${imgHtml}
-      ${reactionsHtml}
-    </div>`;
-  }).join('');
+
+  // Per-player burger ordinals (sorted newest→oldest so index 0 = most recent)
+  const playerBurgerIdx = {};
+  burgerItems.forEach(item => {
+    if (!playerBurgerIdx[item.player.id]) playerBurgerIdx[item.player.id] = [];
+    playerBurgerIdx[item.player.id].push(item);
+  });
+  Object.values(playerBurgerIdx).forEach(arr => arr.sort((a, b) => b.sortTs - a.sortTs));
+
   window._msgImages = {};
   messages.forEach(m => { if (m.imageBase64) window._msgImages[m.id] = m.imageBase64; });
-  // Anchor div at the very bottom — scrollIntoView finds the right scroll container automatically
-  feed.insertAdjacentHTML('beforeend', '<div id="feed-bottom-anchor" style="height:1px;flex-shrink:0"></div>');
-  // column-reverse keeps newest at scrollTop=0 — no manual scroll needed
+
+  feed.innerHTML = allItems.map((item, idx) => {
+    if (item.type === 'message') {
+      const m = item.data;
+      const isMe = m.playerId === myPlayerId;
+      const cc = colorClass(m.colorIdx ?? 0);
+      const timeStr = formatTime(m.createdAt);
+      const targetId = m.id;
+      const imgHtml = m.imageBase64
+        ? `<div class="msg-img-wrap" onclick="openLightbox('${m.id}')"><img src="${escHtml(m.imageBase64)}" alt="photo"/></div>`
+        : '';
+      const textHtml = m.text ? `<div class="msg-text">${escHtml(m.text)}</div>` : '';
+      const pillsHtml = buildReactionPills(m.reactions, targetId, 'message');
+      const reactionsHtml = `<div class="msg-reactions">${pillsHtml}</div>`;
+      const msgComments = comments.filter(c => c.targetId === targetId);
+      const commentLabel = msgComments.length ? `💬 ${msgComments.length}` : '💬';
+      return `<div class="msg-card ${isMe?'mine':''} ${cc}" data-id="${m.id}">
+        <div class="msg-header">
+          ${miniAvatarHTML(m.playerName||'?', m.colorIdx??0, 34)}
+          <div class="msg-header-info">
+            <div class="msg-name">${escHtml(m.playerName||'?')}</div>
+            <div class="msg-time">${timeStr}</div>
+          </div>
+          ${isMe ? '<span class="msg-mine-tag">You</span>' : ''}
+          <button class="msg-react-btn feed-react-btn" data-target-id="${targetId}" data-target-type="message" title="Add reaction">${_REACT_SVG}</button>
+        </div>
+        ${textHtml}${imgHtml}
+        ${reactionsHtml}
+        <div class="feed-card-actions">
+          <button class="feed-comment-btn" onclick="toggleComments('${targetId}')">${commentLabel}</button>
+        </div>
+        ${buildCommentHtml(targetId, 'message', msgComments)}
+      </div>`;
+    } else {
+      // Burger card
+      const pattyCount = (item.patties != null && item.patties > 0) ? item.patties : 1;
+      let stampText, stampCls;
+      if (pattyCount >= 3) stampCls = 'stamp-triple';
+      else if (pattyCount === 2) stampCls = 'stamp-double';
+      else stampCls = 'stamp-single';
+      if (item.menuItem) {
+        stampText = `${item.menuEmoji || '🍔'} ${item.menuItem.toUpperCase()}`;
+      } else if (pattyCount >= 3) {
+        stampText = '🙏 THE HOLY TRINITY';
+      } else if (pattyCount === 2) {
+        stampText = '🥩 THE DOUBLE OR NOTHING';
+      } else {
+        stampText = '🍔 THE SOLO DOLO';
+      }
+      let locPill;
+      if (item.lat && item.lng) {
+        const resolved = item.locationCityState ? escHtml(item.locationCityState) : null;
+        const coordLabel = `${item.lat.toFixed(2)}°N, ${Math.abs(item.lng).toFixed(2)}°W`;
+        locPill = `<span class="grill-pill grill-pill-location has-gps">📍: <span id="geo-${idx}">${resolved || coordLabel}</span></span>`;
+      } else {
+        locPill = `<span class="grill-pill grill-pill-location no-gps">🕵️‍♂️: Off the Grid</span>`;
+      }
+      const d = new Date(item.ts);
+      const timePill = `<span class="grill-pill grill-pill-time">⏰: ${d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit',hour12:true})}, ${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}</span>`;
+      const weatherPill = item.weatherStamp ? `<span class="grill-pill grill-pill-weather">${escHtml(item.weatherStamp)}</span>` : '';
+      const ratingStars = (() => {
+        if (!item.rating || item.rating <= 0) return '<span style="color:var(--muted);font-size:12px">— unrated</span>';
+        let s = '';
+        for (let i = 1; i <= 5; i++) s += item.rating >= i ? '⭐' : '<span style="opacity:0.2">⭐</span>';
+        return `${s} <span class="grill-rating-num">${item.rating}/5</span>`;
+      })();
+      const color = RING_COLORS[item.player.colorIdx % RING_COLORS.length];
+      const ini = initials(item.player.name);
+      const isMe = item.player.id === myPlayerId;
+      const pArr = playerBurgerIdx[item.player.id] || [];
+      const burgerNum = item.player.count - pArr.indexOf(item);
+      const targetId = item.burgerId;
+      const rxns = burgerReactions[targetId] || {};
+      const pillsHtml = buildReactionPills(rxns, targetId, 'burger');
+      const reactionsHtml = `<div class="msg-reactions">${pillsHtml}</div>`;
+      const burgerComments = comments.filter(c => c.targetId === targetId);
+      const commentLabel = burgerComments.length ? `💬 ${burgerComments.length}` : '💬';
+      return `
+<div class="grill-feed-card ${pattyCount>=3?'triple-card':''}${item.rating===5?' perfect-rating':''}" style="animation-delay:${Math.min(idx*0.04,0.6)}s">
+  <div class="grill-card-inner">
+    <div class="grill-left-accent" style="background:${color}"></div>
+    <div class="grill-card-banner">
+      <div class="grill-banner-left">
+        <div class="grill-banner-avatar" style="background:${color}1A;color:${color};border:1.5px solid ${color}55">${ini}</div>
+        <div class="grill-banner-name">${escHtml(item.player.name)}${isMe?' <span class="grill-banner-you">(you)</span>':''}</div>
+      </div>
+      <div class="grill-banner-badge" style="border-color:${color}55">🍔 #${burgerNum>0?burgerNum:'?'}</div>
+    </div>
+    <div class="grill-stripe"></div>
+    <div class="grill-patty-stamp ${stampCls}">${stampText}</div>
+    ${item.photo?`<img class="grill-photo-strip" src="${item.photo}" alt="burger photo" onclick="this.closest('.grill-feed-card').querySelector('img.grill-photo-strip').style.maxHeight=this.style.maxHeight==='none'?'160px':'none'"/>`:''}
+    <div class="grill-card-body">
+      <div class="grill-card-body-content">
+        <div class="grill-restaurant-name">${escHtml(item.restaurant)}</div>
+        ${item.menuItem?`<div class="grill-menu-item-line">${item.menuEmoji||'🍔'} ${escHtml(item.menuItem)}</div>`:''}
+        <div class="grill-pill-row">${locPill}${timePill}${weatherPill}</div>
+        <div class="grill-rating-row">${ratingStars}</div>
+      </div>
+      <div class="burger-stack-wrap">
+        ${item.rating===5?'<div class="perfect-star">⭐</div>':''}
+        ${miniBurgerStack(pattyCount)}
+      </div>
+    </div>
+    ${reactionsHtml}
+    <div class="feed-card-actions">
+      <button class="feed-react-btn" data-target-id="${targetId}" data-target-type="burger" title="Add reaction">${_REACT_SVG}</button>
+      <button class="feed-comment-btn" onclick="toggleComments('${targetId}')">${commentLabel}</button>
+    </div>
+    ${buildCommentHtml(targetId, 'burger', burgerComments)}
+  </div>
+</div>`.trim();
+    }
+  }).join('\n');
+
+  // Lazy reverse-geocode burger entries
+  allItems.forEach((item, idx) => {
+    if (item.type !== 'burger' || !item.lat || !item.lng || item.locationCityState) return;
+    setTimeout(() => {
+      const el = document.getElementById(`geo-${idx}`);
+      if (!el) return;
+      reverseGeocode(item.lat, item.lng).then(loc => { if (loc && el.isConnected) el.textContent = loc; });
+    }, 120 * idx);
+  });
 }
+
+// Keep renderGrillFeed as an alias so existing call-sites still work
+function renderGrillFeed() { renderUnifiedFeed(); }
 
 window.openLightbox = function(msgId) {
   const src = window._msgImages?.[msgId];
@@ -3305,91 +3522,94 @@ window.openLightbox = function(msgId) {
 window.closeLightbox = function() { document.getElementById('lightbox').classList.remove('open'); };
 
 // ── Tapback reactions ─────────────────────────────────────────────
-let _trayMsgId = null;
+let _trayTargetId = null;
+let _trayTargetType = null;
 
 function hideReactionTray() {
   document.getElementById('reaction-tray').classList.remove('open');
-  _trayMsgId = null;
+  _trayTargetId = null;
+  _trayTargetType = null;
 }
 
-function showReactionTray(msgId, anchorEl) {
-  // Toggle if tapping the same post's button again
-  if (_trayMsgId === msgId) { hideReactionTray(); return; }
-  _trayMsgId = msgId;
+function showReactionTray(targetId, targetType, anchorEl) {
+  if (_trayTargetId === targetId) { hideReactionTray(); return; }
+  _trayTargetId = targetId;
+  _trayTargetType = targetType;
   const tray = document.getElementById('reaction-tray');
-  // Position above and right-aligned to the anchor button
   const rect = anchorEl.getBoundingClientRect();
-  const trayW = 230; // approximate rendered width
+  const trayW = 230;
   let left = rect.right - trayW;
   if (left < 8) left = 8;
-  const top = rect.top - 56;
   tray.style.left = left + 'px';
-  tray.style.top  = Math.max(8, top) + 'px';
+  tray.style.top  = Math.max(8, rect.top - 56) + 'px';
   tray.classList.add('open');
 }
 
-async function toggleReaction(msgId, emoji) {
-  console.log('[rxn] called — msgId:', msgId, '| emoji:', emoji, '| myPlayerId:', myPlayerId, '| spectator:', spectatorMode);
-  if (!myPlayerId || spectatorMode) { console.log('[rxn] blocked: no player ID or spectator mode'); return; }
-  if (!db || !roomId)               { console.log('[rxn] blocked: db or roomId missing'); showToast('⚠️ Not connected'); return; }
-  if (!msgId)                       { console.log('[rxn] blocked: msgId falsy'); return; }
-  if (!emoji)                       { console.log('[rxn] blocked: emoji falsy'); return; }
+async function toggleReaction(targetId, emoji, targetType = 'message') {
+  if (!myPlayerId || spectatorMode) return;
+  if (!db || !roomId) { showToast('⚠️ Not connected'); return; }
+  if (!targetId || !emoji) return;
   try {
-    const cached = messages.find(m => m.id === msgId);
-    console.log('[rxn] cached message:', cached ? 'found' : 'NOT FOUND — will still attempt write');
-    const reactions = { ...(cached?.reactions || {}) };
-    const current = Array.isArray(reactions[emoji]) ? reactions[emoji] : [];
-    reactions[emoji] = current.includes(myPlayerId)
-      ? current.filter(id => id !== myPlayerId)
-      : [...current, myPlayerId];
-    if (reactions[emoji].length === 0) delete reactions[emoji];
-    console.log('[rxn] writing reactions:', reactions, 'to message:', msgId);
-    const msgRef = doc(db, 'rooms', roomId, 'messages', msgId);
-    await updateDoc(msgRef, { reactions });
-    console.log('[rxn] write successful ✓');
+    if (targetType === 'burger') {
+      const ref = doc(db, 'rooms', roomId, 'burgerReactions', targetId);
+      const currentRxns = {...(burgerReactions[targetId] || {})};
+      const current = Array.isArray(currentRxns[emoji]) ? currentRxns[emoji] : [];
+      currentRxns[emoji] = current.includes(myPlayerId)
+        ? current.filter(id => id !== myPlayerId)
+        : [...current, myPlayerId];
+      if (currentRxns[emoji].length === 0) delete currentRxns[emoji];
+      await setDoc(ref, {reactions: currentRxns});
+    } else {
+      const cached = messages.find(m => m.id === targetId);
+      const reactions = {...(cached?.reactions || {})};
+      const current = Array.isArray(reactions[emoji]) ? reactions[emoji] : [];
+      reactions[emoji] = current.includes(myPlayerId)
+        ? current.filter(id => id !== myPlayerId)
+        : [...current, myPlayerId];
+      if (reactions[emoji].length === 0) delete reactions[emoji];
+      await updateDoc(doc(db, 'rooms', roomId, 'messages', targetId), {reactions});
+    }
   } catch(e) {
-    console.error('[rxn] write failed:', e.code, e.message, e);
     showToast(`⚠️ Reaction failed (${e.code || e.message})`);
   }
 }
 
 // Single delegated listener — handles tray open, pill toggle, tray emoji pick
 document.addEventListener('click', e => {
-  // Close tray on outside click
   const tray = document.getElementById('reaction-tray');
   if (tray.classList.contains('open')) {
-    if (!e.target.closest('#reaction-tray') && !e.target.closest('.msg-react-btn')) {
+    if (!e.target.closest('#reaction-tray') && !e.target.closest('.feed-react-btn') && !e.target.closest('.msg-react-btn')) {
       hideReactionTray();
     }
   }
-  // Open tray — always read dataset from the button element, not the SVG child
-  const reactBtn = e.target.closest('.msg-react-btn');
+  // Open tray — button has data-target-id + data-target-type
+  const reactBtn = e.target.closest('.feed-react-btn, .msg-react-btn');
   if (reactBtn) {
     e.stopPropagation();
-    const mid = reactBtn.dataset.msgId;
-    if (mid) showReactionTray(mid, reactBtn);
+    const tid = reactBtn.dataset.targetId;
+    const ttype = reactBtn.dataset.targetType || 'message';
+    if (tid) showReactionTray(tid, ttype, reactBtn);
     return;
   }
   // Tray emoji pick
   const trayBtn = e.target.closest('.tray-emoji-btn');
   if (trayBtn) {
-    console.log('[rxn] tray emoji clicked — _trayMsgId:', _trayMsgId, '| emoji:', trayBtn.dataset.emoji);
-    if (_trayMsgId) {
-      const msgIdSnapshot = _trayMsgId;
+    if (_trayTargetId) {
+      const tid = _trayTargetId;
+      const ttype = _trayTargetType;
       const emoji = trayBtn.dataset.emoji;
       hideReactionTray();
-      if (emoji) toggleReaction(msgIdSnapshot, emoji);
-    } else {
-      console.log('[rxn] tray clicked but _trayMsgId is null/undefined');
+      if (emoji) toggleReaction(tid, emoji, ttype);
     }
     return;
   }
   // Pill toggle
   const pill = e.target.closest('.reaction-pill');
   if (pill) {
-    const mid   = pill.dataset.msgId;
+    const tid   = pill.dataset.targetId || pill.dataset.msgId;
+    const ttype = pill.dataset.targetType || 'message';
     const emoji = pill.dataset.emoji;
-    if (mid && emoji) toggleReaction(mid, emoji);
+    if (tid && emoji) toggleReaction(tid, emoji, ttype);
   }
 });
 
@@ -3418,6 +3638,71 @@ window.autoResize = function(el) {
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 120) + 'px';
 };
+
+// ── Comments ──────────────────────────────────────────────────────
+window.toggleComments = function(targetId) {
+  const thread = document.getElementById('thread-' + targetId);
+  if (!thread) return;
+  const currentlyHidden = thread.style.display === 'none';
+  if (currentlyHidden) {
+    thread.style.display = '';
+    openComments.add(targetId);
+    const inp = thread.querySelector('.comment-input-row input');
+    if (inp) setTimeout(() => inp.focus(), 80);
+  } else {
+    thread.style.display = 'none';
+    openComments.delete(targetId);
+  }
+};
+
+window.submitComment = async function(targetId, targetType) {
+  if (!myPlayerId || spectatorMode) return;
+  const inp = document.getElementById('comment-input-' + targetId);
+  if (!inp) return;
+  const text = inp.value.trim();
+  if (!text) return;
+  const me = players.find(p => p.id === myPlayerId);
+  const colorIdx = me?.colorIdx ?? 0;
+  inp.value = '';
+  try {
+    await addDoc(collection(db, 'rooms', roomId, 'comments'), {
+      targetId, targetType,
+      playerId: myPlayerId, playerName: myName, colorIdx,
+      text, createdAt: serverTimestamp()
+    });
+  } catch(e) { showToast('⚠️ Comment failed'); }
+};
+
+window.commentKeydown = function(e, targetId, targetType) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitComment(targetId, targetType); }
+};
+
+function buildCommentHtml(targetId, targetType, commentsForTarget) {
+  const listHtml = commentsForTarget.map(c => {
+    const color = RING_COLORS[c.colorIdx % RING_COLORS.length];
+    const ini = initials(c.playerName || '?');
+    const timeStr = c.createdAt?.toDate ? formatTime(c.createdAt) : '';
+    return `<div class="feed-comment">
+      <div class="comment-avatar" style="background:${color}22;color:${color};border:1.5px solid ${color}55">${ini}</div>
+      <div class="comment-body">
+        <div class="comment-meta">
+          <span class="comment-name">${escHtml(c.playerName||'?')}</span>
+          ${timeStr ? `<span class="comment-time">${timeStr}</span>` : ''}
+        </div>
+        <div class="comment-text">${escHtml(c.text)}</div>
+      </div>
+    </div>`;
+  }).join('');
+  const isOpen = openComments.has(targetId);
+  return `<div class="feed-comment-thread" id="thread-${targetId}" style="${isOpen ? '' : 'display:none'}">
+    <div class="feed-comment-list">${listHtml}</div>
+    <div class="comment-input-row">
+      <input type="text" id="comment-input-${targetId}" placeholder="Add a comment…"
+             onkeydown="commentKeydown(event,'${targetId}','${targetType}')"/>
+      <button class="comment-send-btn" onclick="submitComment('${targetId}','${targetType}')">➤</button>
+    </div>
+  </div>`;
+}
 
 function isSummerHoliday() {
   const d = new Date();
@@ -3525,9 +3810,36 @@ let pendingRating = 0;
 let pendingGPS = null;
 let pendingPattyCount = 0;
 let pendingToppings = [];
+let pendingPhoto = '';
 let receiptTimer = null;
 
 const ALL_TOPPINGS = ['Ketchup','Mustard','Mayo','Cheese','Blue Cheese','Lettuce','Pickles','Tomatoes','Onions','Bacon','Mushrooms','Green Peppers','Special Sauce'];
+
+window.onBurgerPhotoSelected = async function(input) {
+  const file = input.files[0];
+  if (!file) return;
+  try {
+    pendingPhoto = await compressImage(file, 240, 0.45);
+    const thumb = document.getElementById('burger-photo-thumb');
+    const clearBtn = document.getElementById('burger-photo-clear');
+    const photoBtn = document.getElementById('burger-photo-btn');
+    if (thumb) { thumb.src = pendingPhoto; thumb.style.display = 'block'; }
+    if (clearBtn) clearBtn.style.display = 'block';
+    if (photoBtn) { photoBtn.textContent = '📸 Change Photo'; photoBtn.classList.add('has-photo'); }
+  } catch (e) { console.warn('Photo compress failed', e); }
+  // Reset input so same file can be re-selected
+  input.value = '';
+};
+
+window.clearBurgerPhoto = function() {
+  pendingPhoto = '';
+  const thumb = document.getElementById('burger-photo-thumb');
+  const clearBtn = document.getElementById('burger-photo-clear');
+  const photoBtn = document.getElementById('burger-photo-btn');
+  if (thumb) { thumb.src = ''; thumb.style.display = 'none'; }
+  if (clearBtn) clearBtn.style.display = 'none';
+  if (photoBtn) { photoBtn.textContent = '📸 Add Photo'; photoBtn.classList.remove('has-photo'); }
+};
 
 window.toggleTopping = function(topping) {
   const idx = pendingToppings.indexOf(topping);
@@ -3874,6 +4186,7 @@ window.confirmBurger = async function() {
   const snapshotToppings      = [...pendingToppings];
   const snapshotMenuEmoji     = pendingMenuEmoji;
   const snapshotMenuItemName  = pendingMenuItemName;
+  const snapshotPhoto         = pendingPhoto;
 
   // ── 1. Show receipt immediately (before the async Firestore write)
   //       so snapshot re-renders can't race against it
@@ -3939,6 +4252,8 @@ window.confirmBurger = async function() {
   pendingMenuItemName = '';
   const customNameInp = document.getElementById('custom-burger-name');
   if (customNameInp) customNameInp.value = '';
+  pendingPhoto = '';
+  clearBurgerPhoto();
   const customNameRow2 = document.getElementById('custom-burger-name-row');
   if (customNameRow2) customNameRow2.style.display = 'none';
   document.querySelectorAll('.topping-btn').forEach(b => b.classList.remove('topping-active'));
@@ -3957,7 +4272,7 @@ window.confirmBurger = async function() {
   renderRestaurantSuggestions(OHIO_SPOTS.slice(0, 6));
 
   // ── 3. Write to Firestore (snapshot re-renders happen after receipt is already shown)
-  await changeMyCountWithDetails(1, restaurant, snapshotRating, snapshotGPS, snapshotCount, snapshotToppings, snapshotMenuItemName, snapshotMenuEmoji);
+  await changeMyCountWithDetails(1, restaurant, snapshotRating, snapshotGPS, snapshotCount, snapshotToppings, snapshotMenuItemName, snapshotMenuEmoji, snapshotPhoto);
 };
 
 // ── Shared weather code → emoji + label ──────────────────────────────────────
@@ -4019,7 +4334,7 @@ async function backfillWeatherStamps() {
   }
 }
 
-async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null, patties=1, toppings=[], menuItem='', menuEmoji='') {
+async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null, patties=1, toppings=[], menuItem='', menuEmoji='', photo='') {
   const me=players.find(p=>p.id===myPlayerId);
   if(!me) return;
   const newCount=Math.max(0,Math.min(999,me.count+delta));
@@ -4036,6 +4351,7 @@ async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null
     const entry = {ts: new Date().toISOString(), restaurant, rating: rating||0, patties: patties||1, toppings: toppings||[]};
     if (menuItem)  entry.menuItem  = menuItem;
     if (menuEmoji) entry.menuEmoji = menuEmoji;
+    if (photo)     entry.photo     = photo;
     if(gps) {
       entry.lat = gps.lat;
       entry.lng = gps.lng;
@@ -4423,20 +4739,28 @@ function renderBentoList() {
           <div class="podium-card podium-face-back ${cls}" style="padding:10px 6px 12px">
             ${untrackedPill}
             <div style="font-size:9px;font-weight:700;color:${c};text-transform:uppercase;letter-spacing:0.1em">${escHtml(p.name)}</div>
-            <div style="display:flex;gap:6px;width:100%;padding:0 4px;box-sizing:border-box;margin:4px 0">
-              <div style="flex:1;text-align:center">
-                <div style="font-family:'Poppins',sans-serif;font-size:20px;font-weight:900;color:#EF4444;line-height:1">${singles}</div>
-                <div style="font-size:7px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Single</div>
+            ${(()=>{
+              const st = computePlayerStats(p);
+              return `<div style="display:flex;gap:4px;width:100%;padding:0 2px;box-sizing:border-box;margin:3px 0 2px">
+                <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border-radius:5px;padding:3px 0">
+                  <div style="font-family:'Poppins',sans-serif;font-size:13px;font-weight:900;color:${c};line-height:1">${st.avgRating > 0 ? st.avgRating.toFixed(1) : '—'}</div>
+                  <div style="font-size:6px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Avg ⭐</div>
+                </div>
+                <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border-radius:5px;padding:3px 0">
+                  <div style="font-family:'Poppins',sans-serif;font-size:13px;font-weight:900;color:#EF4444;line-height:1">${st.singles}</div>
+                  <div style="font-size:6px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Single</div>
+                </div>
+                <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border-radius:5px;padding:3px 0">
+                  <div style="font-family:'Poppins',sans-serif;font-size:13px;font-weight:900;color:#F5F5F5;line-height:1">${st.doubles}</div>
+                  <div style="font-size:6px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Double</div>
+                </div>
+                <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border-radius:5px;padding:3px 0">
+                  <div style="font-family:'Poppins',sans-serif;font-size:13px;font-weight:900;color:#3B82F6;line-height:1">${st.triples}</div>
+                  <div style="font-size:6px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Triple</div>
+                </div>
               </div>
-              <div style="flex:1;text-align:center">
-                <div style="font-family:'Poppins',sans-serif;font-size:20px;font-weight:900;color:#F5F5F5;line-height:1">${doubles}</div>
-                <div style="font-size:7px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Double</div>
-              </div>
-              <div style="flex:1;text-align:center">
-                <div style="font-family:'Poppins',sans-serif;font-size:20px;font-weight:900;color:#3B82F6;line-height:1">${triples}</div>
-                <div style="font-size:7px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Triples</div>
-              </div>
-            </div>
+              ${st.favRestaurant !== '—' ? `<div style="font-size:8px;color:#9CA3AF;font-weight:500;margin:1px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%">🏠 ${escHtml(st.favRestaurant)}</div>` : ''}`;
+            })()}
             <div style="font-size:9px;color:#9CA3AF;font-weight:500">🏅 ${badgeCount} / ${totalBadges} badges</div>
             <div data-history="1" style="background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.16);border-radius:999px;color:#fff;font-size:10px;font-weight:600;padding:4px 12px;font-family:'Inter',sans-serif;margin-top:4px">📅 History</div>
           </div>
@@ -4475,37 +4799,48 @@ function renderBentoList() {
               <div class="challenger-chevron" id="chev-${p.id}">▾</div>
             </div>
             <div class="challenger-drawer" id="drawer-${p.id}">
-              <div class="challenger-drawer-inner" style="flex-direction:column;gap:8px;align-items:stretch">
-                <div style="display:flex;align-items:center;gap:10px">
-                  <div style="flex:1;min-width:0">
-                    <div style="font-size:9px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px">Latest</div>
-                    <div style="font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${lb.restaurant}</div>
-                    ${lb.when?`<div style="font-size:9px;color:#6B7280;font-weight:500;margin-top:2px">${lb.when}</div>`:''}
+              ${(()=>{
+                const st = computePlayerStats(p);
+                const bestLabel = st.bestBurger ? escHtml((st.bestBurger.menuItem || st.bestBurger.restaurant || '?').slice(0,28)) + ` — ${st.bestBurger.rating}/5` : null;
+                const cu = Math.max(0, p.count - (st.singles + st.doubles + st.triples));
+                return `<div class="challenger-drawer-inner" style="flex-direction:column;gap:7px;align-items:stretch">
+                  <div class="ps-grid">
+                    <div class="ps-cell">
+                      <div class="ps-val">${st.avgRating > 0 ? st.avgRating.toFixed(1) : '—'}</div>
+                      <div class="ps-lbl">⭐ Avg Rating</div>
+                    </div>
+                    <div class="ps-cell">
+                      <div class="ps-val">${st.uniqueSpots || '—'}</div>
+                      <div class="ps-lbl">📍 Spots Hit</div>
+                    </div>
                   </div>
-                  <button onclick="openCalModal('${p.id}')" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:var(--text);font-size:18px;padding:5px 8px;cursor:pointer;flex-shrink:0;line-height:1">📅</button>
-                </div>
-                <div style="display:flex;align-items:center;gap:10px">
-                  ${miniDonut(p)}
-                  <div style="display:flex;flex:1;gap:0">
-                    <div style="flex:1;text-align:center;border-right:1px solid rgba(255,255,255,0.07)">
-                      <div style="font-family:'Poppins',sans-serif;font-size:16px;font-weight:900;color:#EF4444;line-height:1">${cs}</div>
-                      <div style="font-size:8px;color:#9CA3AF;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Single</div>
+                  ${st.favRestaurant !== '—' ? `<div class="ps-row"><span class="ps-tag">🏠 Fav Spot</span><span class="ps-val-sm">${escHtml(st.favRestaurant)}</span></div>` : ''}
+                  ${bestLabel ? `<div class="ps-row"><span class="ps-tag">🏆 Best</span><span class="ps-val-sm">${bestLabel}</span></div>` : ''}
+                  ${st.favTopping !== '—' ? `<div class="ps-row"><span class="ps-tag">🧀 Top Topping</span><span class="ps-val-sm">${escHtml(st.favTopping)}</span></div>` : ''}
+                  <div style="display:flex;align-items:center;gap:10px;margin-top:2px">
+                    ${miniDonut(p)}
+                    <div style="display:flex;flex:1;gap:0">
+                      <div style="flex:1;text-align:center;border-right:1px solid rgba(255,255,255,0.07)">
+                        <div style="font-family:'Poppins',sans-serif;font-size:16px;font-weight:900;color:#EF4444;line-height:1">${st.singles}</div>
+                        <div style="font-size:8px;color:#9CA3AF;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Single</div>
+                      </div>
+                      <div style="flex:1;text-align:center;border-right:1px solid rgba(255,255,255,0.07)">
+                        <div style="font-family:'Poppins',sans-serif;font-size:16px;font-weight:900;color:#E5E5E5;line-height:1">${st.doubles}</div>
+                        <div style="font-size:8px;color:#9CA3AF;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Double</div>
+                      </div>
+                      <div style="flex:1;text-align:center;border-right:${cu>0?'1px solid rgba(255,255,255,0.07)':'none'}">
+                        <div style="font-family:'Poppins',sans-serif;font-size:16px;font-weight:900;color:#3B82F6;line-height:1">${st.triples}</div>
+                        <div style="font-size:8px;color:#9CA3AF;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Triples</div>
+                      </div>
+                      ${cu>0?`<div style="flex:1;text-align:center">
+                        <div style="font-family:'Poppins',sans-serif;font-size:16px;font-weight:900;color:#6B7280;line-height:1">${cu}</div>
+                        <div style="font-size:8px;color:#6B7280;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Untracked</div>
+                      </div>`:''}
                     </div>
-                    <div style="flex:1;text-align:center;border-right:1px solid rgba(255,255,255,0.07)">
-                      <div style="font-family:'Poppins',sans-serif;font-size:16px;font-weight:900;color:#E5E5E5;line-height:1">${cd}</div>
-                      <div style="font-size:8px;color:#9CA3AF;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Double</div>
-                    </div>
-                    <div style="flex:1;text-align:center;border-right:${cu>0?'1px solid rgba(255,255,255,0.07)':'none'}">
-                      <div style="font-family:'Poppins',sans-serif;font-size:16px;font-weight:900;color:#3B82F6;line-height:1">${ct}</div>
-                      <div style="font-size:8px;color:#9CA3AF;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Triples</div>
-                    </div>
-                    ${cu>0?`<div style="flex:1;text-align:center">
-                      <div style="font-family:'Poppins',sans-serif;font-size:16px;font-weight:900;color:#6B7280;line-height:1">${cu}</div>
-                      <div style="font-size:8px;color:#6B7280;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Untracked</div>
-                    </div>`:''}
                   </div>
-                </div>
-              </div>
+                  <button onclick="openCalModal('${p.id}')" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--muted2);font-size:11px;font-weight:600;padding:6px 0;cursor:pointer;font-family:'Inter',sans-serif;width:100%;margin-top:2px">📅 Burger History</button>
+                </div>`;
+              })()}
             </div>
           </div>`;
       }).join('')}
@@ -4798,24 +5133,26 @@ window.switchTab=function(name,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
   btn.classList.add('active');
-  // Compact header for Social + Map; restore for all other tabs
-  document.body.classList.toggle('social-active',  name==='social');
+  // Compact header for Feed + Map + Racing; restore for all other tabs
+  document.body.classList.toggle('feed-active',    name==='feed');
   document.body.classList.toggle('map-active',     name==='map');
   document.body.classList.toggle('racing-active',  name==='racing');
   // Clear players pill active state when switching via tabs
   document.getElementById('players-pill-btn')?.classList.remove('active');
-  if(name==='social'){
-    seenMessageCount = messages.length;
-    const dot = document.getElementById('social-unread-dot');
-    if(dot) dot.classList.remove('visible');
-    _scrollFeedToBottom = false; // column-reverse handles anchoring natively
+  if(name==='feed'){
+    // Check if the unified feed sub-tab is active (not top-rated)
+    const unifiedVisible = document.getElementById('unified-feed-panel')?.style.display !== 'none';
+    if(unifiedVisible) {
+      seenMessageCount = messages.length;
+      const dot = document.getElementById('social-unread-dot');
+      if(dot) dot.classList.remove('visible');
+    }
+    renderUnifiedFeed();
   }
   if(name==='map') setTimeout(() => {
     renderBurgerMap();
-    // Invalidate Leaflet size after the vh-based height is applied
     if(burgerMap) burgerMap.invalidateSize();
   }, 80);
-  if(name==='feed') renderGrillFeed();
   if(name==='list') renderBentoList();
   if(name==='leaderboard') { _openAlbumId = null; const s=[...players].sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name)); renderLeaderboard(s); }
   if(name==='racing') { _raceAnimateFromStart = true; renderRaceTrack(); }
@@ -4825,7 +5162,7 @@ window.switchToPlayers = function() {
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-players').classList.add('active');
-  document.body.classList.remove('social-active','map-active','racing-active');
+  document.body.classList.remove('feed-active','map-active','racing-active');
   const pill = document.getElementById('players-pill-btn');
   if(pill) pill.classList.add('active');
 };
@@ -4969,14 +5306,22 @@ async function reverseGeocode(lat, lng) {
 window.switchFeedTab = function(tab, btn) {
   document.querySelectorAll('.feed-sub-tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  const feedEl = document.getElementById('grill-feed');
+  const unifiedEl = document.getElementById('unified-feed-panel');
   const ratedEl = document.getElementById('top-rated-wrap');
   if (tab === 'feed') {
-    feedEl.style.display = '';
+    if (unifiedEl) unifiedEl.style.display = '';
     ratedEl.style.display = 'none';
+    // Enter full-height feed mode
+    document.body.classList.add('feed-active');
+    seenMessageCount = messages.length;
+    const dot = document.getElementById('social-unread-dot');
+    if (dot) dot.classList.remove('visible');
+    renderUnifiedFeed();
   } else {
-    feedEl.style.display = 'none';
+    if (unifiedEl) unifiedEl.style.display = 'none';
     ratedEl.style.display = '';
+    // Leave full-height mode when on top-rated
+    document.body.classList.remove('feed-active');
     renderTopRated();
   }
 };
@@ -5113,155 +5458,6 @@ function miniBurgerStack(pattyCount) {
   </div>`;
 }
 
-function renderGrillFeed() {
-  const feedEl = document.getElementById('grill-feed');
-  if (!feedEl) return;
-
-  // Collect every log entry from every player
-  const allEntries = [];
-  players.forEach(p => {
-    (p.logs || []).forEach(entry => {
-      const ts = logTs(entry);
-      if (!ts) return;
-      allEntries.push({
-        player:            p,
-        ts,
-        restaurant:        (typeof entry === 'object' && entry.restaurant)        || 'Unknown Spot',
-        rating:            (typeof entry === 'object' && entry.rating)            || 0,
-        patties:           (typeof entry === 'object' && entry.patties > 0) ? entry.patties : null,
-        lat:               (typeof entry === 'object' && entry.lat)               || null,
-        lng:               (typeof entry === 'object' && entry.lng)               || null,
-        locationCityState: (typeof entry === 'object' && entry.locationCityState) || '',
-        weatherStamp:      (typeof entry === 'object' && entry.weatherStamp)      || '',
-        menuItem:          (typeof entry === 'object' && entry.menuItem)           || '',
-        menuEmoji:         (typeof entry === 'object' && entry.menuEmoji)          || '',
-      });
-    });
-  });
-
-  // Newest first
-  allEntries.sort((a, b) => new Date(b.ts) - new Date(a.ts));
-
-  if (!allEntries.length) {
-    feedEl.innerHTML = `
-      <div class="grill-feed-empty">
-        <span class="gfe-icon">🍔🔥</span>
-        <div class="gfe-title">THE GRILL IS COLD</div>
-        Log your first burger to fire up the feed!
-      </div>`;
-    return;
-  }
-
-  feedEl.innerHTML = allEntries.map((item, idx) => {
-    // Default old entries (no patties field) to 1 so they get the Single pun
-    const pattyCount = (item.patties != null && item.patties > 0) ? item.patties : 1;
-
-    // ── Patty stamp — use burger name if available, else pun fallback
-    let stampText, stampCls;
-    if (pattyCount >= 3) { stampCls = 'stamp-triple'; }
-    else if (pattyCount === 2) { stampCls = 'stamp-double'; }
-    else { stampCls = 'stamp-single'; }
-
-    if (item.menuItem) {
-      stampText = `${item.menuEmoji || '🍔'} ${item.menuItem.toUpperCase()}`;
-    } else if (pattyCount >= 3) {
-      stampText = '🙏 THE HOLY TRINITY';
-    } else if (pattyCount === 2) {
-      stampText = '🥩 THE DOUBLE OR NOTHING';
-    } else {
-      stampText = '🍔 THE SOLO DOLO';
-    }
-
-    // ── Location pill
-    let locPill;
-    if (item.lat && item.lng) {
-      const resolved   = item.locationCityState ? escHtml(item.locationCityState) : null;
-      const coordLabel = `${item.lat.toFixed(2)}°N, ${Math.abs(item.lng).toFixed(2)}°W`;
-      const locText    = resolved || coordLabel;
-      locPill = `<span class="grill-pill grill-pill-location has-gps">📍: <span id="geo-${idx}">${locText}</span></span>`;
-    } else {
-      locPill = `<span class="grill-pill grill-pill-location no-gps">🕵️‍♂️: Off the Grid</span>`;
-    }
-
-    // ── Time
-    const d       = new Date(item.ts);
-    const month   = String(d.getMonth() + 1).padStart(2, '0');
-    const day     = String(d.getDate()).padStart(2, '0');
-    const year    = d.getFullYear();
-    const timeStr = d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', hour12:true});
-    const timePill = `<span class="grill-pill grill-pill-time">⏰: ${timeStr}, ${month}/${day}/${year}</span>`;
-
-    // ── Weather stamp
-    const weatherPill = item.weatherStamp
-      ? `<span class="grill-pill grill-pill-weather">${escHtml(item.weatherStamp)}</span>`
-      : '';
-
-    // ── Stars
-    const ratingStars = (() => {
-      if (!item.rating || item.rating <= 0) return '<span style="color:var(--muted);font-size:12px">— unrated</span>';
-      let s = '';
-      for (let i = 1; i <= 5; i++) s += item.rating >= i ? '⭐' : '<span style="opacity:0.2">⭐</span>';
-      return `${s} <span class="grill-rating-num">${item.rating}/5</span>`;
-    })();
-
-    // ── Player color + avatar
-    const color = RING_COLORS[item.player.colorIdx % RING_COLORS.length];
-    const ini   = initials(item.player.name);
-    const isMe  = item.player.id === myPlayerId;
-
-    // ── Burger ordinal for this player
-    const playerEntries = allEntries.filter(e => e.player.id === item.player.id);
-    const burgerNum = item.player.count - playerEntries.indexOf(item);
-
-    return `
-<div class="grill-feed-card ${pattyCount >= 3 ? 'triple-card' : ''}${item.rating === 5 ? ' perfect-rating' : ''}" style="animation-delay:${Math.min(idx * 0.04, 0.6)}s">
-  <div class="grill-card-inner">
-    <div class="grill-left-accent" style="background:${color}"></div>
-    <div class="grill-card-banner">
-      <div class="grill-banner-left">
-        <div class="grill-banner-avatar" style="background:${color}1A;color:${color};border:1.5px solid ${color}55">${ini}</div>
-        <div class="grill-banner-name">${escHtml(item.player.name)}${isMe ? ' <span class="grill-banner-you">(you)</span>' : ''}</div>
-      </div>
-      <div class="grill-banner-badge" style="border-color:${color}55">🍔 #${burgerNum > 0 ? burgerNum : '?'}</div>
-    </div>
-    <div class="grill-stripe"></div>
-    <div class="grill-patty-stamp ${stampCls}">${stampText}</div>
-    <div class="grill-card-body">
-      <div class="grill-card-body-content">
-        <div class="grill-restaurant-name">${escHtml(item.restaurant)}</div>
-        ${item.menuItem ? `<div class="grill-menu-item-line">${item.menuEmoji || '🍔'} ${escHtml(item.menuItem)}</div>` : ''}
-        <div class="grill-pill-row">
-          ${locPill}
-          ${timePill}
-          ${weatherPill}
-        </div>
-        <div class="grill-rating-row">
-          ${ratingStars}
-        </div>
-      </div>
-      <div class="burger-stack-wrap">
-        ${item.rating === 5 ? '<div class="perfect-star">⭐</div>' : ''}
-        ${miniBurgerStack(pattyCount)}
-      </div>
-    </div>
-  </div>
-</div>`.trim();
-  }).join('\n');
-
-  // ── Lazy reverse-geocode old entries that have coords but no saved City, State
-  // Staggered to respect Nominatim's 1-req/sec rate limit
-  allEntries.forEach((item, idx) => {
-    if (!item.lat || !item.lng || item.locationCityState) return;
-    setTimeout(() => {
-      const targetEl = document.getElementById(`geo-${idx}`);
-      if (!targetEl) return; // card scrolled away or feed re-rendered
-      reverseGeocode(item.lat, item.lng).then(loc => {
-        if (loc && targetEl.isConnected) targetEl.textContent = loc;
-      });
-    }, 120 * idx); // 120 ms gap keeps well under the 1-req/sec cap
-  });
-}
-
 window.panMapToSpot = function(lat, lng) {
   // Switch to map tab
   const mapBtn = [...document.querySelectorAll('.tab-btn')].find(b => b.getAttribute('onclick')?.includes("'map'"));
@@ -5283,6 +5479,55 @@ window.panMapToSpot = function(lat, lng) {
 let burgerMap = null;
 let mapMarkers = [];
 const RING_COLORS = ['#F87171','#FCD34D','#4ADE80','#22D3EE','#60A5FA','#E879F9','#CBD5E1','#F472B6','#FB7185','#A78BFA','#FDB974','#5EEAD4','#BEF264','#FB923C','#7DD3FC','#818CF8','#FDE047','#E2E8F0'];
+
+// ── Compute personal stats for a player ──────────────────────────────────────
+function computePlayerStats(p) {
+  const logs = (p.logs || []).filter(e => typeof e === 'object' && e.ts);
+  const ratedLogs = logs.filter(e => e.rating > 0);
+  const avgRating = ratedLogs.length
+    ? Math.round((ratedLogs.reduce((s, e) => s + e.rating, 0) / ratedLogs.length) * 10) / 10
+    : 0;
+  // Fav restaurant
+  const rCounts = {};
+  logs.forEach(e => { const r = e.restaurant || 'Unknown'; rCounts[r] = (rCounts[r] || 0) + 1; });
+  const favRestaurant = Object.entries(rCounts).sort((a,b) => b[1]-a[1])[0]?.[0] || '—';
+  // Fav topping
+  const tCounts = {};
+  logs.forEach(e => (e.toppings || []).forEach(t => { tCounts[t] = (tCounts[t] || 0) + 1; }));
+  const favTopping = Object.entries(tCounts).sort((a,b) => b[1]-a[1])[0]?.[0] || '—';
+  // Best burger (highest rated)
+  const bestBurger = ratedLogs.length
+    ? [...ratedLogs].sort((a,b) => b.rating - a.rating)[0]
+    : null;
+  const uniqueSpots = Object.keys(rCounts).length;
+  const singles = logs.filter(e => !e.patties || e.patties === 1).length;
+  const doubles = logs.filter(e => e.patties === 2).length;
+  const triples = logs.filter(e => e.patties >= 3).length;
+  return { avgRating, favRestaurant, favTopping, bestBurger, uniqueSpots, singles, doubles, triples };
+}
+
+// ── Compress an image File to a small base64 JPEG ────────────────────────────
+function compressImage(file, maxPx=240, quality=0.45) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxPx / Math.max(img.width, img.height));
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 function starsHtml(n) {
   const full = Math.floor(n), half = (n % 1) >= 0.5;
