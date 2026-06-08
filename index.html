@@ -762,6 +762,9 @@ body.social-active .social-input-area{
 .pb-onions   { width:122px; height:6px; background:repeating-linear-gradient(90deg,rgba(255,255,255,0.7) 0,rgba(200,200,220,0.5) 10px,rgba(255,255,255,0.7) 10px,rgba(255,255,255,0.7) 12px); border-radius:3px; margin:1px auto; animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
 .pb-mushrooms { width:118px; height:9px; background:linear-gradient(180deg,#92400E,#78350F); border-radius:5px 5px 2px 2px; margin:1px auto; box-shadow:0 2px 4px rgba(0,0,0,0.4); animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
 .pb-green-peppers { width:120px; height:7px; background:repeating-linear-gradient(90deg,#22C55E 0,#15803D 9px,#22C55E 9px,#22C55E 11px); border-radius:3px; margin:1px auto; animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+.pb-bacon { width:124px; height:8px; background:repeating-linear-gradient(90deg,#C2410C 0px,#C2410C 7px,#9A3412 7px,#9A3412 9px,#EA580C 9px,#EA580C 15px,#7C2D12 15px,#7C2D12 17px,#C2410C 17px); border-radius:3px; margin:1px auto; box-shadow:0 2px 5px rgba(0,0,0,0.45); animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+.pb-blue-cheese { width:120px; height:6px; background:radial-gradient(circle 2px at 12% 50%,#818CF8 0%,transparent 100%),radial-gradient(circle 2px at 38% 30%,#6366F1 0%,transparent 100%),radial-gradient(circle 2px at 62% 70%,#818CF8 0%,transparent 100%),radial-gradient(circle 2px at 85% 40%,#6366F1 0%,transparent 100%),linear-gradient(180deg,#F8FAFC 0%,#E2E8F0 100%); border-radius:3px; margin:1px auto; box-shadow:0 1px 3px rgba(0,0,0,0.2); animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+.pb-special-sauce { width:120px; height:4px; background:linear-gradient(180deg,#FB923C 0%,#C2410C 100%); border-radius:3px; margin:1px auto; box-shadow:0 1px 4px rgba(194,65,12,0.4); animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
 
 .topping-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
 .topping-btn{background:var(--surface3);border:1px solid var(--border2);border-radius:999px;color:var(--muted2);font-size:11px;font-weight:500;padding:5px 11px;cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif}
@@ -3076,16 +3079,19 @@ function renderMyTally(){
     <!-- Patty Stack Builder -->
     <div class="patty-builder">
       <div class="pb-bun-top"></div>
-      <div id="pb-top-Mayo"         class="pb-sauce pb-mayo"         style="display:none"></div>
-      <div id="pb-top-Ketchup"      class="pb-sauce pb-ketchup"      style="display:none"></div>
-      <div id="pb-top-Mustard"      class="pb-sauce pb-mustard"      style="display:none"></div>
-      <div id="pb-top-Lettuce"      class="pb-lettuce"               style="display:none"></div>
-      <div id="pb-top-Tomatoes"     class="pb-tomato"                style="display:none"></div>
-      <div id="pb-top-Pickles"      class="pb-pickles"               style="display:none"></div>
-      <div id="pb-top-Green-Peppers" class="pb-green-peppers"        style="display:none"></div>
-      <div id="pb-top-Mushrooms"    class="pb-mushrooms"             style="display:none"></div>
-      <div id="pb-top-Onions"       class="pb-onions"                style="display:none"></div>
-      <div id="pb-top-Cheese"       class="pb-cheese"                style="display:none"></div>
+      <div id="pb-top-Mayo"          class="pb-sauce pb-mayo"         style="display:none"></div>
+      <div id="pb-top-Ketchup"       class="pb-sauce pb-ketchup"      style="display:none"></div>
+      <div id="pb-top-Mustard"       class="pb-sauce pb-mustard"      style="display:none"></div>
+      <div id="pb-top-Special-Sauce" class="pb-special-sauce"         style="display:none"></div>
+      <div id="pb-top-Lettuce"       class="pb-lettuce"               style="display:none"></div>
+      <div id="pb-top-Tomatoes"      class="pb-tomato"                style="display:none"></div>
+      <div id="pb-top-Pickles"       class="pb-pickles"               style="display:none"></div>
+      <div id="pb-top-Green-Peppers" class="pb-green-peppers"         style="display:none"></div>
+      <div id="pb-top-Mushrooms"     class="pb-mushrooms"             style="display:none"></div>
+      <div id="pb-top-Onions"        class="pb-onions"                style="display:none"></div>
+      <div id="pb-top-Bacon"         class="pb-bacon"                 style="display:none"></div>
+      <div id="pb-top-Cheese"        class="pb-cheese"                style="display:none"></div>
+      <div id="pb-top-Blue-Cheese"   class="pb-blue-cheese"           style="display:none"></div>
       <div class="pb-stack" id="pb-stack"></div>
       <div class="pb-bun-bottom"></div>
       <div class="pb-selector">
@@ -3120,6 +3126,13 @@ function renderMyTally(){
         </div>
       </div>
       <div class="critic-nudge" id="critic-nudge" style="display:none"></div>
+      <!-- Custom burger name — shown only for build-your-own (no menu item selected) -->
+      <div class="burger-detail-row" id="custom-burger-name-row" style="display:none;align-items:center;gap:10px">
+        <label style="white-space:nowrap">Burger name</label>
+        <input type="text" id="custom-burger-name" maxlength="60" autocomplete="off"
+               placeholder="Name your creation…"
+               style="flex:1;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;outline:none"/>
+      </div>
       <div style="display:flex;flex-direction:column;gap:6px">
         <label style="font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em;font-weight:600">Toppings</label>
         <div class="topping-grid" id="topping-grid">
@@ -3430,7 +3443,7 @@ function fireConfetti(big = false) {
   }
 }
 
-const OHIO_SPOTS = ["Five Guys","Wendy's","McDonald's","Burger King","Buffalo Wild Wings","Swenson's","Shake Shack","Steak 'n Shake","Culver's"];
+const OHIO_SPOTS = ["Bickerdyke's","Five Guys","Wendy's","McDonald's","Burger King","Buffalo Wild Wings","Swenson's","Shake Shack","Steak 'n Shake","Culver's"];
 
 // Google Places API key — paste yours here to enable live autocomplete for any restaurant.
 // Get one free at console.cloud.google.com → enable "Places API".
@@ -3438,23 +3451,27 @@ const OHIO_SPOTS = ["Five Guys","Wendy's","McDonald's","Burger King","Buffalo Wi
 const GOOGLE_PLACES_KEY = '';
 
 const BURGER_MENUS = {
+  "Bickerdyke's": { emoji:"🔥", items:[
+    { name:"Bickerdyke Smash Burger", patties:2, toppings:["Cheese","Onions","Pickles","Special Sauce"], emoji:"🍔", criticScore:4.6 },
+    { name:"Bacon Blue Cheese Smash Burger", patties:2, toppings:["Blue Cheese","Onions","Bacon"], emoji:"🥓", criticScore:4.5 },
+  ]},
   "Five Guys": { emoji:"🍔", items:[
-    { name:"Hamburger",          patties:1, toppings:["Ketchup","Mustard","Lettuce","Tomatoes","Pickles","Onions"],           emoji:"🍔", criticScore:4.0 },
-    { name:"Cheeseburger",       patties:1, toppings:["Cheese","Ketchup","Mustard","Lettuce","Tomatoes","Pickles","Onions"],  emoji:"🧀", criticScore:4.1 },
-    { name:"Bacon Burger",       patties:1, toppings:["Ketchup","Mustard","Lettuce","Tomatoes","Pickles","Onions"],           emoji:"🥓", criticScore:4.0 },
-    { name:"Bacon Cheeseburger", patties:1, toppings:["Cheese","Ketchup","Mustard","Pickles","Onions"],                      emoji:"🥓", criticScore:4.3 },
-    { name:"Little Hamburger",   patties:1, toppings:["Ketchup","Mustard","Pickles","Onions"],                               emoji:"🍔", criticScore:3.8 },
-    { name:"Double",             patties:2, toppings:["Cheese","Ketchup","Mustard","Lettuce","Tomatoes","Pickles","Onions"], emoji:"🍔", criticScore:4.2 },
+    { name:"Hamburger",          patties:1, toppings:["Ketchup","Mustard","Lettuce","Tomatoes","Pickles","Onions"],                    emoji:"🍔", criticScore:4.0 },
+    { name:"Cheeseburger",       patties:1, toppings:["Cheese","Ketchup","Mustard","Lettuce","Tomatoes","Pickles","Onions"],           emoji:"🧀", criticScore:4.1 },
+    { name:"Bacon Burger",       patties:1, toppings:["Bacon","Ketchup","Mustard","Lettuce","Tomatoes","Pickles","Onions"],            emoji:"🥓", criticScore:4.0 },
+    { name:"Bacon Cheeseburger", patties:1, toppings:["Bacon","Cheese","Ketchup","Mustard","Pickles","Onions"],                       emoji:"🥓", criticScore:4.3 },
+    { name:"Little Hamburger",   patties:1, toppings:["Ketchup","Mustard","Pickles","Onions"],                                        emoji:"🍔", criticScore:3.8 },
+    { name:"Double",             patties:2, toppings:["Cheese","Ketchup","Mustard","Lettuce","Tomatoes","Pickles","Onions"],           emoji:"🍔", criticScore:4.2 },
   ]},
   "Wendy's": { emoji:"🔴", items:[
-    { name:"Dave's Single",    patties:1, toppings:["Cheese","Ketchup","Mayo","Lettuce","Tomatoes","Pickles","Onions"], emoji:"🍔", criticScore:4.0 },
-    { name:"Dave's Double",    patties:2, toppings:["Cheese","Ketchup","Mayo","Lettuce","Tomatoes","Pickles","Onions"], emoji:"🍔", criticScore:4.2 },
-    { name:"Dave's Triple",    patties:3, toppings:["Cheese","Ketchup","Mayo","Lettuce","Tomatoes","Pickles","Onions"], emoji:"🍔", criticScore:4.1 },
-    { name:"Baconator",        patties:2, toppings:["Cheese","Ketchup","Mayo"],                                         emoji:"🥓", criticScore:3.8 },
-    { name:"Jr. Bacon Chzbrg", patties:1, toppings:["Cheese","Mayo","Lettuce","Tomatoes"],                              emoji:"🧀", criticScore:3.5 },
+    { name:"Dave's Single",    patties:1, toppings:["Cheese","Ketchup","Mayo","Lettuce","Tomatoes","Pickles","Onions"],  emoji:"🍔", criticScore:4.0 },
+    { name:"Dave's Double",    patties:2, toppings:["Cheese","Ketchup","Mayo","Lettuce","Tomatoes","Pickles","Onions"],  emoji:"🍔", criticScore:4.2 },
+    { name:"Dave's Triple",    patties:3, toppings:["Cheese","Ketchup","Mayo","Lettuce","Tomatoes","Pickles","Onions"],  emoji:"🍔", criticScore:4.1 },
+    { name:"Baconator",        patties:2, toppings:["Bacon","Cheese","Ketchup","Mayo"],                                  emoji:"🥓", criticScore:3.8 },
+    { name:"Jr. Bacon Chzbrg", patties:1, toppings:["Bacon","Cheese","Mayo","Lettuce","Tomatoes"],                       emoji:"🧀", criticScore:3.5 },
   ]},
   "McDonald's": { emoji:"🟡", items:[
-    { name:"Big Mac",             patties:2, toppings:["Cheese","Mayo","Lettuce","Pickles","Onions"],            emoji:"🍔", criticScore:3.8 },
+    { name:"Big Mac",             patties:2, toppings:["Cheese","Special Sauce","Lettuce","Pickles","Onions"],   emoji:"🍔", criticScore:3.8 },
     { name:"Quarter Pounder",     patties:1, toppings:["Cheese","Ketchup","Mustard","Pickles","Onions"],         emoji:"🧀", criticScore:3.9 },
     { name:"Dbl Quarter Pounder", patties:2, toppings:["Cheese","Ketchup","Mustard","Pickles","Onions"],         emoji:"🧀", criticScore:4.0 },
     { name:"McDouble",            patties:2, toppings:["Cheese","Ketchup","Mustard","Pickles","Onions"],         emoji:"🍔", criticScore:3.5 },
@@ -3468,21 +3485,21 @@ const BURGER_MENUS = {
   ]},
   "Buffalo Wild Wings": { emoji:"🦬", items:[
     { name:"All American Cheeseburger", patties:2, toppings:["Cheese","Lettuce","Tomatoes","Pickles","Mustard","Mayo"], emoji:"🧀", criticScore:3.5 },
-    { name:"Bacon Smash",          patties:2, toppings:["Cheese","Ketchup","Mustard"],            emoji:"🥓", criticScore:3.8 },
-    { name:"Buffalo Ranch Burger", patties:1, toppings:["Cheese","Lettuce","Tomatoes"],           emoji:"🌶️", criticScore:3.9 },
-    { name:"Mushroom Swiss",       patties:1, toppings:["Cheese","Mushrooms"],                    emoji:"🍄", criticScore:3.7 },
+    { name:"Bacon Smash",          patties:2, toppings:["Bacon","Cheese","Ketchup","Mustard"],      emoji:"🥓", criticScore:3.8 },
+    { name:"Buffalo Ranch Burger", patties:1, toppings:["Cheese","Lettuce","Tomatoes"],             emoji:"🌶️", criticScore:3.9 },
+    { name:"Mushroom Swiss",       patties:1, toppings:["Cheese","Mushrooms"],                      emoji:"🍄", criticScore:3.7 },
   ]},
   "Swenson's": { emoji:"🚗", items:[
-    { name:"Galley Boy",       patties:2, toppings:["Cheese","Ketchup","Mustard","Pickles"],        emoji:"🍔", criticScore:4.5 },
-    { name:"Single Burger",    patties:1, toppings:["Ketchup","Mustard","Pickles","Onions"],        emoji:"🍔", criticScore:4.0 },
-    { name:"Double Burger",    patties:2, toppings:["Ketchup","Mustard","Pickles","Onions"],        emoji:"🍔", criticScore:4.2 },
-    { name:"Triple Cheeseburger", patties:3, toppings:["Ketchup","Mustard","Pickles","Onions"],    emoji:"🧀", criticScore:4.3 },
+    { name:"Galley Boy",          patties:2, toppings:["Cheese","Ketchup","Mustard","Pickles","Special Sauce"], emoji:"🍔", criticScore:4.5 },
+    { name:"Single Burger",       patties:1, toppings:["Ketchup","Mustard","Pickles","Onions"],                 emoji:"🍔", criticScore:4.0 },
+    { name:"Double Burger",       patties:2, toppings:["Ketchup","Mustard","Pickles","Onions"],                 emoji:"🍔", criticScore:4.2 },
+    { name:"Triple Cheeseburger", patties:3, toppings:["Ketchup","Mustard","Pickles","Onions"],                 emoji:"🧀", criticScore:4.3 },
   ]},
   "Shake Shack": { emoji:"🎱", items:[
-    { name:"ShackBurger",        patties:1, toppings:["Cheese","Lettuce","Tomatoes","Mayo"], emoji:"🍔", criticScore:4.4 },
-    { name:"SmokeShack",         patties:1, toppings:["Cheese","Pickles","Mayo"],            emoji:"🥓", criticScore:4.3 },
-    { name:"Double ShackBurger", patties:2, toppings:["Cheese","Lettuce","Tomatoes","Mayo"], emoji:"🍔", criticScore:4.5 },
-    { name:"Shack Stack",        patties:1, toppings:["Cheese","Lettuce","Tomatoes","Mayo"], emoji:"🍔", criticScore:4.4 },
+    { name:"ShackBurger",        patties:1, toppings:["Cheese","Lettuce","Tomatoes","Mayo"],        emoji:"🍔", criticScore:4.4 },
+    { name:"SmokeShack",         patties:1, toppings:["Bacon","Cheese","Pickles","Mayo"],           emoji:"🥓", criticScore:4.3 },
+    { name:"Double ShackBurger", patties:2, toppings:["Cheese","Lettuce","Tomatoes","Mayo"],        emoji:"🍔", criticScore:4.5 },
+    { name:"Shack Stack",        patties:1, toppings:["Cheese","Lettuce","Tomatoes","Mayo"],        emoji:"🍔", criticScore:4.4 },
   ]},
   "Steak 'n Shake": { emoji:"🥤", items:[
     { name:"Classic Burger",     patties:1, toppings:["Cheese","Ketchup","Mustard","Pickles","Onions"], emoji:"🍔", criticScore:3.8 },
@@ -3506,7 +3523,7 @@ let pendingPattyCount = 0;
 let pendingToppings = [];
 let receiptTimer = null;
 
-const ALL_TOPPINGS = ['Ketchup','Mustard','Mayo','Cheese','Lettuce','Pickles','Tomatoes','Onions','Mushrooms','Green Peppers'];
+const ALL_TOPPINGS = ['Ketchup','Mustard','Mayo','Cheese','Blue Cheese','Lettuce','Pickles','Tomatoes','Onions','Bacon','Mushrooms','Green Peppers','Special Sauce'];
 
 window.toggleTopping = function(topping) {
   const idx = pendingToppings.indexOf(topping);
@@ -3552,6 +3569,10 @@ window.selectPatties = function(n) {
   const btnLabels = ['', '✓ Log This Burger', '✓ Log This Double', '✓ Log The Holy Trinity'];
   const confirmBtn = document.getElementById('confirm-btn');
   if (confirmBtn) confirmBtn.textContent = btnLabels[n] || '✓ Log This Burger';
+
+  // Show/hide custom burger name row based on whether a menu item was selected
+  const customRow = document.getElementById('custom-burger-name-row');
+  if (customRow) customRow.style.display = pendingMenuItemName ? 'none' : 'flex';
 
   // Reveal detail form
   const d = document.getElementById('burger-detail');
@@ -3713,6 +3734,9 @@ window.selectMenuItem = function(restaurantKey, idx) {
   // Store emoji + item name for log entry
   pendingMenuEmoji = item.emoji;
   pendingMenuItemName = item.name;
+  // Hide custom burger name field (not needed when a menu item is chosen)
+  const customRow = document.getElementById('custom-burger-name-row');
+  if (customRow) { customRow.style.display = 'none'; const inp = document.getElementById('custom-burger-name'); if (inp) inp.value = ''; }
   // Pre-fill toppings
   pendingToppings = [...item.toppings];
   updateBurgerToppingVisuals();
@@ -3765,6 +3789,11 @@ window.clearRestaurantSelection = function() {
   setRating(0);
   const sliderReset = document.getElementById('rating-slider');
   if (sliderReset) sliderReset.value = 0;
+  // Hide custom burger name field
+  const cRow = document.getElementById('custom-burger-name-row');
+  if (cRow) cRow.style.display = 'none';
+  const cInp = document.getElementById('custom-burger-name');
+  if (cInp) cInp.value = '';
   // Close detail form and reset patty builder
   document.getElementById('burger-detail')?.classList.remove('open');
   document.getElementById('pb-stack').innerHTML = '';
@@ -3783,6 +3812,9 @@ window.showBuildOwn = function() {
   // Clear any pre-filled menu item state
   pendingMenuEmoji = '';
   pendingMenuItemName = '';
+  // Show custom burger name field
+  const customRow = document.getElementById('custom-burger-name-row');
+  if (customRow) customRow.style.display = 'flex';
 };
 
 function initPlacesAutocomplete() {
@@ -3821,6 +3853,16 @@ window.confirmBurger = async function() {
   const count      = pendingPattyCount || 1;
   const restaurant = document.getElementById('detail-restaurant').value.trim() || 'Unknown spot';
   const pattyLabel = ['', 'Single', 'Double', 'The Holy Trinity'][count] || 'Single';
+  // If no menu item was selected, read from custom burger name field
+  if (!pendingMenuItemName) {
+    const customNameEl = document.getElementById('custom-burger-name');
+    const typed = customNameEl ? customNameEl.value.trim() : '';
+    if (typed) {
+      pendingMenuItemName = typed;
+      pendingMenuEmoji = '🍔';
+    }
+  }
+
   // Snapshot these before resetting pending state
   const snapshotRating        = pendingRating;
   const snapshotGPS           = pendingGPS;
@@ -3891,6 +3933,10 @@ window.confirmBurger = async function() {
   pendingToppings = [];
   pendingMenuEmoji = '';
   pendingMenuItemName = '';
+  const customNameInp = document.getElementById('custom-burger-name');
+  if (customNameInp) customNameInp.value = '';
+  const customNameRow2 = document.getElementById('custom-burger-name-row');
+  if (customNameRow2) customNameRow2.style.display = 'none';
   document.querySelectorAll('.topping-btn').forEach(b => b.classList.remove('topping-active'));
   const nudge = document.getElementById('critic-nudge');
   if (nudge) nudge.style.display = 'none';
@@ -4932,18 +4978,21 @@ window.switchFeedTab = function(tab, btn) {
 };
 
 function buildBurgerPreview(pattyCount, toppings) {
-  const toppingOrder = ['Mayo','Ketchup','Mustard','Lettuce','Tomatoes','Pickles','Green Peppers','Mushrooms','Onions','Cheese'];
+  const toppingOrder = ['Mayo','Ketchup','Mustard','Special Sauce','Lettuce','Tomatoes','Pickles','Green Peppers','Mushrooms','Onions','Bacon','Cheese','Blue Cheese'];
   const toppingClass = {
     'Mayo':          'pb-sauce pb-mayo',
     'Ketchup':       'pb-sauce pb-ketchup',
     'Mustard':       'pb-sauce pb-mustard',
+    'Special Sauce': 'pb-special-sauce',
     'Lettuce':       'pb-lettuce',
     'Tomatoes':      'pb-tomato',
     'Pickles':       'pb-pickles',
     'Green Peppers': 'pb-green-peppers',
     'Mushrooms':     'pb-mushrooms',
     'Onions':        'pb-onions',
+    'Bacon':         'pb-bacon',
     'Cheese':        'pb-cheese',
+    'Blue Cheese':   'pb-blue-cheese',
   };
   const n = Math.max(1, Math.min(pattyCount || 1, 3));
   const patties = Array.from({length: n}, () => '<div class="pb-patty"></div>').join('');
@@ -5103,17 +5152,20 @@ function renderGrillFeed() {
     // Default old entries (no patties field) to 1 so they get the Single pun
     const pattyCount = (item.patties != null && item.patties > 0) ? item.patties : 1;
 
-    // ── Patty stamp — always show a pun, never "Burger Logged"
+    // ── Patty stamp — use burger name if available, else pun fallback
     let stampText, stampCls;
-    if (pattyCount >= 3) {
+    if (pattyCount >= 3) { stampCls = 'stamp-triple'; }
+    else if (pattyCount === 2) { stampCls = 'stamp-double'; }
+    else { stampCls = 'stamp-single'; }
+
+    if (item.menuItem) {
+      stampText = `${item.menuEmoji || '🍔'} ${item.menuItem.toUpperCase()}`;
+    } else if (pattyCount >= 3) {
       stampText = '🙏 THE HOLY TRINITY';
-      stampCls  = 'stamp-triple';
     } else if (pattyCount === 2) {
-      stampText = '🥩 THE DOUBLE OR NOTHING (Double)';
-      stampCls  = 'stamp-double';
+      stampText = '🥩 THE DOUBLE OR NOTHING';
     } else {
-      stampText = '🍔 THE SOLO DOLO (Single)';
-      stampCls  = 'stamp-single';
+      stampText = '🍔 THE SOLO DOLO';
     }
 
     // ── Location pill
