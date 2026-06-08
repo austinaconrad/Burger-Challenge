@@ -758,6 +758,39 @@ body.social-active .social-input-area{
 .topping-btn.topping-active{background:rgba(245,158,11,0.15);border-color:var(--amber);color:var(--amber);font-weight:700}
 .quick-spot{background:var(--surface3);border:1px solid var(--border2);border-radius:999px;color:var(--muted2);font-size:11px;font-weight:500;padding:4px 10px;cursor:pointer;transition:border-color 0.15s,color 0.15s,background 0.15s}
 .quick-spot:hover{border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,0.07)}
+/* ── Restaurant-first step ── */
+.restaurant-step{padding:12px 16px 6px}
+.restaurant-step input[type=text]{width:100%;box-sizing:border-box;background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;padding:10px 14px;outline:none;transition:border-color 0.2s}
+.restaurant-step input[type=text]:focus{border-color:var(--amber)}
+.restaurant-step input[type=text]::placeholder{color:var(--muted)}
+.restaurant-locked-row{display:flex;align-items:center;justify-content:space-between;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);border-radius:var(--radius-sm);padding:10px 14px;gap:8px}
+.restaurant-locked-name{font-size:14px;font-weight:700;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.restaurant-change-btn{font-size:11px;color:var(--muted2);background:none;border:none;cursor:pointer;padding:2px 6px;font-family:'Inter',sans-serif;font-weight:500;white-space:nowrap;transition:color 0.15s;flex-shrink:0}
+.restaurant-change-btn:hover{color:var(--text)}
+.restaurant-suggestions{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+.restaurant-suggestion{background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-xs);padding:8px 12px;font-size:13px;color:var(--text);cursor:pointer;transition:background 0.15s,border-color 0.15s;text-align:left;width:100%;box-sizing:border-box;font-family:'Inter',sans-serif}
+.restaurant-suggestion:hover{background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.35)}
+.restaurant-suggestion-badge{font-size:10px;background:rgba(245,158,11,0.15);color:var(--amber);border-radius:999px;padding:1px 7px;margin-left:8px;font-weight:600;vertical-align:middle}
+/* ── Menu picker ── */
+.menu-picker{padding:10px 16px 2px;border-top:1px solid var(--border)}
+.menu-picker-label{font-size:10px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px}
+.menu-cards-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.menu-cards-scroll::-webkit-scrollbar{display:none}
+.menu-card{flex-shrink:0;width:110px;background:var(--surface3);border:1.5px solid var(--border2);border-radius:var(--radius-sm);padding:10px 8px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:border-color 0.15s,background 0.15s,transform 0.1s;-webkit-tap-highlight-color:transparent}
+.menu-card:hover{border-color:rgba(245,158,11,0.5);background:rgba(245,158,11,0.05)}
+.menu-card:active{transform:scale(0.95)}
+.menu-card.selected{border-color:var(--amber);background:rgba(245,158,11,0.1);box-shadow:0 0 0 1px rgba(245,158,11,0.2)}
+.menu-card-emoji{font-size:26px;line-height:1}
+.menu-card-name{font-size:11px;font-weight:700;color:var(--text);text-align:center;line-height:1.25;min-height:26px;display:flex;align-items:center;justify-content:center}
+.menu-card-badge{font-size:9px;font-weight:700;color:var(--amber);background:rgba(245,158,11,0.12);border-radius:999px;padding:2px 8px;text-transform:uppercase;letter-spacing:0.04em}
+.menu-card-toppings{font-size:8px;color:var(--muted2);text-align:center;line-height:1.3;min-height:9px}
+.build-own-btn{background:none;border:none;color:var(--muted2);font-size:11px;font-family:'Inter',sans-serif;cursor:pointer;padding:8px 0 4px;width:100%;text-align:center;transition:color 0.15s}
+.build-own-btn:hover{color:var(--text)}
+/* ── Feed: menu item line ── */
+.grill-menu-item-line{font-size:11px;color:var(--muted2);margin-top:2px;font-weight:500}
+/* ── Critic score nudge ── */
+.critic-nudge{background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.22);border-radius:var(--radius-xs);padding:8px 12px;font-size:12px;color:var(--muted2);line-height:1.4;animation:slideIn 0.2s ease both}
+.critic-nudge strong{color:var(--amber);font-weight:700}
 .detail-confirm-btn{background:linear-gradient(135deg,var(--amber),var(--amber-dark));color:#fff;border:none;border-radius:var(--radius-xs);font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;padding:10px;cursor:pointer;width:100%;margin-top:4px;transition:opacity 0.15s}
 .detail-confirm-btn:hover{opacity:0.9}
 .detail-confirm-btn:active{transform:scale(0.97)}
@@ -2995,6 +3028,8 @@ function renderMyTally(){
   const detailWasOpen = document.getElementById('burger-detail')?.classList.contains('open') || false;
   const savedRestaurant = detailWasOpen ? (document.getElementById('detail-restaurant')?.value || '') : '';
   const savedPattyCount = detailWasOpen ? pendingPattyCount : 0;
+  const savedRestaurantLocked = restaurantLocked;
+  const savedMenuKey = pendingMenuKey;
 
   const cc=colorClass(me.colorIdx);
   const pct=Math.min(100,me.count), isDone=me.count>=100;
@@ -3010,6 +3045,23 @@ function renderMyTally(){
     </div>
     <div class="progress-track"><div class="progress-fill ${cc}" id="my-bar" style="width:${pct}%"></div><div class="progress-burger${pct>0?' visible':''}" id="my-burger" style="left:${pct}%">🍔</div></div>
     <div class="tally-bun-bottom"></div>
+    <!-- Step 1: Restaurant search (always visible) -->
+    <div class="restaurant-step" id="restaurant-step">
+      <div id="restaurant-input-row">
+        <input type="text" id="detail-restaurant" placeholder="🔍 Where are you eating?" maxlength="80" autocomplete="off" oninput="onRestaurantInput(this.value)"/>
+      </div>
+      <div class="restaurant-locked-row" id="restaurant-locked-row" style="display:none">
+        <span class="restaurant-locked-name" id="restaurant-locked-name"></span>
+        <button class="restaurant-change-btn" onclick="clearRestaurantSelection()">✕ Change</button>
+      </div>
+      <div class="restaurant-suggestions" id="restaurant-suggestions"></div>
+    </div>
+    <!-- Menu picker (shown when a known restaurant is selected) -->
+    <div class="menu-picker" id="menu-picker" style="display:none">
+      <div class="menu-picker-label" id="menu-picker-label">Pick your burger:</div>
+      <div class="menu-cards-scroll" id="menu-cards-scroll"></div>
+      <button class="build-own-btn" onclick="showBuildOwn()">🛠 Build your own instead</button>
+    </div>
     <!-- Patty Stack Builder -->
     <div class="patty-builder">
       <div class="pb-bun-top"></div>
@@ -3032,13 +3084,8 @@ function renderMyTally(){
       </div>
       <div class="pb-label" id="pb-label">How many patties?</div>
     </div>
-    <!-- Detail form (revealed after patty selection) -->
+    <!-- Detail form (revealed after patty/menu selection) -->
     <div class="burger-detail" id="burger-detail">
-      <div class="burger-detail-row">
-        <label>Where?</label>
-        <input type="text" id="detail-restaurant" placeholder="Restaurant name…" maxlength="60"/>
-      </div>
-      <div class="quick-spots" id="quick-spots"></div>
       <div class="burger-detail-row" style="align-items:flex-start;gap:10px">
         <label style="padding-top:4px">Rating</label>
         <div class="rating-widget" id="rating-widget">
@@ -3057,6 +3104,7 @@ function renderMyTally(){
           <div class="rating-score" id="rating-score" style="color:var(--muted)">—</div>
         </div>
       </div>
+      <div class="critic-nudge" id="critic-nudge" style="display:none"></div>
       <div style="display:flex;flex-direction:column;gap:6px">
         <label style="font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em;font-weight:600">Toppings</label>
         <div class="topping-grid" id="topping-grid">
@@ -3076,13 +3124,23 @@ function renderMyTally(){
   if (detailWasOpen) {
     const d = document.getElementById('burger-detail');
     if (d) d.classList.add('open');
-    const inp = document.getElementById('detail-restaurant');
-    if (inp) inp.value = savedRestaurant;
-    // Re-seed quick spots
-    const qs = document.getElementById('quick-spots');
-    if (qs) qs.innerHTML = OHIO_SPOTS.slice(0,5).map(s =>
-      `<button class="quick-spot" data-spot="${escHtml(s)}" onclick="document.getElementById('detail-restaurant').value=this.dataset.spot">${escHtml(s)}</button>`
-    ).join('');
+    // Restore restaurant locked state
+    if (savedRestaurantLocked && savedRestaurant) {
+      document.getElementById('restaurant-input-row').style.display = 'none';
+      const lockedRow = document.getElementById('restaurant-locked-row');
+      if (lockedRow) lockedRow.style.display = 'flex';
+      const lockedName = document.getElementById('restaurant-locked-name');
+      if (lockedName) {
+        const mEmoji = (BURGER_MENUS[savedMenuKey] || BURGER_MENUS[savedRestaurant])?.emoji || '📍';
+        lockedName.textContent = mEmoji + ' ' + savedRestaurant;
+      }
+      // If a menu was open but item already selected (detail open), just hide menu picker
+      document.getElementById('menu-picker').style.display = 'none';
+    } else {
+      const inp = document.getElementById('detail-restaurant');
+      if (inp) inp.value = savedRestaurant;
+      if (savedRestaurant) onRestaurantInput(savedRestaurant);
+    }
     // Restore patty selection — re-highlight the correct button and rebuild the visual stack
     if (savedPattyCount > 0) {
       document.querySelectorAll('.pb-btn').forEach((b, i) => b.classList.toggle('selected', i + 1 === savedPattyCount));
@@ -3102,12 +3160,17 @@ function renderMyTally(){
       const btnMap = ['', '✓ Log This Burger', '✓ Log This Double', '✓ Log The Holy Trinity'];
       if (confirmBtn) confirmBtn.textContent = btnMap[savedPattyCount] || '✓ Log This Burger';
     }
+  } else {
+    // Not mid-entry: show OHIO_SPOTS as default suggestions
+    renderRestaurantSuggestions(OHIO_SPOTS.slice(0, 6));
   }
   // Restore topping visuals and button states
   updateBurgerToppingVisuals();
   document.querySelectorAll('.topping-btn').forEach(btn => {
     btn.classList.toggle('topping-active', pendingToppings.includes(btn.dataset.topping));
   });
+  // Re-attach Places autocomplete if key is set
+  if (GOOGLE_PLACES_KEY) setTimeout(initPlacesAutocomplete, 80);
   // Receipt is ephemeral — intentionally not restored after re-render
   // (restoring without restarting the dismiss timer caused it to stick permanently)
 }
@@ -3353,6 +3416,74 @@ function fireConfetti(big = false) {
 }
 
 const OHIO_SPOTS = ["Five Guys","Wendy's","McDonald's","Burger King","Buffalo Wild Wings","Swenson's","Shake Shack","Steak 'n Shake","Culver's"];
+
+// Google Places API key — paste yours here to enable live autocomplete for any restaurant.
+// Get one free at console.cloud.google.com → enable "Places API".
+// Without a key the picker still works for the spots listed in BURGER_MENUS.
+const GOOGLE_PLACES_KEY = '';
+
+const BURGER_MENUS = {
+  "Five Guys": { emoji:"🍔", items:[
+    { name:"Hamburger",          patties:1, toppings:["Ketchup","Mustard","Lettuce","Tomatoes","Pickles","Onions"],           emoji:"🍔", criticScore:4.0 },
+    { name:"Cheeseburger",       patties:1, toppings:["Cheese","Ketchup","Mustard","Lettuce","Tomatoes","Pickles","Onions"],  emoji:"🧀", criticScore:4.1 },
+    { name:"Bacon Burger",       patties:1, toppings:["Ketchup","Mustard","Lettuce","Tomatoes","Pickles","Onions"],           emoji:"🥓", criticScore:4.0 },
+    { name:"Bacon Cheeseburger", patties:1, toppings:["Cheese","Ketchup","Mustard","Pickles","Onions"],                      emoji:"🥓", criticScore:4.3 },
+    { name:"Little Hamburger",   patties:1, toppings:["Ketchup","Mustard","Pickles","Onions"],                               emoji:"🍔", criticScore:3.8 },
+    { name:"Double",             patties:2, toppings:["Cheese","Ketchup","Mustard","Lettuce","Tomatoes","Pickles","Onions"], emoji:"🍔", criticScore:4.2 },
+  ]},
+  "Wendy's": { emoji:"🔴", items:[
+    { name:"Dave's Single",    patties:1, toppings:["Cheese","Ketchup","Mayo","Lettuce","Tomatoes","Pickles","Onions"], emoji:"🍔", criticScore:4.0 },
+    { name:"Dave's Double",    patties:2, toppings:["Cheese","Ketchup","Mayo","Lettuce","Tomatoes","Pickles","Onions"], emoji:"🍔", criticScore:4.2 },
+    { name:"Dave's Triple",    patties:3, toppings:["Cheese","Ketchup","Mayo","Lettuce","Tomatoes","Pickles","Onions"], emoji:"🍔", criticScore:4.1 },
+    { name:"Baconator",        patties:2, toppings:["Cheese","Ketchup","Mayo"],                                         emoji:"🥓", criticScore:3.8 },
+    { name:"Jr. Bacon Chzbrg", patties:1, toppings:["Cheese","Mayo","Lettuce","Tomatoes"],                              emoji:"🧀", criticScore:3.5 },
+  ]},
+  "McDonald's": { emoji:"🟡", items:[
+    { name:"Big Mac",             patties:2, toppings:["Cheese","Mayo","Lettuce","Pickles","Onions"],            emoji:"🍔", criticScore:3.8 },
+    { name:"Quarter Pounder",     patties:1, toppings:["Cheese","Ketchup","Mustard","Pickles","Onions"],         emoji:"🧀", criticScore:3.9 },
+    { name:"Dbl Quarter Pounder", patties:2, toppings:["Cheese","Ketchup","Mustard","Pickles","Onions"],         emoji:"🧀", criticScore:4.0 },
+    { name:"McDouble",            patties:2, toppings:["Cheese","Ketchup","Mustard","Pickles","Onions"],         emoji:"🍔", criticScore:3.5 },
+    { name:"Hamburger",           patties:1, toppings:["Ketchup","Mustard","Pickles","Onions"],                  emoji:"🍔", criticScore:3.2 },
+  ]},
+  "Burger King": { emoji:"👑", items:[
+    { name:"Whopper",        patties:1, toppings:["Mayo","Ketchup","Lettuce","Tomatoes","Pickles","Onions"], emoji:"🍔", criticScore:3.7 },
+    { name:"Double Whopper", patties:2, toppings:["Mayo","Ketchup","Lettuce","Tomatoes","Pickles","Onions"], emoji:"🍔", criticScore:3.9 },
+    { name:"Triple Whopper", patties:3, toppings:["Mayo","Ketchup","Lettuce","Tomatoes","Pickles","Onions"], emoji:"🍔", criticScore:3.6 },
+    { name:"Cheeseburger",   patties:1, toppings:["Cheese","Ketchup","Mustard","Pickles","Onions"],         emoji:"🧀", criticScore:3.0 },
+  ]},
+  "Buffalo Wild Wings": { emoji:"🦬", items:[
+    { name:"Classic Burger",       patties:1, toppings:["Lettuce","Tomatoes","Onions","Pickles"], emoji:"🍔", criticScore:3.5 },
+    { name:"Bacon Smash",          patties:2, toppings:["Cheese","Ketchup","Mustard"],            emoji:"🥓", criticScore:3.8 },
+    { name:"Buffalo Ranch Burger", patties:1, toppings:["Cheese","Lettuce","Tomatoes"],           emoji:"🌶️", criticScore:3.9 },
+    { name:"Mushroom Swiss",       patties:1, toppings:["Cheese","Mushrooms"],                    emoji:"🍄", criticScore:3.7 },
+  ]},
+  "Swenson's": { emoji:"🚗", items:[
+    { name:"Galley Boy",    patties:2, toppings:["Cheese","Ketchup","Mustard","Pickles"], emoji:"🍔", criticScore:4.5 },
+    { name:"Single Burger", patties:1, toppings:["Ketchup","Mustard","Pickles","Onions"], emoji:"🍔", criticScore:4.0 },
+    { name:"Double Burger", patties:2, toppings:["Ketchup","Mustard","Pickles","Onions"], emoji:"🍔", criticScore:4.2 },
+  ]},
+  "Shake Shack": { emoji:"🎱", items:[
+    { name:"ShackBurger",        patties:1, toppings:["Cheese","Lettuce","Tomatoes","Mayo"], emoji:"🍔", criticScore:4.4 },
+    { name:"SmokeShack",         patties:1, toppings:["Cheese","Pickles","Mayo"],            emoji:"🥓", criticScore:4.3 },
+    { name:"Double ShackBurger", patties:2, toppings:["Cheese","Lettuce","Tomatoes","Mayo"], emoji:"🍔", criticScore:4.5 },
+    { name:"Shack Stack",        patties:1, toppings:["Cheese","Lettuce","Tomatoes","Mayo"], emoji:"🍔", criticScore:4.4 },
+  ]},
+  "Steak 'n Shake": { emoji:"🥤", items:[
+    { name:"Classic Burger",     patties:1, toppings:["Cheese","Ketchup","Mustard","Pickles","Onions"], emoji:"🍔", criticScore:3.8 },
+    { name:"Double Steakburger", patties:2, toppings:["Cheese","Ketchup","Mustard","Pickles","Onions"], emoji:"🍔", criticScore:3.9 },
+    { name:"Triple Steakburger", patties:3, toppings:["Cheese","Ketchup","Mustard","Pickles","Onions"], emoji:"🍔", criticScore:3.8 },
+  ]},
+  "Culver's": { emoji:"🧈", items:[
+    { name:"ButterBurger Single", patties:1, toppings:["Cheese","Ketchup","Mustard","Pickles","Onions"], emoji:"🍔", criticScore:4.2 },
+    { name:"ButterBurger Double", patties:2, toppings:["Cheese","Ketchup","Mustard","Pickles","Onions"], emoji:"🍔", criticScore:4.3 },
+    { name:"ButterBurger Triple", patties:3, toppings:["Cheese","Ketchup","Mustard","Pickles","Onions"], emoji:"🍔", criticScore:4.2 },
+  ]},
+};
+
+let pendingMenuEmoji = '';
+let pendingMenuItemName = '';
+let pendingMenuKey = '';
+let restaurantLocked = false;
 let pendingRating = 0;
 let pendingGPS = null;
 let pendingPattyCount = 0;
@@ -3459,15 +3590,200 @@ window.setRating = function(val) {
 // Backwards compat for any lingering setStar(n) calls
 window.setStar = window.setRating;
 
+// ── Restaurant search & menu picker ─────────────────────────────────────────
+
+function renderRestaurantSuggestions(list) {
+  const el = document.getElementById('restaurant-suggestions');
+  if (!el) return;
+  el.innerHTML = list.map(name => {
+    const hasMenu = !!BURGER_MENUS[name];
+    const badge = hasMenu ? '<span class="restaurant-suggestion-badge">Menu</span>' : '';
+    return `<button class="restaurant-suggestion" onclick="onRestaurantSuggestionClick('${escHtml(name).replace(/'/g,"\\'")}')">
+      ${escHtml(name)}${badge}
+    </button>`;
+  }).join('');
+}
+
+window.onRestaurantInput = function(val) {
+  if (!val.trim()) {
+    renderRestaurantSuggestions(OHIO_SPOTS.slice(0, 6));
+    return;
+  }
+  const lower = val.toLowerCase();
+  const allKnown = [...new Set([...Object.keys(BURGER_MENUS), ...OHIO_SPOTS])];
+  const matches = allKnown.filter(r => r.toLowerCase().includes(lower)).slice(0, 6);
+  renderRestaurantSuggestions(matches);
+};
+
+window.onRestaurantSuggestionClick = function(name) {
+  const inp = document.getElementById('detail-restaurant');
+  if (inp) inp.value = name;
+  document.getElementById('restaurant-suggestions').innerHTML = '';
+  if (BURGER_MENUS[name]) {
+    lockRestaurantAndShowMenu(name);
+  } else {
+    lockRestaurant(name, '📍');
+    // Unknown spot — let player build their own; patty builder is always visible
+  }
+};
+
+function lockRestaurant(name, emoji) {
+  restaurantLocked = true;
+  pendingMenuKey = '';
+  document.getElementById('restaurant-input-row').style.display = 'none';
+  const lockedRow = document.getElementById('restaurant-locked-row');
+  const lockedName = document.getElementById('restaurant-locked-name');
+  if (lockedRow) lockedRow.style.display = 'flex';
+  if (lockedName) lockedName.textContent = emoji + ' ' + name;
+}
+
+function lockRestaurantAndShowMenu(name) {
+  const menu = BURGER_MENUS[name];
+  if (!menu) return;
+  pendingMenuKey = name;
+  lockRestaurant(name, menu.emoji);
+  // Populate menu cards
+  const scroll = document.getElementById('menu-cards-scroll');
+  if (scroll) {
+    const pattyLabel = ['','Single','Double','Triple'];
+    scroll.innerHTML = menu.items.map((item, idx) => {
+      const toppingPreview = item.toppings.slice(0, 3).join(', ') + (item.toppings.length > 3 ? '…' : '');
+      return `<div class="menu-card" id="mc-${idx}" onclick="selectMenuItem('${escHtml(name).replace(/'/g,"\\'")}',${idx})">
+        <div class="menu-card-emoji">${item.emoji}</div>
+        <div class="menu-card-name">${escHtml(item.name)}</div>
+        <div class="menu-card-badge">${pattyLabel[Math.min(item.patties,3)]}</div>
+        <div class="menu-card-toppings">${escHtml(toppingPreview)}</div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('menu-picker').style.display = 'block';
+}
+
+window.selectMenuItem = function(restaurantKey, idx) {
+  const menu = BURGER_MENUS[restaurantKey];
+  if (!menu) return;
+  const item = menu.items[idx];
+  if (!item) return;
+  // Highlight selected card
+  document.querySelectorAll('.menu-card').forEach((c, i) => c.classList.toggle('selected', i === idx));
+  // Store emoji + item name for log entry
+  pendingMenuEmoji = item.emoji;
+  pendingMenuItemName = item.name;
+  // Pre-fill toppings
+  pendingToppings = [...item.toppings];
+  updateBurgerToppingVisuals();
+  document.querySelectorAll('.topping-btn').forEach(btn => {
+    btn.classList.toggle('topping-active', pendingToppings.includes(btn.dataset.topping));
+  });
+  // Fire selectPatties to set patty count + open detail form
+  window.selectPatties(item.patties);
+  // Pre-fill critic score rating
+  if (item.criticScore) {
+    const rounded = Math.round(item.criticScore * 2) / 2; // snap to nearest 0.5
+    setRating(rounded);
+    const slider = document.getElementById('rating-slider');
+    if (slider) slider.value = rounded;
+    // Show the critic nudge
+    const nudge = document.getElementById('critic-nudge');
+    if (nudge) {
+      const score = item.criticScore.toFixed(1);
+      let quip;
+      if (item.criticScore >= 4.5)      quip = `Critics are obsessed with this one — <strong>${score}/5</strong>. Live up to the legend?`;
+      else if (item.criticScore >= 4.0) quip = `Critics give the ${escHtml(item.name)} a solid <strong>${score}/5</strong>. Agree, or is it overrated?`;
+      else if (item.criticScore >= 3.5) quip = `Critics are lukewarm — <strong>${score}/5</strong>. Think they've got it wrong?`;
+      else                              quip = `Critics aren't fans of this one (<strong>${score}/5</strong>). Prove them wrong?`;
+      nudge.innerHTML = `🎙️ ${quip}`;
+      nudge.style.display = 'block';
+    }
+  }
+};
+
+window.clearRestaurantSelection = function() {
+  restaurantLocked = false;
+  pendingMenuKey = '';
+  pendingMenuEmoji = '';
+  pendingMenuItemName = '';
+  // Reset restaurant input
+  const inp = document.getElementById('detail-restaurant');
+  if (inp) { inp.value = ''; inp.focus(); }
+  document.getElementById('restaurant-input-row').style.display = '';
+  const lockedRow = document.getElementById('restaurant-locked-row');
+  if (lockedRow) lockedRow.style.display = 'none';
+  // Hide menu picker
+  const mp = document.getElementById('menu-picker');
+  if (mp) mp.style.display = 'none';
+  // Reset toppings + patty builder
+  pendingToppings = [];
+  updateBurgerToppingVisuals();
+  document.querySelectorAll('.topping-btn').forEach(b => b.classList.remove('topping-active'));
+  const nudge2 = document.getElementById('critic-nudge');
+  if (nudge2) nudge2.style.display = 'none';
+  setRating(0);
+  const sliderReset = document.getElementById('rating-slider');
+  if (sliderReset) sliderReset.value = 0;
+  // Close detail form and reset patty builder
+  document.getElementById('burger-detail')?.classList.remove('open');
+  document.getElementById('pb-stack').innerHTML = '';
+  document.querySelectorAll('.pb-btn').forEach(b => b.classList.remove('selected'));
+  const lbl = document.getElementById('pb-label');
+  if (lbl) lbl.textContent = 'How many patties?';
+  pendingPattyCount = 0;
+  // Show default suggestions
+  renderRestaurantSuggestions(OHIO_SPOTS.slice(0, 6));
+};
+
+window.showBuildOwn = function() {
+  // Hide menu picker, keep restaurant locked, let player pick patties manually
+  const mp = document.getElementById('menu-picker');
+  if (mp) mp.style.display = 'none';
+  // Clear any pre-filled menu item state
+  pendingMenuEmoji = '';
+  pendingMenuItemName = '';
+};
+
+function initPlacesAutocomplete() {
+  if (!GOOGLE_PLACES_KEY || !window.google?.maps?.places) return;
+  const inp = document.getElementById('detail-restaurant');
+  if (!inp || inp._placesAC) return;
+  const ac = new google.maps.places.Autocomplete(inp, {
+    types: ['restaurant'],
+    fields: ['name'],
+  });
+  ac.addListener('place_changed', () => {
+    const place = ac.getPlace();
+    const name = place?.name || inp.value.trim();
+    if (!name) return;
+    document.getElementById('restaurant-suggestions').innerHTML = '';
+    if (BURGER_MENUS[name]) {
+      lockRestaurantAndShowMenu(name);
+    } else {
+      lockRestaurant(name, '📍');
+    }
+  });
+  inp._placesAC = ac;
+}
+
+// Load Google Maps JS API lazily when key is set
+(function() {
+  if (!GOOGLE_PLACES_KEY) return;
+  const s = document.createElement('script');
+  s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_PLACES_KEY}&libraries=places&callback=_initPlacesACCallback`;
+  s.async = true; s.defer = true;
+  window._initPlacesACCallback = initPlacesAutocomplete;
+  document.head.appendChild(s);
+})();
+
 window.confirmBurger = async function() {
   const count      = pendingPattyCount || 1;
   const restaurant = document.getElementById('detail-restaurant').value.trim() || 'Unknown spot';
   const pattyLabel = ['', 'Single', 'Double', 'The Holy Trinity'][count] || 'Single';
   // Snapshot these before resetting pending state
-  const snapshotRating   = pendingRating;
-  const snapshotGPS      = pendingGPS;
-  const snapshotCount    = pendingPattyCount || 1;
-  const snapshotToppings = [...pendingToppings];
+  const snapshotRating        = pendingRating;
+  const snapshotGPS           = pendingGPS;
+  const snapshotCount         = pendingPattyCount || 1;
+  const snapshotToppings      = [...pendingToppings];
+  const snapshotMenuEmoji     = pendingMenuEmoji;
+  const snapshotMenuItemName  = pendingMenuItemName;
 
   // ── 1. Show receipt immediately (before the async Firestore write)
   //       so snapshot re-renders can't race against it
@@ -3494,7 +3810,7 @@ window.confirmBurger = async function() {
           <span class="receipt-item-price">LOGGED</span>
         </div>
         <div style="font-family:monospace;font-size:12px;color:#1A1A1A;text-align:center;line-height:1.9;margin:4px 0">
-          ${pattyLabel} Burger<br>
+          ${snapshotMenuItemName ? snapshotMenuEmoji + ' ' + escHtml(snapshotMenuItemName) : pattyLabel + ' Burger'}<br>
           ${escHtml(restaurant)}<br>
           ${starsDisplay}
         </div>
@@ -3529,10 +3845,25 @@ window.confirmBurger = async function() {
   if (lbl) lbl.textContent = 'How many patties?';
   pendingPattyCount = 0;
   pendingToppings = [];
+  pendingMenuEmoji = '';
+  pendingMenuItemName = '';
   document.querySelectorAll('.topping-btn').forEach(b => b.classList.remove('topping-active'));
+  const nudge = document.getElementById('critic-nudge');
+  if (nudge) nudge.style.display = 'none';
+  // Also reset restaurant step
+  restaurantLocked = false;
+  pendingMenuKey = '';
+  document.getElementById('restaurant-input-row').style.display = '';
+  const lockedRow2 = document.getElementById('restaurant-locked-row');
+  if (lockedRow2) lockedRow2.style.display = 'none';
+  const inp2 = document.getElementById('detail-restaurant');
+  if (inp2) inp2.value = '';
+  const mp2 = document.getElementById('menu-picker');
+  if (mp2) mp2.style.display = 'none';
+  renderRestaurantSuggestions(OHIO_SPOTS.slice(0, 6));
 
   // ── 3. Write to Firestore (snapshot re-renders happen after receipt is already shown)
-  await changeMyCountWithDetails(1, restaurant, snapshotRating, snapshotGPS, snapshotCount, snapshotToppings);
+  await changeMyCountWithDetails(1, restaurant, snapshotRating, snapshotGPS, snapshotCount, snapshotToppings, snapshotMenuItemName, snapshotMenuEmoji);
 };
 
 // ── Shared weather code → emoji + label ──────────────────────────────────────
@@ -3594,7 +3925,7 @@ async function backfillWeatherStamps() {
   }
 }
 
-async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null, patties=1, toppings=[]) {
+async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null, patties=1, toppings=[], menuItem='', menuEmoji='') {
   const me=players.find(p=>p.id===myPlayerId);
   if(!me) return;
   const newCount=Math.max(0,Math.min(999,me.count+delta));
@@ -3609,6 +3940,8 @@ async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null
   let newLogs = [...currentLogs];
   if(delta > 0){
     const entry = {ts: new Date().toISOString(), restaurant, rating: rating||0, patties: patties||1, toppings: toppings||[]};
+    if (menuItem)  entry.menuItem  = menuItem;
+    if (menuEmoji) entry.menuEmoji = menuEmoji;
     if(gps) {
       entry.lat = gps.lat;
       entry.lng = gps.lng;
@@ -4703,6 +5036,8 @@ function renderGrillFeed() {
         lng:               (typeof entry === 'object' && entry.lng)               || null,
         locationCityState: (typeof entry === 'object' && entry.locationCityState) || '',
         weatherStamp:      (typeof entry === 'object' && entry.weatherStamp)      || '',
+        menuItem:          (typeof entry === 'object' && entry.menuItem)           || '',
+        menuEmoji:         (typeof entry === 'object' && entry.menuEmoji)          || '',
       });
     });
   });
@@ -4794,6 +5129,7 @@ function renderGrillFeed() {
     <div class="grill-card-body">
       <div class="grill-card-body-content">
         <div class="grill-restaurant-name">${escHtml(item.restaurant)}</div>
+        ${item.menuItem ? `<div class="grill-menu-item-line">${item.menuEmoji || '🍔'} ${escHtml(item.menuItem)}</div>` : ''}
         <div class="grill-pill-row">
           ${locPill}
           ${timePill}
