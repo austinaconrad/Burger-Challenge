@@ -3131,11 +3131,11 @@ function renderMyTally(){
       </div>
       <div class="critic-nudge" id="critic-nudge" style="display:none"></div>
       <!-- Custom burger name — shown only for build-your-own (no menu item selected) -->
-      <div class="burger-detail-row" id="custom-burger-name-row" style="display:none;align-items:center;gap:10px">
-        <label style="white-space:nowrap">Burger name</label>
+      <div id="custom-burger-name-row" style="display:none;flex-direction:column;gap:6px">
+        <label style="font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em;font-weight:600">Burger name</label>
         <input type="text" id="custom-burger-name" maxlength="60" autocomplete="off"
                placeholder="Name your creation…"
-               style="flex:1;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;outline:none"/>
+               style="width:100%;box-sizing:border-box;background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-xs);padding:8px 12px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s"/>
       </div>
       <div style="display:flex;flex-direction:column;gap:6px">
         <label style="font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em;font-weight:600">Toppings</label>
