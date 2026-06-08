@@ -1521,6 +1521,25 @@ body.social-active .social-input-area{
    🔥 DARK SMOKEHOUSE FEED
    ══════════════════════════════════════════════ */
 
+.feed-sub-tabs{display:flex;gap:6px;margin-bottom:14px}
+.feed-sub-tab{flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--muted2);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;padding:8px 12px;cursor:pointer;transition:all 0.2s;letter-spacing:0.01em}
+.feed-sub-tab.active{background:rgba(245,158,11,0.10);border-color:rgba(245,158,11,0.40);color:var(--amber)}
+.feed-sub-tab:active{transform:scale(0.96)}
+.top-rated-wrap{display:flex;flex-direction:column;gap:8px;padding:4px 0 24px}
+.tr-card{background:var(--surface);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-card);animation:slideIn 0.25s ease both}
+.tr-rank{font-family:'Poppins',sans-serif;font-size:18px;font-weight:900;color:var(--muted2);min-width:28px;text-align:center;flex-shrink:0}
+.tr-rank.gold{color:#F59E0B;text-shadow:0 0 10px rgba(245,158,11,0.4)}
+.tr-rank.silver{color:#C0C0C0}
+.tr-rank.bronze{color:#CD7F32}
+.tr-info{flex:1;min-width:0}
+.tr-restaurant{font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tr-meta{display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap}
+.tr-player-chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:999px;white-space:nowrap;text-transform:uppercase;letter-spacing:0.04em}
+.tr-date{font-size:9px;color:var(--muted2);font-weight:400}
+.tr-patty{font-size:9px;color:var(--muted2);font-weight:500}
+.tr-stars{font-size:15px;line-height:1;flex-shrink:0;text-align:right}
+.tr-score{font-family:'Poppins',sans-serif;font-size:11px;font-weight:700;color:#9CA3AF;text-align:right;margin-top:2px}
+.tr-right{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;gap:2px}
 .grill-feed-wrap {
   display: flex;
   flex-direction: column;
@@ -1959,7 +1978,12 @@ body.social-active .social-input-area{
 
     <!-- FEED TAB -->
     <div class="tab-panel" id="tab-feed">
+      <div class="feed-sub-tabs">
+        <button class="feed-sub-tab active" onclick="switchFeedTab('feed',this)">🔥 Feed</button>
+        <button class="feed-sub-tab" onclick="switchFeedTab('rated',this)">⭐ Top Rated</button>
+      </div>
       <div class="grill-feed-wrap" id="grill-feed"></div>
+      <div class="top-rated-wrap" id="top-rated-wrap" style="display:none"></div>
     </div>
 
     <!-- PLAYERS TAB -->
@@ -4484,6 +4508,84 @@ async function reverseGeocode(lat, lng) {
   } catch {
     return '';
   }
+}
+
+window.switchFeedTab = function(tab, btn) {
+  document.querySelectorAll('.feed-sub-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const feedEl = document.getElementById('grill-feed');
+  const ratedEl = document.getElementById('top-rated-wrap');
+  if (tab === 'feed') {
+    feedEl.style.display = '';
+    ratedEl.style.display = 'none';
+  } else {
+    feedEl.style.display = 'none';
+    ratedEl.style.display = '';
+    renderTopRated();
+  }
+};
+
+function renderTopRated() {
+  const el = document.getElementById('top-rated-wrap');
+  if (!el) return;
+
+  // Collect all rated log entries across all players
+  const entries = [];
+  players.forEach(p => {
+    (p.logs || []).forEach(entry => {
+      const ts = logTs(entry);
+      if (!ts) return;
+      const rating = (typeof entry === 'object' && entry.rating) || 0;
+      if (!rating) return;
+      entries.push({
+        player:     p,
+        ts,
+        restaurant: (typeof entry === 'object' && entry.restaurant) || 'Unknown Spot',
+        rating,
+        patties:    (typeof entry === 'object' && entry.patties > 0) ? entry.patties : 1,
+      });
+    });
+  });
+
+  if (!entries.length) {
+    el.innerHTML = `<div class="grill-feed-empty"><span class="gfe-icon">⭐</span><div class="gfe-title">NO RATINGS YET</div>Log a burger and rate it to see rankings!</div>`;
+    return;
+  }
+
+  // Sort by rating desc, then restaurant alpha for ties
+  entries.sort((a, b) => b.rating - a.rating || a.restaurant.localeCompare(b.restaurant));
+
+  const pattyLabel = ['','Single','Double','Triple'];
+  const rankCls = (i) => i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+
+  el.innerHTML = entries.map((item, i) => {
+    const c = colorFor(item.player);
+    const d = new Date(item.ts);
+    const dateStr = `${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)}`;
+    const full = Math.floor(item.rating);
+    const half = item.rating % 1 >= 0.5;
+    let stars = '';
+    for (let s = 1; s <= 5; s++) {
+      if (item.rating >= s)          stars += '🔥';
+      else if (item.rating >= s-0.5) stars += '♨️';
+      else                           stars += '<span style="opacity:0.15;font-size:13px">🔥</span>';
+    }
+    return `<div class="tr-card" style="animation-delay:${Math.min(i*0.04,0.5)}s">
+      <div class="tr-rank ${rankCls(i)}">#${i+1}</div>
+      <div class="tr-info">
+        <div class="tr-restaurant">${escHtml(item.restaurant)}</div>
+        <div class="tr-meta">
+          <span class="tr-player-chip" style="background:${c}18;color:${c};border:1px solid ${c}44">${escHtml(item.player.name)}</span>
+          <span class="tr-patty">${pattyLabel[Math.min(item.patties,3)] || 'Single'}</span>
+          <span class="tr-date">${dateStr}</span>
+        </div>
+      </div>
+      <div class="tr-right">
+        <div class="tr-stars">${stars}</div>
+        <div class="tr-score">${item.rating}/5</div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function ratingToFlames(rating) {
