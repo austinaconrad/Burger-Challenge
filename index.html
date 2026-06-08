@@ -1540,6 +1540,15 @@ body.social-active .social-input-area{
 .tr-stars{font-size:15px;line-height:1;flex-shrink:0;text-align:right}
 .tr-score{font-family:'Poppins',sans-serif;font-size:11px;font-weight:700;color:#9CA3AF;text-align:right;margin-top:2px}
 .tr-right{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;gap:2px}
+.tr-item{display:flex;flex-direction:column}
+.tr-card{cursor:pointer;user-select:none}
+.tr-chevron{font-size:14px;color:var(--muted2);transition:transform 0.25s ease;margin-left:4px;flex-shrink:0;line-height:1}
+.tr-chevron.open{transform:rotate(180deg)}
+.tr-drawer{max-height:0;overflow:hidden;transition:max-height 0.4s cubic-bezier(0.4,0,0.2,1),opacity 0.3s ease;opacity:0}
+.tr-drawer.open{max-height:400px;opacity:1}
+.tr-drawer-inner{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);padding:4px 16px 16px;display:flex;justify-content:center}
+.tr-drawer .patty-builder{padding:8px 16px 10px;gap:3px}
+.tr-drawer .pb-patty{animation:none}
 .grill-feed-wrap {
   display: flex;
   flex-direction: column;
@@ -4544,6 +4553,42 @@ window.switchFeedTab = function(tab, btn) {
   }
 };
 
+function buildBurgerPreview(pattyCount, toppings) {
+  const toppingOrder = ['Mayo','Ketchup','Mustard','Lettuce','Tomatoes','Pickles','Green Peppers','Mushrooms','Onions','Cheese'];
+  const toppingClass = {
+    'Mayo':          'pb-sauce pb-mayo',
+    'Ketchup':       'pb-sauce pb-ketchup',
+    'Mustard':       'pb-sauce pb-mustard',
+    'Lettuce':       'pb-lettuce',
+    'Tomatoes':      'pb-tomato',
+    'Pickles':       'pb-pickles',
+    'Green Peppers': 'pb-green-peppers',
+    'Mushrooms':     'pb-mushrooms',
+    'Onions':        'pb-onions',
+    'Cheese':        'pb-cheese',
+  };
+  const n = Math.max(1, Math.min(pattyCount || 1, 3));
+  const patties = Array.from({length: n}, () => '<div class="pb-patty"></div>').join('');
+  const toppingHtml = toppingOrder
+    .filter(t => (toppings || []).includes(t))
+    .map(t => `<div class="${toppingClass[t]}"></div>`)
+    .join('');
+  return `<div class="patty-builder">
+    <div class="pb-bun-top"></div>
+    ${toppingHtml}
+    <div class="pb-stack">${patties}</div>
+    <div class="pb-bun-bottom"></div>
+  </div>`;
+}
+
+window.toggleTrDrawer = function(idx) {
+  const drawer = document.getElementById('tr-drawer-' + idx);
+  const chevron = document.getElementById('tr-chev-' + idx);
+  if (!drawer) return;
+  const isOpen = drawer.classList.toggle('open');
+  if (chevron) chevron.classList.toggle('open', isOpen);
+};
+
 function renderTopRated() {
   const el = document.getElementById('top-rated-wrap');
   if (!el) return;
@@ -4562,6 +4607,7 @@ function renderTopRated() {
         restaurant: (typeof entry === 'object' && entry.restaurant) || 'Unknown Spot',
         rating,
         patties:    (typeof entry === 'object' && entry.patties > 0) ? entry.patties : 1,
+        toppings:   (typeof entry === 'object' && entry.toppings)    || [],
       });
     });
   });
@@ -4581,27 +4627,31 @@ function renderTopRated() {
     const c = RING_COLORS[item.player.colorIdx % RING_COLORS.length];
     const d = new Date(item.ts);
     const dateStr = `${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)}`;
-    const full = Math.floor(item.rating);
-    const half = item.rating % 1 >= 0.5;
     let stars = '';
     for (let s = 1; s <= 5; s++) {
       if (item.rating >= s)          stars += '⭐';
       else if (item.rating >= s-0.5) stars += '<span style="font-size:13px">✨</span>';
       else                           stars += '<span style="opacity:0.15;font-size:13px">⭐</span>';
     }
-    return `<div class="tr-card" style="animation-delay:${Math.min(i*0.04,0.5)}s">
-      <div class="tr-rank ${rankCls(i)}">#${i+1}</div>
-      <div class="tr-info">
-        <div class="tr-restaurant">${escHtml(item.restaurant)}</div>
-        <div class="tr-meta">
-          <span class="tr-player-chip" style="background:${c}18;color:${c};border:1px solid ${c}44">${escHtml(item.player.name)}</span>
-          <span class="tr-patty">${pattyLabel[Math.min(item.patties,3)] || 'Single'}</span>
-          <span class="tr-date">${dateStr}</span>
+    return `<div class="tr-item">
+      <div class="tr-card" style="animation-delay:${Math.min(i*0.04,0.5)}s" onclick="toggleTrDrawer(${i})">
+        <div class="tr-rank ${rankCls(i)}">#${i+1}</div>
+        <div class="tr-info">
+          <div class="tr-restaurant">${escHtml(item.restaurant)}</div>
+          <div class="tr-meta">
+            <span class="tr-player-chip" style="background:${c}18;color:${c};border:1px solid ${c}44">${escHtml(item.player.name)}</span>
+            <span class="tr-patty">${pattyLabel[Math.min(item.patties,3)] || 'Single'}</span>
+            <span class="tr-date">${dateStr}</span>
+          </div>
         </div>
+        <div class="tr-right">
+          <div class="tr-stars">${stars}</div>
+          <div class="tr-score">${item.rating}/5</div>
+        </div>
+        <div class="tr-chevron" id="tr-chev-${i}">▾</div>
       </div>
-      <div class="tr-right">
-        <div class="tr-stars">${stars}</div>
-        <div class="tr-score">${item.rating}/5</div>
+      <div class="tr-drawer" id="tr-drawer-${i}">
+        <div class="tr-drawer-inner">${buildBurgerPreview(item.patties, item.toppings)}</div>
       </div>
     </div>`;
   }).join('');
