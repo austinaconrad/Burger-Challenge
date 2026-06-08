@@ -4559,7 +4559,7 @@ function renderTopRated() {
   const rankCls = (i) => i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
 
   el.innerHTML = entries.map((item, i) => {
-    const c = colorFor(item.player);
+    const c = RING_COLORS[item.player.colorIdx % RING_COLORS.length];
     const d = new Date(item.ts);
     const dateStr = `${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)}`;
     const full = Math.floor(item.rating);
