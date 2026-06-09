@@ -3339,11 +3339,13 @@ function renderMyTally(){
       </div>
       <div class="critic-nudge" id="critic-nudge" style="display:none"></div>
       <!-- Custom burger name — shown only for build-your-own (no menu item selected) -->
-      <div id="custom-burger-name-row" style="display:none;flex-direction:column;gap:6px">
-        <label style="font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em;font-weight:600">Burger name</label>
+      <div id="custom-burger-name-row" style="display:none;flex-direction:column;gap:8px">
+        <label style="font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em;font-weight:600;width:auto">Burger name</label>
         <input type="text" id="custom-burger-name" maxlength="60" autocomplete="off"
                placeholder="Name your creation…"
-               style="width:100%;box-sizing:border-box;background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-xs);padding:8px 12px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s"/>
+               style="width:100%;box-sizing:border-box;background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-xs);padding:11px 14px;font-size:15px;color:var(--text);font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s,box-shadow 0.2s"
+               onfocus="this.style.borderColor='var(--amber)';this.style.boxShadow='0 0 0 3px rgba(217,119,6,0.12)'"
+               onblur="this.style.borderColor='';this.style.boxShadow=''"/>
       </div>
       <div style="display:flex;flex-direction:column;gap:6px">
         <label style="font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em;font-weight:600">Toppings</label>
