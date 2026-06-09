@@ -2295,7 +2295,13 @@ let messages = [];
 let comments = [];
 let burgerReactions = {}; // { burgerId: {emoji: [playerIds]} }
 const openComments = new Set(); // targetIds whose comment thread is open
-const GEO_CACHE = {}; // { "lat,lng" → "City, ST" } — survives re-renders
+// { "lat,lng" → "City, ST" } — persisted to localStorage so locations are instant on reload
+const GEO_CACHE = (() => {
+  try { return JSON.parse(localStorage.getItem('bc_geo_cache') || '{}'); } catch { return {}; }
+})();
+function _saveGeoCache() {
+  try { localStorage.setItem('bc_geo_cache', JSON.stringify(GEO_CACHE)); } catch {}
+}
 let seenMessageCount = 0;
 let socialInitialLoadDone = false;
 let pendingImageBase64 = null, pendingImageName = '';
@@ -3591,7 +3597,11 @@ function renderUnifiedFeed() {
       let locPill;
       if (item.lat && item.lng) {
         const geoKey = `${item.lat.toFixed(5)},${item.lng.toFixed(5)}`;
-        const resolved = item.locationCityState || GEO_CACHE[geoKey] || '';
+        const cached = GEO_CACHE[geoKey];
+        // Prefer a full "City, State" — fall back to state-only as last resort while re-geocoding
+        const resolved = (item.locationCityState?.includes(',') ? item.locationCityState : null)
+                      || (cached?.includes(',') ? cached : null)
+                      || item.locationCityState || cached || '';
         const coordLabel = `${item.lat.toFixed(2)}°N, ${Math.abs(item.lng).toFixed(2)}°W`;
         locPill = `<span class="grill-pill grill-pill-location has-gps">📍: <span id="geo-${idx}">${resolved ? escHtml(resolved) : coordLabel}</span></span>`;
       } else {
@@ -3674,15 +3684,18 @@ function renderUnifiedFeed() {
   allItems.forEach((item, idx) => {
     if (item.type !== 'burger' || !item.lat || !item.lng) return;
     const geoKey = `${item.lat.toFixed(5)},${item.lng.toFixed(5)}`;
-    if (item.locationCityState || GEO_CACHE[geoKey]) return; // already have it — skip
+    // Skip only if we have a proper "City, State" already — re-fetch state-only entries
+    const hasFullLocation = (item.locationCityState && item.locationCityState.includes(',')) || (GEO_CACHE[geoKey] && GEO_CACHE[geoKey].includes(','));
+    if (hasFullLocation) return;
     const delay = geocodeDelay;
     geocodeDelay += 120; // stagger only the items that actually need a fetch
     setTimeout(() => {
       const el = document.getElementById(`geo-${idx}`);
       if (!el) return;
       reverseGeocode(item.lat, item.lng).then(loc => {
-        if (!loc) return;
+        if (!loc || !loc.includes(',')) return; // only accept full "City, State" results
         GEO_CACHE[geoKey] = loc; // cache so future renders are instant
+        _saveGeoCache();          // persist to localStorage
         if (el.isConnected) el.textContent = loc;
       });
     }, delay);
@@ -4509,6 +4522,9 @@ async function backfillLocationNames() {
     try {
       const loc = await reverseGeocode(entry.lat, entry.lng);
       if (!loc || !loc.includes(',')) continue; // only save if we got a proper "City, State"
+      const geoKey = `${entry.lat.toFixed(5)},${entry.lng.toFixed(5)}`;
+      GEO_CACHE[geoKey] = loc; // seed in-memory cache so feed updates instantly
+      _saveGeoCache();
       updatedLogs = updatedLogs.map(e =>
         (typeof e === 'object' && e.ts === entry.ts) ? { ...e, locationCityState: loc } : e
       );
