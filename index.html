@@ -887,6 +887,9 @@ body.feed-active .feed-sub-tabs{display:none}
 .grill-photo-details{padding:8px 14px 10px 18px;border-bottom:1px solid rgba(255,255,255,0.05)}
 .grill-photo-details .grill-menu-item-line{margin-bottom:5px}
 .grill-photo-details .grill-pill-row{margin-top:0}
+/* Stamp text rendered as an inline pill inside the detail strip (overrides .grill-patty-stamp block styles) */
+.grill-stamp-pill-inline{display:inline-flex!important;padding:3px 10px!important;border-radius:999px!important;margin-bottom:6px;font-size:9px!important;font-weight:700!important;text-transform:uppercase;letter-spacing:0.07em!important;background:rgba(255,255,255,0.06)!important;border:1px solid rgba(255,255,255,0.10)!important;border-bottom:1px solid rgba(255,255,255,0.10)!important;color:rgba(255,255,255,0.60)!important;line-height:1.4!important}
+.grill-stamp-pill-inline.stamp-triple{background:rgba(245,158,11,0.10)!important;border-color:rgba(245,158,11,0.25)!important;color:var(--amber)!important}
 
 /* ══════════════════════════════════════════════
    📋 BENTO LIST TAB
@@ -3584,14 +3587,13 @@ function renderUnifiedFeed() {
     <div class="grill-photo-hero">
       <img class="grill-photo-hero-img" src="${item.photo}" alt="burger photo"/>
       <div class="grill-photo-scrim"></div>
-      <div class="grill-photo-stamp-pill">${stampText}</div>
-      <div class="grill-photo-burger-corner">${miniBurgerStack(pattyCount)}</div>
       <div class="grill-photo-overlay">
         <div class="grill-restaurant-name">${escHtml(item.restaurant)}</div>
         <div class="grill-rating-row">${ratingStars}</div>
       </div>
     </div>
     <div class="grill-photo-details">
+      <div class="grill-patty-stamp ${stampCls} grill-stamp-pill-inline">${stampText}</div>
       ${item.menuItem?`<div class="grill-menu-item-line">${item.menuEmoji||'🍔'} ${escHtml(item.menuItem)}</div>`:''}
       <div class="grill-pill-row">${locPill}${timePill}${weatherPill}</div>
     </div>
