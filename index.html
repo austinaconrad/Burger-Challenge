@@ -21,7 +21,7 @@
   --green:#22C55E; --red:#F87171;
   --cheese:#F59E0B; --bun-top:#D97706; --bun-mid:#F59E0B; --sesame:#EAB308;
   --radius:16px; --radius-sm:12px; --radius-xs:8px;
-  --nav-base-h:56px;
+  --nav-base-h:76px;
   --glass-blur:blur(10px);
   --shadow-card:0 4px 32px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.12);
 }
@@ -86,16 +86,20 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 /* ── Bottom navigation bar ── */
 .tabs{
   position:fixed;
-  bottom:0;left:50%;
+  bottom:max(16px,env(safe-area-inset-bottom));
+  left:50%;
   transform:translateX(-50%);
-  width:100%;max-width:700px;
+  width:calc(100% - 24px);
+  max-width:676px;
   z-index:200;
   display:flex;
-  background:rgba(13,13,13,0.97);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border-top:0.5px solid rgba(255,255,255,0.10);
-  padding:6px 0 max(10px,env(safe-area-inset-bottom));
-  margin-bottom:0;
+  background:rgba(24,24,24,0.78);
+  backdrop-filter:blur(28px) saturate(1.4);
+  -webkit-backdrop-filter:blur(28px) saturate(1.4);
+  border-radius:22px;
+  border:1px solid rgba(255,255,255,0.11);
+  box-shadow:0 8px 32px rgba(0,0,0,0.55),0 1px 0 rgba(255,255,255,0.06) inset,0 0 0 0.5px rgba(255,255,255,0.04) inset;
+  padding:6px 4px 6px;
 }
 .tab-btn{
   flex:1;
@@ -119,7 +123,7 @@ h1{font-family:'Poppins',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:9
 .tab-btn.active{color:var(--amber)}
 .tab-btn.active .tab-active-dot{opacity:1}
 .tab-btn:active{transform:scale(0.86);transition:transform 0.12s ease}
-.tab-unread{position:absolute;top:-1px;right:-3px;width:7px;height:7px;border-radius:50%;background:#22C55E;border:1.5px solid #0D0D0D;display:none;animation:pulse 1.5s ease-in-out infinite}
+.tab-unread{position:absolute;top:-1px;right:-3px;width:7px;height:7px;border-radius:50%;background:#22C55E;border:1.5px solid rgba(24,24,24,0.78);display:none;animation:pulse 1.5s ease-in-out infinite}
 .tab-unread.visible{display:block}
 .tab-panel{display:none}
 .tab-panel.active{display:block}
@@ -341,12 +345,17 @@ button{transition:transform 0.2s ease}
 .msg-time{font-size:10px;color:var(--muted2);font-weight:400;white-space:nowrap;margin-top:0}
 /* Cinematic: cap photo height so portraits don't swamp the feed */
 .msg-img-wrap img{max-height:240px;object-fit:cover;border-radius:12px;width:100%;display:block}
-/* ── Compact header: shared rules for Social + Map + Base tabs ── */
+/* ── Compact header: shared rules for Social + Map + Tally + Racing tabs ── */
 body.feed-active header .burger-deco,
 body.feed-active header h1,
 body.feed-active header .room-pill,
 body.feed-active header #stat-pills-row,
 body.feed-active header #spectator-pill,
+body.tally-active header .burger-deco,
+body.tally-active header h1,
+body.tally-active header .room-pill,
+body.tally-active header #stat-pills-row,
+body.tally-active header #spectator-pill,
 body.map-active header .burger-deco,
 body.map-active header h1,
 body.map-active header .room-pill,
@@ -358,6 +367,7 @@ body.racing-active header .room-pill,
 body.racing-active header #stat-pills-row,
 body.racing-active header #spectator-pill{display:none!important}
 body.feed-active header,
+body.tally-active header,
 body.map-active header,
 body.racing-active header{padding:6px 0 0!important;gap:0!important}
 /* tabs are always fixed at bottom — no sticky overrides needed */
@@ -5350,8 +5360,9 @@ window.switchTab=function(name,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
   btn.classList.add('active');
-  // Compact header for Feed + Map + Racing; restore for all other tabs
+  // Compact header for Feed + Tally + Map + Racing; restore for all other tabs
   document.body.classList.toggle('feed-active',    name==='feed');
+  document.body.classList.toggle('tally-active',   name==='tally');
   document.body.classList.toggle('map-active',     name==='map');
   document.body.classList.toggle('racing-active',  name==='racing');
   // Clear players pill active state when switching via tabs
@@ -5384,7 +5395,7 @@ window.switchToPlayers = function() {
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-players').classList.add('active');
-  document.body.classList.remove('feed-active','map-active','racing-active');
+  document.body.classList.remove('feed-active','tally-active','map-active','racing-active');
   const pill = document.getElementById('players-pill-btn');
   if(pill) pill.classList.add('active');
 };
