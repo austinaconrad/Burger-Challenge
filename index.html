@@ -5318,6 +5318,11 @@ window.switchTab=function(name,btn){
       if(dot) dot.classList.remove('visible');
     }
     renderUnifiedFeed();
+    // Always jump to newest content (scrollTop=0 = visual top in column-reverse)
+    requestAnimationFrame(() => {
+      const feed = document.getElementById('unified-feed');
+      if (feed) feed.scrollTop = 0;
+    });
   }
   if(name==='map') setTimeout(() => {
     renderBurgerMap();
