@@ -189,19 +189,33 @@ button{transition:transform 0.2s ease}
 .hl-count-lbl{font-size:9px;color:rgba(167,139,250,0.6);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;text-align:right}
 .my-tally-card{background:rgba(26,26,26,0.7);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-card);position:relative}
 /* ── ORDER RECEIPT ── */
+/* Outer element is the full-screen backdrop */
 .order-receipt{
-  position:fixed;top:0;left:50%;transform:translateX(-50%) translateY(-110%);
-  width:100%;max-width:700px;z-index:500;
-  background:#F7F2E8;
-  border-radius:0 0 18px 18px;
-  overflow:hidden;
-  padding:0;
-  transition:transform 0.42s cubic-bezier(0.34,1.15,0.64,1),opacity 0.3s ease;
+  position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,0.65);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
   opacity:0;pointer-events:none;
-  box-shadow:0 12px 48px rgba(0,0,0,0.55),0 2px 8px rgba(0,0,0,0.2);
+  transition:opacity 0.25s ease;
 }
-.order-receipt.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto}
-.order-receipt.hide{transform:translateX(-50%) translateY(-110%);opacity:0;pointer-events:none}
+.order-receipt.show{opacity:1;pointer-events:auto}
+.order-receipt.hide{opacity:0;pointer-events:none}
+/* Inner receipt card */
+.receipt-card{
+  background:#F7F2E8;
+  border-radius:18px;
+  overflow:hidden;
+  width:100%;max-width:380px;
+  box-shadow:0 24px 64px rgba(0,0,0,0.55),0 4px 12px rgba(0,0,0,0.25);
+  transform:scale(0.88) translateY(16px);
+  transition:transform 0.38s cubic-bezier(0.34,1.15,0.64,1);
+  max-height:90dvh;overflow-y:auto;
+}
+.order-receipt.show .receipt-card{transform:scale(1) translateY(0)}
+/* Done / close button */
+.receipt-done-btn{display:block;width:calc(100% - 48px);margin:10px auto 16px;padding:11px;background:linear-gradient(135deg,#B45309,#F59E0B);color:#fff;border:none;border-radius:999px;font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:0.02em;transition:opacity 0.15s,transform 0.1s}
+.receipt-done-btn:active{transform:scale(0.97);opacity:0.9}
 /* amber gradient stripe at very top */
 .receipt-top-bar{height:5px;background:linear-gradient(90deg,#92400E,#F59E0B,#D97706,#F59E0B,#92400E)}
 /* hero / header */
@@ -226,10 +240,6 @@ button{transition:transform 0.2s ease}
 .receipt-meta-col{text-align:right;font-family:monospace;font-size:9px;color:#999;text-transform:uppercase;letter-spacing:0.08em;line-height:1.9}
 /* footer */
 .receipt-foot{text-align:center;padding:9px 24px 5px;font-family:monospace;font-size:9px;color:#AAA;text-transform:uppercase;letter-spacing:0.12em;line-height:1.9}
-/* drain progress bar */
-.receipt-progress{height:3px;background:#E0D8CC;overflow:hidden;margin:0}
-.receipt-progress-fill{height:100%;background:linear-gradient(90deg,#B45309,#F59E0B);width:100%;transform-origin:left;animation:receiptDrain 4s linear forwards}
-@keyframes receiptDrain{from{transform:scaleX(1)}to{transform:scaleX(0)}}
 .my-tally-card.complete{border-color:rgba(34,197,94,0.30);box-shadow:0 0 0 1.5px rgba(34,197,94,0.20),0 4px 24px rgba(0,0,0,0.4)}
 .tally-bun-top{height:3px;background:linear-gradient(90deg,var(--amber-dark),#F59E0B,var(--amber-mid),#F59E0B,var(--amber-dark));opacity:0.8}
 .tally-top{display:flex;align-items:center;gap:14px;padding:16px 16px 12px}
@@ -3971,7 +3981,10 @@ let pendingGPS = null;
 let pendingPattyCount = 0;
 let pendingToppings = [];
 let pendingPhoto = '';
-let receiptTimer = null;
+window.closeReceipt = function() {
+  const r = document.getElementById('order-receipt');
+  if (r) { r.classList.remove('show'); r.classList.add('hide'); }
+};
 
 const ALL_TOPPINGS = ['Ketchup','Mustard','Mayo','Cheese','Blue Cheese','Lettuce','Pickles','Tomatoes','Onions','Bacon','Mushrooms','Green Peppers','Special Sauce'];
 
@@ -4366,40 +4379,35 @@ window.confirmBurger = async function() {
       ? `${snapshotMenuEmoji || '🍔'} ${escHtml(snapshotMenuItemName)}`
       : `${pattyLabel} Burger`;
     receipt.innerHTML = `
-      <div class="receipt-top-bar"></div>
-      <div class="receipt-hero-section">
-        <span class="receipt-burger-icon">🍔</span>
-        <div class="receipt-challenge-title">100 Burger Challenge</div>
-        <div class="receipt-challenge-sub">The Summer Grind &middot; Room ${escHtml(roomId)}</div>
-      </div>
-      <hr class="receipt-perf"/>
-      <div class="receipt-main-section">
-        <div class="receipt-logged-tag">✓ Logged</div>
-        <div class="receipt-restaurant-name">${escHtml(restaurant)}</div>
-        <div class="receipt-menu-pill">${burgerLabel}</div>
-        ${snapshotRating ? `<div class="receipt-fire-row">${fireDisplay}</div><div class="receipt-rating-txt">${snapshotRating} / 5</div>` : ''}
-      </div>
-      <div class="receipt-count-section">
-        <div class="receipt-plus-block">
-          <div class="receipt-plus-num">+1</div>
-          <div class="receipt-plus-unit">🍔<br>logged</div>
+      <div class="receipt-card" onclick="event.stopPropagation()">
+        <div class="receipt-top-bar"></div>
+        <div class="receipt-hero-section">
+          <span class="receipt-burger-icon">🍔</span>
+          <div class="receipt-challenge-title">100 Burger Challenge</div>
+          <div class="receipt-challenge-sub">The Summer Grind &middot; Room ${escHtml(roomId)}</div>
         </div>
-        <div class="receipt-meta-col">${dateStr}<br>${timeStr}<br>Room: ${escHtml(roomId)}</div>
+        <hr class="receipt-perf"/>
+        <div class="receipt-main-section">
+          <div class="receipt-logged-tag">✓ Logged</div>
+          <div class="receipt-restaurant-name">${escHtml(restaurant)}</div>
+          <div class="receipt-menu-pill">${burgerLabel}</div>
+          ${snapshotRating ? `<div class="receipt-fire-row">${fireDisplay}</div><div class="receipt-rating-txt">${snapshotRating} / 5</div>` : ''}
+        </div>
+        <div class="receipt-count-section">
+          <div class="receipt-plus-block">
+            <div class="receipt-plus-num">+1</div>
+            <div class="receipt-plus-unit">🍔<br>logged</div>
+          </div>
+          <div class="receipt-meta-col">${dateStr}<br>${timeStr}<br>Room: ${escHtml(roomId)}</div>
+        </div>
+        <div class="receipt-foot">Thank you, ${escHtml(myName)}!<br>Keep eating burgers!</div>
+        <button class="receipt-done-btn" onclick="closeReceipt()">Done</button>
       </div>
-      <div class="receipt-foot">Thank you, ${escHtml(myName)}!<br>Keep eating burgers!</div>
-      <div class="receipt-progress"><div class="receipt-progress-fill"></div></div>
     `;
+    receipt.onclick = (e) => { if (e.target === receipt) closeReceipt(); };
     receipt.classList.remove('hide');
     void receipt.offsetWidth;
     receipt.classList.add('show');
-
-    // Clear any existing timer before starting a new one
-    if (receiptTimer) clearTimeout(receiptTimer);
-    receiptTimer = setTimeout(() => {
-      receipt.classList.remove('show');
-      receipt.classList.add('hide');
-      receiptTimer = null;
-    }, 4000);
   }
 
   // ── 2. Reset builder UI
