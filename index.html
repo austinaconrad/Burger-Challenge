@@ -359,8 +359,12 @@ body.feed-active .social-input-area{
 .feed-react-btn:active{transform:scale(0.92)}
 .feed-comment-btn{background:none;border:none;color:rgba(255,255,255,0.35);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;transition:background 0.15s,color 0.15s;font-family:'Inter',sans-serif}
 .feed-comment-btn:hover{background:rgba(255,255,255,0.07);color:var(--text)}
+.feed-comment-btn.active{background:rgba(245,158,11,0.10);color:var(--amber)}
 .feed-comment-btn .comment-count{font-size:11px;color:var(--muted2)}
-.feed-comment-thread{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)}
+/* ── Accordion comment thread ── */
+.feed-comment-thread{overflow:hidden;max-height:0;opacity:0;transition:max-height 0.34s cubic-bezier(0.4,0,0.2,1),opacity 0.22s ease}
+.feed-comment-thread.open{opacity:1}
+.feed-comment-thread-inner{margin-top:8px;background:rgba(0,0,0,0.20);border-radius:8px;padding:9px 12px 10px}
 .feed-comment-list{display:flex;flex-direction:column;gap:7px;margin-bottom:9px}
 .feed-comment{display:flex;gap:8px;align-items:flex-start}
 .comment-avatar{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;margin-top:1px}
@@ -1104,7 +1108,7 @@ body.feed-active .feed-sub-tabs{display:none}
   transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease;
   opacity: 0;
 }
-.challenger-drawer.open { max-height: 160px; opacity: 1; }
+.challenger-drawer.open { max-height: 400px; opacity: 1; }
 .challenger-drawer-inner {
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.07); border-top: none;
@@ -1709,6 +1713,10 @@ body.feed-active .feed-sub-tabs{display:none}
 
 /* Inner wrapper — just for positioning the accent strip */
 .grill-card-inner { position: relative; }
+/* Reactions, actions, and comment threads inside burger cards need the same left indent as the card body */
+.grill-card-inner .msg-reactions,
+.grill-card-inner .feed-card-actions { padding-left: 18px; padding-right: 14px; }
+.grill-card-inner .feed-comment-thread { padding-left: 0; padding-right: 0; }
 
 /* Left accent strip — player color injected via inline style */
 .grill-left-accent {
@@ -2227,6 +2235,7 @@ let messages = [];
 let comments = [];
 let burgerReactions = {}; // { burgerId: {emoji: [playerIds]} }
 const openComments = new Set(); // targetIds whose comment thread is open
+const GEO_CACHE = {}; // { "lat,lng" → "City, ST" } — survives re-renders
 let seenMessageCount = 0;
 let socialInitialLoadDone = false;
 let pendingImageBase64 = null, pendingImageName = '';
@@ -2740,11 +2749,30 @@ function subscribeToRoom(){
 
 function subscribeToMessages(){
   const q = query(collection(db,'rooms',roomId,'messages'),orderBy('createdAt','asc'),limit(200));
+  let _prevMsgCount = 0;
   unsubMessages = onSnapshot(q, snap => {
+    const prevCount = _prevMsgCount;
     messages = [];
     snap.forEach(d => messages.push({id:d.id,...d.data()}));
-    renderUnifiedFeed();
+    _prevMsgCount = messages.length;
+    // Only reaction/content changed on existing messages — patch in-place, no re-render
+    if (messages.length === prevCount && prevCount > 0) {
+      patchMessageReactions();
+    } else {
+      renderUnifiedFeed();
+    }
   }, () => {});
+}
+
+// Patch message reaction pills in-place without re-rendering the feed
+function patchMessageReactions() {
+  const feed = document.getElementById('unified-feed');
+  if (!feed) return;
+  messages.forEach(m => {
+    const rxnEl = feed.querySelector(`.msg-reactions[data-msg-id="${m.id}"]`);
+    if (!rxnEl) return;
+    rxnEl.innerHTML = buildReactionPills(m.reactions, m.id, 'message');
+  });
 }
 
 function subscribeToComments(){
@@ -2752,7 +2780,8 @@ function subscribeToComments(){
   unsubComments = onSnapshot(q, snap => {
     comments = [];
     snap.forEach(d => comments.push({id:d.id,...d.data()}));
-    renderUnifiedFeed();
+    // Targeted update: patch comment counts on visible cards without full re-render
+    patchCommentCounts();
   }, () => {});
 }
 
@@ -2760,8 +2789,68 @@ function subscribeToBurgerReactions(){
   unsubBurgerReactions = onSnapshot(collection(db,'rooms',roomId,'burgerReactions'), snap => {
     burgerReactions = {};
     snap.forEach(d => { burgerReactions[d.id] = d.data().reactions || {}; });
-    renderUnifiedFeed();
+    // Targeted update: patch only the reaction pills on visible burger cards
+    patchBurgerReactions();
   }, () => {});
+}
+
+// Patch reaction pills for burger cards in-place (no full re-render)
+function patchBurgerReactions() {
+  const feed = document.getElementById('unified-feed');
+  if (!feed) return;
+  Object.entries(burgerReactions).forEach(([burgerId, rxns]) => {
+    const rxnEl = feed.querySelector(`.msg-reactions[data-burger-id="${burgerId}"]`);
+    if (!rxnEl) return;
+    rxnEl.innerHTML = buildReactionPills(rxns, burgerId, 'burger');
+  });
+  // Also clear pills for burgers that lost all reactions
+  feed.querySelectorAll('.msg-reactions[data-burger-id]').forEach(el => {
+    const bid = el.dataset.burgerId;
+    if (!burgerReactions[bid]) el.innerHTML = '';
+  });
+}
+
+// Patch comment counts on visible cards in-place (no full re-render)
+function patchCommentCounts() {
+  const feed = document.getElementById('unified-feed');
+  if (!feed) return;
+  // Group comments by targetId
+  const byTarget = {};
+  comments.forEach(c => { (byTarget[c.targetId] = byTarget[c.targetId] || []).push(c); });
+  // Update comment buttons
+  feed.querySelectorAll('.feed-comment-btn[data-target-id]').forEach(btn => {
+    const tid = btn.dataset.targetId;
+    const count = (byTarget[tid] || []).length;
+    btn.textContent = count ? `💬 ${count}` : '💬';
+  });
+  // Update open comment threads
+  feed.querySelectorAll('.feed-comment-thread[id]').forEach(thread => {
+    const tid = thread.id.replace('thread-', '');
+    if (!thread.classList.contains('open')) return; // don't update closed threads
+    const list = thread.querySelector('.feed-comment-list');
+    if (!list) return;
+    const targetComments = byTarget[tid] || [];
+    // Determine targetType from existing submit button
+    const sendBtn = thread.querySelector('.comment-send-btn');
+    const targetType = sendBtn?.getAttribute('onclick')?.match(/'([^']+)'\s*\)/)?.[1] || 'message';
+    list.innerHTML = targetComments.map(c => {
+      const color = RING_COLORS[c.colorIdx % RING_COLORS.length];
+      const ini = initials(c.playerName || '?');
+      const timeStr = c.createdAt?.toDate ? formatTime(c.createdAt) : '';
+      return `<div class="feed-comment">
+        <div class="comment-avatar" style="background:${color}22;color:${color};border:1.5px solid ${color}55">${ini}</div>
+        <div class="comment-body">
+          <div class="comment-meta">
+            <span class="comment-name">${escHtml(c.playerName||'?')}</span>
+            ${timeStr ? `<span class="comment-time">${timeStr}</span>` : ''}
+          </div>
+          <div class="comment-text">${escHtml(c.text)}</div>
+        </div>
+      </div>`;
+    }).join('');
+    // Re-measure after content update so the accordion height stays correct
+    thread.style.maxHeight = thread.scrollHeight + 'px';
+  });
 }
 
 function render(){
@@ -3398,7 +3487,7 @@ function renderUnifiedFeed() {
         : '';
       const textHtml = m.text ? `<div class="msg-text">${escHtml(m.text)}</div>` : '';
       const pillsHtml = buildReactionPills(m.reactions, targetId, 'message');
-      const reactionsHtml = `<div class="msg-reactions">${pillsHtml}</div>`;
+      const reactionsHtml = `<div class="msg-reactions" data-msg-id="${targetId}">${pillsHtml}</div>`;
       const msgComments = comments.filter(c => c.targetId === targetId);
       const commentLabel = msgComments.length ? `💬 ${msgComments.length}` : '💬';
       return `<div class="msg-card ${isMe?'mine':''} ${cc}" data-id="${m.id}">
@@ -3414,7 +3503,7 @@ function renderUnifiedFeed() {
         ${textHtml}${imgHtml}
         ${reactionsHtml}
         <div class="feed-card-actions">
-          <button class="feed-comment-btn" onclick="toggleComments('${targetId}')">${commentLabel}</button>
+          <button class="feed-comment-btn" data-target-id="${targetId}" onclick="toggleComments('${targetId}')">${commentLabel}</button>
         </div>
         ${buildCommentHtml(targetId, 'message', msgComments)}
       </div>`;
@@ -3436,9 +3525,10 @@ function renderUnifiedFeed() {
       }
       let locPill;
       if (item.lat && item.lng) {
-        const resolved = item.locationCityState ? escHtml(item.locationCityState) : null;
+        const geoKey = `${item.lat.toFixed(5)},${item.lng.toFixed(5)}`;
+        const resolved = item.locationCityState || GEO_CACHE[geoKey] || '';
         const coordLabel = `${item.lat.toFixed(2)}°N, ${Math.abs(item.lng).toFixed(2)}°W`;
-        locPill = `<span class="grill-pill grill-pill-location has-gps">📍: <span id="geo-${idx}">${resolved || coordLabel}</span></span>`;
+        locPill = `<span class="grill-pill grill-pill-location has-gps">📍: <span id="geo-${idx}">${resolved ? escHtml(resolved) : coordLabel}</span></span>`;
       } else {
         locPill = `<span class="grill-pill grill-pill-location no-gps">🕵️‍♂️: Off the Grid</span>`;
       }
@@ -3459,7 +3549,6 @@ function renderUnifiedFeed() {
       const targetId = item.burgerId;
       const rxns = burgerReactions[targetId] || {};
       const pillsHtml = buildReactionPills(rxns, targetId, 'burger');
-      const reactionsHtml = `<div class="msg-reactions">${pillsHtml}</div>`;
       const burgerComments = comments.filter(c => c.targetId === targetId);
       const commentLabel = burgerComments.length ? `💬 ${burgerComments.length}` : '💬';
       return `
@@ -3488,10 +3577,10 @@ function renderUnifiedFeed() {
         ${miniBurgerStack(pattyCount)}
       </div>
     </div>
-    ${reactionsHtml}
+    <div class="msg-reactions" data-burger-id="${targetId}">${pillsHtml}</div>
     <div class="feed-card-actions">
       <button class="feed-react-btn" data-target-id="${targetId}" data-target-type="burger" title="Add reaction">${_REACT_SVG}</button>
-      <button class="feed-comment-btn" onclick="toggleComments('${targetId}')">${commentLabel}</button>
+      <button class="feed-comment-btn" data-target-id="${targetId}" onclick="toggleComments('${targetId}')">${commentLabel}</button>
     </div>
     ${buildCommentHtml(targetId, 'burger', burgerComments)}
   </div>
@@ -3499,14 +3588,23 @@ function renderUnifiedFeed() {
     }
   }).join('\n');
 
-  // Lazy reverse-geocode burger entries
+  // Lazy reverse-geocode burger entries (cache-first: only fetch when not already resolved)
+  let geocodeDelay = 0;
   allItems.forEach((item, idx) => {
-    if (item.type !== 'burger' || !item.lat || !item.lng || item.locationCityState) return;
+    if (item.type !== 'burger' || !item.lat || !item.lng) return;
+    const geoKey = `${item.lat.toFixed(5)},${item.lng.toFixed(5)}`;
+    if (item.locationCityState || GEO_CACHE[geoKey]) return; // already have it — skip
+    const delay = geocodeDelay;
+    geocodeDelay += 120; // stagger only the items that actually need a fetch
     setTimeout(() => {
       const el = document.getElementById(`geo-${idx}`);
       if (!el) return;
-      reverseGeocode(item.lat, item.lng).then(loc => { if (loc && el.isConnected) el.textContent = loc; });
-    }, 120 * idx);
+      reverseGeocode(item.lat, item.lng).then(loc => {
+        if (!loc) return;
+        GEO_CACHE[geoKey] = loc; // cache so future renders are instant
+        if (el.isConnected) el.textContent = loc;
+      });
+    }, delay);
   });
 }
 
@@ -3643,15 +3741,21 @@ window.autoResize = function(el) {
 window.toggleComments = function(targetId) {
   const thread = document.getElementById('thread-' + targetId);
   if (!thread) return;
-  const currentlyHidden = thread.style.display === 'none';
-  if (currentlyHidden) {
-    thread.style.display = '';
+  const isOpen = thread.classList.contains('open');
+  const btn = document.querySelector(`.feed-comment-btn[data-target-id="${CSS.escape(targetId)}"]`);
+  if (!isOpen) {
+    // Measure full height before animating open
+    thread.style.maxHeight = thread.scrollHeight + 'px';
+    thread.classList.add('open');
     openComments.add(targetId);
+    if (btn) btn.classList.add('active');
     const inp = thread.querySelector('.comment-input-row input');
-    if (inp) setTimeout(() => inp.focus(), 80);
+    if (inp) setTimeout(() => inp.focus(), 340);
   } else {
-    thread.style.display = 'none';
+    thread.style.maxHeight = '0';
+    thread.classList.remove('open');
     openComments.delete(targetId);
+    if (btn) btn.classList.remove('active');
   }
 };
 
@@ -3694,12 +3798,16 @@ function buildCommentHtml(targetId, targetType, commentsForTarget) {
     </div>`;
   }).join('');
   const isOpen = openComments.has(targetId);
-  return `<div class="feed-comment-thread" id="thread-${targetId}" style="${isOpen ? '' : 'display:none'}">
-    <div class="feed-comment-list">${listHtml}</div>
-    <div class="comment-input-row">
-      <input type="text" id="comment-input-${targetId}" placeholder="Add a comment…"
-             onkeydown="commentKeydown(event,'${targetId}','${targetType}')"/>
-      <button class="comment-send-btn" onclick="submitComment('${targetId}','${targetType}')">➤</button>
+  // Use a large fixed max-height for pre-open state (no JS measurement possible in template)
+  const initStyle = isOpen ? 'max-height:800px;opacity:1' : '';
+  return `<div class="feed-comment-thread${isOpen ? ' open' : ''}" id="thread-${targetId}" style="${initStyle}">
+    <div class="feed-comment-thread-inner">
+      <div class="feed-comment-list">${listHtml}</div>
+      <div class="comment-input-row">
+        <input type="text" id="comment-input-${targetId}" placeholder="Add a comment…"
+               onkeydown="commentKeydown(event,'${targetId}','${targetType}')"/>
+        <button class="comment-send-btn" onclick="submitComment('${targetId}','${targetType}')">➤</button>
+      </div>
     </div>
   </div>`;
 }
@@ -5170,6 +5278,35 @@ window.switchToPlayers = function() {
 document.getElementById('setup-name').addEventListener('keydown',e=>{if(e.key==='Enter') document.getElementById('setup-room').value?joinRoom():createRoom()});
 document.getElementById('setup-room').addEventListener('keydown',e=>{if(e.key==='Enter') joinRoom()});
 document.getElementById('setup-room').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase()});
+
+// ── iOS keyboard: prevent feed from jumping when the message input gains focus ──
+// When the keyboard slides up, dvh shrinks → column-reverse container reflows → scroll jumps.
+// Snapshot scrollTop on focus and restore it at several points during the keyboard animation.
+document.getElementById('social-text').addEventListener('focus', function() {
+  const feed = document.getElementById('unified-feed');
+  if (!feed) return;
+  const snap = feed.scrollTop;
+  // Restore at multiple frames to cover the full ~350ms keyboard slide-up animation
+  [0, 50, 120, 220, 350].forEach(ms => setTimeout(() => { feed.scrollTop = snap; }, ms));
+}, { passive: true });
+
+// Also handle the visualViewport resize (fires when keyboard opens/closes on iOS 13+)
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', () => {
+    const ta = document.getElementById('social-text');
+    if (document.activeElement !== ta) return;
+    const feed = document.getElementById('unified-feed');
+    if (feed) feed.scrollTop = feed._lockedScroll ?? feed.scrollTop;
+  });
+}
+document.getElementById('social-text').addEventListener('focus', function() {
+  const feed = document.getElementById('unified-feed');
+  if (feed) feed._lockedScroll = feed.scrollTop;
+}, { passive: true, capture: true });
+document.getElementById('social-text').addEventListener('blur', function() {
+  const feed = document.getElementById('unified-feed');
+  if (feed) feed._lockedScroll = null;
+}, { passive: true });
 
 const bdgTip = document.getElementById('bdg-tip');
 let bdgTipTimer = null;
