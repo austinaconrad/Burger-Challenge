@@ -872,7 +872,7 @@ body.feed-active .feed-sub-tabs{display:none}
 
 /* ── Photo hero layout (burger card with attached photo) ── */
 .grill-photo-hero{position:relative;overflow:hidden}
-.grill-photo-hero-img{width:100%;height:230px;object-fit:cover;display:block}
+.grill-photo-hero-img{width:100%;height:230px;object-fit:cover;display:block;cursor:zoom-in}
 /* top-to-bottom dark fade so text at bottom is always readable */
 .grill-photo-scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.48) 36%,rgba(0,0,0,0.10) 64%,transparent 100%);pointer-events:none}
 /* frosted-glass stamp badge top-left */
@@ -3585,7 +3585,7 @@ function renderUnifiedFeed() {
     </div>
     ${item.photo ? `
     <div class="grill-photo-hero">
-      <img class="grill-photo-hero-img" src="${item.photo}" alt="burger photo"/>
+      <img class="grill-photo-hero-img" src="${item.photo}" alt="burger photo" onclick="openLightboxSrc(this.src)"/>
       <div class="grill-photo-scrim"></div>
       <div class="grill-photo-overlay">
         <div class="grill-restaurant-name">${escHtml(item.restaurant)}</div>
@@ -3594,7 +3594,6 @@ function renderUnifiedFeed() {
     </div>
     <div class="grill-photo-details">
       <div class="grill-patty-stamp ${stampCls} grill-stamp-pill-inline">${stampText}</div>
-      ${item.menuItem?`<div class="grill-menu-item-line">${item.menuEmoji||'🍔'} ${escHtml(item.menuItem)}</div>`:''}
       <div class="grill-pill-row">${locPill}${timePill}${weatherPill}</div>
     </div>
     ` : `
@@ -3603,7 +3602,6 @@ function renderUnifiedFeed() {
     <div class="grill-card-body">
       <div class="grill-card-body-content">
         <div class="grill-restaurant-name">${escHtml(item.restaurant)}</div>
-        ${item.menuItem?`<div class="grill-menu-item-line">${item.menuEmoji||'🍔'} ${escHtml(item.menuItem)}</div>`:''}
         <div class="grill-pill-row">${locPill}${timePill}${weatherPill}</div>
         <div class="grill-rating-row">${ratingStars}</div>
       </div>
@@ -3649,6 +3647,11 @@ function renderGrillFeed() { renderUnifiedFeed(); }
 
 window.openLightbox = function(msgId) {
   const src = window._msgImages?.[msgId];
+  if (!src) return;
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox').classList.add('open');
+};
+window.openLightboxSrc = function(src) {
   if (!src) return;
   document.getElementById('lightbox-img').src = src;
   document.getElementById('lightbox').classList.add('open');
