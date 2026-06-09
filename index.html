@@ -2802,6 +2802,7 @@ function subscribeToRoom(){
       players.sort((a,b)=>(a.joinedAt?.seconds||0)-(b.joinedAt?.seconds||0));
       render();
       backfillWeatherStamps();
+      backfillLocationNames();
     },
     ()=>{cs.className='offline-dot'; cs.textContent='Reconnecting…'}
   );
@@ -3466,6 +3467,8 @@ function buildReactionPills(reactions, targetId, targetType) {
     }).join('');
 }
 
+let _feedInitialRenderDone = false;
+
 function renderUnifiedFeed() {
   const feed = document.getElementById('unified-feed');
   const empty = document.getElementById('social-empty');
@@ -3614,7 +3617,7 @@ function renderUnifiedFeed() {
       const burgerComments = comments.filter(c => c.targetId === targetId);
       const commentLabel = burgerComments.length ? `💬 ${burgerComments.length}` : '💬';
       return `
-<div class="grill-feed-card ${pattyCount>=3?'triple-card':''}${item.rating===5?' perfect-rating':''}" style="animation-delay:${Math.min(idx*0.04,0.6)}s">
+<div class="grill-feed-card ${pattyCount>=3?'triple-card':''}${item.rating===5?' perfect-rating':''}" style="animation-delay:${_feedInitialRenderDone ? '0s' : Math.min(idx*0.04,0.6)+'s'}">
   <div class="grill-card-inner">
     <div class="grill-left-accent" style="background:${color}"></div>
     <div class="grill-card-banner">
@@ -3662,6 +3665,9 @@ function renderUnifiedFeed() {
 </div>`.trim();
     }
   }).join('\n');
+
+  // Mark initial render done so subsequent re-renders skip the stagger delay
+  _feedInitialRenderDone = true;
 
   // Lazy reverse-geocode burger entries (cache-first: only fetch when not already resolved)
   let geocodeDelay = 0;
@@ -4480,6 +4486,40 @@ function weatherStampFromCode(weatherCode, tempF) {
   else if (tempF >= 90)                              { conditionLabel = 'SCORCHING HEATPACK';                 weatherEmoji = '🔥'; }
   else if (tempF <= 45)                              { conditionLabel = 'CHILLY SEAR';                        weatherEmoji = '🥶'; }
   return `${weatherEmoji} ${tempF}°F - ${conditionLabel}`;
+}
+
+// ── Backfill city names for logs that only have a state (no comma = no city) ──
+let _backfillLocationDone = false;
+async function backfillLocationNames() {
+  if (_backfillLocationDone) return;
+  _backfillLocationDone = true;
+  const me = players.find(p => p.id === myPlayerId);
+  if (!me) return;
+  // Target entries with GPS where locationCityState is missing or has no comma (just a state)
+  const needsCity = (me.logs || []).filter(e =>
+    typeof e === 'object' && e.ts && e.lat && e.lng &&
+    (!e.locationCityState || !e.locationCityState.includes(','))
+  );
+  if (!needsCity.length) return;
+
+  let updatedLogs = [...(me.logs || [])];
+  let changed = false;
+
+  for (const entry of needsCity) {
+    try {
+      const loc = await reverseGeocode(entry.lat, entry.lng);
+      if (!loc || !loc.includes(',')) continue; // only save if we got a proper "City, State"
+      updatedLogs = updatedLogs.map(e =>
+        (typeof e === 'object' && e.ts === entry.ts) ? { ...e, locationCityState: loc } : e
+      );
+      changed = true;
+    } catch (_) { /* silently skip */ }
+    await new Promise(r => setTimeout(r, 300)); // respect Nominatim rate limit
+  }
+
+  if (changed) {
+    updateDoc(doc(db, 'rooms', roomId, 'players', myPlayerId), { logs: updatedLogs }).catch(() => {});
+  }
 }
 
 // ── Backfill weather for old logs that have GPS but no stamp ─────────────────
@@ -5534,7 +5574,9 @@ async function reverseGeocode(lat, lng) {
     clearTimeout(timer);
     const data = await res.json();
     const address = data.address || {};
-    const city  = address.city || address.town || address.village || address.suburb || '';
+    const city  = address.city || address.town || address.village || address.suburb
+               || address.municipality || address.hamlet || address.locality
+               || address.neighbourhood || address.county || '';
     const rawState = address.state || '';
     const state = STATE_ABBR[rawState] || rawState;
     return city && state ? `${city}, ${state}` : (city || state || '');
