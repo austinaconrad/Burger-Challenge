@@ -1680,6 +1680,64 @@ body.feed-active .social-input-area.comment-focus-hide{opacity:0;transform:trans
 .feed-sub-tab{flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--muted2);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;padding:8px 12px;cursor:pointer;transition:all 0.2s;letter-spacing:0.01em}
 .feed-sub-tab.active{background:rgba(245,158,11,0.10);border-color:rgba(245,158,11,0.40);color:var(--amber)}
 .feed-sub-tab:active{transform:scale(0.96)}
+
+/* ── Restaurant Leaderboard ── */
+.ranks-sub-tabs{display:flex;gap:6px;margin-bottom:14px}
+.ranks-sub-tab{flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--muted2);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;padding:8px 12px;cursor:pointer;transition:all 0.2s;letter-spacing:0.01em}
+.ranks-sub-tab.active{background:rgba(245,158,11,0.10);border-color:rgba(245,158,11,0.40);color:var(--amber)}
+.ranks-sub-tab:active{transform:scale(0.96)}
+.resto-lb-wrap{display:flex;flex-direction:column;gap:8px;padding:4px 0 24px}
+.resto-card{background:var(--surface);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-card);animation:slideIn 0.25s ease both;position:relative;overflow:hidden}
+.resto-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.12),transparent)}
+.resto-rank{font-family:'Poppins',sans-serif;font-size:22px;font-weight:900;min-width:32px;text-align:center;flex-shrink:0}
+.resto-rank.r1{color:#F59E0B;text-shadow:0 0 12px rgba(245,158,11,0.45)}
+.resto-rank.r2{color:#C0C0C0}
+.resto-rank.r3{color:#CD7F32}
+.resto-rank.rn{color:var(--muted2)}
+.resto-info{flex:1;min-width:0}
+.resto-name{font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.resto-meta{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
+.resto-visits{font-size:11px;font-weight:600;color:var(--muted2)}
+.resto-bar-wrap{height:3px;background:rgba(255,255,255,0.07);border-radius:999px;margin-top:6px;overflow:hidden}
+.resto-bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--amber-dark),var(--amber));transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1)}
+.resto-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
+.resto-stars{font-size:14px;line-height:1}
+.resto-score{font-family:'Poppins',sans-serif;font-size:13px;font-weight:800;color:var(--amber)}
+.resto-unrated{font-size:11px;color:var(--muted);font-weight:500}
+
+/* ── Weekly Digest Card ── */
+.weekly-digest{
+  background:#0A0A0A;
+  border:1px solid rgba(245,158,11,0.25);
+  border-radius:14px;
+  overflow:hidden;
+  margin-bottom:10px;
+  flex-shrink:0;
+  box-shadow:0 4px 24px rgba(0,0,0,0.5),inset 0 1px 0 rgba(245,158,11,0.08);
+}
+.wd-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 14px 6px;
+  border-bottom:1px solid rgba(245,158,11,0.12);
+}
+.wd-title{
+  font-family:'Press Start 2P',monospace;
+  font-size:7px;
+  color:var(--amber);
+  letter-spacing:0.06em;
+  text-shadow:0 0 8px rgba(245,158,11,0.5);
+  line-height:1.4;
+}
+.wd-dates{font-size:9px;color:#555;font-family:monospace;letter-spacing:0.08em}
+.wd-items{display:grid;grid-template-columns:repeat(3,1fr)}
+.wd-item{padding:10px 10px 12px;border-right:1px solid rgba(255,255,255,0.05);display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px}
+.wd-item:last-child{border-right:none}
+.wd-item-label{font-family:'Press Start 2P',monospace;font-size:5px;color:#444;letter-spacing:0.08em;line-height:1.4;text-transform:uppercase}
+.wd-item-emoji{font-size:22px;line-height:1;filter:drop-shadow(0 2px 6px rgba(245,158,11,0.3))}
+.wd-item-name{font-family:'Poppins',sans-serif;font-size:12px;font-weight:800;color:#F5F5F5;line-height:1.2;letter-spacing:-0.2px;margin-top:1px}
+.wd-item-sub{font-size:9px;color:#666;font-weight:500;line-height:1.3}
+.wd-item-val{font-family:'Poppins',sans-serif;font-size:18px;font-weight:900;color:var(--amber);line-height:1;letter-spacing:-0.5px;text-shadow:0 0 10px rgba(245,158,11,0.35)}
+.wd-empty{padding:18px;text-align:center;font-size:11px;color:#444;font-family:monospace}
 .top-rated-wrap{display:flex;flex-direction:column;gap:8px;padding:4px 0 24px}
 .tr-card{background:var(--surface);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-card);animation:slideIn 0.25s ease both}
 .tr-rank{font-family:'Poppins',sans-serif;font-size:18px;font-weight:900;color:var(--muted2);min-width:28px;text-align:center;flex-shrink:0}
@@ -2109,7 +2167,16 @@ body.feed-active .social-input-area.comment-focus-hide{opacity:0;transform:trans
 
     <!-- LIST TAB -->
     <div class="tab-panel active" id="tab-list">
-      <div id="bento-list"></div>
+      <div class="ranks-sub-tabs">
+        <button class="ranks-sub-tab active" onclick="switchRanksTab('players',this)">🏆 Players</button>
+        <button class="ranks-sub-tab" onclick="switchRanksTab('restaurants',this)">🍔 Restaurants</button>
+      </div>
+      <div id="ranks-players-panel">
+        <div id="bento-list"></div>
+      </div>
+      <div id="ranks-restaurants-panel" style="display:none">
+        <div class="resto-lb-wrap" id="resto-lb-wrap"></div>
+      </div>
     </div>
 
     <!-- TALLY TAB -->
@@ -2129,6 +2196,7 @@ body.feed-active .social-input-area.comment-focus-hide{opacity:0;transform:trans
       <!-- Unified feed panel -->
       <div id="unified-feed-panel">
         <div class="social-wrap">
+          <div class="weekly-digest" id="weekly-digest" style="display:none"></div>
           <div class="social-empty" id="social-empty" style="display:none">
             <div class="e-icon">🍔💬</div>
             <p>No activity yet — log your first burger!</p>
@@ -3492,6 +3560,8 @@ function renderUnifiedFeed() {
       if (dot) dot.classList.add('visible');
     }
   }
+
+  renderWeeklyDigest();
 
   // Build burger entries from all players
   const burgerItems = [];
@@ -5371,6 +5441,156 @@ function renderRaceTrack() {
   }
 }
 
+// ── Restaurant Leaderboard ────────────────────────────────────────────────────
+window.switchRanksTab = function(tab, btn) {
+  document.querySelectorAll('.ranks-sub-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const playersPanel = document.getElementById('ranks-players-panel');
+  const restoPanel   = document.getElementById('ranks-restaurants-panel');
+  if (tab === 'players') {
+    playersPanel.style.display = '';
+    restoPanel.style.display   = 'none';
+  } else {
+    playersPanel.style.display = 'none';
+    restoPanel.style.display   = '';
+    renderRestaurantLB();
+  }
+};
+
+function renderRestaurantLB() {
+  const wrap = document.getElementById('resto-lb-wrap');
+  if (!wrap) return;
+
+  // Aggregate all logs across all players
+  const restoMap = {}; // key: normalized name → { name, visits, totalRating, ratedCount, players: Set }
+  players.forEach(p => {
+    (p.logs || []).forEach(entry => {
+      if (typeof entry !== 'object' || !entry.ts) return;
+      const raw = (entry.restaurant || 'Unknown Spot').trim();
+      const key = raw.toLowerCase();
+      if (!restoMap[key]) restoMap[key] = { name: raw, visits: 0, totalRating: 0, ratedCount: 0, playerNames: new Set() };
+      restoMap[key].visits++;
+      if (entry.rating && entry.rating > 0) {
+        restoMap[key].totalRating += entry.rating;
+        restoMap[key].ratedCount++;
+      }
+      restoMap[key].playerNames.add(p.name);
+    });
+  });
+
+  const sorted = Object.values(restoMap).sort((a, b) => b.visits - a.visits || b.totalRating - a.totalRating);
+  if (!sorted.length) {
+    wrap.innerHTML = '<div style="text-align:center;padding:48px 20px;color:var(--muted);font-size:13px">No burger logs yet!</div>';
+    return;
+  }
+
+  const maxVisits = sorted[0].visits;
+  wrap.innerHTML = sorted.map((r, i) => {
+    const rank = i + 1;
+    const rankCls = rank === 1 ? 'r1' : rank === 2 ? 'r2' : rank === 3 ? 'r3' : 'rn';
+    const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+    const avgRating = r.ratedCount > 0 ? (r.totalRating / r.ratedCount) : null;
+    const starsHtml = avgRating
+      ? `<div class="resto-stars">${'⭐'.repeat(Math.round(avgRating))}</div><div class="resto-score">${avgRating.toFixed(1)}</div>`
+      : `<div class="resto-unrated">unrated</div>`;
+    const playerList = [...r.playerNames].slice(0, 4).map(n => escHtml(n)).join(', ');
+    const barPct = Math.round((r.visits / maxVisits) * 100);
+    return `
+<div class="resto-card" style="animation-delay:${Math.min(i * 0.05, 0.4)}s">
+  <div class="resto-rank ${rankCls}">${rankEmoji}</div>
+  <div class="resto-info">
+    <div class="resto-name">${escHtml(r.name)}</div>
+    <div class="resto-meta">
+      <span class="resto-visits">🍔 ${r.visits} visit${r.visits !== 1 ? 's' : ''}</span>
+      <span style="font-size:10px;color:var(--muted2)">· ${playerList}</span>
+    </div>
+    <div class="resto-bar-wrap"><div class="resto-bar-fill" style="width:${barPct}%"></div></div>
+  </div>
+  <div class="resto-right">${starsHtml}</div>
+</div>`.trim();
+  }).join('\n');
+}
+
+// ── Weekly Digest Card ────────────────────────────────────────────────────────
+function renderWeeklyDigest() {
+  const el = document.getElementById('weekly-digest');
+  if (!el) return;
+
+  const monday = getThisMonday();
+  const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
+  const fmt = d => `${d.getMonth()+1}/${d.getDate()}`;
+  const dateRange = `${fmt(monday)} – ${fmt(sunday)}`;
+
+  // All logs this week across all players
+  const allLogs = [];
+  players.forEach(p => {
+    (p.logs || []).forEach(entry => {
+      if (typeof entry !== 'object' || !entry.ts) return;
+      if (new Date(entry.ts) >= monday) allLogs.push({ ...entry, _player: p });
+    });
+  });
+
+  if (!allLogs.length) { el.style.display = 'none'; return; }
+  el.style.display = '';
+
+  // 1. Most burgers logged this week (by player)
+  const byPlayer = {};
+  allLogs.forEach(e => {
+    const id = e._player.id;
+    byPlayer[id] = byPlayer[id] || { player: e._player, count: 0 };
+    byPlayer[id].count++;
+  });
+  const topPlayer = Object.values(byPlayer).sort((a, b) => b.count - a.count)[0];
+
+  // 2. Highest rated burger this week
+  const ratedLogs = allLogs.filter(e => e.rating > 0).sort((a, b) => b.rating - a.rating);
+  const topRated = ratedLogs[0] || null;
+
+  // 3. Most reactions this week (burger cards)
+  let topReactLog = null, topReactCount = 0;
+  allLogs.forEach(e => {
+    const burgerId = (e._player.id + '_' + e.ts).replace(/[^a-zA-Z0-9_]/g, '_');
+    const rxns = burgerReactions[burgerId] || {};
+    const total = Object.values(rxns).reduce((s, arr) => s + (arr?.length || 0), 0);
+    if (total > topReactCount) { topReactCount = total; topReactLog = e; }
+  });
+
+  const starStr = r => r >= 5 ? '★★★★★' : r >= 4 ? '★★★★' : r >= 3 ? '★★★' : r >= 2 ? '★★' : '★';
+
+  el.innerHTML = `
+<div class="wd-header">
+  <div class="wd-title">THIS WEEK'S<br>SPECIAL MENU</div>
+  <div class="wd-dates">${dateRange}</div>
+</div>
+<div class="wd-items">
+  <div class="wd-item">
+    <div class="wd-item-label">Top Eater</div>
+    <div class="wd-item-emoji">🍔</div>
+    <div class="wd-item-val">${topPlayer.count}</div>
+    <div class="wd-item-name">${escHtml(topPlayer.player.name)}</div>
+    <div class="wd-item-sub">burger${topPlayer.count !== 1 ? 's' : ''} this week</div>
+  </div>
+  <div class="wd-item">
+    <div class="wd-item-label">Best Bite</div>
+    <div class="wd-item-emoji">⭐</div>
+    ${topRated ? `
+      <div class="wd-item-val" style="font-size:13px;letter-spacing:0;color:#FBBF24">${starStr(topRated.rating)}</div>
+      <div class="wd-item-name">${escHtml(topRated.restaurant || 'Unknown')}</div>
+      <div class="wd-item-sub">${escHtml(topRated._player.name)} · ${topRated.rating}/5</div>
+    ` : `<div class="wd-item-sub" style="margin-top:6px">No ratings yet</div>`}
+  </div>
+  <div class="wd-item">
+    <div class="wd-item-label">Most Hype</div>
+    <div class="wd-item-emoji">🔥</div>
+    ${topReactLog && topReactCount > 0 ? `
+      <div class="wd-item-val">${topReactCount}</div>
+      <div class="wd-item-name">${escHtml(topReactLog.restaurant || 'Unknown')}</div>
+      <div class="wd-item-sub">${escHtml(topReactLog._player.name)}</div>
+    ` : `<div class="wd-item-sub" style="margin-top:6px">No reactions yet</div>`}
+  </div>
+</div>`;
+}
+
 window.switchTab=function(name,btn){
   document.getElementById('badge-popup')?.remove();
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
@@ -5404,7 +5624,13 @@ window.switchTab=function(name,btn){
     renderBurgerMap();
     if(burgerMap) burgerMap.invalidateSize();
   }, 80);
-  if(name==='list') renderBentoList();
+  if(name==='list') {
+    // Always default to Players sub-tab when switching to Ranks
+    document.querySelectorAll('.ranks-sub-tab').forEach((b,i) => b.classList.toggle('active', i===0));
+    document.getElementById('ranks-players-panel').style.display = '';
+    document.getElementById('ranks-restaurants-panel').style.display = 'none';
+    renderBentoList();
+  }
   if(name==='leaderboard') { _openAlbumId = null; const s=[...players].sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name)); renderLeaderboard(s); }
   if(name==='racing') { _raceAnimateFromStart = true; renderRaceTrack(); }
 };
