@@ -2205,6 +2205,43 @@ body.feed-active .social-input-area.comment-focus-hide{opacity:0;transform:trans
 </div>
 <div id="lightbox" onclick="closeLightbox()"><img id="lightbox-img" src="" alt=""/></div>
 
+<!-- AVATAR PICKER MODAL -->
+<div id="avatar-picker-overlay" onclick="closeAvatarPicker(event)" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:flex-end;justify-content:center">
+  <div id="avatar-picker-sheet" onclick="event.stopPropagation()" style="background:var(--surface);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:20px 16px 32px;width:100%;max-width:480px;box-sizing:border-box;animation:slideIn 0.2s ease both">
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="width:40px;height:4px;background:var(--border);border-radius:999px;margin:0 auto 14px"></div>
+      <div id="avatar-picker-preview" style="width:72px;height:72px;border-radius:50%;margin:0 auto 10px;overflow:hidden;background:var(--surface3);border:2px solid var(--border)"></div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--text)">CHANGE AVATAR</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px;font-family:'Barlow',sans-serif">Pick a photo for your profile</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button onclick="document.getElementById('avatar-input-camera').click()" style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;width:100%;text-align:left;transition:background 0.15s">
+        <span style="font-size:22px">📸</span>
+        <div>
+          <div style="font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;color:var(--text)">Take a Selfie</div>
+          <div style="font-family:'Barlow',sans-serif;font-size:11px;color:var(--muted);margin-top:1px">Open camera and take a photo</div>
+        </div>
+      </button>
+      <button onclick="document.getElementById('avatar-input-upload').click()" style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;width:100%;text-align:left;transition:background 0.15s">
+        <span style="font-size:22px">🖼️</span>
+        <div>
+          <div style="font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;color:var(--text)">Choose from Library</div>
+          <div style="font-family:'Barlow',sans-serif;font-size:11px;color:var(--muted);margin-top:1px">Upload an existing photo</div>
+        </div>
+      </button>
+      <div id="avatar-remove-row" style="display:none">
+        <button onclick="removeAvatar()" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;width:100%;text-align:left;transition:background 0.15s">
+          <span style="font-size:22px">🗑️</span>
+          <div>
+            <div style="font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;color:#F87171">Remove Photo</div>
+            <div style="font-family:'Barlow',sans-serif;font-size:11px;color:var(--muted);margin-top:1px">Go back to initials avatar</div>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- BURGER HISTORY CALENDAR MODAL -->
 <div class="cal-modal-overlay" id="cal-modal-overlay" onclick="closeCalModal(event)">
   <div class="cal-modal" id="cal-modal">
@@ -2534,10 +2571,17 @@ function ringAvatarHTML(p, size, emojiOverride=null) {
   const pct  = Math.min(100, p.count) / 100;
   const dash = circ * pct;
   const gap  = circ - dash;
-  const inner = emojiOverride
-    ? `<span style="font-size:${Math.round(size*0.44)}px;line-height:1">${emojiOverride}</span>`
-    : initials(p.name);
-  const innerStyle = emojiOverride ? '' : `font-size:${Math.round(size*0.28)}px;font-weight:700`;
+  let innerContent, innerStyle;
+  if (p.avatar) {
+    innerContent = `<img src="${p.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover" alt="${escHtml(p.name)}"/>`;
+    innerStyle = 'padding:0;overflow:hidden';
+  } else if (emojiOverride) {
+    innerContent = `<span style="font-size:${Math.round(size*0.44)}px;line-height:1">${emojiOverride}</span>`;
+    innerStyle = '';
+  } else {
+    innerContent = initials(p.name);
+    innerStyle = `font-size:${Math.round(size*0.28)}px;font-weight:700`;
+  }
   return `<div class="ring-avatar ${cc}" style="width:${size}px;height:${size}px">
     <svg viewBox="0 0 ${size} ${size}">
       <circle class="ring-track" cx="${size/2}" cy="${size/2}" r="${r}"/>
@@ -2545,17 +2589,23 @@ function ringAvatarHTML(p, size, emojiOverride=null) {
         stroke-dasharray="${dash} ${gap}"
         stroke-dashoffset="0"/>
     </svg>
-    <div class="ring-inner" style="${innerStyle}">${inner}</div>
+    <div class="ring-inner" style="${innerStyle}">${innerContent}</div>
   </div>`;
 }
 
 function avatarHTML(p, size) {
   const cc = colorClass(p.colorIdx);
+  if (p.avatar) {
+    return `<div class="${cc}" style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="${p.avatar}" style="width:100%;height:100%;object-fit:cover" alt="${escHtml(p.name)}"/></div>`;
+  }
   return `<div class="${cc}" style="width:${size}px;height:${size}px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.33)}px;font-weight:700;background:var(--av-bg);color:var(--av-text);flex-shrink:0;font-family:'Barlow',sans-serif">${initials(p.name)}</div>`;
 }
 
-function miniAvatarHTML(name, colorIdx, size) {
+function miniAvatarHTML(name, colorIdx, size, avatar='') {
   const cc = colorClass(colorIdx);
+  if (avatar) {
+    return `<div class="${cc}" style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="${avatar}" style="width:100%;height:100%;object-fit:cover" alt="${escHtml(name)}"/></div>`;
+  }
   return `<div class="${cc}" style="width:${size}px;height:${size}px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.36)}px;font-weight:700;background:var(--av-bg);color:var(--av-text);flex-shrink:0;font-family:'Barlow',sans-serif">${initials(name)}</div>`;
 }
 
@@ -2664,6 +2714,31 @@ function computeAchievements(p, allPlayers) {
   if ((p.logs || []).some(entry => typeof entry === 'object' && entry.patties >= 3)) earned.push('ooh_baby_triple');
 
   return earned;
+}
+
+function compressAvatarImage(file) {
+  const AV_SIZE = 120;
+  const AV_QUALITY = 0.55;
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        // Square-crop from center
+        const size = Math.min(img.width, img.height);
+        const sx = (img.width - size) / 2;
+        const sy = (img.height - size) / 2;
+        const canvas = document.createElement('canvas');
+        canvas.width = AV_SIZE; canvas.height = AV_SIZE;
+        canvas.getContext('2d').drawImage(img, sx, sy, size, size, 0, 0, AV_SIZE, AV_SIZE);
+        resolve(canvas.toDataURL('image/jpeg', AV_QUALITY));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 function compressImage(file) {
@@ -3236,8 +3311,8 @@ function renderLeaderboard(sorted){
         style="--album-color:${color}"
         onclick="openAlbum('${p.id}')">
       <div class="album-cover-rank">#${i+1}</div>
-      <div class="album-cover-avatar" style="background:${color}22;color:${color};border:1.5px solid ${color}44">
-        ${initials(p.name)}
+      <div class="album-cover-avatar" style="background:${color}22;color:${color};border:1.5px solid ${color}44;${p.avatar ? 'overflow:hidden;padding:0' : ''}">
+        ${p.avatar ? `<img src="${p.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="${escHtml(p.name)}"/>` : initials(p.name)}
       </div>
       <div class="album-cover-info">
         <div class="album-cover-name">
@@ -3398,6 +3473,9 @@ function renderMyTally(){
       </div>
       <input type="file" id="burger-photo-input-camera" accept="image/*" capture="environment" style="display:none" onchange="onBurgerPhotoSelected(this)"/>
       <input type="file" id="burger-photo-input-upload" accept="image/*" style="display:none" onchange="onBurgerPhotoSelected(this)"/>
+      <!-- Avatar photo inputs -->
+      <input type="file" id="avatar-input-camera" accept="image/*" capture="user" style="display:none" onchange="onAvatarPhotoSelected(this)"/>
+      <input type="file" id="avatar-input-upload" accept="image/*" style="display:none" onchange="onAvatarPhotoSelected(this)"/>
       <button class="detail-confirm-btn" id="confirm-btn" onclick="confirmBurger()">✓ Log Burger</button>
     </div>
     <!-- Undo strip -->
@@ -3469,8 +3547,14 @@ function renderPlayersList(){
   empty.style.display='none';
   list.innerHTML=players.map(p=>{
     const cc=colorClass(p.colorIdx), isMe=p.id===myPlayerId;
+    const avatarEl = isMe
+      ? `<div style="position:relative;flex-shrink:0;cursor:pointer" onclick="openAvatarPicker()" title="Change your avatar">
+          ${avatarHTML(p,38)}
+          <div style="position:absolute;bottom:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:#F59E0B;display:flex;align-items:center;justify-content:center;font-size:9px;border:1.5px solid var(--bg)">📷</div>
+        </div>`
+      : avatarHTML(p,38);
     return `<div class="player-row ${cc}">
-      ${avatarHTML(p,38)}
+      ${avatarEl}
       <div class="player-row-info">
         <div class="player-row-name">${escHtml(p.name)}${isMe?' <span style="font-size:10px;color:var(--muted2);font-weight:400">(you)</span>':''}</div>
         <div class="player-row-sub">${p.count}/100 · ${Math.min(100,p.count)}% done</div>
@@ -3585,6 +3669,7 @@ function renderUnifiedFeed() {
       if (m.type === 'milestone') {
         const color = RING_COLORS[(m.colorIdx ?? 0) % RING_COLORS.length];
         const ini = (m.playerName || '?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+        const _mAvatar = players.find(p => p.id === m.playerId)?.avatar || '';
         const timeStr = formatTime(m.createdAt);
         const ms = m.milestone || 0;
         const st = m.stats || {};
@@ -3605,7 +3690,7 @@ function renderUnifiedFeed() {
         return `<div class="milestone-card" style="animation-delay:${_feedInitialRenderDone?'0s':Math.min(idx*0.04,0.6)+'s'}">
   <div class="mc-top-bar"></div>
   <div class="mc-header">
-    <div class="mc-avatar" style="background:${color}22;color:${color};border-color:${color}55">${ini}</div>
+    <div class="mc-avatar" style="background:${color}22;color:${color};border-color:${color}55;${_mAvatar ? 'overflow:hidden;padding:0' : ''}">${_mAvatar ? `<img src="${_mAvatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="avatar"/>` : ini}</div>
     <div class="mc-header-info">
       <div class="mc-player-name">${escHtml(m.playerName||'?')}</div>
       <div class="mc-timestamp">${timeStr}</div>
@@ -3646,7 +3731,7 @@ function renderUnifiedFeed() {
       const commentLabel = msgComments.length ? `💬 ${msgComments.length}` : '💬';
       return `<div class="msg-card ${isMe?'mine':''} ${cc}" data-id="${m.id}">
         <div class="msg-header">
-          ${miniAvatarHTML(m.playerName||'?', m.colorIdx??0, 34)}
+          ${miniAvatarHTML(m.playerName||'?', m.colorIdx??0, 34, players.find(p=>p.id===m.playerId)?.avatar||'')}
           <div class="msg-header-info">
             <div class="msg-name">${escHtml(m.playerName||'?')}</div>
             <div class="msg-time">${timeStr}</div>
@@ -3715,7 +3800,7 @@ function renderUnifiedFeed() {
     <div class="grill-left-accent" style="background:${color}"></div>
     <div class="grill-card-banner">
       <div class="grill-banner-left">
-        <div class="grill-banner-avatar" style="background:${color}1A;color:${color};border:1.5px solid ${color}55">${ini}</div>
+        <div class="grill-banner-avatar" style="background:${color}1A;color:${color};border:1.5px solid ${color}55;${item.player.avatar ? 'overflow:hidden;padding:0' : ''}">${item.player.avatar ? `<img src="${item.player.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="avatar"/>` : ini}</div>
         <div class="grill-banner-name">${escHtml(item.player.name)}${isMe?' <span class="grill-banner-you">(you)</span>':''}</div>
       </div>
       <div class="grill-banner-badge" style="border-color:${color}55">🍔 #${burgerNum>0?burgerNum:'?'}</div>
@@ -4886,6 +4971,61 @@ window.rerollColor=async function(){
   }catch(e){showToast('Error updating color');}
 };
 
+// ── Avatar photo picker ──────────────────────────────────────────────────────
+window.openAvatarPicker = function() {
+  const overlay = document.getElementById('avatar-picker-overlay');
+  const preview = document.getElementById('avatar-picker-preview');
+  const removeRow = document.getElementById('avatar-remove-row');
+  if (!overlay) return;
+  const me = players.find(p => p.id === myPlayerId);
+  if (!me) return;
+  // Show current avatar in preview
+  if (me.avatar) {
+    preview.innerHTML = `<img src="${me.avatar}" style="width:100%;height:100%;object-fit:cover" alt="avatar"/>`;
+    removeRow.style.display = 'block';
+  } else {
+    const c = RING_COLORS[me.colorIdx % RING_COLORS.length];
+    preview.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;font-family:'Barlow',sans-serif;color:${c};background:${c}22">${initials(me.name)}</div>`;
+    removeRow.style.display = 'none';
+  }
+  overlay.style.display = 'flex';
+  // Reset file inputs so same file can be re-selected
+  document.getElementById('avatar-input-camera').value = '';
+  document.getElementById('avatar-input-upload').value = '';
+};
+
+window.closeAvatarPicker = function(e) {
+  if (!e || e.target === document.getElementById('avatar-picker-overlay')) {
+    document.getElementById('avatar-picker-overlay').style.display = 'none';
+  }
+};
+
+window.onAvatarPhotoSelected = async function(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  document.getElementById('avatar-picker-overlay').style.display = 'none';
+  showToast('⏳ Saving avatar…');
+  try {
+    const base64 = await compressAvatarImage(file);
+    await updateDoc(doc(db, 'rooms', roomId, 'players', myPlayerId), { avatar: base64 });
+    showToast('✅ Avatar updated!');
+  } catch(err) {
+    showToast('⚠️ Failed to save avatar');
+  }
+  input.value = '';
+};
+
+window.removeAvatar = async function() {
+  document.getElementById('avatar-picker-overlay').style.display = 'none';
+  try {
+    await updateDoc(doc(db, 'rooms', roomId, 'players', myPlayerId), { avatar: '' });
+    showToast('Avatar removed');
+  } catch(err) {
+    showToast('⚠️ Failed to remove avatar');
+  }
+};
+// ────────────────────────────────────────────────────────────────────────────
+
 window.removePlayer=async function(playerId){
   const isMe = playerId === myPlayerId;
   const target = players.find(p=>p.id===playerId);
@@ -5146,7 +5286,7 @@ function renderBentoList() {
     const lastSeenHtml = lastSeen ? `<span style="font-size:9px;color:var(--muted);font-weight:500;margin-left:4px">${lastSeen}</span>` : '';
     return `<div class="pl-row ${rankCls}" style="animation-delay:${Math.min(i*0.04,0.35)}s;cursor:pointer" onclick="openCalModal('${p.id}')" title="View burger history">
       <div class="pl-rank">${rank}</div>
-      <div class="pl-avatar" style="background:${c}20;color:${c};border:1.5px solid ${c}44">${initials(p.name)}</div>
+      <div class="pl-avatar" style="background:${c}20;color:${c};border:1.5px solid ${c}44;${p.avatar ? 'overflow:hidden;padding:0' : ''}">${p.avatar ? `<img src="${p.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:9px" alt="${escHtml(p.name)}"/>` : initials(p.name)}</div>
       <div class="pl-info">
         <div class="pl-name">
           ${escHtml(p.name)}
@@ -6145,7 +6285,7 @@ function renderBurgerMap() {
       const lng = typeof entry === 'object' && entry.lng;
       if (!lat || !lng) return; // only show pinned burgers
       feedItems.push({
-        player: p, color, ini,
+        player: p, color, ini, avatar: p.avatar || '',
         restaurant: (typeof entry === 'object' && entry.restaurant) || 'Unknown spot',
         rating: (typeof entry === 'object' && entry.rating) || 0,
         ts, lat, lng,
@@ -6185,7 +6325,7 @@ function renderBurgerMap() {
 
   feedEl.innerHTML = feedItems.slice(0, 20).map((item, idx) => `
     <div class="map-feed-card" data-feed-idx="${idx}">
-      <div class="map-feed-avatar" style="background:${item.color}22;border:2px solid ${item.color};color:${item.color}">${item.ini}</div>
+      <div class="map-feed-avatar" style="background:${item.color}22;border:2px solid ${item.color};color:${item.color};${item.avatar ? 'overflow:hidden;padding:0' : ''}">${item.avatar ? `<img src="${item.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="avatar"/>` : item.ini}</div>
       <div class="map-feed-body">
         <div class="map-feed-name" style="color:${item.color}">${escHtml(item.player.name)}</div>
         <div class="map-feed-restaurant">${escHtml(item.restaurant)}</div>
