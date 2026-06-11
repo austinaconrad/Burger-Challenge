@@ -1694,7 +1694,7 @@ body.feed-active .social-input-area.comment-focus-hide{opacity:0;transform:trans
 .resto-rank.r1{color:#F59E0B;text-shadow:0 0 12px rgba(245,158,11,0.45)}
 .resto-rank.r2{color:#C0C0C0}
 .resto-rank.r3{color:#CD7F32}
-.resto-rank.rn{color:var(--muted2)}
+.resto-rank.rn{color:#FFFFFF}
 .resto-info{flex:1;min-width:0}
 .resto-name{font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .resto-meta{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
@@ -1767,7 +1767,7 @@ body.feed-active .social-input-area.comment-focus-hide{opacity:0;transform:trans
 .mc-spots span{display:flex;align-items:center;gap:4px}
 .top-rated-wrap{display:flex;flex-direction:column;gap:8px;padding:4px 0 24px}
 .tr-card{background:var(--surface);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-card);animation:slideIn 0.25s ease both}
-.tr-rank{font-family:'Poppins',sans-serif;font-size:18px;font-weight:900;color:var(--muted2);min-width:28px;text-align:center;flex-shrink:0}
+.tr-rank{font-family:'Poppins',sans-serif;font-size:18px;font-weight:900;color:#FFFFFF;min-width:28px;text-align:center;flex-shrink:0}
 .tr-rank.gold{color:#F59E0B;text-shadow:0 0 10px rgba(245,158,11,0.4)}
 .tr-rank.silver{color:#C0C0C0}
 .tr-rank.bronze{color:#CD7F32}
@@ -5581,7 +5581,23 @@ function renderRestaurantLB() {
     });
   });
 
-  const sorted = Object.values(restoMap).sort((a, b) => b.visits - a.visits);
+  // Normalize Swenson's variants to a single key before sorting
+  const ALIASES = { "swensons": "swenson's" };
+  const normalizedMap = {};
+  Object.entries(restoMap).forEach(([key, r]) => {
+    const normKey = ALIASES[key] || key;
+    if (!normalizedMap[normKey]) normalizedMap[normKey] = { ...r, name: ALIASES[key] ? "Swenson's" : r.name };
+    else {
+      normalizedMap[normKey].visits += r.visits;
+      normalizedMap[normKey].totalRating += r.totalRating;
+      normalizedMap[normKey].ratedCount += r.ratedCount;
+      r.playerNames.forEach(n => normalizedMap[normKey].playerNames.add(n));
+    }
+  });
+
+  const sorted = Object.values(normalizedMap)
+    .filter(r => r.name.toLowerCase() !== 'unknown spot')
+    .sort((a, b) => b.visits - a.visits);
   if (!sorted.length) {
     wrap.innerHTML = '<div style="text-align:center;padding:48px 20px;color:var(--muted);font-size:13px">No burger logs yet!</div>';
     return;
@@ -5591,7 +5607,11 @@ function renderRestaurantLB() {
   function restoEmoji(name) {
     const n = name.toLowerCase();
     if (n.includes('mcdonald') || n.includes('micky d')) return '🍟';
-    if (n.includes('wendy'))                               return '🦰';
+    if (n.includes('wendy'))                               return '👩🏻‍🦰';
+    if (n.includes('home') || n.includes('my house'))     return '🏠';
+    if (n.includes('regional finals'))                     return '🏃🏽‍♂️';
+    if (n.includes('milkman'))                             return '🥛';
+    if (n.includes('district day'))                        return '🎽';
     if (n.includes('burger king') || n.includes('bk'))    return '👑';
     if (n.includes('five guys'))                           return '5️⃣';
     if (n.includes('shake shack'))                         return '🍦';
