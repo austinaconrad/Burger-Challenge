@@ -5005,16 +5005,29 @@ function renderBentoList() {
   const MEDALS = ['🥇','🥈','🥉'];
   const RANK_CLS = ['pl-gold','pl-silver','pl-bronze'];
 
+  // Build a set of counts that appear more than once (ties)
+  const countFreq = {};
+  sorted.forEach(p => { countFreq[p.count] = (countFreq[p.count] || 0) + 1; });
+
+  // Assign display ranks accounting for ties (two players at 12 both get rank 1)
+  let displayRank = 1;
+  const rankMap = sorted.map((p, i) => {
+    if (i > 0 && sorted[i-1].count !== p.count) displayRank = i + 1;
+    return displayRank;
+  });
+
   el.innerHTML = `<div class="pl-list">${sorted.map((p, i) => {
     const c = colorFor(p);
     const st = computePlayerStats(p);
-    const rank = i < 3 ? MEDALS[i] : `#${i+1}`;
-    const rankCls = RANK_CLS[i] || '';
+    const dr = rankMap[i];
+    const isTied = countFreq[p.count] > 1;
+    const rankCls = dr === 1 ? 'pl-gold' : dr === 2 ? 'pl-silver' : dr === 3 ? 'pl-bronze' : '';
+    const rank = dr === 1 ? '🥇' : dr === 2 ? '🥈' : dr === 3 ? '🥉' : `#${dr}`;
     const pct = Math.min(100, p.count);
-    const countColor = i === 0 ? '#F59E0B' : i === 1 ? '#C0C0C0' : i === 2 ? '#CD7F32' : '#F2EDE4';
     const avgPill = st.avgRating > 0 ? `<span class="pl-pill">⭐ ${st.avgRating.toFixed(1)}</span>` : '';
     const spotPill = st.uniqueSpots > 0 ? `<span class="pl-pill">📍 ${st.uniqueSpots}</span>` : '';
     const favPill = st.favRestaurant && st.favRestaurant !== '—' ? `<span class="pl-pill">🏠 ${escHtml(st.favRestaurant)}</span>` : '';
+    const tiedBadge = isTied ? `<span style="font-size:9px;font-weight:700;color:var(--amber);background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);border-radius:4px;padding:1px 5px;margin-left:4px;letter-spacing:0.03em">TIE</span>` : '';
     const lastSeen = timeAgo(p);
     const lastSeenHtml = lastSeen ? `<span style="font-size:9px;color:var(--muted);font-weight:500;margin-left:4px">${lastSeen}</span>` : '';
     return `<div class="pl-row ${rankCls}" style="animation-delay:${Math.min(i*0.04,0.35)}s">
@@ -5025,13 +5038,14 @@ function renderBentoList() {
           ${escHtml(p.name)}
           ${p.id === myPlayerId ? '<span class="me-badge">You</span>' : ''}
           ${p.count >= 100 ? '<span class="done-badge">✓</span>' : ''}
+          ${tiedBadge}
           ${lastSeenHtml}
         </div>
         <div class="pl-pills">${avgPill}${spotPill}${favPill}</div>
         <div class="pl-bar-track"><div class="pl-bar-fill" style="width:${pct}%;background:${c}"></div></div>
       </div>
       <div style="text-align:right;flex-shrink:0">
-        <div class="pl-count" style="color:${countColor}">${p.count}</div>
+        <div class="pl-count" style="color:${c}">${p.count}</div>
         <div class="pl-count-lbl">burgers</div>
       </div>
     </div>`;
