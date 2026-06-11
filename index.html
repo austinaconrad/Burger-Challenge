@@ -1239,7 +1239,7 @@ body.feed-active .social-input-area.comment-focus-hide{opacity:0;transform:trans
   box-shadow: var(--shadow-card); overflow: hidden;
 }
 .challenger-row:active { transform: scale(0.98); }
-.challenger-rank { font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 900; color: var(--muted2); min-width: 28px; text-align: center; flex-shrink: 0; }
+.challenger-rank { font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 900; color: #FFFFFF; min-width: 28px; text-align: center; flex-shrink: 0; }
 .challenger-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; font-family: 'Inter', sans-serif; border: 1.5px solid; flex-shrink: 0; }
 .challenger-name { flex: 1; font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .challenger-count { font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 900; letter-spacing: -0.5px; line-height: 1; flex-shrink: 0; }
@@ -5138,7 +5138,7 @@ function renderBentoList() {
     const doubles=ol.filter(e=>e.patties===2).length;
     const triples=ol.filter(e=>e.patties>=3).length;
     const untracked=Math.max(0, p.count-(singles+doubles+triples));
-    const untrackedPill=untracked>0?`<span style="position:absolute;top:8px;right:8px;z-index:2;font-size:8px;font-weight:700;color:#9CA3AF;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:999px;padding:2px 7px;white-space:nowrap;font-family:'Inter',sans-serif">${untracked} untracked</span>`:'';
+    const untrackedPill=untracked>0?`<span style="position:absolute;top:5px;right:5px;z-index:2;font-size:7px;font-weight:600;color:#6B7280;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:999px;padding:1px 5px;white-space:nowrap;font-family:'Inter',sans-serif">${untracked} untracked</span>`:'';
     const badgeCount=computeAchievements(p,players).length;
     const totalBadges=Object.keys(ACHIEVEMENTS).length;
     return `
