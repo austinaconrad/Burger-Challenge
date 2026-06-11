@@ -4348,9 +4348,10 @@ function renderRestaurantSuggestions(list) {
     const hasMenu = !!BURGER_MENUS[name];
     const badge = hasMenu ? '<span class="restaurant-suggestion-badge">Menu</span>' : '';
     const emoji = restoEmoji(name);
+    const nameFontSize = name.length > 16 ? '10px' : name.length > 11 ? '11px' : '12px';
     return `<button class="restaurant-suggestion" onclick="onRestaurantSuggestionClick('${escHtml(name).replace(/'/g,"\\'")}')">
       <span class="restaurant-suggestion-emoji">${emoji}</span>
-      <span class="restaurant-suggestion-name">${escHtml(name)}</span>
+      <span class="restaurant-suggestion-name" style="font-size:${nameFontSize}">${escHtml(name)}</span>
       ${badge}
     </button>`;
   }).join('');
