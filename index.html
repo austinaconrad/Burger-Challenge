@@ -1738,6 +1738,32 @@ body.feed-active .social-input-area.comment-focus-hide{opacity:0;transform:trans
 .wd-item-sub{font-size:9px;color:#666;font-weight:500;line-height:1.3}
 .wd-item-val{font-family:'Poppins',sans-serif;font-size:18px;font-weight:900;color:var(--amber);line-height:1;letter-spacing:-0.5px;text-shadow:0 0 10px rgba(245,158,11,0.35)}
 .wd-empty{padding:18px;text-align:center;font-size:11px;color:#444;font-family:monospace}
+
+/* ── Milestone Feed Card ── */
+.milestone-card{
+  background:rgba(20,12,0,0.95);
+  border:1px solid rgba(245,158,11,0.45);
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 0 0 1px rgba(245,158,11,0.12),0 8px 32px rgba(245,158,11,0.15),0 4px 16px rgba(0,0,0,0.6);
+  animation:slideIn 0.35s ease both;
+}
+.mc-top-bar{height:4px;background:linear-gradient(90deg,#92400E,#F59E0B,#FCD34D,#F59E0B,#92400E)}
+.mc-header{display:flex;align-items:center;gap:12px;padding:14px 16px 10px}
+.mc-avatar{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0;border:2px solid rgba(255,255,255,0.12)}
+.mc-header-info{flex:1;min-width:0}
+.mc-player-name{font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc-timestamp{font-size:10px;color:var(--muted2);margin-top:1px}
+.mc-hero{text-align:center;padding:4px 16px 14px}
+.mc-milestone-num{font-family:'Poppins',sans-serif;font-size:64px;font-weight:900;line-height:1;letter-spacing:-3px;color:#F59E0B;text-shadow:0 0 30px rgba(245,158,11,0.5),0 0 60px rgba(245,158,11,0.2)}
+.mc-milestone-label{font-family:'Poppins',sans-serif;font-size:11px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:rgba(245,158,11,0.7);margin-top:-4px}
+.mc-tagline{font-size:13px;color:#D4C5A0;margin-top:8px;font-weight:500;line-height:1.4}
+.mc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,0.05);border-top:1px solid rgba(245,158,11,0.12);border-bottom:1px solid rgba(245,158,11,0.12)}
+.mc-stat{background:rgba(14,9,0,0.8);padding:10px 8px;text-align:center}
+.mc-stat-val{font-family:'Poppins',sans-serif;font-size:16px;font-weight:900;color:#F5F5F5;line-height:1}
+.mc-stat-lbl{font-size:8px;color:#6B7280;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;margin-top:3px}
+.mc-spots{padding:10px 16px 12px;font-size:11px;color:#9CA3AF;display:flex;gap:14px;flex-wrap:wrap}
+.mc-spots span{display:flex;align-items:center;gap:4px}
 .top-rated-wrap{display:flex;flex-direction:column;gap:8px;padding:4px 0 24px}
 .tr-card{background:var(--surface);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-card);animation:slideIn 0.25s ease both}
 .tr-rank{font-family:'Poppins',sans-serif;font-size:18px;font-weight:900;color:var(--muted2);min-width:28px;text-align:center;flex-shrink:0}
@@ -3619,6 +3645,58 @@ function renderUnifiedFeed() {
   feed.innerHTML = allItems.map((item, idx) => {
     if (item.type === 'message') {
       const m = item.data;
+
+      // ── Milestone card ──────────────────────────────────────────────────────
+      if (m.type === 'milestone') {
+        const color = RING_COLORS[(m.colorIdx ?? 0) % RING_COLORS.length];
+        const ini = (m.playerName || '?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+        const timeStr = formatTime(m.createdAt);
+        const ms = m.milestone || 0;
+        const st = m.stats || {};
+        const avgStr = st.avgRating != null ? st.avgRating.toFixed(1) + '★' : '—';
+        const spotStr = st.uniqueSpots != null ? st.uniqueSpots : '—';
+        const favStr = st.favRestaurant ? escHtml(st.favRestaurant) : '—';
+        const toppingStr = st.favTopping ? escHtml(st.favTopping) : '—';
+        const singles = st.singles ?? 0;
+        const doubles = st.doubles ?? 0;
+        const triples = st.triples ?? 0;
+        const taglines = {
+          25: `Just hit ${ms} burgers and there's no stopping now 🔥`,
+          50: `${ms} burgers deep. The halfway point hits different 🏁`,
+          75: `${ms} burgers in. The finish line is in sight 👀`,
+          100: `${ms} BURGERS. THE CHALLENGE IS COMPLETE. LEGEND STATUS ACHIEVED 🏆`,
+        };
+        const tagline = taglines[ms] || `${ms} burgers logged. What a run.`;
+        return `<div class="milestone-card" style="animation-delay:${_feedInitialRenderDone?'0s':Math.min(idx*0.04,0.6)+'s'}">
+  <div class="mc-top-bar"></div>
+  <div class="mc-header">
+    <div class="mc-avatar" style="background:${color}22;color:${color};border-color:${color}55">${ini}</div>
+    <div class="mc-header-info">
+      <div class="mc-player-name">${escHtml(m.playerName||'?')}</div>
+      <div class="mc-timestamp">${timeStr}</div>
+    </div>
+    <div style="font-size:22px;margin-left:auto">🎉</div>
+  </div>
+  <div class="mc-hero">
+    <div class="mc-milestone-num">${ms}</div>
+    <div class="mc-milestone-label">burgers</div>
+    <div class="mc-tagline">${tagline}</div>
+  </div>
+  <div class="mc-stats">
+    <div class="mc-stat"><div class="mc-stat-val">${avgStr}</div><div class="mc-stat-lbl">Avg Rating</div></div>
+    <div class="mc-stat"><div class="mc-stat-val">${spotStr}</div><div class="mc-stat-lbl">Unique Spots</div></div>
+    <div class="mc-stat"><div class="mc-stat-val">${favStr}</div><div class="mc-stat-lbl">Fav Spot</div></div>
+  </div>
+  <div class="mc-spots">
+    <span>🍔 ${singles}× single</span>
+    <span>🥩 ${doubles}× double</span>
+    <span>🙏 ${triples}× triple+</span>
+    ${toppingStr !== '—' ? `<span>🧀 Loves: ${toppingStr}</span>` : ''}
+  </div>
+</div>`.trim();
+      }
+
+      // ── Regular message card ────────────────────────────────────────────────
       const isMe = m.playerId === myPlayerId;
       const cc = colorClass(m.colorIdx ?? 0);
       const timeStr = formatTime(m.createdAt);
@@ -4722,7 +4800,31 @@ async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null
       } else if(newCount===25){
         showMcAdvancement('⚡','First Milestone!','25 burgers eaten. Just getting warmed up.');
       }
-      else {
+      if(isMilestone){
+        const alreadyPosted = messages.some(m => m.type === 'milestone' && m.playerId === myPlayerId && m.milestone === newCount);
+        if(!alreadyPosted){
+          const statsPlayer = {...me, count: newCount, logs: newLogs};
+          const st = computePlayerStats(statsPlayer);
+          addDoc(collection(db,'rooms',roomId,'messages'), {
+            type: 'milestone',
+            playerId: myPlayerId,
+            playerName: myName,
+            colorIdx: me.colorIdx ?? 0,
+            createdAt: serverTimestamp(),
+            milestone: newCount,
+            stats: {
+              avgRating: st.avgRating,
+              favRestaurant: st.favRestaurant,
+              favTopping: st.favTopping,
+              uniqueSpots: st.uniqueSpots,
+              singles: st.singles,
+              doubles: st.doubles,
+              triples: st.triples,
+            }
+          }).catch(()=>{});
+        }
+      }
+      if(!isMilestone) {
         const hour=new Date().getHours();
         if(hour>=23) showToast('🌙 Late night burger #'+newCount+' logged!');
         else showToast('🍔 Burger #'+newCount+' at '+restaurant+' logged!');
