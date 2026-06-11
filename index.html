@@ -5128,8 +5128,10 @@ function renderBentoList() {
     const rank = dr === 1 ? '🥇' : dr === 2 ? '🥈' : dr === 3 ? '🥉' : `#${dr}`;
     const pct = Math.min(100, p.count);
     const avgPill = st.avgRating > 0 ? `<span class="pl-pill">⭐ ${st.avgRating.toFixed(1)}</span>` : '';
-    const totalPatties = (st.singles ?? 0) * 1 + (st.doubles ?? 0) * 2 + (st.triples ?? 0) * 3;
-    const pattyPill = totalPatties > 0 ? `<span class="pl-pill">🥩 ${totalPatties} patties</span>` : '';
+    const _rCounts = {};
+    (p.logs || []).filter(e => typeof e === 'object' && e.restaurant).forEach(e => { const r = e.restaurant.trim(); _rCounts[r] = (_rCounts[r] || 0) + 1; });
+    const _topSpot = Object.entries(_rCounts).sort((a,b) => b[1]-a[1])[0];
+    const loyaltyPill = _topSpot && _topSpot[1] > 1 ? `<span class="pl-pill">🔁 ${_topSpot[1]}× ${escHtml(_topSpot[0].length > 12 ? _topSpot[0].slice(0,12)+'…' : _topSpot[0])}</span>` : '';
     const _now = new Date();
     const _day = _now.getDay(); // 0=Sun,1=Mon,...
     const _daysSinceMon = (_day + 6) % 7; // Mon=0, Tue=1, ... Sun=6
@@ -5151,7 +5153,7 @@ function renderBentoList() {
           ${tiedBadge}
           ${lastSeenHtml}
         </div>
-        <div class="pl-pills">${avgPill}${pattyPill}${weekPill}</div>
+        <div class="pl-pills">${avgPill}${loyaltyPill}${weekPill}</div>
         <div class="pl-bar-track"><div class="pl-bar-fill" style="width:${pct}%;background:${c}"></div></div>
       </div>
       <div style="text-align:right;flex-shrink:0">
