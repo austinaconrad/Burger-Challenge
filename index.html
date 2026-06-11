@@ -2185,6 +2185,7 @@ body.feed-active .social-input-area.comment-focus-hide{opacity:0;transform:trans
     <div class="tab-panel" id="tab-map">
       <div class="map-wrap">
         <div id="burger-map"></div>
+        <button id="map-locate-btn" onclick="flyToMyLocation()" title="My location" style="position:absolute;bottom:12px;right:12px;z-index:1000;width:38px;height:38px;border-radius:10px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,0.5);transition:background 0.15s,transform 0.12s">📍</button>
       </div>
       <div class="map-section-label">Recent Burger Spots</div>
       <div id="map-feed" class="map-feed-wrap"></div>
@@ -6011,6 +6012,31 @@ window.panMapToSpot = function(lat, lng) {
 
 let burgerMap = null;
 let mapMarkers = [];
+let myLocationMarker = null;
+
+window.flyToMyLocation = function() {
+  const btn = document.getElementById('map-locate-btn');
+  if (!navigator.geolocation) { showToast('⚠️ Location not supported'); return; }
+  if (btn) { btn.textContent = '⏳'; btn.style.opacity = '0.6'; btn.disabled = true; }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const { latitude: lat, longitude: lng } = pos.coords;
+      if (!burgerMap) renderBurgerMap();
+      burgerMap.flyTo([lat, lng], 14, { animate: true, duration: 0.9 });
+      if (myLocationMarker) myLocationMarker.remove();
+      myLocationMarker = L.circleMarker([lat, lng], {
+        radius: 8, fillColor: '#3B82F6', fillOpacity: 1,
+        color: '#fff', weight: 2.5
+      }).addTo(burgerMap).bindPopup('<div style="font-size:13px;font-weight:600;color:var(--text);padding:4px 6px">📍 You are here</div>');
+      if (btn) { btn.textContent = '📍'; btn.style.opacity = '1'; btn.disabled = false; }
+    },
+    () => {
+      showToast('⚠️ Could not get location');
+      if (btn) { btn.textContent = '📍'; btn.style.opacity = '1'; btn.disabled = false; }
+    },
+    { enableHighAccuracy: true, timeout: 8000 }
+  );
+};
 const RING_COLORS = ['#F87171','#FCD34D','#4ADE80','#22D3EE','#60A5FA','#E879F9','#CBD5E1','#F472B6','#FB7185','#A78BFA','#FDB974','#5EEAD4','#BEF264','#FB923C','#7DD3FC','#818CF8','#FDE047','#E2E8F0'];
 
 // ── Compute personal stats for a player ──────────────────────────────────────
@@ -6124,6 +6150,7 @@ function renderBurgerMap() {
         rating: (typeof entry === 'object' && entry.rating) || 0,
         ts, lat, lng,
         feedKey: `${p.id}_${ts}`,
+        photo: (typeof entry === 'object' && entry.photo) || '',
       });
     });
   });
@@ -6168,7 +6195,7 @@ function renderBurgerMap() {
           <span class="map-feed-time">${feedTimeStr(item.ts)}</span>
         </div>
       </div>
-      <div class="map-feed-arrow">›</div>
+      ${item.photo ? `<img src="${item.photo}" style="width:44px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0;border:1.5px solid rgba(245,158,11,0.3)" alt="burger"/>` : `<div class="map-feed-arrow">›</div>`}
     </div>
   `).join('');
 
