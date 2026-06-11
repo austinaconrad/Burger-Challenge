@@ -148,7 +148,7 @@ button{transition:transform 0.2s ease}
 .ring-inner{position:absolute;top:5px;left:5px;right:5px;bottom:5px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:none;font-family:'Inter',sans-serif}
 .rank-badge{font-size:20px;width:28px;text-align:center;flex-shrink:0;line-height:1}
 .player-info{flex:0 0 110px;width:110px;min-width:0;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
-.player-name{font-size:16px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;font-family:'Inter',sans-serif}
+.player-name{font-size:16px;font-weight:600;color:#FFFFFF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;font-family:'Inter',sans-serif}
 .player-last-spot{font-size:10px;color:var(--muted2);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:color 0.15s;line-height:1.3;font-weight:400}
 .player-last-spot:hover{color:var(--amber)}
 /* ── MICRO GRID ── */
@@ -1386,7 +1386,7 @@ body.feed-active .social-input-area.comment-focus-hide{opacity:0;transform:trans
 }
 .album-cover-rank {
   font-family: 'Poppins', sans-serif;
-  font-size: 11px; font-weight: 700; color: #9CA3AF;
+  font-size: 11px; font-weight: 700; color: #FFFFFF;
   text-transform: uppercase; flex-shrink: 0; min-width: 20px;
 }
 .album-cover-avatar {
@@ -5581,23 +5581,59 @@ function renderRestaurantLB() {
     });
   });
 
-  const avgRating = r => r.ratedCount > 0 ? r.totalRating / r.ratedCount : -1;
-  const sorted = Object.values(restoMap).sort((a, b) => avgRating(b) - avgRating(a) || b.visits - a.visits);
+  const sorted = Object.values(restoMap).sort((a, b) => b.visits - a.visits);
   if (!sorted.length) {
     wrap.innerHTML = '<div style="text-align:center;padding:48px 20px;color:var(--muted);font-size:13px">No burger logs yet!</div>';
     return;
+  }
+
+  // Emoji lookup by restaurant keyword
+  function restoEmoji(name) {
+    const n = name.toLowerCase();
+    if (n.includes('mcdonald') || n.includes('micky d')) return '🍟';
+    if (n.includes('wendy'))                               return '🦰';
+    if (n.includes('burger king') || n.includes('bk'))    return '👑';
+    if (n.includes('five guys'))                           return '5️⃣';
+    if (n.includes('shake shack'))                         return '🍦';
+    if (n.includes('whataburger'))                         return '🤠';
+    if (n.includes('in-n-out') || n.includes('in n out')) return '🌴';
+    if (n.includes('sonic'))                               return '⚡';
+    if (n.includes('culver'))                              return '🧀';
+    if (n.includes('steak n shake') || n.includes('steak \'n shake')) return '🥤';
+    if (n.includes('dairy queen') || n.includes('dq'))    return '🍦';
+    if (n.includes('hardee') || n.includes('carl'))       return '🌟';
+    if (n.includes('jack in the box'))                     return '🎃';
+    if (n.includes('white castle'))                        return '🏰';
+    if (n.includes('smashburger'))                         return '💥';
+    if (n.includes('fatburger'))                           return '💪';
+    if (n.includes('red robin'))                           return '🐦';
+    if (n.includes('applebee'))                            return '🍎';
+    if (n.includes('diner') || n.includes('grill'))        return '🍽️';
+    if (n.includes('bbq') || n.includes('barbecue'))       return '🔥';
+    if (n.includes('brew') || n.includes('bar'))           return '🍺';
+    if (n.includes('steak') || n.includes('steakhouse'))   return '🥩';
+    if (n.includes('taco'))                                return '🌮';
+    if (n.includes('pizza'))                               return '🍕';
+    if (n.includes('wings') || n.includes('wing'))        return '🍗';
+    if (n.includes('sushi') || n.includes('japanese'))    return '🍣';
+    if (n.includes('chinese') || n.includes('china'))     return '🥡';
+    if (n.includes('italian') || n.includes('pasta'))     return '🍝';
+    if (n.includes('mexican') || n.includes('cantina'))   return '🌯';
+    if (n.includes('deli') || n.includes('sandwich'))     return '🥪';
+    if (n.includes('pub') || n.includes('tavern'))        return '🍻';
+    if (n.includes('truck') || n.includes('street'))      return '🚚';
+    if (n.includes('kitchen') || n.includes('bistro'))    return '👨‍🍳';
+    if (n.includes('cafe') || n.includes('coffee'))       return '☕';
+    return '🍔';
   }
 
   wrap.innerHTML = sorted.map((r, i) => {
     const rank = i + 1;
     const rankCls = rank === 1 ? 'r1' : rank === 2 ? 'r2' : rank === 3 ? 'r3' : 'rn';
     const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
-    const avg = r.ratedCount > 0 ? (r.totalRating / r.ratedCount) : null;
-    const starsHtml = avg
-      ? `<div class="resto-stars">${'⭐'.repeat(Math.round(avg))}</div><div class="resto-score">${avg.toFixed(1)}</div>`
-      : `<div class="resto-unrated">unrated</div>`;
+    const emoji = restoEmoji(r.name);
     const playerList = [...r.playerNames].slice(0, 4).map(n => escHtml(n)).join(', ');
-    const barPct = avg != null ? Math.round((avg / 5) * 100) : 0;
+    const barPct = Math.min(100, Math.round((r.visits / sorted[0].visits) * 100));
     return `
 <div class="resto-card" style="animation-delay:${Math.min(i * 0.05, 0.4)}s">
   <div class="resto-rank ${rankCls}">${rankEmoji}</div>
@@ -5609,7 +5645,7 @@ function renderRestaurantLB() {
     </div>
     <div class="resto-bar-wrap"><div class="resto-bar-fill" style="width:${barPct}%"></div></div>
   </div>
-  <div class="resto-right">${starsHtml}</div>
+  <div class="resto-right" style="font-size:28px;line-height:1">${emoji}</div>
 </div>`.trim();
   }).join('\n');
 }
