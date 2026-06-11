@@ -5478,23 +5478,23 @@ function renderRestaurantLB() {
     });
   });
 
-  const sorted = Object.values(restoMap).sort((a, b) => b.visits - a.visits || b.totalRating - a.totalRating);
+  const avgRating = r => r.ratedCount > 0 ? r.totalRating / r.ratedCount : -1;
+  const sorted = Object.values(restoMap).sort((a, b) => avgRating(b) - avgRating(a) || b.visits - a.visits);
   if (!sorted.length) {
     wrap.innerHTML = '<div style="text-align:center;padding:48px 20px;color:var(--muted);font-size:13px">No burger logs yet!</div>';
     return;
   }
 
-  const maxVisits = sorted[0].visits;
   wrap.innerHTML = sorted.map((r, i) => {
     const rank = i + 1;
     const rankCls = rank === 1 ? 'r1' : rank === 2 ? 'r2' : rank === 3 ? 'r3' : 'rn';
     const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
-    const avgRating = r.ratedCount > 0 ? (r.totalRating / r.ratedCount) : null;
-    const starsHtml = avgRating
-      ? `<div class="resto-stars">${'⭐'.repeat(Math.round(avgRating))}</div><div class="resto-score">${avgRating.toFixed(1)}</div>`
+    const avg = r.ratedCount > 0 ? (r.totalRating / r.ratedCount) : null;
+    const starsHtml = avg
+      ? `<div class="resto-stars">${'⭐'.repeat(Math.round(avg))}</div><div class="resto-score">${avg.toFixed(1)}</div>`
       : `<div class="resto-unrated">unrated</div>`;
     const playerList = [...r.playerNames].slice(0, 4).map(n => escHtml(n)).join(', ');
-    const barPct = Math.round((r.visits / maxVisits) * 100);
+    const barPct = avg != null ? Math.round((avg / 5) * 100) : 0;
     return `
 <div class="resto-card" style="animation-delay:${Math.min(i * 0.05, 0.4)}s">
   <div class="resto-rank ${rankCls}">${rankEmoji}</div>
