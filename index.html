@@ -5552,13 +5552,25 @@ function renderWeeklyDigest() {
     });
   const topStacked = stackedLogs[0] || null;
 
-  // 3. Most reactions this week (burger cards)
-  let topReactLog = null, topReactCount = 0;
+  // 3. Biggest rank jump this week
+  // For each player: rank before week = sort by (count - logsThisWeek), rank now = sort by count
+  const weekCounts = {};
   allLogs.forEach(e => {
-    const burgerId = (e._player.id + '_' + e.ts).replace(/[^a-zA-Z0-9_]/g, '_');
-    const rxns = burgerReactions[burgerId] || {};
-    const total = Object.values(rxns).reduce((s, arr) => s + (arr?.length || 0), 0);
-    if (total > topReactCount) { topReactCount = total; topReactLog = e; }
+    weekCounts[e._player.id] = (weekCounts[e._player.id] || 0) + 1;
+  });
+  const rankNow = [...players].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+  const rankBefore = [...players].sort((a, b) => {
+    const aC = (a.count || 0) - (weekCounts[a.id] || 0);
+    const bC = (b.count || 0) - (weekCounts[b.id] || 0);
+    return bC - aC || a.name.localeCompare(b.name);
+  });
+  let biggestJumper = null, biggestJump = 0;
+  players.forEach(p => {
+    if (!(weekCounts[p.id] > 0)) return; // only consider players active this week
+    const before = rankBefore.findIndex(x => x.id === p.id) + 1;
+    const now    = rankNow.findIndex(x => x.id === p.id) + 1;
+    const jump   = before - now; // positive = moved up
+    if (jump > biggestJump) { biggestJump = jump; biggestJumper = { player: p, jump, now }; }
   });
 
   el.innerHTML = `
@@ -5584,13 +5596,13 @@ function renderWeeklyDigest() {
     ` : `<div class="wd-item-sub" style="margin-top:6px">No toppings logged</div>`}
   </div>
   <div class="wd-item">
-    <div class="wd-item-label">Most Hype</div>
-    <div class="wd-item-emoji">🔥</div>
-    ${topReactLog && topReactCount > 0 ? `
-      <div class="wd-item-val">${topReactCount}</div>
-      <div class="wd-item-name">${escHtml(topReactLog.restaurant || 'Unknown')}</div>
-      <div class="wd-item-sub">${escHtml(topReactLog._player.name)}</div>
-    ` : `<div class="wd-item-sub" style="margin-top:6px">No reactions yet</div>`}
+    <div class="wd-item-label">Biggest Jump</div>
+    <div class="wd-item-emoji">📈</div>
+    ${biggestJumper ? `
+      <div class="wd-item-val" style="color:#4ADE80;text-shadow:0 0 10px rgba(74,222,128,0.35)">+${biggestJumper.jump}</div>
+      <div class="wd-item-name">${escHtml(biggestJumper.player.name)}</div>
+      <div class="wd-item-sub">now #${biggestJumper.now} overall</div>
+    ` : `<div class="wd-item-sub" style="margin-top:6px">No rank changes</div>`}
   </div>
 </div>`;
 }
