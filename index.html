@@ -5130,9 +5130,12 @@ function renderBentoList() {
     const avgPill = st.avgRating > 0 ? `<span class="pl-pill">⭐ ${st.avgRating.toFixed(1)}</span>` : '';
     const totalPatties = (st.singles ?? 0) * 1 + (st.doubles ?? 0) * 2 + (st.triples ?? 0) * 3;
     const pattyPill = totalPatties > 0 ? `<span class="pl-pill">🥩 ${totalPatties} patties</span>` : '';
-    const now = Date.now();
-    const weekAgo = now - 7 * 24 * 60 * 60 * 1000;
-    const thisWeek = (p.logs || []).filter(e => typeof e === 'object' && e.ts && new Date(e.ts).getTime() >= weekAgo).length;
+    const _now = new Date();
+    const _day = _now.getDay(); // 0=Sun,1=Mon,...
+    const _daysSinceMon = (_day + 6) % 7; // Mon=0, Tue=1, ... Sun=6
+    const _weekStart = new Date(_now.getFullYear(), _now.getMonth(), _now.getDate() - _daysSinceMon);
+    _weekStart.setHours(0, 0, 0, 0);
+    const thisWeek = (p.logs || []).filter(e => typeof e === 'object' && e.ts && new Date(e.ts) >= _weekStart).length;
     const weekPill = thisWeek > 0 ? `<span class="pl-pill">🍔 ${thisWeek} this week</span>` : `<span class="pl-pill" style="opacity:0.5">🍔 0 this week</span>`;
     const tiedBadge = isTied ? `<span style="font-size:9px;font-weight:700;color:var(--amber);background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);border-radius:4px;padding:1px 5px;margin-left:4px;letter-spacing:0.03em">TIE</span>` : '';
     const lastSeen = timeAgo(p);
