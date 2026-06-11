@@ -1131,119 +1131,36 @@ body.feed-active .social-input-area.comment-focus-hide{opacity:0;transform:trans
 }
 
 /* ══════════════════════════════════════════════
-   🏆 ARCADE PODIUM — Ranks Tab
+   🏆 PLAYER RANKS — Rich List
    ══════════════════════════════════════════════ */
-.podium-wrap { padding: 4px 0 24px; }
-.podium-row { display: flex; align-items: flex-end; gap: 6px; margin-bottom: 14px; }
-
-.podium-col {
-  flex: 1; display: flex; flex-direction: column; align-items: center;
-  perspective: 900px;
-}
-
-/* 3D flip wrapper — grid-stack keeps both faces in flow, no absolute needed */
-.podium-flip-wrap {
-  width: 100%;
-  display: grid;
-  transform-style: preserve-3d;
-  transition: transform 0.55s cubic-bezier(0.4,0,0.2,1);
-  cursor: pointer;
-}
-.podium-flip-wrap:active .podium-card { opacity: 0.88; }
-.podium-flip-wrap.flipped { transform: rotateY(180deg); }
-.podium-face-front, .podium-face-back {
-  grid-area: 1 / 1;   /* stack both faces in the same cell */
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-}
-.podium-face-back {
-  transform: rotateY(180deg);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 6px;
-}
-
-/* Challenger accordion */
-.challenger-item { display: flex; flex-direction: column; }
-.challenger-drawer {
-  max-height: 0; overflow: hidden;
-  transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease;
-  opacity: 0;
-}
-.challenger-drawer.open { max-height: 400px; opacity: 1; }
-.challenger-drawer-inner {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07); border-top: none;
-  border-radius: 0 0 12px 12px;
-  padding: 10px 14px; display: flex; align-items: center; gap: 12px;
-}
-.challenger-chevron {
-  font-size: 12px; color: var(--muted2); flex-shrink: 0;
-  transition: transform 0.25s ease; line-height: 1;
-}
-
-.podium-card {
-  width: 100%; border-radius: 14px 14px 0 0;
+.pl-list { display: flex; flex-direction: column; gap: 8px; padding: 4px 0 24px; }
+.pl-row {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface);
   backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid; border-bottom: none;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
   box-shadow: var(--shadow-card);
-  padding: 12px 6px 14px;
-  display: flex; flex-direction: column; align-items: center; gap: 5px;
-  position: relative; overflow: hidden; text-align: center;
+  transition: border-color 0.2s, transform 0.15s;
+  position: relative; overflow: hidden;
 }
-.podium-card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-}
-.podium-card.p1 { background: rgba(245,158,11,0.10); border-color: #F59E0B; box-shadow: 0 0 22px rgba(245,158,11,0.14), var(--shadow-card); }
-.podium-card.p1::before { background: linear-gradient(90deg, transparent, rgba(245,158,11,0.9), transparent); }
-.podium-card.p2 { background: rgba(167,139,250,0.08); border-color: #9CA3AF; }
-.podium-card.p2::before { background: linear-gradient(90deg, transparent, rgba(156,163,175,0.8), transparent); }
-.podium-card.p3 { background: rgba(180,83,9,0.07); border-color: #B45309; }
-.podium-card.p3::before { background: linear-gradient(90deg, transparent, rgba(180,83,9,0.8), transparent); }
-
-.podium-medal { font-size: 22px; line-height: 1; }
-.podium-avatar {
-  width: 46px; height: 46px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px; font-weight: 800; font-family: 'Inter', sans-serif;
-  border: 2px solid; flex-shrink: 0;
-}
-.podium-name {
-  font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
-  color: var(--text); white-space: nowrap; overflow: hidden;
-  text-overflow: ellipsis; width: 100%; padding: 0 4px;
-}
-.podium-count { font-family: 'Poppins', sans-serif; font-weight: 900; line-height: 1; letter-spacing: -0.03em; }
-.podium-count.p1 { font-size: 42px; color: #F59E0B; }
-.podium-count.p2 { font-size: 34px; color: #A78BFA; }
-.podium-count.p3 { font-size: 28px; color: #6EE7B7; }
-.podium-burger-label { font-size: 9px; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
-
-.podium-step {
-  width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
-  border-radius: 0 0 10px 10px;
-}
-.podium-step-ordinal { font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 900; color: #fff; line-height: 1; }
-.podium-step-label { font-family: 'Inter', sans-serif; font-size: 7px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.55); line-height: 1; }
-.podium-step.p1 { height: 46px; background: linear-gradient(180deg, rgba(245,158,11,0.35), rgba(245,158,11,0.12)); }
-.podium-step.p2 { height: 34px; background: linear-gradient(180deg, rgba(156,163,175,0.30), rgba(156,163,175,0.10)); }
-.podium-step.p3 { height: 24px; background: linear-gradient(180deg, rgba(180,83,9,0.30), rgba(180,83,9,0.10)); }
-
-/* Challenger Pack */
-.challenger-list { display: flex; flex-direction: column; gap: 10px; }
-.challenger-row {
-  display: flex; align-items: center; gap: 12px;
-  background: var(--surface); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--border); border-radius: 12px;
-  padding: 10px 14px; cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.2s;
-  box-shadow: var(--shadow-card); overflow: hidden;
-}
-.challenger-row:active { transform: scale(0.98); }
-.challenger-rank { font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 900; color: #FFFFFF; min-width: 28px; text-align: center; flex-shrink: 0; }
-.challenger-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; font-family: 'Inter', sans-serif; border: 1.5px solid; flex-shrink: 0; }
-.challenger-name { flex: 1; font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.challenger-count { font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 900; letter-spacing: -0.5px; line-height: 1; flex-shrink: 0; }
-.challenger-emoji { font-size: 13px; flex-shrink: 0; }
+.pl-row::before { content:''; position:absolute; top:0; left:0; right:0; height:1.5px; background:linear-gradient(90deg,transparent,rgba(245,158,11,0.15),transparent); }
+.pl-row:active { transform: scale(0.99); }
+.pl-row.pl-gold { border-color: rgba(245,158,11,0.45); background: rgba(245,158,11,0.05); }
+.pl-row.pl-gold::before { background: linear-gradient(90deg,transparent,rgba(245,158,11,0.5),transparent); }
+.pl-row.pl-silver { border-color: rgba(192,192,192,0.3); }
+.pl-row.pl-bronze { border-color: rgba(180,83,9,0.3); }
+.pl-rank { font-family:'Poppins',sans-serif; font-size:18px; font-weight:900; color:#fff; width:28px; text-align:center; flex-shrink:0; line-height:1; }
+.pl-avatar { width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; font-family:'Inter',sans-serif; flex-shrink:0; }
+.pl-info { flex:1; min-width:0; }
+.pl-name { font-size:15px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:6px; }
+.pl-pills { display:flex; gap:5px; margin-top:4px; flex-wrap:nowrap; overflow:hidden; }
+.pl-pill { font-size:10px; color:var(--muted2); background:rgba(245,158,11,0.07); border:1px solid rgba(245,158,11,0.10); border-radius:5px; padding:1px 6px; white-space:nowrap; flex-shrink:0; }
+.pl-bar-track { height:3px; background:rgba(245,158,11,0.08); border-radius:99px; overflow:hidden; margin-top:5px; }
+.pl-bar-fill { height:3px; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+.pl-count { font-family:'Poppins',sans-serif; font-size:32px; font-weight:900; line-height:1; letter-spacing:-1.5px; flex-shrink:0; }
+.pl-count-lbl { font-size:8px; color:var(--muted2); text-transform:uppercase; letter-spacing:0.08em; font-weight:600; text-align:right; margin-top:2px; }
 
 /* ══════════════════════════════════════════════
    📅 BURGER HISTORY CALENDAR MODAL
@@ -5085,208 +5002,40 @@ function renderBentoList() {
   if (!sorted.length) { el.innerHTML = '<div class="empty"><div class="e-icon">🍔</div><p>No players yet!</p></div>'; return; }
 
   const colorFor = p => RING_COLORS[p.colorIdx % RING_COLORS.length];
-  const ini = p => initials(p.name);
-  const isMe = p => p.id === myPlayerId;
+  const MEDALS = ['🥇','🥈','🥉'];
+  const RANK_CLS = ['pl-gold','pl-silver','pl-bronze'];
 
-  // Mini 40px donut SVG for challenger drawer
-  const miniDonut = p => {
-    const ol = (p.logs||[]).filter(e=>typeof e==='object'&&e.ts);
-    const s=ol.filter(e=>!e.patties||e.patties===1).length;
-    const d=ol.filter(e=>e.patties===2).length;
-    const t=ol.filter(e=>e.patties>=3).length;
-    const tot=s+d+t||1;
-    const r=14,cx=20,cy=20,circ=2*Math.PI*r;
-    const arc=(pct,off,col)=>pct>0?`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${col}" stroke-width="5" stroke-dasharray="${(pct*circ).toFixed(2)} ${circ.toFixed(2)}" stroke-dashoffset="${(-off*circ).toFixed(2)}" transform="rotate(-90 ${cx} ${cy})" stroke-linecap="butt"/>`:'';
-    return `<svg width="40" height="40" viewBox="0 0 40 40" style="flex-shrink:0">
-      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="5"/>
-      ${arc(s/tot,0,'#EF4444')}${arc(d/tot,s/tot,'#E5E5E5')}${arc(t/tot,(s+d)/tot,'#3B82F6')}
-    </svg>`;
-  };
-
-  // Latest burger string with date/time
-  const latestBurger = p => {
-    const ol=(p.logs||[]).filter(e=>typeof e==='object'&&e.ts).sort((a,b)=>new Date(b.ts)-new Date(a.ts));
-    if (!ol.length) return {restaurant:'No logs yet', when:''};
-    const l=ol[0];
-    const stars=l.rating?` — ${'⭐'.repeat(Math.floor(l.rating))}${l.rating%1>=0.5?'½':''} ${l.rating}/5`:'';
-    const d=new Date(l.ts);
-    const timeStr=d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
-    const dateStr=`${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)}`;
-    return {restaurant:`${escHtml(l.restaurant||'Unknown spot')}${stars}`, when:`${timeStr} · ${dateStr}`};
-  };
-
-  const p1=sorted[0], p2=sorted[1]||null, p3=sorted[2]||null;
-  const topTieCount = p1?.count || 0;
-  const isTied = (p) => p && topTieCount > 0 && p.count === topTieCount;
-  const challengers=sorted.slice(3);
-
-  const PODIUM={
-    1:{cls:'p1',medal:'🥇',ordinal:'1st'},
-    2:{cls:'p2',medal:'🥈',ordinal:'2nd'},
-    3:{cls:'p3',medal:'🥉',ordinal:'3rd'},
-  };
-
-  const podiumCol=(p,rank)=>{
-    if (!p) return `<div class="podium-col" style="visibility:hidden;pointer-events:none"></div>`;
-    const {cls,medal,ordinal}=PODIUM[rank];
-    const c=colorFor(p);
-    const youBadge=isMe(p)?`<span class="me-badge" style="position:absolute;top:8px;right:8px;z-index:2;white-space:nowrap">You</span>`:'';
-    const lastSeenPodium=timeAgo(p);
-    const lastSeenBadge=lastSeenPodium?`<span style="position:absolute;top:8px;left:8px;z-index:2;font-size:8px;font-weight:600;color:rgba(255,255,255,0.45);background:rgba(0,0,0,0.3);border-radius:999px;padding:2px 6px;white-space:nowrap;font-family:'Inter',sans-serif">${lastSeenPodium}</span>`:'';
-    const ol=(p.logs||[]).filter(e=>typeof e==='object'&&e.ts);
-    const singles=ol.filter(e=>!e.patties||e.patties===1).length;
-    const doubles=ol.filter(e=>e.patties===2).length;
-    const triples=ol.filter(e=>e.patties>=3).length;
-    const untracked=Math.max(0, p.count-(singles+doubles+triples));
-    const untrackedPill=untracked>0?`<span style="position:absolute;top:5px;right:5px;z-index:2;font-size:7px;font-weight:600;color:#6B7280;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:999px;padding:1px 5px;white-space:nowrap;font-family:'Inter',sans-serif">${untracked} untracked</span>`:'';
-    const badgeCount=computeAchievements(p,players).length;
-    const totalBadges=Object.keys(ACHIEVEMENTS).length;
-    return `
-      <div class="podium-col">
-        <div class="podium-flip-wrap" id="flip-${p.id}" style="cursor:pointer">
-          <div class="podium-card podium-face-front ${cls}">
-            ${youBadge}
-            ${lastSeenBadge}
-            <div class="podium-medal">${medal}</div>
-            <div class="podium-avatar" style="background:${c}22;color:${c};border-color:${c}55">${ini(p)}</div>
-            <div class="podium-name">${escHtml(p.name)}${p.count>=100?' <span class="done-badge">✓</span>':''}</div>
-            <div class="podium-count ${cls}">${p.count}</div>
-            <div class="podium-burger-label">🍔 burgers</div>
-          </div>
-          <div class="podium-card podium-face-back ${cls}" style="padding:10px 6px 12px">
-            ${untrackedPill}
-            <div style="font-size:9px;font-weight:700;color:${c};text-transform:uppercase;letter-spacing:0.1em">${escHtml(p.name)}</div>
-            ${(()=>{
-              const st = computePlayerStats(p);
-              return `<div style="display:flex;gap:4px;width:100%;padding:0 2px;box-sizing:border-box;margin:3px 0 2px">
-                <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border-radius:5px;padding:3px 0">
-                  <div style="font-family:'Poppins',sans-serif;font-size:13px;font-weight:900;color:${c};line-height:1">${st.avgRating > 0 ? st.avgRating.toFixed(1) : '—'}</div>
-                  <div style="font-size:6px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Avg ⭐</div>
-                </div>
-                <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border-radius:5px;padding:3px 0">
-                  <div style="font-family:'Poppins',sans-serif;font-size:13px;font-weight:900;color:#EF4444;line-height:1">${st.singles}</div>
-                  <div style="font-size:6px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Single</div>
-                </div>
-                <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border-radius:5px;padding:3px 0">
-                  <div style="font-family:'Poppins',sans-serif;font-size:13px;font-weight:900;color:#F5F5F5;line-height:1">${st.doubles}</div>
-                  <div style="font-size:6px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Double</div>
-                </div>
-                <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border-radius:5px;padding:3px 0">
-                  <div style="font-family:'Poppins',sans-serif;font-size:13px;font-weight:900;color:#3B82F6;line-height:1">${st.triples}</div>
-                  <div style="font-size:6px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Triple</div>
-                </div>
-              </div>
-              ${st.favRestaurant !== '—' ? `<div style="font-size:8px;color:#9CA3AF;font-weight:500;margin:1px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%">🏠 ${escHtml(st.favRestaurant)}</div>` : ''}`;
-            })()}
-            <div style="font-size:9px;color:#9CA3AF;font-weight:500">🏅 ${badgeCount} / ${totalBadges} badges</div>
-            <div data-history="1" style="background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.16);border-radius:999px;color:#fff;font-size:10px;font-weight:600;padding:4px 12px;font-family:'Inter',sans-serif;margin-top:4px">📅 History</div>
-          </div>
+  el.innerHTML = `<div class="pl-list">${sorted.map((p, i) => {
+    const c = colorFor(p);
+    const st = computePlayerStats(p);
+    const rank = i < 3 ? MEDALS[i] : `#${i+1}`;
+    const rankCls = RANK_CLS[i] || '';
+    const pct = Math.min(100, p.count);
+    const countColor = i === 0 ? '#F59E0B' : i === 1 ? '#C0C0C0' : i === 2 ? '#CD7F32' : '#F2EDE4';
+    const avgPill = st.avgRating > 0 ? `<span class="pl-pill">⭐ ${st.avgRating.toFixed(1)}</span>` : '';
+    const spotPill = st.uniqueSpots > 0 ? `<span class="pl-pill">📍 ${st.uniqueSpots}</span>` : '';
+    const favPill = st.favRestaurant && st.favRestaurant !== '—' ? `<span class="pl-pill">🏠 ${escHtml(st.favRestaurant)}</span>` : '';
+    const lastSeen = timeAgo(p);
+    const lastSeenHtml = lastSeen ? `<span style="font-size:9px;color:var(--muted);font-weight:500;margin-left:4px">${lastSeen}</span>` : '';
+    return `<div class="pl-row ${rankCls}" style="animation-delay:${Math.min(i*0.04,0.35)}s">
+      <div class="pl-rank">${rank}</div>
+      <div class="pl-avatar" style="background:${c}20;color:${c};border:1.5px solid ${c}44">${initials(p.name)}</div>
+      <div class="pl-info">
+        <div class="pl-name">
+          ${escHtml(p.name)}
+          ${p.id === myPlayerId ? '<span class="me-badge">You</span>' : ''}
+          ${p.count >= 100 ? '<span class="done-badge">✓</span>' : ''}
+          ${lastSeenHtml}
         </div>
-        <div class="podium-step ${cls}" onclick="toggleCardFlip('${p.id}')">
-          <span class="podium-step-ordinal">${ordinal}</span>
-          <span class="podium-step-label">PLACE</span>
-        </div>
-      </div>`;
-  };
-
-  const podiumHtml=podiumCol(p2,isTied(p2)?1:2)+podiumCol(p1,1)+podiumCol(p3,isTied(p3)?1:3);
-
-  const challengerHtml=challengers.length?`
-    <div class="challenger-list">
-      ${challengers.map((p,i)=>{
-        const c=colorFor(p);
-        const ol=(p.logs||[]).filter(e=>typeof e==='object'&&e.ts);
-        const cs=ol.filter(e=>!e.patties||e.patties===1).length;
-        const cd=ol.filter(e=>e.patties===2).length;
-        const ct=ol.filter(e=>e.patties>=3).length;
-        const cu=Math.max(0, p.count-(cs+cd+ct));
-        const lb=latestBurger(p);
-        const lastSeen=timeAgo(p);
-        return `
-          <div class="challenger-item">
-            <div class="challenger-row" onclick="toggleChallengerDrawer('${p.id}')" style="border-left:3px solid ${c}">
-              <div class="challenger-rank">#${i+4}</div>
-              <div class="challenger-avatar" style="background:${c}1A;color:${c};border-color:${c}55">${ini(p)}</div>
-              <div class="challenger-name">
-                <div>${escHtml(p.name)}${isMe(p)?' <span class="me-badge">You</span>':''}</div>
-                ${lastSeen?`<div style="font-size:9px;color:#6B7280;font-weight:500;margin-top:1px">${lastSeen}</div>`:''}
-              </div>
-              <div class="challenger-count" style="color:${c}">${p.count}</div>
-              <div class="challenger-emoji">🍔</div>
-              <div class="challenger-chevron" id="chev-${p.id}">▾</div>
-            </div>
-            <div class="challenger-drawer" id="drawer-${p.id}">
-              ${(()=>{
-                const st = computePlayerStats(p);
-                const bestLabel = st.bestBurger ? escHtml((st.bestBurger.menuItem || st.bestBurger.restaurant || '?').slice(0,28)) + ` — ${st.bestBurger.rating}/5` : null;
-                const cu = Math.max(0, p.count - (st.singles + st.doubles + st.triples));
-                return `<div class="challenger-drawer-inner" style="flex-direction:column;gap:7px;align-items:stretch">
-                  <div class="ps-grid">
-                    <div class="ps-cell">
-                      <div class="ps-val">${st.avgRating > 0 ? st.avgRating.toFixed(1) : '—'}</div>
-                      <div class="ps-lbl">⭐ Avg Rating</div>
-                    </div>
-                    <div class="ps-cell">
-                      <div class="ps-val">${st.uniqueSpots || '—'}</div>
-                      <div class="ps-lbl">📍 Spots Hit</div>
-                    </div>
-                  </div>
-                  ${st.favRestaurant !== '—' ? `<div class="ps-row"><span class="ps-tag">🏠 Fav Spot</span><span class="ps-val-sm">${escHtml(st.favRestaurant)}</span></div>` : ''}
-                  ${bestLabel ? `<div class="ps-row"><span class="ps-tag">🏆 Best</span><span class="ps-val-sm">${bestLabel}</span></div>` : ''}
-                  ${st.favTopping !== '—' ? `<div class="ps-row"><span class="ps-tag">🧀 Top Topping</span><span class="ps-val-sm">${escHtml(st.favTopping)}</span></div>` : ''}
-                  <div style="display:flex;align-items:center;gap:10px;margin-top:2px">
-                    ${miniDonut(p)}
-                    <div style="display:flex;flex:1;gap:0">
-                      <div style="flex:1;text-align:center;border-right:1px solid rgba(255,255,255,0.07)">
-                        <div style="font-family:'Poppins',sans-serif;font-size:16px;font-weight:900;color:#EF4444;line-height:1">${st.singles}</div>
-                        <div style="font-size:8px;color:#9CA3AF;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Single</div>
-                      </div>
-                      <div style="flex:1;text-align:center;border-right:1px solid rgba(255,255,255,0.07)">
-                        <div style="font-family:'Poppins',sans-serif;font-size:16px;font-weight:900;color:#E5E5E5;line-height:1">${st.doubles}</div>
-                        <div style="font-size:8px;color:#9CA3AF;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Double</div>
-                      </div>
-                      <div style="flex:1;text-align:center;border-right:${cu>0?'1px solid rgba(255,255,255,0.07)':'none'}">
-                        <div style="font-family:'Poppins',sans-serif;font-size:16px;font-weight:900;color:#3B82F6;line-height:1">${st.triples}</div>
-                        <div style="font-size:8px;color:#9CA3AF;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Triples</div>
-                      </div>
-                      ${cu>0?`<div style="flex:1;text-align:center">
-                        <div style="font-family:'Poppins',sans-serif;font-size:16px;font-weight:900;color:#6B7280;line-height:1">${cu}</div>
-                        <div style="font-size:8px;color:#6B7280;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Untracked</div>
-                      </div>`:''}
-                    </div>
-                  </div>
-                  <button onclick="openCalModal('${p.id}')" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--muted2);font-size:11px;font-weight:600;padding:6px 0;cursor:pointer;font-family:'Inter',sans-serif;width:100%;margin-top:2px">📅 Burger History</button>
-                </div>`;
-              })()}
-            </div>
-          </div>`;
-      }).join('')}
-    </div>`:''  ;
-
-  el.innerHTML=`<div class="podium-wrap"><div class="podium-row">${podiumHtml}</div>${challengerHtml}</div>`;
-
-  // iOS Safari: touchstart.target is reliable inside preserve-3d; click.target is not.
-  // Store the touchstart target and use it in the click handler.
-  [p1,p2,p3].filter(Boolean).forEach(p=>{
-    const wrap=document.getElementById('flip-'+p.id);
-    if(!wrap) return;
-    let _touchTarget=null;
-    // touchstart (passive) — reliably records the tapped element on iOS
-    wrap.addEventListener('touchstart',e=>{ _touchTarget=e.target; },{passive:true});
-    // touchend handles all logic and suppresses the follow-up click
-    wrap.addEventListener('touchend',e=>{
-      if(!_touchTarget) return;
-      e.preventDefault(); // block the ghost click that iOS fires after touchend
-      if(!wrap.classList.contains('flipped')){
-        wrap.classList.add('flipped');
-      } else if(_touchTarget.closest&&_touchTarget.closest('[data-history]')){
-        openCalModal(p.id);
-      } else {
-        wrap.classList.remove('flipped');
-      }
-      _touchTarget=null;
-    },{passive:false});
-  });
+        <div class="pl-pills">${avgPill}${spotPill}${favPill}</div>
+        <div class="pl-bar-track"><div class="pl-bar-fill" style="width:${pct}%;background:${c}"></div></div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div class="pl-count" style="color:${countColor}">${p.count}</div>
+        <div class="pl-count-lbl">burgers</div>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
 }
 
 // Tap the card: front → flip to back; back → flip back (unless history pill tapped)
