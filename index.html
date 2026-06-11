@@ -5133,11 +5133,11 @@ function renderBentoList() {
     const now = Date.now();
     const weekAgo = now - 7 * 24 * 60 * 60 * 1000;
     const thisWeek = (p.logs || []).filter(e => typeof e === 'object' && e.ts && new Date(e.ts).getTime() >= weekAgo).length;
-    const weekPill = thisWeek > 0 ? `<span class="pl-pill">📈 ${thisWeek} this week</span>` : `<span class="pl-pill" style="opacity:0.5">📈 0 this week</span>`;
+    const weekPill = thisWeek > 0 ? `<span class="pl-pill">🍔 ${thisWeek} this week</span>` : `<span class="pl-pill" style="opacity:0.5">🍔 0 this week</span>`;
     const tiedBadge = isTied ? `<span style="font-size:9px;font-weight:700;color:var(--amber);background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);border-radius:4px;padding:1px 5px;margin-left:4px;letter-spacing:0.03em">TIE</span>` : '';
     const lastSeen = timeAgo(p);
     const lastSeenHtml = lastSeen ? `<span style="font-size:9px;color:var(--muted);font-weight:500;margin-left:4px">${lastSeen}</span>` : '';
-    return `<div class="pl-row ${rankCls}" style="animation-delay:${Math.min(i*0.04,0.35)}s">
+    return `<div class="pl-row ${rankCls}" style="animation-delay:${Math.min(i*0.04,0.35)}s;cursor:pointer" onclick="openCalModal('${p.id}')" title="View burger history">
       <div class="pl-rank">${rank}</div>
       <div class="pl-avatar" style="background:${c}20;color:${c};border:1.5px solid ${c}44">${initials(p.name)}</div>
       <div class="pl-info">
