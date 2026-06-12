@@ -23,6 +23,12 @@
   --radius:16px; --radius-sm:12px; --radius-xs:8px;
   --glass-blur:blur(22px);
   --shadow-card:0 4px 32px rgba(0,0,0,0.55),inset 0 1px 0 rgba(255,255,255,0.11),inset 0 0 0 1px rgba(255,255,255,0.04);
+  /* ── Fluid spacing tokens ── */
+  --space-xs:clamp(4px,0.75vw,6px);
+  --space-sm:clamp(8px,1.5vw,12px);
+  --space-md:clamp(14px,2.5vw,20px);
+  --space-lg:clamp(20px,4vw,32px);
+  --space-xl:clamp(32px,6vw,48px);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 /* ── Global typographic meta-label token ── */
@@ -349,17 +355,23 @@ body.tally-active header #spectator-pill,
 body.leaderboard-active header .burger-deco,
 body.leaderboard-active header h1,
 body.leaderboard-active header #stat-pills-row,
-body.leaderboard-active header #spectator-pill{display:none!important}
+body.leaderboard-active header #spectator-pill,
+body.duel-active header .burger-deco,
+body.duel-active header h1,
+body.duel-active header #stat-pills-row,
+body.duel-active header #spectator-pill{display:none!important}
 body.feed-active header,
 body.map-active header,
 body.racing-active header,
 body.tally-active header,
-body.leaderboard-active header{padding:6px 0 0!important;gap:0!important}
+body.leaderboard-active header,
+body.duel-active header{padding:6px 0 0!important;gap:0!important}
 body.feed-active .tabs,
 body.map-active .tabs,
 body.racing-active .tabs,
 body.tally-active .tabs,
-body.leaderboard-active .tabs{
+body.leaderboard-active .tabs,
+body.duel-active .tabs{
   position:sticky;top:0;z-index:20;
   background:rgba(8,5,0,0.55);
   backdrop-filter:var(--glass-blur);
@@ -368,6 +380,302 @@ body.leaderboard-active .tabs{
   margin-bottom:10px;
   box-shadow:0 4px 24px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.07);
 }
+/* ═══════════════════════════════════════════════════════════
+   🥊 DUEL TAB
+   ═══════════════════════════════════════════════════════════ */
+#duel-root {
+  padding: var(--space-sm) var(--space-sm) 80px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+/* picker row */
+.duel-picker-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: var(--space-sm);
+  box-shadow: var(--shadow-card);
+}
+.duel-picker-side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.duel-picker-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted2);
+  font-family: 'Barlow', sans-serif;
+}
+.duel-picker-left .duel-picker-label { color: var(--duel-a-color, var(--amber)); }
+.duel-picker-right .duel-picker-label { color: var(--duel-b-color, #60A5FA); }
+.duel-select {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-xs);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 10px;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  outline: none;
+  width: 100%;
+}
+.duel-select:focus { border-color: var(--amber); }
+.duel-vs-badge {
+  font-size: 24px;
+  flex-shrink: 0;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px rgba(245,158,11,0.5));
+}
+/* section header */
+.duel-section-label {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted2);
+  padding: 0 2px;
+  margin-bottom: -2px;
+}
+/* player header cards */
+.duel-player-headers {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: var(--space-xs);
+  align-items: center;
+}
+.duel-player-header {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+}
+.duel-player-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--ph-color, var(--amber));
+  border-radius: 3px 3px 0 0;
+}
+.duel-player-header.winner-glow {
+  box-shadow: var(--shadow-card), 0 0 0 2px var(--ph-color, var(--amber)), 0 0 18px rgba(245,158,11,0.25);
+}
+.duel-player-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 17px;
+  letter-spacing: 0.03em;
+  color: var(--text);
+  text-align: center;
+  line-height: 1.1;
+}
+.duel-player-count {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 30px;
+  line-height: 1;
+}
+.duel-vs-mid {
+  font-size: 18px;
+  text-align: center;
+  color: var(--muted2);
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.05em;
+}
+/* stat grid */
+.duel-stat-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+.duel-stat-block-title {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted2);
+  padding: 10px 14px 6px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+}
+.duel-stat-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 9px 14px;
+  border-bottom: 1px solid rgba(245,158,11,0.06);
+  gap: 6px;
+}
+.duel-stat-row:last-child { border-bottom: none; }
+.duel-stat-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  line-height: 1;
+}
+.duel-stat-val.side-a { color: var(--duel-a-color, var(--amber)); text-align: left; }
+.duel-stat-val.side-b { color: var(--duel-b-color, #60A5FA); text-align: right; }
+.duel-stat-val.winner { filter: brightness(1.15); }
+.duel-stat-val.loser  { opacity: 0.55; }
+.duel-stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted2);
+  text-align: center;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-family: 'Barlow', sans-serif;
+  line-height: 1.2;
+}
+.duel-stat-sub {
+  font-size: 10px;
+  color: var(--muted2);
+  font-family: 'Barlow', sans-serif;
+  font-weight: 500;
+}
+.duel-stat-sub.side-a { text-align: left; }
+.duel-stat-sub.side-b { text-align: right; }
+/* forecast colour helpers */
+.duel-forecast-green { color: #4ADE80; }
+.duel-forecast-amber { color: var(--amber); }
+.duel-forecast-red   { color: var(--red); }
+/* battlegrounds section */
+.duel-battleground-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  padding: 9px 12px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 6px;
+  align-items: center;
+  margin: 4px 10px;
+}
+.duel-battleground-card:first-child { margin-top: 8px; }
+.duel-battleground-card:last-child  { margin-bottom: 8px; }
+.duel-bg-name {
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Barlow', sans-serif;
+  color: var(--text);
+  text-align: center;
+  grid-column: 1 / -1;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2px;
+}
+.duel-bg-rating { font-size: 13px; font-family: 'Barlow', sans-serif; font-weight: 600; }
+.duel-bg-rating.side-a { color: var(--duel-a-color, var(--amber)); text-align: left; }
+.duel-bg-rating.side-b { color: var(--duel-b-color, #60A5FA); text-align: right; }
+.duel-bg-vs { font-size: 11px; color: var(--muted); text-align: center; }
+/* prompt state */
+.duel-prompt {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--muted);
+  font-family: 'Barlow', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.duel-prompt-icon { font-size: 40px; margin-bottom: 12px; }
+
+/* ── Duel fight animations ── */
+@keyframes duelClashLeft {
+  0%   { transform: translateX(0)    rotate(0deg); }
+  30%  { transform: translateX(46px) rotate(-6deg); }   /* rush in */
+  42%  { transform: translateX(42px) rotate(4deg);  }   /* impact bounce */
+  52%  { transform: translateX(48px) rotate(-3deg); }   /* recoil */
+  62%  { transform: translateX(44px) rotate(2deg);  }   /* settle clash */
+  78%  { transform: translateX(0)    rotate(0deg);  }   /* retreat */
+  100% { transform: translateX(0)    rotate(0deg);  }
+}
+@keyframes duelClashRight {
+  0%   { transform: translateX(0)     rotate(0deg); }
+  30%  { transform: translateX(-46px) rotate(6deg);  }
+  42%  { transform: translateX(-42px) rotate(-4deg); }
+  52%  { transform: translateX(-48px) rotate(3deg);  }
+  62%  { transform: translateX(-44px) rotate(-2deg); }
+  78%  { transform: translateX(0)     rotate(0deg);  }
+  100% { transform: translateX(0)     rotate(0deg);  }
+}
+.duel-clash-a {
+  animation: duelClashLeft  0.85s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
+  z-index: 2; position: relative;
+}
+.duel-clash-b {
+  animation: duelClashRight 0.85s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
+  z-index: 2; position: relative;
+}
+@keyframes duelImpactPop {
+  0%   { transform: scale(1)   rotate(0deg);  }
+  20%  { transform: scale(2.4) rotate(-12deg); }
+  45%  { transform: scale(1.9) rotate(8deg);  }
+  65%  { transform: scale(1.4) rotate(-4deg); }
+  85%  { transform: scale(1.1) rotate(2deg);  }
+  100% { transform: scale(1)   rotate(0deg);  }
+}
+.duel-impact-flash {
+  animation: duelImpactPop 0.45s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  display: inline-block;
+  filter: drop-shadow(0 0 8px rgba(251,191,36,0.9));
+}
+
+/* victor banner */
+.duel-victor-banner {
+  text-align: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 0.06em;
+  padding: 2px 12px 6px;
+  min-height: 30px;
+  opacity: 0;
+}
+@keyframes duelVictorReveal {
+  0%   { opacity: 0; transform: translateY(-8px) scale(0.85); }
+  55%  { opacity: 1; transform: translateY(2px)  scale(1.06); }
+  100% { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+.duel-victor-banner.visible {
+  animation: duelVictorReveal 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+
+/* crown */
+@keyframes duelCrownDrop {
+  0%   { transform: translateX(-50%) translateY(-22px) scale(0) rotate(-20deg); opacity: 0; }
+  55%  { transform: translateX(-50%) translateY(4px)   scale(1.3) rotate(6deg);  opacity: 1; }
+  75%  { transform: translateX(-50%) translateY(-3px)  scale(0.95) rotate(-2deg); }
+  100% { transform: translateX(-50%) translateY(0)     scale(1)   rotate(0deg);  opacity: 1; }
+}
+.duel-crown {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 22px;
+  line-height: 1;
+  pointer-events: none;
+  animation: duelCrownDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.7)) drop-shadow(0 0 8px rgba(251,191,36,0.6));
+}
+
 /* ── Racing-specific expansion ── */
 body.racing-active #race-track-container {
   height: calc(100dvh - 130px - 80px);
@@ -2247,6 +2555,7 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
       <button class="tab-btn" onclick="switchTab('feed',this)"><span class="tab-emoji">🔥</span><span class="tab-label">Feed</span><span class="tab-unread" id="social-unread-dot"></span></button>
       <button class="tab-btn" onclick="switchTab('map',this)"><span class="tab-emoji">🗺</span><span class="tab-label">Map</span></button>
       <button class="tab-btn" onclick="switchTab('leaderboard',this)"><span class="tab-emoji">🏅</span><span class="tab-label">Badges</span></button>
+      <button class="tab-btn" onclick="switchTab('duel',this)"><span class="tab-emoji">🥊</span><span class="tab-label">Duel</span></button>
       <button class="tab-btn" onclick="switchTab('racing',this)"><span class="tab-emoji">🏇</span><span class="tab-label">Racing</span></button>
     </div>
 
@@ -2256,6 +2565,30 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
       <div class="section-label">Player Badges</div>
       <div class="leaderboard" id="leaderboard"></div>
       <div id="lb-empty" class="empty" style="display:none"><div class="e-icon">🍔</div><p>No players yet!</p></div>
+    </div>
+
+    <!-- DUEL TAB -->
+    <div class="tab-panel" id="tab-duel">
+      <div id="duel-root">
+        <!-- Picker row -->
+        <div class="duel-picker-row">
+          <div class="duel-picker-side duel-picker-left">
+            <label class="duel-picker-label">Player 1</label>
+            <select class="duel-select" id="duel-sel-a" onchange="renderDuel()">
+              <option value="">— choose —</option>
+            </select>
+          </div>
+          <div class="duel-vs-badge">🥊</div>
+          <div class="duel-picker-side duel-picker-right">
+            <label class="duel-picker-label">Player 2</label>
+            <select class="duel-select" id="duel-sel-b" onchange="renderDuel()">
+              <option value="">— choose —</option>
+            </select>
+          </div>
+        </div>
+        <!-- Split-screen output -->
+        <div id="duel-grid"></div>
+      </div>
     </div>
 
     <!-- RACING TAB -->
@@ -2929,6 +3262,70 @@ function miniAvatarHTML(name, colorIdx, size, avatar='') {
 
 function logTs(entry) { return typeof entry === 'string' ? entry : (entry && entry.ts) || ''; }
 
+// ── Safe parsing helpers (backward-compatible) ──────────────────────────────
+// safeTs: extract an ISO timestamp string from any log entry format.
+// Supports: plain ISO string, {ts:"..."}, {timestamp:"..."}, {date:"..."}, Firestore Timestamp
+function safeTs(entry) {
+  if (!entry) return '';
+  if (typeof entry === 'string') return entry;
+  // Firestore server Timestamp object
+  if (entry.toDate) { try { return entry.toDate().toISOString(); } catch(e) {} }
+  // ts, timestamp, date string fields
+  if (typeof entry.ts === 'string' && entry.ts) return entry.ts;
+  if (typeof entry.timestamp === 'string' && entry.timestamp) return entry.timestamp;
+  if (typeof entry.date === 'string' && entry.date) return entry.date;
+  // Numeric epoch
+  if (typeof entry.ts === 'number') return new Date(entry.ts).toISOString();
+  if (typeof entry.timestamp === 'number') return new Date(entry.timestamp).toISOString();
+  return '';
+}
+
+// safeDate: parse any timestamp representation to a Date, never throws.
+function safeDate(ts) {
+  if (!ts) return null;
+  try {
+    if (ts && typeof ts.toDate === 'function') return ts.toDate();
+    if (typeof ts === 'number') return new Date(ts);
+    const d = new Date(ts);
+    return isNaN(d.getTime()) ? null : d;
+  } catch(e) { return null; }
+}
+
+// normalizeLogEntry: coerce any log entry format into a canonical object.
+// NEVER drops entries — always returns something with at least {ts, restaurant}.
+// Old format: plain ISO string (entry === "2024-01-15T...") => {ts: entry, restaurant:""}
+// New format: {ts, restaurant, rating, toppings, notes, lat, lng, ...}
+function normalizeLogEntry(entry) {
+  if (!entry) return null;
+  if (typeof entry === 'string') {
+    // Legacy plain-string log — the string IS the timestamp
+    return { ts: entry, restaurant: '', rating: null, toppings: [], notes: '', _legacy: true };
+  }
+  if (typeof entry !== 'object') return null;
+  const ts = safeTs(entry);
+  return {
+    ts,
+    restaurant: (typeof entry.restaurant === 'string' ? entry.restaurant : '') || '',
+    rating:     (typeof entry.rating === 'number' ? entry.rating : null),
+    toppings:   Array.isArray(entry.toppings) ? entry.toppings : [],
+    notes:      (typeof entry.notes === 'string' ? entry.notes : '') || '',
+    lat:        (typeof entry.lat === 'number' ? entry.lat : null),
+    lng:        (typeof entry.lng === 'number' ? entry.lng : null),
+    locationName: (typeof entry.locationName === 'string' ? entry.locationName : '') || '',
+    weather:    entry.weather || null,
+    patty:      (typeof entry.patty === 'string' ? entry.patty : '') || '',
+    _raw:       entry,
+  };
+}
+
+// normalizeLogs: map a raw logs array through normalizeLogEntry, skipping nulls but
+// NEVER silently discarding real entries — unknown shapes are wrapped with a ts fallback.
+function normalizeLogs(rawLogs) {
+  if (!Array.isArray(rawLogs)) return [];
+  return rawLogs.map(e => normalizeLogEntry(e)).filter(Boolean);
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 function computeAchievements(p, allPlayers) {
   const earned = [];
   const rawLogs = p.logs || [];
@@ -3395,8 +3792,75 @@ function patchCommentCounts() {
   });
 }
 
+// ── Derived state cache ───────────────────────────────────────────────────────
+// Computed once per Firebase snapshot; consumed by render functions so they
+// don't each re-aggregate the full logs arrays independently.
+let _derivedState = {};
+
+function computeDerivedState() {
+  // 1. Sorted player list (descending count)
+  const sorted = [...players].sort((a, b) => b.count - a.count);
+
+  // 2. Per-player normalized logs + quick-access counts
+  const playerStats = {};
+  players.forEach(p => {
+    const normalized = normalizeLogs(p.logs || []);
+    playerStats[p.id] = { normalized };
+  });
+
+  // 3. Restaurant leaderboard aggregation (across all players, all logs)
+  const restoMap = {};
+  players.forEach(p => {
+    const normalized = playerStats[p.id].normalized;
+    normalized.forEach(entry => {
+      const raw = (entry.restaurant || 'Unknown Spot').trim() || 'Unknown Spot';
+      const key = raw.toLowerCase();
+      if (!restoMap[key]) restoMap[key] = { name: raw, visits: 0, totalRating: 0, ratedCount: 0, playerNames: new Set() };
+      restoMap[key].visits++;
+      if (entry.rating && entry.rating > 0) {
+        restoMap[key].totalRating += entry.rating;
+        restoMap[key].ratedCount++;
+      }
+      restoMap[key].playerNames.add(p.name);
+    });
+  });
+
+  // Alias normalization (e.g. "swensons" → "swenson's")
+  const ALIASES = { 'swensons': "swenson's" };
+  const normalizedRestoMap = {};
+  Object.entries(restoMap).forEach(([key, r]) => {
+    const normKey = ALIASES[key] || key;
+    if (!normalizedRestoMap[normKey]) {
+      normalizedRestoMap[normKey] = { ...r, name: ALIASES[key] ? "Swenson's" : r.name, playerNames: new Set(r.playerNames) };
+    } else {
+      normalizedRestoMap[normKey].visits += r.visits;
+      normalizedRestoMap[normKey].totalRating += r.totalRating;
+      normalizedRestoMap[normKey].ratedCount += r.ratedCount;
+      r.playerNames.forEach(n => normalizedRestoMap[normKey].playerNames.add(n));
+    }
+  });
+
+  const restoLeaderboard = Object.values(normalizedRestoMap)
+    .filter(r => r.name.toLowerCase() !== 'unknown spot')
+    .sort((a, b) => b.visits - a.visits);
+
+  // 4. This-week logs (used by multiple cards)
+  const monday = getThisMonday();
+  const weekLogs = [];
+  players.forEach(p => {
+    (playerStats[p.id].normalized).forEach(entry => {
+      const d = safeDate(entry.ts);
+      if (d && d >= monday) weekLogs.push({ ...entry, _player: p });
+    });
+  });
+
+  _derivedState = { sorted, playerStats, restoLeaderboard, weekLogs, computedAt: Date.now() };
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 function render(){
-  const sorted=[...players].sort((a,b)=>b.count-a.count);
+  computeDerivedState();
+  const sorted = _derivedState.sorted;
   countUp('stat-days', daysUntilLaborDay(), 500);
   countUp('stat-finished', players.reduce((sum,p)=>sum+(p.count||0),0), 500);
   renderLeaderboard(sorted);
@@ -3407,6 +3871,7 @@ function render(){
   if(document.getElementById('tab-feed')?.classList.contains('active')) renderUnifiedFeed();
   if(document.getElementById('tab-list')?.classList.contains('active')) renderBentoList();
   if(document.getElementById('tab-racing')?.classList.contains('active')) renderRaceTrack();
+  if(document.getElementById('tab-duel')?.classList.contains('active')) { populateDuelSelects(); renderDuel(); }
   // Update players pill count
   const pill = document.getElementById('players-pill-btn');
   if(pill) pill.textContent = `👥 Players (${players.length})`;
@@ -3822,6 +4287,12 @@ function buildReactionPills(reactions, targetId, targetType) {
 }
 
 let _feedInitialRenderDone = false;
+let _feedItemLimit = 30; // max items to render; grows on "Load More"
+
+window.loadMoreFeed = function() {
+  _feedItemLimit += 30;
+  renderUnifiedFeed();
+};
 
 function renderUnifiedFeed() {
   const feed = document.getElementById('unified-feed');
@@ -3885,6 +4356,11 @@ function renderUnifiedFeed() {
   }
   if (empty) empty.style.display = 'none';
 
+  // Paginate: show the _feedItemLimit most recent items
+  const totalItems = allItems.length;
+  const hasMore = totalItems > _feedItemLimit;
+  const visibleItems = hasMore ? allItems.slice(-_feedItemLimit) : allItems;
+
   // Per-player burger ordinals (sorted newest→oldest so index 0 = most recent)
   const playerBurgerIdx = {};
   burgerItems.forEach(item => {
@@ -3896,7 +4372,19 @@ function renderUnifiedFeed() {
   window._msgImages = {};
   messages.forEach(m => { if (m.imageBase64) window._msgImages[m.id] = m.imageBase64; });
 
-  feed.innerHTML = allItems.map((item, idx) => {
+  // Assign visibleItems indices relative to allItems for stable burger IDs
+  const visibleOffset = totalItems - visibleItems.length;
+
+  const loadMoreHtml = hasMore
+    ? `<div style="display:flex;justify-content:center;padding:16px 0 8px;flex-shrink:0">
+         <button onclick="loadMoreFeed()" style="background:rgba(245,158,11,0.12);border:1px solid var(--border2);color:var(--amber);font-family:'Barlow',sans-serif;font-size:13px;font-weight:600;padding:8px 22px;border-radius:999px;cursor:pointer;letter-spacing:0.02em">
+           ↑ Load ${Math.min(30, totalItems - _feedItemLimit)} older burgers
+         </button>
+       </div>`
+    : '';
+
+  feed.innerHTML = visibleItems.map((item, i) => {
+    const idx = visibleOffset + i;
     if (item.type === 'message') {
       const m = item.data;
 
@@ -4077,15 +4565,16 @@ function renderUnifiedFeed() {
   </div>
 </div>`.trim();
     }
-  }).join('\n');
+  }).join('\n') + loadMoreHtml;
 
   // Mark initial render done so subsequent re-renders skip the stagger delay
   _feedInitialRenderDone = true;
 
-  // Lazy reverse-geocode burger entries (cache-first: only fetch when not already resolved)
+  // Lazy reverse-geocode visible burger entries (cache-first: only fetch when not already resolved)
   let geocodeDelay = 0;
-  allItems.forEach((item, idx) => {
+  visibleItems.forEach((item, i) => {
     if (item.type !== 'burger' || !item.lat || !item.lng) return;
+    const idx = visibleOffset + i;
     const geoKey = `${item.lat.toFixed(5)},${item.lng.toFixed(5)}`;
     // Skip only if we have a proper "City, State" already — re-fetch state-only entries
     const hasFullLocation = (item.locationCityState && item.locationCityState.includes(',')) || (GEO_CACHE[geoKey] && GEO_CACHE[geoKey].includes(','));
@@ -5864,52 +6353,30 @@ window.switchRanksTab = function(tab, btn) {
   }
 };
 
+let _lbRestoLimit = 10; // paginate the restaurant leaderboard
+window.loadMoreRestoLB = function() { _lbRestoLimit += 10; renderRestaurantLB(); };
+
 function renderRestaurantLB() {
   const wrap = document.getElementById('resto-lb-wrap');
   if (!wrap) return;
 
-  // Aggregate all logs across all players
-  const restoMap = {}; // key: normalized name → { name, visits, totalRating, ratedCount, players: Set }
-  players.forEach(p => {
-    (p.logs || []).forEach(entry => {
-      if (typeof entry !== 'object' || !entry.ts) return;
-      const raw = (entry.restaurant || 'Unknown Spot').trim();
-      const key = raw.toLowerCase();
-      if (!restoMap[key]) restoMap[key] = { name: raw, visits: 0, totalRating: 0, ratedCount: 0, playerNames: new Set() };
-      restoMap[key].visits++;
-      if (entry.rating && entry.rating > 0) {
-        restoMap[key].totalRating += entry.rating;
-        restoMap[key].ratedCount++;
-      }
-      restoMap[key].playerNames.add(p.name);
-    });
-  });
+  // Use cached derivedState if available; fall back to live recompute if called before first snapshot
+  let sorted = _derivedState.restoLeaderboard;
+  if (!sorted) {
+    computeDerivedState();
+    sorted = _derivedState.restoLeaderboard || [];
+  }
 
-  // Normalize Swenson's variants to a single key before sorting
-  const ALIASES = { "swensons": "swenson's" };
-  const normalizedMap = {};
-  Object.entries(restoMap).forEach(([key, r]) => {
-    const normKey = ALIASES[key] || key;
-    if (!normalizedMap[normKey]) normalizedMap[normKey] = { ...r, name: ALIASES[key] ? "Swenson's" : r.name };
-    else {
-      normalizedMap[normKey].visits += r.visits;
-      normalizedMap[normKey].totalRating += r.totalRating;
-      normalizedMap[normKey].ratedCount += r.ratedCount;
-      r.playerNames.forEach(n => normalizedMap[normKey].playerNames.add(n));
-    }
-  });
-
-  const sorted = Object.values(normalizedMap)
-    .filter(r => r.name.toLowerCase() !== 'unknown spot')
-    .sort((a, b) => b.visits - a.visits);
   if (!sorted.length) {
     wrap.innerHTML = '<div style="text-align:center;padding:48px 20px;color:var(--muted);font-size:13px">No burger logs yet!</div>';
     return;
   }
 
-  // restoEmoji is defined at top level — used here and in renderRestaurantSuggestions
+  const visible = sorted.slice(0, _lbRestoLimit);
+  const hasMoreResto = sorted.length > _lbRestoLimit;
 
-  wrap.innerHTML = sorted.map((r, i) => {
+  // restoEmoji is defined at top level — used here and in renderRestaurantSuggestions
+  const cardsHtml = visible.map((r, i) => {
     const rank = i + 1;
     const rankCls = rank === 1 ? 'r1' : rank === 2 ? 'r2' : rank === 3 ? 'r3' : 'rn';
     const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
@@ -5930,6 +6397,16 @@ function renderRestaurantLB() {
   <div class="resto-right" style="font-size:28px;line-height:1">${emoji}</div>
 </div>`.trim();
   }).join('\n');
+
+  const loadMoreRestoHtml = hasMoreResto
+    ? `<div style="display:flex;justify-content:center;padding:12px 0 4px">
+         <button onclick="loadMoreRestoLB()" style="background:rgba(245,158,11,0.12);border:1px solid var(--border2);color:var(--amber);font-family:'Barlow',sans-serif;font-size:13px;font-weight:600;padding:8px 22px;border-radius:999px;cursor:pointer;letter-spacing:0.02em">
+           Show ${Math.min(10, sorted.length - _lbRestoLimit)} more spots
+         </button>
+       </div>`
+    : '';
+
+  wrap.innerHTML = cardsHtml + loadMoreRestoHtml;
 }
 
 // ── Weekly Digest Card ────────────────────────────────────────────────────────
@@ -6028,6 +6505,386 @@ function renderWeeklyDigest() {
 </div>`;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 🥊  DUEL TAB — Head-to-Head comparisons
+// ═══════════════════════════════════════════════════════════════════════════
+
+function populateDuelSelects() {
+  const selA = document.getElementById('duel-sel-a');
+  const selB = document.getElementById('duel-sel-b');
+  if (!selA || !selB) return;
+  const prevA = selA.value, prevB = selB.value;
+  const sorted = [...players].sort((a, b) => b.count - a.count);
+  const opts = sorted.map(p => `<option value="${escHtml(p.id)}">${escHtml(p.name)} (${p.count || 0})</option>`).join('');
+  selA.innerHTML = '<option value="">— choose —</option>' + opts;
+  selB.innerHTML = '<option value="">— choose —</option>' + opts;
+  // Restore previous selections if still valid
+  if (prevA && sorted.find(p => p.id === prevA)) selA.value = prevA;
+  if (prevB && sorted.find(p => p.id === prevB)) selB.value = prevB;
+}
+
+// ── Helper: compute duel stats for one player ────────────────────────────────
+function _duelStats(p) {
+  const raw = p.logs || [];
+  // Use normalizeLogs so legacy string entries aren't dropped
+  const logs = normalizeLogs(raw);
+  const count = p.count || 0;
+  const now = new Date();
+
+  // ── Velocity: avg burgers per week based on span of all logs ──────────────
+  let velocity = 0;
+  const timestamps = logs.map(e => safeDate(e.ts)).filter(Boolean).sort((a, b) => a - b);
+  if (timestamps.length >= 2) {
+    const spanWeeks = (timestamps[timestamps.length - 1] - timestamps[0]) / (7 * 86400000);
+    velocity = spanWeeks > 0 ? (logs.length / spanWeeks) : logs.length;
+  } else if (timestamps.length === 1) {
+    // Less than 2 data points — use weeks since first log
+    const weeksElapsed = Math.max(0.143, (now - timestamps[0]) / (7 * 86400000));
+    velocity = 1 / weeksElapsed;
+  }
+
+  // ── Labor Day forecast ────────────────────────────────────────────────────
+  const ld = laborDay(now.getFullYear());
+  const weeksToLD = Math.max(0, (ld - now) / (7 * 86400000));
+  const ldForecast = Math.round(count + velocity * weeksToLD);
+
+  // ── Expected finish date ──────────────────────────────────────────────────
+  let finishDate = null;
+  if (count >= 100) {
+    finishDate = 'Already done! 🏆';
+  } else if (velocity > 0) {
+    const weeksLeft = (100 - count) / velocity;
+    const finish = new Date(now.getTime() + weeksLeft * 7 * 86400000);
+    finishDate = finish.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  } else {
+    finishDate = 'No pace yet';
+  }
+
+  // ── Weekly heat (last 7 days) ─────────────────────────────────────────────
+  const sevenDaysAgo = new Date(now - 7 * 86400000);
+  const weeklyHeat = logs.filter(e => { const d = safeDate(e.ts); return d && d >= sevenDaysAgo; }).length;
+
+  // ── Streak ────────────────────────────────────────────────────────────────
+  const daySet = {};
+  logs.forEach(e => {
+    const d = safeDate(e.ts);
+    if (!d) return;
+    const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    daySet[key] = true;
+  });
+  const dayKeys = Object.keys(daySet).sort((a, b) => {
+    const [ay, am, ad] = a.split('-').map(Number);
+    const [by, bm, bd] = b.split('-').map(Number);
+    return new Date(ay, am, ad) - new Date(by, bm, bd);
+  });
+  let currentStreak = 0, maxStreak = 0, streak = 1;
+  for (let i = 1; i < dayKeys.length; i++) {
+    const [py, pm, pd] = dayKeys[i-1].split('-').map(Number);
+    const [cy, cm, cd] = dayKeys[i].split('-').map(Number);
+    const diff = Math.round((new Date(cy, cm, cd) - new Date(py, pm, pd)) / 86400000);
+    if (diff === 1) { streak++; } else { streak = 1; }
+    maxStreak = Math.max(maxStreak, streak);
+  }
+  if (dayKeys.length > 0) { maxStreak = Math.max(maxStreak, 1); }
+  // Current streak: check if last logged day was today or yesterday
+  if (dayKeys.length > 0) {
+    const [ly, lm, ld2] = dayKeys[dayKeys.length - 1].split('-').map(Number);
+    const lastDate = new Date(ly, lm, ld2);
+    const todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const diff = Math.round((todayMid - lastDate) / 86400000);
+    if (diff <= 1) {
+      // Walk backwards from the end to find current streak length
+      let cs = 1;
+      for (let i = dayKeys.length - 2; i >= 0; i--) {
+        const [py, pm, pd] = dayKeys[i].split('-').map(Number);
+        const [cy, cm, cd] = dayKeys[i+1].split('-').map(Number);
+        const d = Math.round((new Date(cy, cm, cd) - new Date(py, pm, pd)) / 86400000);
+        if (d === 1) cs++; else break;
+      }
+      currentStreak = cs;
+    }
+  }
+
+  // ── Weekend bias ──────────────────────────────────────────────────────────
+  const weekendLogs = logs.filter(e => { const d = safeDate(e.ts); if (!d) return false; const dow = d.getDay(); return dow === 5 || dow === 6 || dow === 0; }).length;
+  const weekendBias = logs.length > 0 ? Math.round((weekendLogs / logs.length) * 100) : 0;
+
+  // ── Average rating ────────────────────────────────────────────────────────
+  const ratedLogs = logs.filter(e => typeof e.rating === 'number' && e.rating > 0);
+  const avgRating = ratedLogs.length > 0
+    ? (ratedLogs.reduce((s, e) => s + e.rating, 0) / ratedLogs.length)
+    : null;
+
+  // ── Meat density (avg patties) ────────────────────────────────────────────
+  const pattyLogs = logs.filter(e => typeof e._raw?.patties === 'number' && e._raw.patties > 0);
+  const meatDensity = pattyLogs.length > 0
+    ? (pattyLogs.reduce((s, e) => s + e._raw.patties, 0) / pattyLogs.length)
+    : null;
+
+  // ── Per-restaurant ratings map (for battlegrounds) ────────────────────────
+  const restoRatings = {}; // key: lower-case name → { sum, count, ratings[] }
+  logs.forEach(e => {
+    if (!e.restaurant) return;
+    const key = e.restaurant.trim().toLowerCase();
+    if (!restoRatings[key]) restoRatings[key] = { name: e.restaurant.trim(), ratings: [] };
+    if (typeof e.rating === 'number' && e.rating > 0) restoRatings[key].ratings.push(e.rating);
+    else restoRatings[key].ratings.push(null); // visited but unrated
+    restoRatings[key].visitCount = (restoRatings[key].visitCount || 0) + 1;
+  });
+
+  return { count, velocity, ldForecast, finishDate, weeklyHeat, currentStreak, maxStreak, weekendBias, avgRating, meatDensity, restoRatings };
+}
+
+// ── starsInline: compact star display ─────────────────────────────────────────
+function _duelStars(n) {
+  if (n === null) return '<span style="color:var(--muted);font-size:12px">—</span>';
+  const full = Math.floor(n), half = (n % 1) >= 0.5;
+  return Array.from({length: 5}, (_, i) => {
+    if (i < full) return `<span style="color:#F59E0B">★</span>`;
+    if (i === full && half) return `<span style="color:#F59E0B;opacity:0.5">★</span>`;
+    return `<span style="color:#333">★</span>`;
+  }).join('') + `<span style="font-size:11px;margin-left:3px;color:var(--muted2)">${n.toFixed(1)}</span>`;
+}
+
+// ── Main render ────────────────────────────────────────────────────────────────
+function renderDuel() {
+  const grid = document.getElementById('duel-grid');
+  if (!grid) return;
+  const selA = document.getElementById('duel-sel-a');
+  const selB = document.getElementById('duel-sel-b');
+  if (!selA || !selB) return;
+  const idA = selA.value, idB = selB.value;
+  if (!idA || !idB || idA === idB) {
+    grid.innerHTML = `<div class="duel-prompt"><div class="duel-prompt-icon">🥊</div>Select two different players above to start the duel!</div>`;
+    return;
+  }
+  const pA = players.find(p => p.id === idA);
+  const pB = players.find(p => p.id === idB);
+  if (!pA || !pB) { grid.innerHTML = `<div class="duel-prompt">Player not found.</div>`; return; }
+
+  const colorA = RING_COLORS[pA.colorIdx % RING_COLORS.length];
+  const colorB = RING_COLORS[pB.colorIdx % RING_COLORS.length];
+  // Set CSS variables for colour-coded sides
+  grid.style.setProperty('--duel-a-color', colorA);
+  grid.style.setProperty('--duel-b-color', colorB);
+
+  const sA = _duelStats(pA);
+  const sB = _duelStats(pB);
+
+  // ── Category win counting (used for victor) ──────────────────────────────
+  let _wA = 0, _wB = 0;
+  function _cmp(a, b) {
+    if (a === null || b === null) return;
+    const na = parseFloat(a), nb = parseFloat(b);
+    if (isNaN(na) || isNaN(nb)) return;
+    if (na > nb) _wA++; else if (nb > na) _wB++;
+  }
+  _cmp(sA.count,         sB.count);
+  _cmp(sA.velocity,      sB.velocity);
+  _cmp(sA.ldForecast,    sB.ldForecast);
+  _cmp(sA.weeklyHeat,    sB.weeklyHeat);
+  _cmp(sA.currentStreak, sB.currentStreak);
+  _cmp(sA.maxStreak,     sB.maxStreak);
+  _cmp(sA.weekendBias,   sB.weekendBias);
+  _cmp(sA.avgRating,     sB.avgRating);
+  _cmp(sA.meatDensity,   sB.meatDensity);
+  const winsA = _wA, winsB = _wB;
+
+  // ── Player header cards ────────────────────────────────────────────────────
+  const headerHtml = `
+<div class="duel-player-headers">
+  <div class="duel-player-header" id="duel-head-a" style="--ph-color:${colorA};overflow:hidden">
+    ${ringAvatarHTML(pA, 48)}
+    <div class="duel-player-name" style="color:${colorA}">${escHtml(pA.name)}</div>
+    <div class="duel-player-count" style="color:${colorA}">${sA.count}</div>
+  </div>
+  <div class="duel-vs-mid" id="duel-vs-mid">🥊</div>
+  <div class="duel-player-header" id="duel-head-b" style="--ph-color:${colorB};overflow:hidden">
+    ${ringAvatarHTML(pB, 48)}
+    <div class="duel-player-name" style="color:${colorB}">${escHtml(pB.name)}</div>
+    <div class="duel-player-count" style="color:${colorB}">${sB.count}</div>
+  </div>
+</div>
+<div class="duel-victor-banner" id="duel-victor-banner"></div>`;
+
+  // ── Helper: build one stat row ─────────────────────────────────────────────
+  function row(labelHtml, valA, valB, higherWins = true, subA = '', subB = '') {
+    let clsA = '', clsB = '';
+    if (valA !== null && valB !== null) {
+      const numA = parseFloat(String(valA).replace(/[^0-9.-]/g, ''));
+      const numB = parseFloat(String(valB).replace(/[^0-9.-]/g, ''));
+      if (!isNaN(numA) && !isNaN(numB) && numA !== numB) {
+        const aWins = higherWins ? numA > numB : numA < numB;
+        clsA = aWins ? 'winner' : 'loser';
+        clsB = aWins ? 'loser' : 'winner';
+      }
+    }
+    return `<div class="duel-stat-row">
+      <div>
+        <div class="duel-stat-val side-a ${clsA}">${valA ?? '—'}</div>
+        ${subA ? `<div class="duel-stat-sub side-a">${subA}</div>` : ''}
+      </div>
+      <div class="duel-stat-label">${labelHtml}</div>
+      <div>
+        <div class="duel-stat-val side-b ${clsB}">${valB ?? '—'}</div>
+        ${subB ? `<div class="duel-stat-sub side-b">${subB}</div>` : ''}
+      </div>
+    </div>`;
+  }
+
+  // ── Velocity & forecast rows ───────────────────────────────────────────────
+  const fmtVel = v => v > 0 ? v.toFixed(1) + '/wk' : '0/wk';
+
+  const ldClassA = sA.ldForecast >= 100 ? 'duel-forecast-green' : sA.ldForecast >= 75 ? 'duel-forecast-amber' : 'duel-forecast-red';
+  const ldClassB = sB.ldForecast >= 100 ? 'duel-forecast-green' : sB.ldForecast >= 75 ? 'duel-forecast-amber' : 'duel-forecast-red';
+  const ldRowHtml = `<div class="duel-stat-row">
+    <div>
+      <div class="duel-stat-val side-a ${ldClassA}">${sA.ldForecast}</div>
+    </div>
+    <div class="duel-stat-label">Labor Day<br>Forecast</div>
+    <div>
+      <div class="duel-stat-val side-b ${ldClassB}">${sB.ldForecast}</div>
+    </div>
+  </div>`;
+
+  const finishA = sA.finishDate || '—';
+  const finishB = sB.finishDate || '—';
+
+  // ── THE RACE LINE ──────────────────────────────────────────────────────────
+  const raceBlock = `<div class="duel-stat-block">
+    <div class="duel-stat-block-title">🏁 The Race Line</div>
+    ${row('Current<br>Count', sA.count, sB.count, true)}
+    ${row('Velocity', fmtVel(sA.velocity), fmtVel(sB.velocity), true)}
+    ${ldRowHtml}
+    <div class="duel-stat-row">
+      <div><div class="duel-stat-val side-a" style="font-size:13px;font-family:'Barlow',sans-serif;font-weight:700">${finishA}</div></div>
+      <div class="duel-stat-label">Expected<br>Finish</div>
+      <div><div class="duel-stat-val side-b" style="font-size:13px;font-family:'Barlow',sans-serif;font-weight:700">${finishB}</div></div>
+    </div>
+  </div>`;
+
+  // ── THE MOMENTUM ───────────────────────────────────────────────────────────
+  const streakA = `${sA.currentStreak} / ${sA.maxStreak}`;
+  const streakB = `${sB.currentStreak} / ${sB.maxStreak}`;
+  const momentumBlock = `<div class="duel-stat-block">
+    <div class="duel-stat-block-title">🔥 The Momentum</div>
+    ${row('Weekly<br>Heat', sA.weeklyHeat, sB.weeklyHeat, true)}
+    ${row('Cur / Max<br>Streak', streakA, streakB, true)}
+    ${row('Weekend<br>Bias', sA.weekendBias + '%', sB.weekendBias + '%', true)}
+  </div>`;
+
+  // ── THE PALATE ─────────────────────────────────────────────────────────────
+  const avgRA = sA.avgRating !== null ? sA.avgRating.toFixed(1) : null;
+  const avgRB = sB.avgRating !== null ? sB.avgRating.toFixed(1) : null;
+  const mdA = sA.meatDensity !== null ? sA.meatDensity.toFixed(1) + 'x' : null;
+  const mdB = sB.meatDensity !== null ? sB.meatDensity.toFixed(1) + 'x' : null;
+
+  // Battlegrounds: find mutual restaurants
+  const keysA = new Set(Object.keys(sA.restoRatings));
+  const keysB = new Set(Object.keys(sB.restoRatings));
+  const mutual = [...keysA].filter(k => keysB.has(k));
+
+  let battlegroundsHtml = '';
+  if (mutual.length > 0) {
+    const bgCards = mutual.map(k => {
+      const rA = sA.restoRatings[k];
+      const rB = sB.restoRatings[k];
+      const displayName = rA.name;
+      const avgA = rA.ratings.filter(r => r !== null).length > 0
+        ? rA.ratings.filter(r => r !== null).reduce((s, r) => s + r, 0) / rA.ratings.filter(r => r !== null).length
+        : null;
+      const avgB = rB.ratings.filter(r => r !== null).length > 0
+        ? rB.ratings.filter(r => r !== null).reduce((s, r) => s + r, 0) / rB.ratings.filter(r => r !== null).length
+        : null;
+      const visA = rA.visitCount || rA.ratings.length;
+      const visB = rB.visitCount || rB.ratings.length;
+      return `<div class="duel-battleground-card">
+        <div class="duel-bg-name">${escHtml(displayName)}</div>
+        <div class="duel-bg-rating side-a">${_duelStars(avgA)}<br><span style="font-size:10px;color:var(--muted2)">${visA} visit${visA!==1?'s':''}</span></div>
+        <div class="duel-bg-vs">VS</div>
+        <div class="duel-bg-rating side-b">${_duelStars(avgB)}<br><span style="font-size:10px;color:var(--muted2)">${visB} visit${visB!==1?'s':''}</span></div>
+      </div>`;
+    }).join('');
+    battlegroundsHtml = `<div style="padding:0 0 4px">${bgCards}</div>`;
+  } else {
+    battlegroundsHtml = `<div style="text-align:center;padding:14px 12px 12px;color:var(--muted);font-size:12px;font-family:'Barlow',sans-serif">No mutual spots yet — get out there together!</div>`;
+  }
+
+  const palateBlock = `<div class="duel-stat-block">
+    <div class="duel-stat-block-title">🍽️ The Palate</div>
+    ${row('Avg<br>Rating', avgRA, avgRB, true)}
+    ${row('Meat<br>Density', mdA, mdB, true)}
+    <div style="padding:8px 14px 4px;border-top:1px solid var(--border);font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted2)">⚔️ Battlegrounds — Mutual Spots</div>
+    ${battlegroundsHtml}
+  </div>`;
+
+  grid.innerHTML = headerHtml + raceBlock + momentumBlock + palateBlock;
+  // Apply color vars to the grid so child CSS vars resolve
+  grid.style.setProperty('--duel-a-color', colorA);
+  grid.style.setProperty('--duel-b-color', colorB);
+
+  // ── Fight animation + victor reveal ──────────────────────────────────────
+  requestAnimationFrame(() => _triggerDuelFight(winsA, winsB, pA.name, pB.name, colorA, colorB));
+}
+
+function _triggerDuelFight(winsA, winsB, nameA, nameB, colorA, colorB) {
+  const headA   = document.getElementById('duel-head-a');
+  const headB   = document.getElementById('duel-head-b');
+  const vsBadge = document.getElementById('duel-vs-mid');
+  const banner  = document.getElementById('duel-victor-banner');
+  if (!headA || !headB) return;
+
+  // 1. Both fighters rush at each other
+  headA.classList.add('duel-clash-a');
+  headB.classList.add('duel-clash-b');
+
+  // 2. Impact: swap VS to 💥 at peak collision (~30% of 850ms = 255ms)
+  setTimeout(() => {
+    if (vsBadge) {
+      vsBadge.textContent = '💥';
+      vsBadge.classList.add('duel-impact-flash');
+    }
+  }, 265);
+
+  // 3. Restore 🥊 as fighters recoil
+  setTimeout(() => {
+    if (vsBadge) {
+      vsBadge.classList.remove('duel-impact-flash');
+      vsBadge.textContent = '🥊';
+    }
+  }, 710);
+
+  // 4. Fighters settle; remove animation classes so layout returns to normal
+  setTimeout(() => {
+    headA.classList.remove('duel-clash-a');
+    headB.classList.remove('duel-clash-b');
+  }, 870);
+
+  // 5. Victor reveal — crown drops + banner appears
+  setTimeout(() => {
+    if (winsA > winsB) {
+      // Crown player A
+      headA.style.overflow = 'visible';
+      headA.insertAdjacentHTML('afterbegin', '<div class="duel-crown">👑</div>');
+      headA.classList.add('winner-glow');
+      if (banner) banner.innerHTML = `<span style="color:${colorA}">👑 ${escHtml(nameA)} wins the duel! &nbsp;${winsA}–${winsB}</span>`;
+    } else if (winsB > winsA) {
+      // Crown player B
+      headB.style.overflow = 'visible';
+      headB.insertAdjacentHTML('afterbegin', '<div class="duel-crown">👑</div>');
+      headB.classList.add('winner-glow');
+      if (banner) banner.innerHTML = `<span style="color:${colorB}">👑 ${escHtml(nameB)} wins the duel! &nbsp;${winsB}–${winsA}</span>`;
+    } else {
+      if (banner) banner.innerHTML = `<span style="color:var(--muted2)">🤝 Dead even — ${winsA} categories each</span>`;
+    }
+    if (banner) banner.classList.add('visible');
+  }, 1020);
+}
+
+// ── expose for inline handlers ───────────────────────────────────────────────
+window.renderDuel = renderDuel;
+window.populateDuelSelects = populateDuelSelects;
+
 window.switchTab=function(name,btn){
   document.getElementById('badge-popup')?.remove();
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
@@ -6040,6 +6897,7 @@ window.switchTab=function(name,btn){
   document.body.classList.toggle('racing-active',      name==='racing');
   document.body.classList.toggle('tally-active',       name==='tally');
   document.body.classList.toggle('leaderboard-active', name==='leaderboard');
+  document.body.classList.toggle('duel-active',        name==='duel');
   // Clear players pill active state when switching via tabs
   document.getElementById('players-pill-btn')?.classList.remove('active');
   if(name==='feed'){
@@ -6069,6 +6927,7 @@ window.switchTab=function(name,btn){
     renderBentoList();
   }
   if(name==='leaderboard') { _openAlbumId = null; const s=[...players].sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name)); renderLeaderboard(s); }
+  if(name==='duel') { populateDuelSelects(); renderDuel(); }
   if(name==='racing') { _raceAnimateFromStart = true; renderRaceTrack(); }
 };
 
@@ -6242,7 +7101,28 @@ const STATE_ABBR = {
   'West Virginia':'WV','Wisconsin':'WI','Wyoming':'WY','District of Columbia':'DC',
 };
 
-async function reverseGeocode(lat, lng) {
+// ── Nominatim geocoding cache + request queue ─────────────────────────────
+const _geoCache = new Map();
+let _geoQueue = [];
+let _geoRunning = false;
+
+function _roundCoord(v) { return Math.round(v * 10000) / 10000; }
+
+function _geoCacheKey(lat, lng) { return `${_roundCoord(lat)},${_roundCoord(lng)}`; }
+
+function _drainGeoQueue() {
+  if (_geoRunning || _geoQueue.length === 0) return;
+  _geoRunning = true;
+  const { lat, lng, resolve } = _geoQueue.shift();
+  _reverseGeocodeRaw(lat, lng).then(result => {
+    _geoCache.set(_geoCacheKey(lat, lng), result);
+    resolve(result);
+    // Nominatim rate limit: 1 req/sec
+    setTimeout(() => { _geoRunning = false; _drainGeoQueue(); }, 1100);
+  });
+}
+
+async function _reverseGeocodeRaw(lat, lng) {
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 5000);
@@ -6263,6 +7143,16 @@ async function reverseGeocode(lat, lng) {
     return '';
   }
 }
+
+async function reverseGeocode(lat, lng) {
+  const key = _geoCacheKey(lat, lng);
+  if (_geoCache.has(key)) return _geoCache.get(key);
+  return new Promise(resolve => {
+    _geoQueue.push({ lat, lng, resolve });
+    _drainGeoQueue();
+  });
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 window.switchFeedTab = function(tab, btn) {
   document.querySelectorAll('.feed-sub-tab').forEach(b => b.classList.remove('active'));
@@ -6468,7 +7358,11 @@ const RING_COLORS = ['#F87171','#FCD34D','#4ADE80','#22D3EE','#60A5FA','#E879F9'
 
 // ── Compute personal stats for a player ──────────────────────────────────────
 function computePlayerStats(p) {
-  const logs = (p.logs || []).filter(e => typeof e === 'object' && e.ts);
+  // Use cached normalized logs if available; otherwise normalize on the fly.
+  // normalizeLogs handles legacy plain-string entries so no data is ever dropped.
+  const logs = (_derivedState.playerStats && _derivedState.playerStats[p.id])
+    ? _derivedState.playerStats[p.id].normalized
+    : normalizeLogs(p.logs || []);
   const ratedLogs = logs.filter(e => e.rating > 0);
   const avgRating = ratedLogs.length
     ? Math.round((ratedLogs.reduce((s, e) => s + e.rating, 0) / ratedLogs.length) * 10) / 10
