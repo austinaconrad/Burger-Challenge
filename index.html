@@ -332,27 +332,22 @@ button{transition:transform 0.2s ease}
 /* ── Compact header: shared rules for Social + Map + Base tabs ── */
 body.feed-active header .burger-deco,
 body.feed-active header h1,
-body.feed-active header .room-pill,
 body.feed-active header #stat-pills-row,
 body.feed-active header #spectator-pill,
 body.map-active header .burger-deco,
 body.map-active header h1,
-body.map-active header .room-pill,
 body.map-active header #stat-pills-row,
 body.map-active header #spectator-pill,
 body.racing-active header .burger-deco,
 body.racing-active header h1,
-body.racing-active header .room-pill,
 body.racing-active header #stat-pills-row,
 body.racing-active header #spectator-pill,
 body.tally-active header .burger-deco,
 body.tally-active header h1,
-body.tally-active header .room-pill,
 body.tally-active header #stat-pills-row,
 body.tally-active header #spectator-pill,
 body.leaderboard-active header .burger-deco,
 body.leaderboard-active header h1,
-body.leaderboard-active header .room-pill,
 body.leaderboard-active header #stat-pills-row,
 body.leaderboard-active header #spectator-pill{display:none!important}
 body.feed-active header,
@@ -2216,11 +2211,13 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
           <div id="conn-status" class="offline-dot">connecting…</div>
           <button class="players-pill" id="players-pill-btn" onclick="switchToPlayers()">👥 Players</button>
         </div>
-        <button class="leave-btn" onclick="leaveRoom()">Leave room</button>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+          <button class="leave-btn" onclick="leaveRoom()">Leave room</button>
+          <div class="room-pill">Room: <span id="room-display">—</span></div>
+        </div>
       </div>
       <div class="burger-deco">🍔</div>
       <h1>100 Burger Challenge</h1>
-      <div class="room-pill">Room: <span id="room-display">—</span></div>
       <div id="stat-pills-row">
         <div class="stat-pill">🗓 <span id="stat-days" class="stat-num">--</span><span class="stat-label">days left</span></div>
         <div class="stat-pill">🍔 <span id="stat-finished" class="stat-num">0</span><span class="stat-label">total</span></div>
