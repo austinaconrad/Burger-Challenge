@@ -15,14 +15,14 @@
 :root {
   --amber:#F59E0B; --amber-dark:#D97706; --amber-mid:#F59E0B; --patty:#1C0A00;
   --bg:#080500; --bg2:#100900;
-  --surface:rgba(22,13,2,0.82); --surface2:rgba(30,18,3,0.85); --surface3:rgba(44,26,5,0.88);
-  --border:rgba(245,158,11,0.10); --border2:rgba(245,158,11,0.18); --border3:rgba(245,158,11,0.30);
+  --surface:rgba(22,13,2,0.46); --surface2:rgba(30,18,3,0.52); --surface3:rgba(44,26,5,0.60);
+  --border:rgba(245,158,11,0.18); --border2:rgba(245,158,11,0.28); --border3:rgba(245,158,11,0.42);
   --text:#F2EDE4; --muted:#4A4035; --muted2:#A8916E;
   --green:#22C55E; --red:#F87171;
   --cheese:#F59E0B; --bun-top:#D97706; --bun-mid:#F59E0B; --sesame:#EAB308;
   --radius:16px; --radius-sm:12px; --radius-xs:8px;
-  --glass-blur:blur(12px);
-  --shadow-card:0 4px 32px rgba(0,0,0,0.7),inset 0 1px 0 rgba(245,158,11,0.06);
+  --glass-blur:blur(22px);
+  --shadow-card:0 4px 32px rgba(0,0,0,0.55),inset 0 1px 0 rgba(255,255,255,0.11),inset 0 0 0 1px rgba(255,255,255,0.04);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 /* ── Global typographic meta-label token ── */
@@ -35,10 +35,13 @@
 .grill-banner-name,.setup-card h2{letter-spacing:-0.03em}
 body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;overflow-x:hidden}
 body::before{content:'';position:fixed;inset:0;z-index:0;background:
-  radial-gradient(ellipse 110% 55% at 50% 105%,rgba(245,158,11,0.22) 0%,transparent 65%),
-  radial-gradient(ellipse 60% 35% at 50% 100%,rgba(217,119,6,0.14) 0%,transparent 55%),
-  radial-gradient(ellipse 40% 20% at 20% 100%,rgba(180,83,9,0.08) 0%,transparent 50%),
-  radial-gradient(ellipse 40% 20% at 80% 100%,rgba(180,83,9,0.08) 0%,transparent 50%);
+  radial-gradient(ellipse 110% 55% at 50% 105%,rgba(245,158,11,0.28) 0%,transparent 65%),
+  radial-gradient(ellipse 60% 35% at 50% 100%,rgba(217,119,6,0.18) 0%,transparent 55%),
+  radial-gradient(ellipse 40% 20% at 20% 100%,rgba(180,83,9,0.11) 0%,transparent 50%),
+  radial-gradient(ellipse 40% 20% at 80% 100%,rgba(180,83,9,0.11) 0%,transparent 50%),
+  radial-gradient(ellipse 80% 40% at 50% 0%,rgba(120,60,5,0.14) 0%,transparent 60%),
+  radial-gradient(ellipse 50% 30% at 15% 30%,rgba(180,83,9,0.07) 0%,transparent 50%),
+  radial-gradient(ellipse 50% 30% at 85% 60%,rgba(180,83,9,0.07) 0%,transparent 50%);
   pointer-events:none}
 .wrapper{position:relative;z-index:1;max-width:700px;margin:0 auto;padding:0 16px calc(80px + env(safe-area-inset-bottom))}
 .burger-deco{font-size:80px;line-height:1;animation:wobble 1.6s ease-in-out infinite;filter:drop-shadow(0 4px 24px rgba(217,119,6,0.30));cursor:pointer;user-select:none}
@@ -48,7 +51,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:
 #setup-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px;text-align:center;gap:0;position:relative;z-index:1}
 #setup-screen h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(38px,10vw,66px);font-weight:900;letter-spacing:3px;line-height:1;color:var(--text);margin-bottom:8px}
 #setup-screen .subtitle{font-size:14px;color:var(--muted2);margin-bottom:32px;font-weight:400}
-.setup-card{background:rgba(26,26,26,0.7);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius);padding:28px;width:100%;max-width:440px;text-align:left;box-shadow:var(--shadow-card)}
+.setup-card{background:rgba(22,13,2,0.46);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius);padding:28px;width:100%;max-width:440px;text-align:left;box-shadow:var(--shadow-card)}
 .setup-card h2{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--amber);margin-bottom:6px;font-weight:700}
 .setup-card p{font-size:13px;color:var(--muted2);margin-bottom:20px;line-height:1.6}
 .setup-card label{font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:6px;margin-top:16px;font-weight:500}
@@ -82,7 +85,7 @@ header{padding:22px 0 16px;display:flex;flex-direction:column;align-items:center
 h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:900;letter-spacing:-0.03em;line-height:1;color:var(--text)}
 .room-pill{font-size:11px;font-weight:500;color:var(--muted2);background:rgba(217,119,6,0.07);border:1px solid var(--border);padding:4px 14px;border-radius:999px;letter-spacing:0.04em}
 .room-pill span{color:var(--amber);font-weight:700}
-.tabs{display:flex;gap:2px;background:rgba(10,6,0,0.7);border:1px solid rgba(245,158,11,0.12);border-radius:var(--radius);padding:4px;margin-bottom:20px;box-shadow:0 2px 12px rgba(0,0,0,0.4),inset 0 1px 0 rgba(245,158,11,0.04)}
+.tabs{display:flex;gap:2px;background:rgba(10,6,0,0.45);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid rgba(245,158,11,0.22);border-radius:var(--radius);padding:4px;margin-bottom:20px;box-shadow:0 2px 12px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.08)}
 .tab-btn{flex:1;padding:7px 4px;border:none;background:transparent;color:var(--muted2);font-family:'Barlow',sans-serif;font-size:11px;font-weight:500;border-radius:calc(var(--radius) - 5px);cursor:pointer;transition:all 0.2s;letter-spacing:0.01em;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
 .tab-emoji{font-size:18px;line-height:1}
 .tab-label{font-size:10px;font-weight:500;line-height:1}
@@ -94,7 +97,7 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,8vw,50px);font-weigh
 .tab-panel{display:none}
 .tab-panel.active{display:block}
 .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
-.stat-card{background:rgba(26,26,26,0.7);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 14px 12px;text-align:left;position:relative;overflow:hidden;box-shadow:var(--shadow-card)}
+.stat-card{background:rgba(22,13,2,0.46);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 14px 12px;text-align:left;position:relative;overflow:hidden;box-shadow:var(--shadow-card)}
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--amber-dark),var(--amber));opacity:0.8}
 .stat-icon{position:absolute;top:10px;right:11px;font-size:18px;opacity:1;line-height:1}
 .stat-val{font-family:'Bebas Neue',sans-serif;font-size:30px;font-weight:800;line-height:1;color:var(--amber);letter-spacing:-0.5px}
@@ -132,7 +135,7 @@ button{transition:transform 0.2s ease}
 .player-row:active{transform:scale(0.98)}
 .grill-feed-card:active{transform:scale(0.99)}
 .ach-badge{transition:transform 0.2s ease,box-shadow 0.2s,filter 0.2s,opacity 0.2s}
-.lb-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,rgba(245,158,11,0.18),transparent);opacity:1}
+.lb-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.22),rgba(245,158,11,0.28),rgba(255,255,255,0.22),transparent);opacity:1}
 .lb-card.first-place{
   background:rgba(245,158,11,0.06);
   border:1px solid rgba(245,158,11,0.55);
@@ -141,6 +144,12 @@ button{transition:transform 0.2s ease}
 .lb-card.first-place::before{background:linear-gradient(90deg,transparent,rgba(245,158,11,0.5),transparent)}
 .lb-card.complete{border-color:rgba(34,197,94,0.3);box-shadow:0 0 0 1px rgba(34,197,94,0.1),0 4px 20px rgba(0,0,0,0.4)}
 .lb-card.is-me{}
+/* ── Glass sheen on all cards ── */
+.lb-card::after,.my-tally-card::after,.stat-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:45%;
+  background:linear-gradient(180deg,rgba(255,255,255,0.04) 0%,transparent 100%);
+  border-radius:inherit;pointer-events:none
+}
 /* ── Cropper.js circular avatar overrides ── */
 #avatar-crop-container .cropper-view-box{border-radius:50%;outline:3px solid rgba(245,158,11,0.8);outline-offset:0}
 #avatar-crop-container .cropper-face{border-radius:50%;background:transparent}
@@ -197,7 +206,7 @@ button{transition:transform 0.2s ease}
 .hl-sub{font-size:11px;color:rgba(167,139,250,0.65);margin-top:2px;font-weight:400}
 .hl-count{font-family:'Bebas Neue',sans-serif;font-size:32px;font-weight:900;color:#A78BFA;line-height:1;flex-shrink:0;text-align:right}
 .hl-count-lbl{font-size:9px;color:rgba(167,139,250,0.6);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;text-align:right}
-.my-tally-card{background:rgba(26,26,26,0.7);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-card);position:relative}
+.my-tally-card{background:rgba(22,13,2,0.46);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-card);position:relative}
 /* ── ORDER RECEIPT ── */
 /* Outer element is the full-screen backdrop */
 .order-receipt{
@@ -251,7 +260,7 @@ button{transition:transform 0.2s ease}
 /* footer */
 .receipt-foot{text-align:center;padding:9px 24px 5px;font-family:monospace;font-size:9px;color:#AAA;text-transform:uppercase;letter-spacing:0.12em;line-height:1.9}
 .my-tally-card.complete{border-color:rgba(34,197,94,0.30);box-shadow:0 0 0 1.5px rgba(34,197,94,0.20),0 4px 24px rgba(0,0,0,0.4)}
-.tally-bun-top{height:3px;background:linear-gradient(90deg,var(--amber-dark),#F59E0B,var(--amber-mid),#F59E0B,var(--amber-dark));opacity:0.8}
+.tally-bun-top{height:3px;background:linear-gradient(90deg,transparent,var(--amber-dark),#F59E0B,rgba(255,255,255,0.6),#F59E0B,var(--amber-dark),transparent);opacity:0.9}
 .tally-top{display:flex;align-items:center;gap:14px;padding:16px 16px 12px}
 .tally-info{flex:1}
 .tally-name{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--text);font-weight:800;letter-spacing:-0.3px}
@@ -276,7 +285,7 @@ button{transition:transform 0.2s ease}
 .ate-btn:active .bicon{transform:scale(1.4) rotate(-12deg)}
 .complete-strip{padding:10px 16px;background:rgba(34,197,94,0.10);color:var(--green);font-size:13px;font-weight:600;text-align:center;border-top:1px solid rgba(34,197,94,0.15);display:none}
 .players-list{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
-.player-row{background:rgba(26,26,26,0.7);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;gap:12px;animation:slideIn 0.25s ease both;transition:transform 0.2s ease;box-shadow:var(--shadow-card)}
+.player-row{background:rgba(22,13,2,0.46);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;gap:12px;animation:slideIn 0.25s ease both;transition:transform 0.2s ease;box-shadow:var(--shadow-card)}
 .player-row:active{transform:scale(0.98)}
 .player-row-info{flex:1}
 .player-row-name{font-size:14px;font-weight:600;color:var(--text)}
@@ -357,10 +366,12 @@ body.racing-active .tabs,
 body.tally-active .tabs,
 body.leaderboard-active .tabs{
   position:sticky;top:0;z-index:20;
-  background:var(--bg);
+  background:rgba(8,5,0,0.55);
+  backdrop-filter:var(--glass-blur);
+  -webkit-backdrop-filter:var(--glass-blur);
   padding-top:6px;
   margin-bottom:10px;
-  box-shadow:0 2px 12px rgba(0,0,0,0.25);
+  box-shadow:0 4px 24px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.07);
 }
 /* ── Racing-specific expansion ── */
 body.racing-active #race-track-container {
@@ -2213,7 +2224,7 @@ body.feed-active .social-input-area.comment-focus-hide{opacity:0;transform:trans
 <div id="lightbox" onclick="closeLightbox()"><img id="lightbox-img" src="" alt=""/></div>
 
 <!-- AVATAR PICKER MODAL -->
-<div id="avatar-picker-overlay" onclick="closeAvatarPicker(event)" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:flex-end;justify-content:center">
+<div id="avatar-picker-overlay" onclick="closeAvatarPicker(event)" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.55);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);align-items:flex-end;justify-content:center">
   <div id="avatar-picker-sheet" onclick="event.stopPropagation()" style="background:var(--surface);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:20px 16px 32px;width:100%;max-width:480px;box-sizing:border-box;animation:slideIn 0.2s ease both">
     <div style="text-align:center;margin-bottom:16px">
       <div style="width:40px;height:4px;background:var(--border);border-radius:999px;margin:0 auto 14px"></div>
