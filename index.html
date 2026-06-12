@@ -210,7 +210,7 @@ button{transition:transform 0.2s ease}
 /* ── ORDER RECEIPT ── */
 /* Outer element is the full-screen backdrop */
 .order-receipt{
-  position:fixed;inset:0;z-index:500;
+  position:fixed;inset:0;z-index:1000;
   background:rgba(0,0,0,0.65);
   backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   display:flex;align-items:center;justify-content:center;
@@ -540,6 +540,96 @@ body.feed-active .social-input-area.comment-focus-hide{opacity:0;transform:trans
 .empty{text-align:center;padding:48px 20px;color:var(--muted)}
 .empty .e-icon{font-size:40px;margin-bottom:12px}
 .empty p{font-size:13px}
+/* ── Floating Log Button ── */
+#log-fab{
+  position:fixed;bottom:28px;right:20px;z-index:600;
+  width:60px;height:60px;border-radius:50%;border:none;cursor:pointer;
+  background:linear-gradient(145deg,#F59E0B,#D97706);
+  box-shadow:0 4px 20px rgba(245,158,11,0.45),0 2px 8px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.25);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.2s,bottom 0.25s ease;
+}
+#log-fab:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(245,158,11,0.6),0 2px 8px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.25)}
+#log-fab:active{transform:scale(0.93)}
+#log-fab-icon{font-size:26px;line-height:1;transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1)}
+#log-fab:hover #log-fab-icon{transform:rotate(-10deg) scale(1.1)}
+@keyframes fabPulse{0%,100%{box-shadow:0 4px 20px rgba(245,158,11,0.45),0 2px 8px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.25)}50%{box-shadow:0 4px 28px rgba(245,158,11,0.7),0 0 0 8px rgba(245,158,11,0.12),0 2px 8px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.25)}}
+#log-fab.pulse{animation:fabPulse 1.4s ease-in-out 3}
+/* lift above feed input bar */
+body.feed-active #log-fab{bottom:88px}
+/* hide when modal is open */
+body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
+/* ── Log Burger Bottom Sheet Modal ── */
+#log-modal-overlay{
+  position:fixed;inset:0;z-index:800;
+  background:rgba(0,0,0,0.65);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  display:none;
+  align-items:flex-end;justify-content:center;
+}
+#log-modal-overlay.open{display:flex}
+#log-modal-sheet{
+  width:100%;max-width:540px;
+  max-height:92vh;
+  background:rgba(12,7,0,0.97);
+  backdrop-filter:var(--glass-blur);
+  -webkit-backdrop-filter:var(--glass-blur);
+  border-top-left-radius:24px;border-top-right-radius:24px;
+  border:1px solid var(--border2);border-bottom:none;
+  box-shadow:0 -8px 48px rgba(0,0,0,0.7),inset 0 1px 0 rgba(255,255,255,0.10),inset 0 0 0 1px rgba(255,255,255,0.035);
+  display:flex;flex-direction:column;
+  animation:sheetUp 0.35s cubic-bezier(0.16,1,0.3,1);
+  overflow:hidden;
+}
+@keyframes sheetUp{
+  from{transform:translateY(60%);opacity:0.4}
+  to{transform:translateY(0);opacity:1}
+}
+#log-modal-drag{
+  width:36px;height:4px;border-radius:2px;
+  background:rgba(255,255,255,0.20);
+  margin:12px auto 0;flex-shrink:0;
+}
+#log-modal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 20px 12px;flex-shrink:0;
+  border-bottom:1px solid var(--border);
+}
+#log-modal-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:22px;letter-spacing:0.05em;
+  color:var(--text);
+  display:flex;align-items:center;gap:8px;
+}
+#log-modal-close{
+  width:32px;height:32px;border-radius:50%;
+  border:1px solid var(--border2);
+  background:rgba(255,255,255,0.05);
+  color:var(--muted);font-size:14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background 0.15s,color 0.15s;line-height:1;font-family:sans-serif;
+}
+#log-modal-close:hover{background:rgba(255,255,255,0.12);color:var(--text)}
+#log-modal-mini{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 20px;flex-shrink:0;
+  border-bottom:1px solid var(--border);
+  background:rgba(245,158,11,0.04);
+}
+#log-modal-mini-bar-track{
+  flex:1;height:5px;background:rgba(255,255,255,0.07);border-radius:999px;overflow:hidden;
+}
+#log-modal-mini-bar-fill{
+  height:100%;border-radius:999px;
+  background:linear-gradient(90deg,var(--amber-dark),var(--amber));
+  transition:width 0.6s ease;
+}
+#log-modal-scroll{
+  overflow-y:auto;flex:1;min-height:0;
+  /* safe area for devices with home bar */
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-size:13px;font-weight:500;padding:10px 20px;border-radius:999px;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1),opacity 0.3s;opacity:0;z-index:999;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.25);font-family:'Barlow',sans-serif}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 
@@ -2100,13 +2190,28 @@ body.feed-active .social-input-area.comment-focus-hide{opacity:0;transform:trans
         <div class="stat-pill">🍔 <span id="stat-finished" class="stat-num">0</span><span class="stat-label">total</span></div>
         <div class="stat-pill" id="daily-pill">🔥 <span id="daily-count" class="stat-num">0</span><span class="stat-label">today</span></div>
       </div>
+      <!-- Compact personal progress strip -->
+      <div id="header-tally-strip" style="display:none;width:100%;max-width:480px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 14px;box-sizing:border-box;box-shadow:var(--shadow-card)">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div id="header-ring-avatar" style="flex-shrink:0"></div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:5px">
+              <span id="header-tally-name" style="font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px"></span>
+              <span id="header-tally-count" style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;line-height:1"></span>
+              <span style="font-size:11px;color:var(--muted);font-family:'Barlow',sans-serif">/ 100</span>
+            </div>
+            <div style="height:5px;background:rgba(255,255,255,0.07);border-radius:999px;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.3)">
+              <div id="header-tally-bar" style="height:100%;border-radius:999px;background:linear-gradient(90deg,var(--amber-dark),var(--amber));transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 0 8px rgba(245,158,11,0.4)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div id="spectator-pill" style="display:none;font-size:11px;font-weight:600;color:var(--muted2);background:rgba(255,255,255,0.05);border:1px solid var(--border2);padding:3px 12px;border-radius:999px;letter-spacing:0.04em">👁 Spectating</div>
     </header>
 
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('list',this)"><span class="tab-emoji">🏆</span><span class="tab-label">Ranks</span></button>
       <button class="tab-btn" onclick="switchTab('feed',this)"><span class="tab-emoji">🔥</span><span class="tab-label">Feed</span><span class="tab-unread" id="social-unread-dot"></span></button>
-      <button class="tab-btn" onclick="switchTab('tally',this)"><span class="tab-emoji">➕</span><span class="tab-label">Tally</span></button>
       <button class="tab-btn" onclick="switchTab('map',this)"><span class="tab-emoji">🗺</span><span class="tab-label">Map</span></button>
       <button class="tab-btn" onclick="switchTab('leaderboard',this)"><span class="tab-emoji">🏅</span><span class="tab-label">Badges</span></button>
       <button class="tab-btn" onclick="switchTab('racing',this)"><span class="tab-emoji">🏇</span><span class="tab-label">Racing</span></button>
@@ -2222,6 +2327,141 @@ body.feed-active .social-input-area.comment-focus-hide{opacity:0;transform:trans
   <button class="tray-emoji-btn" data-emoji="❓">❓</button>
 </div>
 <div id="lightbox" onclick="closeLightbox()"><img id="lightbox-img" src="" alt=""/></div>
+
+<!-- FLOATING LOG BUTTON -->
+<button id="log-fab" onclick="openFABLog()" aria-label="Log a burger" style="display:none">
+  <span id="log-fab-icon">🍔</span>
+</button>
+
+<!-- LOG BURGER MODAL -->
+<div id="log-modal-overlay" onclick="onLogOverlayClick(event)">
+  <div id="log-modal-sheet" onclick="event.stopPropagation()">
+    <div id="log-modal-drag"></div>
+    <div id="log-modal-header">
+      <div id="log-modal-title">🍔 Log a Burger</div>
+      <button id="log-modal-close" onclick="closeLogModal()">✕</button>
+    </div>
+    <!-- Mini progress strip -->
+    <div id="log-modal-mini">
+      <div id="log-modal-mini-avatar" style="flex-shrink:0"></div>
+      <div id="log-modal-mini-bar-track"><div id="log-modal-mini-bar-fill" style="width:0%"></div></div>
+      <div id="log-modal-mini-count" style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--amber);flex-shrink:0"></div>
+      <div style="font-size:11px;color:var(--muted);flex-shrink:0">/ 100</div>
+    </div>
+    <!-- Scrollable form content -->
+    <div id="log-modal-scroll">
+      <!-- Step 1: Restaurant search -->
+      <div class="restaurant-step" id="restaurant-step">
+        <div id="restaurant-input-row">
+          <input type="text" id="detail-restaurant" placeholder="🔍 Where are you eating?" maxlength="80" autocomplete="off" oninput="onRestaurantInput(this.value)"/>
+        </div>
+        <div class="restaurant-locked-row" id="restaurant-locked-row" style="display:none">
+          <span class="restaurant-locked-name" id="restaurant-locked-name"></span>
+          <button class="restaurant-change-btn" onclick="clearRestaurantSelection()">✕ Change</button>
+        </div>
+        <div class="restaurant-suggestions" id="restaurant-suggestions"></div>
+      </div>
+      <!-- Menu picker (shown when a known restaurant is selected) -->
+      <div class="menu-picker" id="menu-picker" style="display:none">
+        <div class="menu-picker-label" id="menu-picker-label">Pick your burger:</div>
+        <div class="menu-cards-scroll" id="menu-cards-scroll"></div>
+        <button class="build-own-btn" onclick="showBuildOwn()">🛠 Build your own instead</button>
+      </div>
+      <!-- Patty Stack Builder -->
+      <div class="patty-builder">
+        <div class="pb-bun-top"></div>
+        <div id="pb-top-Mayo"          class="pb-sauce pb-mayo"         style="display:none"></div>
+        <div id="pb-top-Ketchup"       class="pb-sauce pb-ketchup"      style="display:none"></div>
+        <div id="pb-top-Mustard"       class="pb-sauce pb-mustard"      style="display:none"></div>
+        <div id="pb-top-Special-Sauce" class="pb-special-sauce"         style="display:none"></div>
+        <div id="pb-top-Lettuce"       class="pb-lettuce"               style="display:none"></div>
+        <div id="pb-top-Tomatoes"      class="pb-tomato"                style="display:none"></div>
+        <div id="pb-top-Pickles"       class="pb-pickles"               style="display:none"></div>
+        <div id="pb-top-Green-Peppers" class="pb-green-peppers"         style="display:none"></div>
+        <div id="pb-top-Mushrooms"     class="pb-mushrooms"             style="display:none"></div>
+        <div id="pb-top-Onions"        class="pb-onions"                style="display:none"></div>
+        <div id="pb-top-Bacon"         class="pb-bacon"                 style="display:none"></div>
+        <div id="pb-top-Cheese"        class="pb-cheese"                style="display:none"></div>
+        <div id="pb-top-Blue-Cheese"   class="pb-blue-cheese"           style="display:none"></div>
+        <div class="pb-stack" id="pb-stack"></div>
+        <div class="pb-bun-bottom"></div>
+        <div class="pb-selector">
+          <button class="pb-btn" onclick="selectPatties(1)">Single</button>
+          <button class="pb-btn" onclick="selectPatties(2)">Double</button>
+          <button class="pb-btn" onclick="selectPatties(3)">Triple</button>
+        </div>
+        <div class="pb-label" id="pb-label">How many patties?</div>
+      </div>
+      <!-- Detail form (revealed after patty/menu selection) -->
+      <div class="burger-detail" id="burger-detail">
+        <div class="burger-detail-row" style="align-items:flex-start;gap:10px">
+          <label style="padding-top:4px">Rating</label>
+          <div class="rating-widget" id="rating-widget">
+            <div class="star-slider-wrap">
+              <div class="star-display" id="star-display">
+                <span class="star-icon" data-idx="1">★</span>
+                <span class="star-icon" data-idx="2">★</span>
+                <span class="star-icon" data-idx="3">★</span>
+                <span class="star-icon" data-idx="4">★</span>
+                <span class="star-icon" data-idx="5">★</span>
+              </div>
+              <input type="range" min="0" max="5" step="0.1" value="0"
+                     class="rating-slider" id="rating-slider"
+                     oninput="setRating(+this.value)"/>
+            </div>
+            <input type="number" class="rating-score" id="rating-score"
+                   min="0" max="5" step="0.1" placeholder="—"
+                   style="color:var(--muted)"
+                   oninput="onRatingTextInput(this.value)"
+                   onblur="onRatingTextBlur(this.value)"/>
+          </div>
+        </div>
+        <div class="critic-nudge" id="critic-nudge" style="display:none"></div>
+        <!-- Custom burger name -->
+        <div id="custom-burger-name-row" style="display:none;flex-direction:column;gap:8px">
+          <label style="font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em;font-weight:600;width:auto">Burger name</label>
+          <input type="text" id="custom-burger-name" maxlength="60" autocomplete="off"
+                 placeholder="Name your creation…"
+                 style="width:100%;box-sizing:border-box;background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-xs);padding:11px 14px;font-size:15px;color:var(--text);font-family:'Barlow',sans-serif;outline:none;transition:border-color 0.2s,box-shadow 0.2s"
+                 onfocus="this.style.borderColor='var(--amber)';this.style.boxShadow='0 0 0 3px rgba(217,119,6,0.12)'"
+                 onblur="this.style.borderColor='';this.style.boxShadow=''"/>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <button id="toppings-toggle" onclick="toggleToppingsPanel()" style="display:flex;align-items:center;justify-content:space-between;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:'Barlow',sans-serif;width:100%;transition:background 0.15s,border-color 0.15s">
+            <span id="toppings-toggle-label" style="font-size:12px;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em">+ Add Toppings</span>
+            <span id="toppings-chevron" style="font-size:12px;color:var(--muted2);transition:transform 0.2s">▾</span>
+          </button>
+          <div id="topping-grid-wrap" style="display:none;animation:slideIn 0.15s ease both">
+            <div class="topping-grid" id="topping-grid"><!-- populated by initLogModal() --></div>
+          </div>
+        </div>
+        <!-- Burger photo -->
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <div id="burger-photo-btns" style="display:flex;gap:8px">
+            <button class="burger-photo-btn" id="burger-photo-btn-camera" onclick="document.getElementById('burger-photo-input-camera').click()">📸 Take Photo</button>
+            <button class="burger-photo-btn" id="burger-photo-btn-upload" onclick="document.getElementById('burger-photo-input-upload').click()">🖼️ Upload</button>
+          </div>
+          <div id="burger-photo-has" style="display:none;align-items:center;gap:8px">
+            <img id="burger-photo-thumb" class="burger-photo-preview" style="display:block" alt="burger preview"/>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <button class="burger-photo-btn has-photo" style="font-size:11px;padding:4px 10px" onclick="document.getElementById('burger-photo-input-camera').click()">📸 Retake</button>
+              <button class="burger-photo-btn has-photo" style="font-size:11px;padding:4px 10px" onclick="document.getElementById('burger-photo-input-upload').click()">🖼️ Replace</button>
+            </div>
+            <button onclick="clearBurgerPhoto()" style="background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:4px;line-height:1">✕</button>
+          </div>
+        </div>
+        <input type="file" id="burger-photo-input-camera" accept="image/*" capture="environment" style="display:none" onchange="onBurgerPhotoSelected(this)"/>
+        <input type="file" id="burger-photo-input-upload" accept="image/*" style="display:none" onchange="onBurgerPhotoSelected(this)"/>
+        <!-- Avatar photo inputs (global, live here for DOM simplicity) -->
+        <input type="file" id="avatar-input-camera" accept="image/*" capture="user" style="display:none" onchange="onAvatarPhotoSelected(this)"/>
+        <input type="file" id="avatar-input-upload" accept="image/*" style="display:none" onchange="onAvatarPhotoSelected(this)"/>
+        <button class="detail-confirm-btn" id="confirm-btn" onclick="confirmBurger()">✓ Log Burger</button>
+      </div>
+      <!-- Completion strip -->
+      <div class="complete-strip" id="log-modal-complete-strip" style="display:none">🎉 You crushed 100 burgers! You're a legend!</div>
+    </div>
+  </div>
+</div>
 
 <!-- AVATAR PICKER MODAL -->
 <div id="avatar-picker-overlay" onclick="closeAvatarPicker(event)" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.55);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);align-items:flex-end;justify-content:center">
@@ -2884,6 +3124,68 @@ window.spectateRoom=async function(){
   }catch(e){alert('Error: '+e.message);btn.disabled=false;btn.textContent='👁 Spectate';}
 };
 
+// ── Log Modal ─────────────────────────────────────────────────────────────────
+let _logModalInitialized = false;
+
+function initLogModal() {
+  _logModalInitialized = true;
+  // Populate topping buttons (ALL_TOPPINGS is a runtime array)
+  const grid = document.getElementById('topping-grid');
+  if (grid) {
+    grid.innerHTML = ALL_TOPPINGS.map(t =>
+      `<button class="topping-btn" data-topping="${t}" onclick="toggleTopping('${t}')">${t}</button>`
+    ).join('');
+  }
+  // Show default restaurant suggestions
+  renderRestaurantSuggestions(OHIO_SPOTS.slice(0, 6));
+  // Wire Places autocomplete if API key is configured
+  if (GOOGLE_PLACES_KEY) setTimeout(initPlacesAutocomplete, 80);
+}
+
+window.openFABLog = function() {
+  const overlay = document.getElementById('log-modal-overlay');
+  if (!overlay) return;
+  // Update mini progress strip
+  const me = players.find(p => p.id === myPlayerId);
+  if (me) {
+    const fill = document.getElementById('log-modal-mini-bar-fill');
+    const count = document.getElementById('log-modal-mini-count');
+    const av = document.getElementById('log-modal-mini-avatar');
+    if (fill) fill.style.width = Math.min(100, me.count) + '%';
+    if (count) { count.textContent = me.count; count.style.color = RING_COLORS[me.colorIdx % RING_COLORS.length]; }
+    if (av) av.innerHTML = ringAvatarHTML(me, 28);
+  }
+  // Show default suggestions if not mid-entry
+  if (!restaurantLocked && !document.getElementById('detail-restaurant')?.value.trim()) {
+    renderRestaurantSuggestions(OHIO_SPOTS.slice(0, 6));
+  }
+  overlay.classList.add('open');
+  document.body.classList.add('log-modal-open');
+  document.body.style.overflow = 'hidden';
+  // Scroll modal content to top
+  const scroll = document.getElementById('log-modal-scroll');
+  if (scroll) scroll.scrollTop = 0;
+  // Pulse patty buttons so user knows what to tap first
+  setTimeout(() => {
+    document.querySelectorAll('.pb-btn').forEach(btn => {
+      btn.style.transition = 'box-shadow 0.2s';
+      btn.style.boxShadow = '0 0 0 2px rgba(245,158,11,0.7)';
+      setTimeout(() => { btn.style.boxShadow = ''; }, 700);
+    });
+  }, 350);
+};
+
+window.closeLogModal = function() {
+  const overlay = document.getElementById('log-modal-overlay');
+  if (overlay) overlay.classList.remove('open');
+  document.body.classList.remove('log-modal-open');
+  document.body.style.overflow = '';
+};
+
+window.onLogOverlayClick = function(e) {
+  if (e.target === document.getElementById('log-modal-overlay')) closeLogModal();
+};
+
 window.leaveRoom=function(){
   if(!confirm('Leave this challenge?')) return;
   if(unsubscribe) unsubscribe();
@@ -2905,11 +3207,12 @@ function startApp(){
     renderLeaderboard(sorted);
     renderDailyCard(players);
   }, 60000);
+  // Show FAB only for active players, not spectators
+  if (!spectatorMode) {
+    const fab = document.getElementById('log-fab');
+    if (fab) { fab.style.display = 'flex'; setTimeout(() => fab.classList.add('pulse'), 600); }
+  }
   if(spectatorMode){
-    document.querySelectorAll('.tab-btn').forEach(b=>{
-      const name=b.getAttribute('onclick')?.match(/'(\w+)'/)?.[1];
-      if(['tally'].includes(name)) b.style.display='none';
-    });
     document.getElementById('players-pill-btn').style.display='none';
     document.getElementById('add-player-form').style.display='none';
     document.getElementById('spectator-pill').style.display='block';
@@ -3052,6 +3355,7 @@ function render(){
   countUp('stat-finished', players.reduce((sum,p)=>sum+(p.count||0),0), 500);
   renderLeaderboard(sorted);
   renderMyTally();
+  renderHeaderTally();
   renderPlayersList();
   renderDailyCard(players);
   if(document.getElementById('tab-feed')?.classList.contains('active')) renderUnifiedFeed();
@@ -3378,18 +3682,26 @@ function renderLeaderboard(sorted){
 
 
 
+function renderHeaderTally() {
+  const strip = document.getElementById('header-tally-strip');
+  if (!strip || spectatorMode) return;
+  const me = players.find(p => p.id === myPlayerId);
+  if (!me) return;
+  const c = RING_COLORS[me.colorIdx % RING_COLORS.length];
+  strip.style.display = 'block';
+  document.getElementById('header-ring-avatar').innerHTML = ringAvatarHTML(me, 36);
+  const nameEl = document.getElementById('header-tally-name');
+  const countEl = document.getElementById('header-tally-count');
+  const barEl = document.getElementById('header-tally-bar');
+  if (nameEl) nameEl.textContent = me.name;
+  if (countEl) { countEl.textContent = me.count; countEl.style.color = c; }
+  if (barEl) barEl.style.width = Math.min(100, me.count) + '%';
+}
+
 function renderMyTally(){
   const area=document.getElementById('my-tally-area');
   const me=players.find(p=>p.id===myPlayerId);
   if(!me){area.innerHTML='<div class="empty"><div class="e-icon">🔍</div><p>Player not found. Try rejoining.</p></div>';return;}
-
-  // Preserve burger detail state so a Firestore re-render doesn't wipe the user's mid-entry selection
-  const detailWasOpen = document.getElementById('burger-detail')?.classList.contains('open') || false;
-  const savedRestaurant = detailWasOpen ? (document.getElementById('detail-restaurant')?.value || '') : '';
-  const savedPattyCount = detailWasOpen ? pendingPattyCount : 0;
-  const savedRestaurantLocked = restaurantLocked;
-  const savedMenuKey = pendingMenuKey;
-
   const cc=colorClass(me.colorIdx);
   const pct=Math.min(100,me.count), isDone=me.count>=100;
   area.innerHTML=`<div class="my-tally-card ${cc} ${isDone?'complete':''}">
@@ -3404,176 +3716,15 @@ function renderMyTally(){
     </div>
     <div class="progress-track"><div class="progress-fill ${cc}" id="my-bar" style="width:${pct}%"></div><div class="progress-burger${pct>0?' visible':''}" id="my-burger" style="left:${pct}%">🍔</div></div>
     <div class="tally-bun-bottom"></div>
-    <!-- Step 1: Restaurant search (always visible) -->
-    <div class="restaurant-step" id="restaurant-step">
-      <div id="restaurant-input-row">
-        <input type="text" id="detail-restaurant" placeholder="🔍 Where are you eating?" maxlength="80" autocomplete="off" oninput="onRestaurantInput(this.value)"/>
-      </div>
-      <div class="restaurant-locked-row" id="restaurant-locked-row" style="display:none">
-        <span class="restaurant-locked-name" id="restaurant-locked-name"></span>
-        <button class="restaurant-change-btn" onclick="clearRestaurantSelection()">✕ Change</button>
-      </div>
-      <div class="restaurant-suggestions" id="restaurant-suggestions"></div>
-    </div>
-    <!-- Menu picker (shown when a known restaurant is selected) -->
-    <div class="menu-picker" id="menu-picker" style="display:none">
-      <div class="menu-picker-label" id="menu-picker-label">Pick your burger:</div>
-      <div class="menu-cards-scroll" id="menu-cards-scroll"></div>
-      <button class="build-own-btn" onclick="showBuildOwn()">🛠 Build your own instead</button>
-    </div>
-    <!-- Patty Stack Builder -->
-    <div class="patty-builder">
-      <div class="pb-bun-top"></div>
-      <div id="pb-top-Mayo"          class="pb-sauce pb-mayo"         style="display:none"></div>
-      <div id="pb-top-Ketchup"       class="pb-sauce pb-ketchup"      style="display:none"></div>
-      <div id="pb-top-Mustard"       class="pb-sauce pb-mustard"      style="display:none"></div>
-      <div id="pb-top-Special-Sauce" class="pb-special-sauce"         style="display:none"></div>
-      <div id="pb-top-Lettuce"       class="pb-lettuce"               style="display:none"></div>
-      <div id="pb-top-Tomatoes"      class="pb-tomato"                style="display:none"></div>
-      <div id="pb-top-Pickles"       class="pb-pickles"               style="display:none"></div>
-      <div id="pb-top-Green-Peppers" class="pb-green-peppers"         style="display:none"></div>
-      <div id="pb-top-Mushrooms"     class="pb-mushrooms"             style="display:none"></div>
-      <div id="pb-top-Onions"        class="pb-onions"                style="display:none"></div>
-      <div id="pb-top-Bacon"         class="pb-bacon"                 style="display:none"></div>
-      <div id="pb-top-Cheese"        class="pb-cheese"                style="display:none"></div>
-      <div id="pb-top-Blue-Cheese"   class="pb-blue-cheese"           style="display:none"></div>
-      <div class="pb-stack" id="pb-stack"></div>
-      <div class="pb-bun-bottom"></div>
-      <div class="pb-selector">
-        <button class="pb-btn" onclick="selectPatties(1)">Single</button>
-        <button class="pb-btn" onclick="selectPatties(2)">Double</button>
-        <button class="pb-btn" onclick="selectPatties(3)">Triple</button>
-      </div>
-      <div class="pb-label" id="pb-label">How many patties?</div>
-    </div>
-    <!-- Detail form (revealed after patty/menu selection) -->
-    <div class="burger-detail" id="burger-detail">
-      <div class="burger-detail-row" style="align-items:flex-start;gap:10px">
-        <label style="padding-top:4px">Rating</label>
-        <div class="rating-widget" id="rating-widget">
-          <div class="star-slider-wrap">
-            <div class="star-display" id="star-display">
-              <span class="star-icon" data-idx="1">★</span>
-              <span class="star-icon" data-idx="2">★</span>
-              <span class="star-icon" data-idx="3">★</span>
-              <span class="star-icon" data-idx="4">★</span>
-              <span class="star-icon" data-idx="5">★</span>
-            </div>
-            <input type="range" min="0" max="5" step="0.1" value="0"
-                   class="rating-slider" id="rating-slider"
-                   oninput="setRating(+this.value)"/>
-          </div>
-          <input type="number" class="rating-score" id="rating-score"
-                 min="0" max="5" step="0.1" placeholder="—"
-                 style="color:var(--muted)"
-                 oninput="onRatingTextInput(this.value)"
-                 onblur="onRatingTextBlur(this.value)"/>
-        </div>
-      </div>
-      <div class="critic-nudge" id="critic-nudge" style="display:none"></div>
-      <!-- Custom burger name — shown only for build-your-own (no menu item selected) -->
-      <div id="custom-burger-name-row" style="display:none;flex-direction:column;gap:8px">
-        <label style="font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em;font-weight:600;width:auto">Burger name</label>
-        <input type="text" id="custom-burger-name" maxlength="60" autocomplete="off"
-               placeholder="Name your creation…"
-               style="width:100%;box-sizing:border-box;background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-xs);padding:11px 14px;font-size:15px;color:var(--text);font-family:'Barlow',sans-serif;outline:none;transition:border-color 0.2s,box-shadow 0.2s"
-               onfocus="this.style.borderColor='var(--amber)';this.style.boxShadow='0 0 0 3px rgba(217,119,6,0.12)'"
-               onblur="this.style.borderColor='';this.style.boxShadow=''"/>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:6px">
-        <button id="toppings-toggle" onclick="toggleToppingsPanel()" style="display:flex;align-items:center;justify-content:space-between;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:'Barlow',sans-serif;width:100%;transition:background 0.15s,border-color 0.15s">
-          <span id="toppings-toggle-label" style="font-size:12px;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em">+ Add Toppings</span>
-          <span id="toppings-chevron" style="font-size:12px;color:var(--muted2);transition:transform 0.2s">▾</span>
-        </button>
-        <div id="topping-grid-wrap" style="display:none;animation:slideIn 0.15s ease both">
-          <div class="topping-grid" id="topping-grid">
-            ${ALL_TOPPINGS.map(t => `<button class="topping-btn" data-topping="${t}" onclick="toggleTopping('${t}')">${t}</button>`).join('')}
-          </div>
-        </div>
-      </div>
-      <!-- Burger photo -->
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <div id="burger-photo-btns" style="display:flex;gap:8px">
-          <button class="burger-photo-btn" id="burger-photo-btn-camera" onclick="document.getElementById('burger-photo-input-camera').click()">📸 Take Photo</button>
-          <button class="burger-photo-btn" id="burger-photo-btn-upload" onclick="document.getElementById('burger-photo-input-upload').click()">🖼️ Upload</button>
-        </div>
-        <div id="burger-photo-has" style="display:none;align-items:center;gap:8px">
-          <img id="burger-photo-thumb" class="burger-photo-preview" style="display:block" alt="burger preview"/>
-          <div style="display:flex;flex-direction:column;gap:4px">
-            <button class="burger-photo-btn has-photo" style="font-size:11px;padding:4px 10px" onclick="document.getElementById('burger-photo-input-camera').click()">📸 Retake</button>
-            <button class="burger-photo-btn has-photo" style="font-size:11px;padding:4px 10px" onclick="document.getElementById('burger-photo-input-upload').click()">🖼️ Replace</button>
-          </div>
-          <button onclick="clearBurgerPhoto()" style="background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:4px;line-height:1">✕</button>
-        </div>
-      </div>
-      <input type="file" id="burger-photo-input-camera" accept="image/*" capture="environment" style="display:none" onchange="onBurgerPhotoSelected(this)"/>
-      <input type="file" id="burger-photo-input-upload" accept="image/*" style="display:none" onchange="onBurgerPhotoSelected(this)"/>
-      <!-- Avatar photo inputs -->
-      <input type="file" id="avatar-input-camera" accept="image/*" capture="user" style="display:none" onchange="onAvatarPhotoSelected(this)"/>
-      <input type="file" id="avatar-input-upload" accept="image/*" style="display:none" onchange="onAvatarPhotoSelected(this)"/>
-      <button class="detail-confirm-btn" id="confirm-btn" onclick="confirmBurger()">✓ Log Burger</button>
-    </div>
-    <!-- Undo strip -->
-    <div style="display:flex;justify-content:center;padding:8px 16px 14px;border-top:1px solid var(--border)">
-      <button class="ctrl-btn" onclick="changeMyCount(-1)" style="font-size:13px;color:var(--muted2);gap:6px;display:flex;align-items:center">↩ Undo last burger</button>
-    </div>
-    <div class="complete-strip" ${isDone?'style="display:block"':''}>🎉 You crushed 100 burgers! You're a legend!</div>
+    ${isDone?'<div class="complete-strip">🎉 You crushed 100 burgers! You\'re a legend!</div>':''}
   </div>`;
-
-  // Restore detail panel state so a mid-entry Firestore re-render doesn't lose selections
-  if (detailWasOpen) {
-    const d = document.getElementById('burger-detail');
-    if (d) d.classList.add('open');
-    // Restore restaurant locked state
-    if (savedRestaurantLocked && savedRestaurant) {
-      document.getElementById('restaurant-input-row').style.display = 'none';
-      const lockedRow = document.getElementById('restaurant-locked-row');
-      if (lockedRow) lockedRow.style.display = 'flex';
-      const lockedName = document.getElementById('restaurant-locked-name');
-      if (lockedName) {
-        const mEmoji = (BURGER_MENUS[savedMenuKey] || BURGER_MENUS[savedRestaurant])?.emoji || '📍';
-        lockedName.textContent = mEmoji + ' ' + savedRestaurant;
-      }
-      // If a menu was open but item already selected (detail open), just hide menu picker
-      document.getElementById('menu-picker').style.display = 'none';
-    } else {
-      const inp = document.getElementById('detail-restaurant');
-      if (inp) inp.value = savedRestaurant;
-      if (savedRestaurant) onRestaurantInput(savedRestaurant);
-    }
-    // Restore patty selection — re-highlight the correct button and rebuild the visual stack
-    if (savedPattyCount > 0) {
-      document.querySelectorAll('.pb-btn').forEach((b, i) => b.classList.toggle('selected', i + 1 === savedPattyCount));
-      const stack = document.getElementById('pb-stack');
-      if (stack) {
-        stack.innerHTML = '';
-        for (let i = 0; i < savedPattyCount; i++) {
-          const patty = document.createElement('div');
-          patty.className = 'pb-patty';
-          stack.appendChild(patty);
-        }
-      }
-      const lbl = document.getElementById('pb-label');
-      const lblMap = ['', 'One patty — classic!', 'Two patties — serious.', 'Three patties — legend.'];
-      if (lbl) lbl.textContent = lblMap[savedPattyCount] || '';
-      const confirmBtn = document.getElementById('confirm-btn');
-      const btnMap = ['', '✓ Log This Burger', '✓ Log This Double', '✓ Log The Holy Trinity'];
-      if (confirmBtn) confirmBtn.textContent = btnMap[savedPattyCount] || '✓ Log This Burger';
-    }
-  } else {
-    // Not mid-entry: show OHIO_SPOTS as default suggestions
-    renderRestaurantSuggestions(OHIO_SPOTS.slice(0, 6));
-  }
-  // Restore topping visuals and button states
-  updateBurgerToppingVisuals();
-  document.querySelectorAll('.topping-btn').forEach(btn => {
-    btn.classList.toggle('topping-active', pendingToppings.includes(btn.dataset.topping));
-  });
-  // Re-attach Places autocomplete if key is set
-  if (GOOGLE_PLACES_KEY) setTimeout(initPlacesAutocomplete, 80);
-  // Receipt is ephemeral — intentionally not restored after re-render
-  // (restoring without restarting the dismiss timer caused it to stick permanently)
+  // Initialize the modal log form on first load
+  if (!_logModalInitialized) initLogModal();
+  // Keep modal complete strip in sync
+  const cs = document.getElementById('log-modal-complete-strip');
+  if (cs) cs.style.display = isDone ? 'block' : 'none';
 }
+
 
 function renderPlayersList(){
   const list=document.getElementById('players-list');
@@ -4659,6 +4810,8 @@ function initPlacesAutocomplete() {
 })();
 
 window.confirmBurger = async function() {
+  // Dismiss the log modal so the receipt can show cleanly on top
+  closeLogModal();
   const count      = pendingPattyCount || 1;
   const restaurant = document.getElementById('detail-restaurant').value.trim() || 'Unknown spot';
   const pattyLabel = ['', 'Single', 'Double', 'The Holy Trinity'][count] || 'Single';
