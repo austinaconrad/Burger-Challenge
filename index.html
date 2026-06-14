@@ -4386,7 +4386,7 @@ function renderUnifiedFeed() {
        </div>`
     : '';
 
-  feed.innerHTML = visibleItems.map((item, i) => {
+  feed.innerHTML = loadMoreHtml + visibleItems.map((item, i) => {
     const idx = visibleOffset + i;
     if (item.type === 'message') {
       const m = item.data;
@@ -4568,7 +4568,7 @@ function renderUnifiedFeed() {
   </div>
 </div>`.trim();
     }
-  }).join('\n') + loadMoreHtml;
+  }).join('\n');
 
   // Mark initial render done so subsequent re-renders skip the stagger delay
   _feedInitialRenderDone = true;
@@ -4966,18 +4966,43 @@ window.closeReceipt = function() {
 
 const ALL_TOPPINGS = ['Ketchup','Mustard','Mayo','Cheese','Blue Cheese','Lettuce','Pickles','Tomatoes','Onions','Bacon','Mushrooms','Green Peppers','Special Sauce'];
 
+// Compress a burger-log photo to fit within Firestore's 1 MB document limit.
+// We target ≤ 65 KB as a base64 string (≈ 48 KB binary) per photo, which
+// allows ~14 photos before approaching the limit.  We start at a size that
+// looks sharp on a 390 px-wide mobile screen and back off only as needed.
+async function compressBurgerPhoto(file) {
+  // Ordered steps: try best quality first, fall back if still too big.
+  const BUDGET_KB = 65;
+  const steps = [
+    { px: 560, q: 0.72 },
+    { px: 560, q: 0.58 },
+    { px: 560, q: 0.46 },
+    { px: 420, q: 0.55 },
+    { px: 420, q: 0.42 },
+    { px: 320, q: 0.45 },
+  ];
+  for (const { px, q } of steps) {
+    const dataUrl = await compressImage(file, px, q);
+    // dataUrl is an ASCII base64 string — each character is 1 byte in Firestore
+    if (dataUrl.length / 1024 <= BUDGET_KB) return dataUrl;
+  }
+  // Absolute last resort — tiny but readable thumbnail
+  return compressImage(file, 280, 0.40);
+}
+
 window.onBurgerPhotoSelected = async function(input) {
   const file = input.files[0];
   if (!file) return;
   try {
-    pendingPhoto = await compressImage(file, 240, 0.45);
+    showToast('📷 Compressing image…');
+    pendingPhoto = await compressBurgerPhoto(file);
     const thumb = document.getElementById('burger-photo-thumb');
     const btns  = document.getElementById('burger-photo-btns');
     const has   = document.getElementById('burger-photo-has');
     if (thumb) thumb.src = pendingPhoto;
     if (btns) btns.style.display = 'none';
     if (has)  has.style.display  = 'flex';
-  } catch (e) { console.warn('Photo compress failed', e); }
+  } catch (e) { console.warn('Photo compress failed', e); showToast('⚠️ Could not load image'); }
   input.value = '';
 };
 
