@@ -2867,7 +2867,7 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
         <button onclick="removeAvatar()" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;width:100%;text-align:left;transition:background 0.15s">
           <span style="font-size:22px">🗑️</span>
           <div>
-            <div style="font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;color:#F87171">Remove Photo</div>
+            <div style="font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;color:var(--red)">Remove Photo</div>
             <div style="font-family:'Barlow',sans-serif;font-size:11px;color:var(--muted);margin-top:1px">Go back to initials avatar</div>
           </div>
         </button>
@@ -2888,7 +2888,7 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
     </div>
     <div style="display:flex;gap:10px;width:100%;max-width:320px">
       <button onclick="cancelAvatarCrop()" style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:13px;color:#fff;font-family:'Barlow',sans-serif;font-size:14px;font-weight:600;cursor:pointer">Cancel</button>
-      <button onclick="confirmAvatarCrop()" style="flex:2;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.5);border-radius:12px;padding:13px;color:#F59E0B;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;cursor:pointer">SAVE AVATAR</button>
+      <button onclick="confirmAvatarCrop()" style="flex:2;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.5);border-radius:12px;padding:13px;color:var(--amber);font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;cursor:pointer">SAVE AVATAR</button>
     </div>
   </div>
 </div>
@@ -2957,6 +2957,8 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getFirestore, doc, collection, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp, query, orderBy, limit }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
 
 const FIREBASE_CONFIG = {
   apiKey:            "AIzaSyCqqA4XLxrRNQLAEcLSuszvpsJIhZLWqcQ",
@@ -2992,7 +2994,7 @@ const ACHIEVEMENTS = {
   ooh_baby_triple: { label:'Ooh Baby A Triple',      tip:'Log a triple burger (3 patties) to unlock', color:'rgba(59,130,246,0.8)', glow:'rgba(59,130,246,0.3)', size:null, emoji:`<span style="display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1"><span style="font-size:16px">🍔</span><span style="display:flex;gap:2px;font-size:16px"><span>🍔</span><span>🍔</span></span></span>` },
 };
 
-let app, db, unsubscribe, unsubMessages, unsubComments, unsubBurgerReactions;
+let app, db, storage, unsubscribe, unsubMessages, unsubComments, unsubBurgerReactions;
 let myPlayerId = null, myName = '', roomId = '', spectatorMode = false;
 let players = [];
 let messages = [];
@@ -3023,8 +3025,9 @@ function showConfigBanner() {
 if (!IS_CONFIGURED) showConfigBanner();
 
 function initFirebase() {
-  app = initializeApp(FIREBASE_CONFIG);
-  db  = getFirestore(app);
+  app     = initializeApp(FIREBASE_CONFIG);
+  db      = getFirestore(app);
+  storage = getStorage(app);
 }
 
 const uid = () => Math.random().toString(36).slice(2,10);
@@ -3127,7 +3130,8 @@ function getDailyBurgerCount(allPlayers) {
     (p.logs || []).forEach(entry => {
       const ts = logTs(entry);
       if (!ts) return;
-      const d = new Date(ts);
+      const d = safeDate(ts);
+      if (!d) return;
       const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
       if (key === todayKey) total++;
     });
@@ -3331,11 +3335,12 @@ function computeAchievements(p, allPlayers) {
   const rawLogs = p.logs || [];
   const logs = rawLogs.map(logTs).filter(Boolean);
 
-  if (logs.some(ts => { const d = new Date(ts); return d.getHours() >= 23; })) earned.push('last_minute');
+  if (logs.some(ts => { const d = safeDate(ts); return d && d.getHours() >= 23; })) earned.push('last_minute');
 
   const byDay = {};
   logs.forEach(ts => {
-    const d = new Date(ts);
+    const d = safeDate(ts);
+    if (!d) return;
     // Zero-pad month and day so string sort works correctly across month/year boundaries
     const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     byDay[key] = (byDay[key] || 0) + 1;
@@ -3359,13 +3364,14 @@ function computeAchievements(p, allPlayers) {
 
   const sortedLogs = [...logs].sort();
   for (let i = 1; i < sortedLogs.length; i++) {
-    const diff = new Date(sortedLogs[i]) - new Date(sortedLogs[i-1]);
+    const diff = (safeDate(sortedLogs[i]) || new Date(0)) - (safeDate(sortedLogs[i-1]) || new Date(0));
     if (diff > 0 && diff <= 12 * 3600000) { earned.push('back_to_back'); break; }
   }
 
   const weekendCounts = {};
   logs.forEach(ts => {
-    const d = new Date(ts);
+    const d = safeDate(ts);
+    if (!d) return;
     const dow = d.getDay();
     if (dow === 0 || dow === 5 || dow === 6) {
       const fri = new Date(d);
@@ -3392,8 +3398,8 @@ function computeAchievements(p, allPlayers) {
 
   // Early Bird Special — any log before 10:30 AM
   if (logs.some(ts => {
-    const d = new Date(ts);
-    return d.getHours() < 10 || (d.getHours() === 10 && d.getMinutes() < 30);
+    const d = safeDate(ts);
+    return d && (d.getHours() < 10 || (d.getHours() === 10 && d.getMinutes() < 30));
   })) earned.push('early_bird');
 
   // Rain or Shine — weatherStamp contains RAIN DETECTED or THUNDERSTORM
@@ -3636,6 +3642,8 @@ window.leaveRoom=function(){
   if(!confirm('Leave this challenge?')) return;
   if(unsubscribe) unsubscribe();
   if(unsubMessages) unsubMessages();
+  if(unsubComments) unsubComments();
+  if(unsubBurgerReactions) unsubBurgerReactions();
   localStorage.removeItem('bc_session'); location.reload();
 };
 
@@ -3896,7 +3904,7 @@ function computeHeavyLifting(allPlayers) {
   allPlayers.forEach(p => {
     const count = (p.logs || []).filter(entry => {
       const ts = logTs(entry);
-      return ts && new Date(ts) >= monday;
+      return ts && (safeDate(ts) || new Date(0)) >= monday;
     }).length;
     if (count > top) { top = count; winner = p; }
   });
@@ -4017,7 +4025,8 @@ function computeBadgeProgress(p) {
   const objLogs = (p.logs || []).filter(e => typeof e === 'object' && e.ts);
   const byDay = {};
   objLogs.forEach(e => {
-    const d = new Date(e.ts);
+    const d = safeDate(e.ts);
+    if (!d) return;
     const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     byDay[key] = (byDay[key] || 0) + 1;
   });
@@ -4034,7 +4043,7 @@ function computeBadgeProgress(p) {
   const maxInDay = Math.max(0, ...Object.values(byDay), 0);
   const weekendCounts = {};
   objLogs.forEach(e => {
-    const d = new Date(e.ts), dow = d.getDay();
+    const d = safeDate(e.ts); if (!d) return; const dow = d.getDay();
     if (dow===0||dow===5||dow===6) {
       const fri = new Date(d);
       if (dow===0) fri.setDate(d.getDate()-2);
@@ -4253,7 +4262,7 @@ function renderPlayersList(){
     const avatarEl = isMe
       ? `<div style="position:relative;flex-shrink:0;cursor:pointer" onclick="openAvatarPicker()" title="Change your avatar">
           ${avatarHTML(p,38)}
-          <div style="position:absolute;bottom:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:#F59E0B;display:flex;align-items:center;justify-content:center;font-size:9px;border:1.5px solid var(--bg)">📷</div>
+          <div style="position:absolute;bottom:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:9px;border:1.5px solid var(--bg)">📷</div>
         </div>`
       : avatarHTML(p,38);
     return `<div class="player-row ${cc}">
@@ -4325,7 +4334,7 @@ function renderUnifiedFeed() {
       if (!ts) return;
       const burgerId = (p.id + '_' + ts).replace(/[^a-zA-Z0-9_]/g, '_');
       burgerItems.push({
-        type: 'burger', ts, sortTs: new Date(ts), burgerId, player: p,
+        type: 'burger', ts, sortTs: safeDate(ts) || new Date(0), burgerId, player: p,
         restaurant:        (typeof entry==='object' && entry.restaurant)        || 'Unknown Spot',
         rating:            (typeof entry==='object' && entry.rating)            || 0,
         patties:           (typeof entry==='object' && entry.patties > 0) ? entry.patties : null,
@@ -4501,8 +4510,8 @@ function renderUnifiedFeed() {
       } else {
         locPill = `<span class="grill-pill grill-pill-location no-gps">🕵️‍♂️: Off the Grid</span>`;
       }
-      const d = new Date(item.ts);
-      const timePill = `<span class="grill-pill grill-pill-time">⏰: ${d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit',hour12:true})}, ${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}</span>`;
+      const d = safeDate(item.ts);
+      const timePill = d ? `<span class="grill-pill grill-pill-time">⏰: ${d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit',hour12:true})}, ${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}</span>` : '';
       const weatherPill = item.weatherStamp ? `<span class="grill-pill grill-pill-weather">${escHtml(item.weatherStamp)}</span>` : '';
       const ratingStars = (() => {
         if (!item.rating || item.rating <= 0) return '<span style="color:var(--muted);font-size:12px">— unrated</span>';
@@ -4958,7 +4967,8 @@ let pendingRating = 0;
 let pendingGPS = null;
 let pendingPattyCount = 0;
 let pendingToppings = [];
-let pendingPhoto = '';
+let pendingPhoto = '';      // base64 preview shown in the UI thumbnail
+let pendingPhotoFile = null; // original File — uploaded to Storage at submit time
 window.closeReceipt = function() {
   const r = document.getElementById('order-receipt');
   if (r) { r.classList.remove('show'); r.classList.add('hide'); }
@@ -4990,11 +5000,29 @@ async function compressBurgerPhoto(file) {
   return compressImage(file, 280, 0.40);
 }
 
+// Upload a File to Firebase Storage and return the public download URL.
+// Path: burgerPhotos/{roomId}/{playerId}/{timestamp}_{random}.jpg
+async function uploadBurgerPhoto(file) {
+  if (!storage) throw new Error('Storage not initialized');
+  // Compress to high-quality JPEG for upload (900px, 0.85 quality — no Firestore size concern)
+  const compressed = await compressImage(file, 900, 0.85);
+  // Convert base64 data URL → Blob
+  const res = await fetch(compressed);
+  const blob = await res.blob();
+  const path = `burgerPhotos/${roomId}/${myPlayerId}/${Date.now()}_${uid()}.jpg`;
+  const photoRef = storageRef(storage, path);
+  await uploadBytes(photoRef, blob, { contentType: 'image/jpeg' });
+  return await getDownloadURL(photoRef);
+}
+
 window.onBurgerPhotoSelected = async function(input) {
   const file = input.files[0];
   if (!file) return;
   try {
-    showToast('📷 Compressing image…');
+    showToast('📷 Loading photo…');
+    // Store the raw File for high-quality upload at submit time
+    pendingPhotoFile = file;
+    // Generate a small preview for the thumbnail (same compressed preview as before)
     pendingPhoto = await compressBurgerPhoto(file);
     const thumb = document.getElementById('burger-photo-thumb');
     const btns  = document.getElementById('burger-photo-btns');
@@ -5002,12 +5030,13 @@ window.onBurgerPhotoSelected = async function(input) {
     if (thumb) thumb.src = pendingPhoto;
     if (btns) btns.style.display = 'none';
     if (has)  has.style.display  = 'flex';
-  } catch (e) { console.warn('Photo compress failed', e); showToast('⚠️ Could not load image'); }
+  } catch (e) { console.warn('Photo load failed', e); showToast('⚠️ Could not load image'); }
   input.value = '';
 };
 
 window.clearBurgerPhoto = function() {
   pendingPhoto = '';
+  pendingPhotoFile = null;
   const thumb = document.getElementById('burger-photo-thumb');
   const btns  = document.getElementById('burger-photo-btns');
   const has   = document.getElementById('burger-photo-has');
@@ -5398,7 +5427,8 @@ window.confirmBurger = async function() {
   const snapshotToppings      = [...pendingToppings];
   const snapshotMenuEmoji     = pendingMenuEmoji;
   const snapshotMenuItemName  = pendingMenuItemName;
-  const snapshotPhoto         = pendingPhoto;
+  const snapshotPhoto         = pendingPhoto;      // base64 preview — used for receipt UI only
+  const snapshotPhotoFile     = pendingPhotoFile;  // original File — uploaded to Storage
 
   // ── 1. Show receipt immediately (before the async Firestore write)
   //       so snapshot re-renders can't race against it
@@ -5462,6 +5492,7 @@ window.confirmBurger = async function() {
   const customNameInp = document.getElementById('custom-burger-name');
   if (customNameInp) customNameInp.value = '';
   pendingPhoto = '';
+  pendingPhotoFile = null;
   clearBurgerPhoto();
   const customNameRow2 = document.getElementById('custom-burger-name-row');
   if (customNameRow2) customNameRow2.style.display = 'none';
@@ -5488,8 +5519,19 @@ window.confirmBurger = async function() {
   if (mp2) mp2.style.display = 'none';
   renderRestaurantSuggestions(OHIO_SPOTS.slice(0, 6));
 
-  // ── 3. Write to Firestore (snapshot re-renders happen after receipt is already shown)
-  await changeMyCountWithDetails(1, restaurant, snapshotRating, snapshotGPS, snapshotCount, snapshotToppings, snapshotMenuItemName, snapshotMenuEmoji, snapshotPhoto);
+  // ── 3. Upload photo to Firebase Storage (if any), then write to Firestore
+  let photoToSave = '';
+  if (snapshotPhotoFile && storage) {
+    try {
+      showToast('📤 Uploading photo…');
+      photoToSave = await uploadBurgerPhoto(snapshotPhotoFile);
+    } catch (e) {
+      console.warn('[photo upload] Firebase Storage failed, falling back to compressed base64:', e);
+      // Graceful fallback: use the compressed base64 so the burger still logs
+      photoToSave = snapshotPhoto;
+    }
+  }
+  await changeMyCountWithDetails(1, restaurant, snapshotRating, snapshotGPS, snapshotCount, snapshotToppings, snapshotMenuItemName, snapshotMenuEmoji, photoToSave);
 };
 
 // ── Shared weather code → emoji + label ──────────────────────────────────────
@@ -5565,7 +5607,8 @@ async function backfillWeatherStamps() {
 
   for (const entry of needsStamp) {
     try {
-      const d = new Date(entry.ts);
+      const d = safeDate(entry.ts);
+      if (!d) continue;
       const dateStr = d.toISOString().slice(0, 10);
       const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${entry.lat}&longitude=${entry.lng}&start_date=${dateStr}&end_date=${dateStr}&hourly=weathercode,temperature_2m&timezone=UTC`;
       const data = await fetch(url).then(r => r.json());
@@ -5666,7 +5709,7 @@ async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null
         const alreadyPosted = messages.some(m => m.type === 'milestone' && m.playerId === myPlayerId && m.milestone === newCount);
         if(!alreadyPosted){
           const statsPlayer = {...me, count: newCount, logs: newLogs};
-          const st = computePlayerStats(statsPlayer);
+          const st = computePlayerStats(statsPlayer, { forceFresh: true });
           addDoc(collection(db,'rooms',roomId,'messages'), {
             type: 'milestone',
             playerId: myPlayerId,
@@ -5900,7 +5943,8 @@ function _renderCalendar() {
   (p.logs || []).forEach(entry => {
     const ts = logTs(entry);
     if (!ts) return;
-    const d = new Date(ts);
+    const d = safeDate(ts);
+    if (!d) return;
     const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     dayMap[key] = (dayMap[key] || 0) + 1;
   });
@@ -5939,7 +5983,7 @@ function _renderCalendar() {
   const globalBest = Object.values(
     (p.logs || []).reduce((acc, e) => {
       const ts = logTs(e); if (!ts) return acc;
-      const d2 = new Date(ts);
+      const d2 = safeDate(ts); if (!d2) return acc;
       const k = `${d2.getFullYear()}-${String(d2.getMonth()).padStart(2,'0')}-${String(d2.getDate()).padStart(2,'0')}`;
       acc[k] = (acc[k] || 0) + 1; return acc;
     }, {})
@@ -5967,15 +6011,15 @@ window.openDayDetail = function(year, month, day) {
   const dayLogs = (p.logs || []).filter(entry => {
     const ts = logTs(entry);
     if (!ts) return false;
-    const d = new Date(ts);
-    return d.getFullYear() === year && d.getMonth() === month && d.getDate() === day;
+    const d = safeDate(ts);
+    return d && d.getFullYear() === year && d.getMonth() === month && d.getDate() === day;
   });
 
   // Build mini feed cards
   const logsHtml = dayLogs.map((entry, idx) => {
     const ts = logTs(entry);
-    const d = new Date(ts);
-    const timeStr = d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', hour12:true});
+    const d = safeDate(ts);
+    const timeStr = d ? d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', hour12:true}) : '';
     const isObj = typeof entry === 'object';
     const rawRestaurant = isObj ? (entry.restaurant || '') : '';
     const restaurant = rawRestaurant && rawRestaurant !== 'Unknown spot' ? rawRestaurant : null;
@@ -6091,7 +6135,7 @@ function renderBentoList() {
     const _daysSinceMon = (_day + 6) % 7; // Mon=0, Tue=1, ... Sun=6
     const _weekStart = new Date(_now.getFullYear(), _now.getMonth(), _now.getDate() - _daysSinceMon);
     _weekStart.setHours(0, 0, 0, 0);
-    const thisWeek = (p.logs || []).filter(e => typeof e === 'object' && e.ts && new Date(e.ts) >= _weekStart).length;
+    const thisWeek = (p.logs || []).filter(e => typeof e === 'object' && e.ts && (safeDate(e.ts) || new Date(0)) >= _weekStart).length;
     const weekPill = thisWeek > 0 ? `<span class="pl-pill">🍔 ${thisWeek} this week</span>` : `<span class="pl-pill" style="opacity:0.5">🍔 0 this week</span>`;
     const tiedBadge = isTied ? `<span style="font-size:9px;font-weight:700;color:var(--amber);background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);border-radius:4px;padding:1px 5px;margin-left:4px;letter-spacing:0.03em">TIE</span>` : '';
     const lastSeen = timeAgo(p);
@@ -6156,9 +6200,9 @@ window.openPlayerHistory=function(pid){
 
 function timeAgo(p) {
   const ts = (p.logs || []).map(e => typeof e === 'object' ? e.ts : e).filter(Boolean)
-    .reduce((a,b) => new Date(a) > new Date(b) ? a : b, null);
+    .reduce((a,b) => (safeDate(a) || new Date(0)) > (safeDate(b) || new Date(0)) ? a : b, null);
   if (!ts) return null;
-  const diff = Date.now() - new Date(ts).getTime();
+  const diff = Date.now() - (safeDate(ts) || new Date(0)).getTime();
   const mins = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
@@ -6173,10 +6217,10 @@ function projectedFinish(p) {
   if (logs.length < 2) return null;
   const now = new Date();
   const cutoff = new Date(now - 14 * 86400000);
-  const recent = logs.filter(e => new Date(e.ts) >= cutoff);
+  const recent = logs.filter(e => (safeDate(e.ts) || new Date(0)) >= cutoff);
   if (!recent.length) return null;
-  const oldest = recent.reduce((a,b) => new Date(a.ts) < new Date(b.ts) ? a : b);
-  const daysElapsed = Math.max(1, (now - new Date(oldest.ts)) / 86400000);
+  const oldest = recent.reduce((a,b) => (safeDate(a.ts) || new Date(0)) < (safeDate(b.ts) || new Date(0)) ? a : b);
+  const daysElapsed = Math.max(1, (now - (safeDate(oldest.ts) || new Date(0))) / 86400000);
   const pace = recent.length / daysElapsed;
   if (pace <= 0) return null;
   const daysLeft = (100 - p.count) / pace;
@@ -6460,7 +6504,7 @@ function renderWeeklyDigest() {
   players.forEach(p => {
     (p.logs || []).forEach(entry => {
       if (typeof entry !== 'object' || !entry.ts) return;
-      if (new Date(entry.ts) >= monday) allLogs.push({ ...entry, _player: p });
+      if ((safeDate(entry.ts) || new Date(0)) >= monday) allLogs.push({ ...entry, _player: p });
     });
   });
 
@@ -6676,8 +6720,8 @@ function _duelStars(n) {
   if (n === null) return '<span style="color:var(--muted);font-size:12px">—</span>';
   const full = Math.floor(n), half = (n % 1) >= 0.5;
   return Array.from({length: 5}, (_, i) => {
-    if (i < full) return `<span style="color:#F59E0B">★</span>`;
-    if (i === full && half) return `<span style="color:#F59E0B;opacity:0.5">★</span>`;
+    if (i < full) return `<span style="color:var(--amber)">★</span>`;
+    if (i === full && half) return `<span style="color:var(--amber);opacity:0.5">★</span>`;
     return `<span style="color:#333">★</span>`;
   }).join('') + `<span style="font-size:11px;margin-left:3px;color:var(--muted2)">${n.toFixed(1)}</span>`;
 }
@@ -7288,8 +7332,8 @@ function renderTopRated() {
 
   el.innerHTML = entries.map((item, i) => {
     const c = RING_COLORS[item.player.colorIdx % RING_COLORS.length];
-    const d = new Date(item.ts);
-    const dateStr = `${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)}`;
+    const d = safeDate(item.ts);
+    const dateStr = d ? `${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)}` : '';
     let stars = '';
     for (let s = 1; s <= 5; s++) {
       if (item.rating >= s)          stars += '⭐';
@@ -7393,10 +7437,11 @@ window.flyToMyLocation = function() {
 const RING_COLORS = ['#F87171','#FCD34D','#4ADE80','#22D3EE','#60A5FA','#E879F9','#CBD5E1','#F472B6','#FB7185','#A78BFA','#FDB974','#5EEAD4','#BEF264','#FB923C','#7DD3FC','#818CF8','#FDE047','#E2E8F0'];
 
 // ── Compute personal stats for a player ──────────────────────────────────────
-function computePlayerStats(p) {
+function computePlayerStats(p, { forceFresh = false } = {}) {
   // Use cached normalized logs if available; otherwise normalize on the fly.
   // normalizeLogs handles legacy plain-string entries so no data is ever dropped.
-  const logs = (_derivedState.playerStats && _derivedState.playerStats[p.id])
+  // Pass forceFresh:true when p.logs was just mutated (e.g. milestone post after new log entry).
+  const logs = (!forceFresh && _derivedState.playerStats && _derivedState.playerStats[p.id])
     ? _derivedState.playerStats[p.id].normalized
     : normalizeLogs(p.logs || []);
   const ratedLogs = logs.filter(e => e.rating > 0);
@@ -7427,8 +7472,8 @@ function computePlayerStats(p) {
 function starsHtml(n) {
   const full = Math.floor(n), half = (n % 1) >= 0.5;
   return Array.from({length:5}, (_,i) => {
-    if (i < full) return `<span style="color:#F59E0B;font-size:14px">★</span>`;
-    if (i === full && half) return `<span style="background:linear-gradient(90deg,#F59E0B 50%,#444 50%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:14px">★</span>`;
+    if (i < full) return `<span style="color:var(--amber);font-size:14px">★</span>`;
+    if (i === full && half) return `<span style="background:linear-gradient(90deg,var(--amber) 50%,#444 50%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:14px">★</span>`;
     return `<span style="color:#444;font-size:14px">★</span>`;
   }).join('');
 }
@@ -7511,7 +7556,7 @@ function renderBurgerMap() {
       });
     });
   });
-  feedItems.sort((a, b) => new Date(b.ts) - new Date(a.ts));
+  feedItems.sort((a, b) => (safeDate(b.ts) || new Date(0)) - (safeDate(a.ts) || new Date(0)));
 
   if (!feedItems.length) {
     feedEl.innerHTML = '<div class="map-feed-empty">No pinned burgers yet — log one with location on!</div>';
@@ -7520,8 +7565,8 @@ function renderBurgerMap() {
 
   function feedTimeStr(ts) {
     if (!ts) return '';
-    const d = new Date(ts);
-    if (isNaN(d)) return '';
+    const d = safeDate(ts);
+    if (!d) return '';
     const now = new Date();
     const isToday = d.toDateString() === now.toDateString();
     const time = d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', hour12:true});
@@ -7534,8 +7579,8 @@ function renderBurgerMap() {
     if (!n) return '<span style="color:var(--muted);font-size:10px">No rating</span>';
     const full = Math.floor(n), half = (n % 1) >= 0.5;
     return Array.from({length:5}, (_,i) => {
-      if (i < full) return `<span style="color:#F59E0B;font-size:11px">★</span>`;
-      if (i === full && half) return `<span style="background:linear-gradient(90deg,#F59E0B 50%,#444 50%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:11px">★</span>`;
+      if (i < full) return `<span style="color:var(--amber);font-size:11px">★</span>`;
+      if (i === full && half) return `<span style="background:linear-gradient(90deg,var(--amber) 50%,#444 50%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:11px">★</span>`;
       return `<span style="color:#3A3A3A;font-size:11px">★</span>`;
     }).join('') + `<span style="font-size:9px;color:var(--muted2);margin-left:3px">${n}</span>`;
   }
