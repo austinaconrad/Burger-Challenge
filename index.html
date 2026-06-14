@@ -6445,14 +6445,14 @@ function projectedFinish(p) {
 }
 
 // ── Compute per-player pace stats ────────────────────────────────────────────
-// Returns { weeklyPace, finishDate, finishDateStr, weeksAhead, status }
+// Returns { weeklyPace, finishDate, finishDateStr, burgersAhead, status }
 // status: 'done' | 'ahead' | 'ontrack' | 'behind' | 'inactive'
 // Challenge deadline: 52 weeks (1 year) from the first log in the room.
 function computePaceStats(p) {
-  if (p.count >= 100) return { status: 'done', weeklyPace: null, finishDateStr: null, weeksAhead: null, buffer: null };
+  if (p.count >= 100) return { status: 'done', weeklyPace: null, finishDateStr: null, burgersAhead: null, buffer: null };
 
   const logs = (p.logs || []).filter(e => typeof e === 'object' && e.ts);
-  if (logs.length < 2) return { status: 'inactive', weeklyPace: 0, finishDateStr: null, weeksAhead: null, buffer: null };
+  if (logs.length < 2) return { status: 'inactive', weeklyPace: 0, finishDateStr: null, burgersAhead: null, buffer: null };
 
   const now = new Date();
 
@@ -6465,29 +6465,34 @@ function computePaceStats(p) {
     : 4;
   const weeklyPace = recent.length ? recent.length / weeksElapsed : 0;
 
-  if (weeklyPace <= 0) return { status: 'inactive', weeklyPace: 0, finishDateStr: null, weeksAhead: null, buffer: null };
+  if (weeklyPace <= 0) return { status: 'inactive', weeklyPace: 0, finishDateStr: null, burgersAhead: null, buffer: null };
 
   // Deadline: first log date + 52 weeks
   const allTs = logs.map(e => safeDate(e.ts)).filter(Boolean);
   const firstLog = allTs.length ? new Date(Math.min(...allTs)) : now;
   const deadline = new Date(firstLog.getTime() + 52 * 7 * 86400000);
+  const totalWeeks = 52;
   const weeksToDeadline = Math.max(0, (deadline - now) / 604800000);
   const neededPace = weeksToDeadline > 0 ? (100 - p.count) / weeksToDeadline : Infinity;
 
   // Projected finish
   const weeksLeft = (100 - p.count) / weeklyPace;
   const finishDate = new Date(now.getTime() + weeksLeft * 7 * 86400000);
-  const weeksAhead = weeksToDeadline - weeksLeft; // positive = early, negative = late
+
+  // Burgers ahead/behind: how many more/fewer burgers than expected at this point in the year
+  const weeksElapsedTotal = Math.max(0, (now - firstLog) / 604800000);
+  const expectedByNow = Math.min(100, (weeksElapsedTotal / totalWeeks) * 100);
+  const burgersAhead = Math.round(p.count - expectedByNow);
 
   const finishDateStr = finishDate.toLocaleDateString([], { month: 'short', day: 'numeric',
     year: finishDate.getFullYear() !== now.getFullYear() ? 'numeric' : undefined });
 
   let status;
-  if (weeksAhead > 2)       status = 'ahead';
-  else if (weeksAhead < -2) status = 'behind';
-  else                      status = 'ontrack';
+  if (burgersAhead > 3)       status = 'ahead';
+  else if (burgersAhead < -3) status = 'behind';
+  else                        status = 'ontrack';
 
-  return { status, weeklyPace, finishDateStr, finishDate, weeksAhead: Math.round(weeksAhead), neededPace };
+  return { status, weeklyPace, finishDateStr, finishDate, burgersAhead, neededPace };
 }
 
 function renderPaceTab() {
@@ -6526,9 +6531,9 @@ function renderPaceTab() {
     const pct   = Math.min(100, p.count);
 
     let badgeClass, badgeLabel;
-    if (ps.status === 'done')     { badgeClass = 'pace-done';    badgeLabel = '✓ Finished'; }
-    else if (ps.status === 'ahead')   { badgeClass = 'pace-ahead';   badgeLabel = `+${ps.weeksAhead}w ahead`; }
-    else if (ps.status === 'behind')  { badgeClass = 'pace-behind';  badgeLabel = `${ps.weeksAhead}w behind`; }
+    if (ps.status === 'done')         { badgeClass = 'pace-done';    badgeLabel = '✓ Finished'; }
+    else if (ps.status === 'ahead')   { badgeClass = 'pace-ahead';   badgeLabel = `+${ps.burgersAhead}🍔 ahead`; }
+    else if (ps.status === 'behind')  { badgeClass = 'pace-behind';  badgeLabel = `${ps.burgersAhead}🍔 behind`; }
     else if (ps.status === 'ontrack') { badgeClass = 'pace-ontrack'; badgeLabel = 'On track'; }
     else                              { badgeClass = 'pace-behind';  badgeLabel = 'Inactive'; }
 
