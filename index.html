@@ -2574,14 +2574,14 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
         <div class="duel-picker-row">
           <div class="duel-picker-side duel-picker-left">
             <label class="duel-picker-label">Player 1</label>
-            <select class="duel-select" id="duel-sel-a" onchange="renderDuel()">
+            <select class="duel-select" id="duel-sel-a" onchange="_activeDuelPlayerA=this.value;renderDuel()">
               <option value="">— choose —</option>
             </select>
           </div>
           <div class="duel-vs-badge">🥊</div>
           <div class="duel-picker-side duel-picker-right">
             <label class="duel-picker-label">Player 2</label>
-            <select class="duel-select" id="duel-sel-b" onchange="renderDuel()">
+            <select class="duel-select" id="duel-sel-b" onchange="_activeDuelPlayerB=this.value;renderDuel()">
               <option value="">— choose —</option>
             </select>
           </div>
@@ -3130,9 +3130,9 @@ function getDailyBurgerCount(allPlayers) {
     (p.logs || []).forEach(entry => {
       const ts = logTs(entry);
       if (!ts) return;
-      const d = safeDate(ts);
-      if (!d) return;
-      const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      const dObj = safeDate(ts);
+      if (!dObj) return;
+      const key = `${dObj.getFullYear()}-${String(dObj.getMonth()+1).padStart(2,'0')}-${String(dObj.getDate()).padStart(2,'0')}`;
       if (key === todayKey) total++;
     });
   });
@@ -3339,11 +3339,8 @@ function computeAchievements(p, allPlayers) {
 
   const byDay = {};
   logs.forEach(ts => {
-    const d = safeDate(ts);
-    if (!d) return;
-    // Zero-pad month and day so string sort works correctly across month/year boundaries
-    const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    byDay[key] = (byDay[key] || 0) + 1;
+    const key = tsToDateKey(ts);
+    if (key) byDay[key] = (byDay[key] || 0) + 1;
   });
   if (Object.values(byDay).some(v => v >= 2)) earned.push('double_down');
   if (Object.values(byDay).some(v => v >= 3)) earned.push('iron_stomach');
@@ -3745,63 +3742,96 @@ function subscribeToBurgerReactions(){
 }
 
 // Patch reaction pills for burger cards in-place (no full re-render)
+let _patchRafId = null;
 function patchBurgerReactions() {
-  const feed = document.getElementById('unified-feed');
-  if (!feed) return;
-  Object.entries(burgerReactions).forEach(([burgerId, rxns]) => {
-    const rxnEl = feed.querySelector(`.msg-reactions[data-burger-id="${burgerId}"]`);
-    if (!rxnEl) return;
-    rxnEl.innerHTML = buildReactionPills(rxns, burgerId, 'burger');
-  });
-  // Also clear pills for burgers that lost all reactions
-  feed.querySelectorAll('.msg-reactions[data-burger-id]').forEach(el => {
-    const bid = el.dataset.burgerId;
-    if (!burgerReactions[bid]) el.innerHTML = '';
+  if (_patchRafId) return; // already queued — coalesce into the pending frame
+  _patchRafId = requestAnimationFrame(() => {
+    _patchRafId = null;
+    const feed = document.getElementById('unified-feed');
+    if (!feed) return;
+    // Build all new HTML strings first (read phase — no layout forced)
+    const updates = [];
+    Object.entries(burgerReactions).forEach(([burgerId, rxns]) => {
+      const rxnEl = feed.querySelector(`.msg-reactions[data-burger-id="${burgerId}"]`);
+      if (rxnEl) updates.push({ el: rxnEl, html: buildReactionPills(rxns, burgerId, 'burger') });
+    });
+    feed.querySelectorAll('.msg-reactions[data-burger-id]').forEach(el => {
+      if (!burgerReactions[el.dataset.burgerId]) updates.push({ el, html: '' });
+    });
+    // Write phase — all mutations in one batch
+    updates.forEach(({ el, html }) => { el.innerHTML = html; });
   });
 }
 
 // Patch comment counts on visible cards in-place (no full re-render)
+let _commentRafId = null;
 function patchCommentCounts() {
-  const feed = document.getElementById('unified-feed');
-  if (!feed) return;
-  // Group comments by targetId
-  const byTarget = {};
-  comments.forEach(c => { (byTarget[c.targetId] = byTarget[c.targetId] || []).push(c); });
-  // Update comment buttons
-  feed.querySelectorAll('.feed-comment-btn[data-target-id]').forEach(btn => {
-    const tid = btn.dataset.targetId;
-    const count = (byTarget[tid] || []).length;
-    btn.textContent = count ? `💬 ${count}` : '💬';
-  });
-  // Update open comment threads
-  feed.querySelectorAll('.feed-comment-thread[id]').forEach(thread => {
-    const tid = thread.id.replace('thread-', '');
-    if (!thread.classList.contains('open')) return; // don't update closed threads
-    const list = thread.querySelector('.feed-comment-list');
-    if (!list) return;
-    const targetComments = byTarget[tid] || [];
-    // Determine targetType from existing submit button
-    const sendBtn = thread.querySelector('.comment-send-btn');
-    const targetType = sendBtn?.getAttribute('onclick')?.match(/'([^']+)'\s*\)/)?.[1] || 'message';
-    list.innerHTML = targetComments.map(c => {
-      const color = RING_COLORS[c.colorIdx % RING_COLORS.length];
-      const ini = initials(c.playerName || '?');
-      const timeStr = c.createdAt?.toDate ? formatTime(c.createdAt) : '';
-      return `<div class="feed-comment">
-        <div class="comment-avatar" style="background:${color}22;color:${color};border:1.5px solid ${color}55">${ini}</div>
-        <div class="comment-body">
-          <div class="comment-meta">
-            <span class="comment-name">${escHtml(c.playerName||'?')}</span>
-            ${timeStr ? `<span class="comment-time">${timeStr}</span>` : ''}
+  if (_commentRafId) return; // coalesce rapid calls into one frame
+  _commentRafId = requestAnimationFrame(() => {
+    _commentRafId = null;
+    const feed = document.getElementById('unified-feed');
+    if (!feed) return;
+    // Group comments by targetId (read phase)
+    const byTarget = {};
+    comments.forEach(c => { (byTarget[c.targetId] = byTarget[c.targetId] || []).push(c); });
+
+    // Collect all pending writes before touching the DOM
+    const btnUpdates = [];
+    feed.querySelectorAll('.feed-comment-btn[data-target-id]').forEach(btn => {
+      const count = (byTarget[btn.dataset.targetId] || []).length;
+      const text = count ? `💬 ${count}` : '💬';
+      if (btn.textContent !== text) btnUpdates.push({ el: btn, text });
+    });
+    const threadUpdates = [];
+    feed.querySelectorAll('.feed-comment-thread[id]').forEach(thread => {
+      if (!thread.classList.contains('open')) return;
+      const list = thread.querySelector('.feed-comment-list');
+      if (!list) return;
+      const tid = thread.id.replace('thread-', '');
+      const targetComments = byTarget[tid] || [];
+      const html = targetComments.map(c => {
+        const color = RING_COLORS[c.colorIdx % RING_COLORS.length];
+        const ini = initials(c.playerName || '?');
+        const timeStr = c.createdAt?.toDate ? formatTime(c.createdAt) : '';
+        return `<div class="feed-comment">
+          <div class="comment-avatar" style="background:${color}22;color:${color};border:1.5px solid ${color}55">${ini}</div>
+          <div class="comment-body">
+            <div class="comment-meta">
+              <span class="comment-name">${escHtml(c.playerName||'?')}</span>
+              ${timeStr ? `<span class="comment-time">${timeStr}</span>` : ''}
+            </div>
+            <div class="comment-text">${escHtml(c.text)}</div>
           </div>
-          <div class="comment-text">${escHtml(c.text)}</div>
-        </div>
-      </div>`;
-    }).join('');
-    // Re-measure after content update so the accordion height stays correct
-    thread.style.maxHeight = thread.scrollHeight + 'px';
+        </div>`;
+      }).join('');
+      threadUpdates.push({ list, thread, html });
+    });
+
+    // Write phase — all mutations batched
+    btnUpdates.forEach(({ el, text }) => { el.textContent = text; });
+    threadUpdates.forEach(({ list, thread, html }) => {
+      list.innerHTML = html;
+      thread.style.maxHeight = thread.scrollHeight + 'px';
+    });
   });
 }
+
+// ── Date-key memoization ──────────────────────────────────────────────────────
+// Converts a timestamp string → "YYYY-M-D" day key (month is 0-indexed so
+// string sort within the same year is safe, and it matches getMonth() output).
+// Cached in a Map so repeated calls on identical ts strings cost one Map lookup.
+const _dateKeyCache = new Map();
+function tsToDateKey(ts) {
+  if (!ts) return null;
+  if (_dateKeyCache.has(ts)) return _dateKeyCache.get(ts);
+  const d = safeDate(ts);
+  if (!d) { _dateKeyCache.set(ts, null); return null; }
+  const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+  _dateKeyCache.set(ts, key);
+  return key;
+}
+// Clear the cache each Firebase snapshot so stale ts→key entries don't linger forever.
+function _clearDateKeyCache() { _dateKeyCache.clear(); }
 
 // ── Derived state cache ───────────────────────────────────────────────────────
 // Computed once per Firebase snapshot; consumed by render functions so they
@@ -3809,6 +3839,7 @@ function patchCommentCounts() {
 let _derivedState = {};
 
 function computeDerivedState() {
+  _clearDateKeyCache(); // flush ts→dateKey memo between snapshots
   // 1. Sorted player list (descending count)
   const sorted = [...players].sort((a, b) => b.count - a.count);
 
@@ -4025,10 +4056,8 @@ function computeBadgeProgress(p) {
   const objLogs = (p.logs || []).filter(e => typeof e === 'object' && e.ts);
   const byDay = {};
   objLogs.forEach(e => {
-    const d = safeDate(e.ts);
-    if (!d) return;
-    const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    byDay[key] = (byDay[key] || 0) + 1;
+    const key = tsToDateKey(e.ts);
+    if (key) byDay[key] = (byDay[key] || 0) + 1;
   });
   const dayKeys = Object.keys(byDay).sort();
   let streak = 1, best = 1;
@@ -4969,6 +4998,8 @@ let pendingPattyCount = 0;
 let pendingToppings = [];
 let pendingPhoto = '';      // base64 preview shown in the UI thumbnail
 let pendingPhotoFile = null; // original File — uploaded to Storage at submit time
+let _activeDuelPlayerA = ''; // persists duel selections across tab switches
+let _activeDuelPlayerB = '';
 window.closeReceipt = function() {
   const r = document.getElementById('order-receipt');
   if (r) { r.classList.remove('show'); r.classList.add('hide'); }
@@ -5943,10 +5974,8 @@ function _renderCalendar() {
   (p.logs || []).forEach(entry => {
     const ts = logTs(entry);
     if (!ts) return;
-    const d = safeDate(ts);
-    if (!d) return;
-    const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    dayMap[key] = (dayMap[key] || 0) + 1;
+    const key = tsToDateKey(ts);
+    if (key) dayMap[key] = (dayMap[key] || 0) + 1;
   });
 
   // Month header
@@ -5983,8 +6012,7 @@ function _renderCalendar() {
   const globalBest = Object.values(
     (p.logs || []).reduce((acc, e) => {
       const ts = logTs(e); if (!ts) return acc;
-      const d2 = safeDate(ts); if (!d2) return acc;
-      const k = `${d2.getFullYear()}-${String(d2.getMonth()).padStart(2,'0')}-${String(d2.getDate()).padStart(2,'0')}`;
+      const k = tsToDateKey(ts); if (!k) return acc;
       acc[k] = (acc[k] || 0) + 1; return acc;
     }, {})
   ).reduce((a, b) => Math.max(a, b), 0);
@@ -6593,14 +6621,16 @@ function populateDuelSelects() {
   const selA = document.getElementById('duel-sel-a');
   const selB = document.getElementById('duel-sel-b');
   if (!selA || !selB) return;
-  const prevA = selA.value, prevB = selB.value;
+  // Prefer the persisted globals; fall back to whatever the DOM currently has
+  const prevA = _activeDuelPlayerA || selA.value;
+  const prevB = _activeDuelPlayerB || selB.value;
   const sorted = [...players].sort((a, b) => b.count - a.count);
   const opts = sorted.map(p => `<option value="${escHtml(p.id)}">${escHtml(p.name)} (${p.count || 0})</option>`).join('');
   selA.innerHTML = '<option value="">— choose —</option>' + opts;
   selB.innerHTML = '<option value="">— choose —</option>' + opts;
   // Restore previous selections if still valid
-  if (prevA && sorted.find(p => p.id === prevA)) selA.value = prevA;
-  if (prevB && sorted.find(p => p.id === prevB)) selB.value = prevB;
+  if (prevA && sorted.find(p => p.id === prevA)) { selA.value = prevA; _activeDuelPlayerA = prevA; }
+  if (prevB && sorted.find(p => p.id === prevB)) { selB.value = prevB; _activeDuelPlayerB = prevB; }
 }
 
 // ── Helper: compute duel stats for one player ────────────────────────────────
@@ -6647,10 +6677,8 @@ function _duelStats(p) {
   // ── Streak ────────────────────────────────────────────────────────────────
   const daySet = {};
   logs.forEach(e => {
-    const d = safeDate(e.ts);
-    if (!d) return;
-    const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-    daySet[key] = true;
+    const key = tsToDateKey(e.ts);
+    if (key) daySet[key] = true;
   });
   const dayKeys = Object.keys(daySet).sort((a, b) => {
     const [ay, am, ad] = a.split('-').map(Number);
@@ -7483,6 +7511,7 @@ function renderBurgerMap() {
     burgerMap = L.map('burger-map', {
       center: [40.4173, -82.9071], zoom: 7,
       minZoom: 3,
+      preferCanvas: true,
     });
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/">CARTO</a>',
