@@ -6447,12 +6447,16 @@ function projectedFinish(p) {
 // ── Compute per-player pace stats ────────────────────────────────────────────
 // Returns { weeklyPace, finishDate, finishDateStr, burgersAhead, status }
 // status: 'done' | 'ahead' | 'ontrack' | 'behind' | 'inactive'
-// Challenge deadline: 52 weeks (1 year) from the first log in the room.
+// Challenge window: Memorial Day 2026 (May 25) → Labor Day 2026 (Sept 7)
+const CHALLENGE_START = new Date(2026, 4, 25); // May 25, 2026
+const CHALLENGE_END   = new Date(2026, 8, 7);  // Sept 7, 2026
+const CHALLENGE_MS    = CHALLENGE_END - CHALLENGE_START;
+
 function computePaceStats(p) {
-  if (p.count >= 100) return { status: 'done', weeklyPace: null, finishDateStr: null, burgersAhead: null, buffer: null };
+  if (p.count >= 100) return { status: 'done', weeklyPace: null, finishDateStr: null, burgersAhead: null, neededPace: null };
 
   const logs = (p.logs || []).filter(e => typeof e === 'object' && e.ts);
-  if (logs.length < 2) return { status: 'inactive', weeklyPace: 0, finishDateStr: null, burgersAhead: null, buffer: null };
+  if (logs.length < 2) return { status: 'inactive', weeklyPace: 0, finishDateStr: null, burgersAhead: null, neededPace: null };
 
   const now = new Date();
 
@@ -6465,27 +6469,23 @@ function computePaceStats(p) {
     : 4;
   const weeklyPace = recent.length ? recent.length / weeksElapsed : 0;
 
-  if (weeklyPace <= 0) return { status: 'inactive', weeklyPace: 0, finishDateStr: null, burgersAhead: null, buffer: null };
+  if (weeklyPace <= 0) return { status: 'inactive', weeklyPace: 0, finishDateStr: null, burgersAhead: null, neededPace: null };
 
-  // Deadline: first log date + 52 weeks
-  const allTs = logs.map(e => safeDate(e.ts)).filter(Boolean);
-  const firstLog = allTs.length ? new Date(Math.min(...allTs)) : now;
-  const deadline = new Date(firstLog.getTime() + 52 * 7 * 86400000);
-  const totalWeeks = 52;
-  const weeksToDeadline = Math.max(0, (deadline - now) / 604800000);
+  // Weeks remaining until Labor Day
+  const weeksToDeadline = Math.max(0, (CHALLENGE_END - now) / 604800000);
   const neededPace = weeksToDeadline > 0 ? (100 - p.count) / weeksToDeadline : Infinity;
 
-  // Projected finish
+  // Projected finish at current pace
   const weeksLeft = (100 - p.count) / weeklyPace;
   const finishDate = new Date(now.getTime() + weeksLeft * 7 * 86400000);
-
-  // Burgers ahead/behind: how many more/fewer burgers than expected at this point in the year
-  const weeksElapsedTotal = Math.max(0, (now - firstLog) / 604800000);
-  const expectedByNow = Math.min(100, (weeksElapsedTotal / totalWeeks) * 100);
-  const burgersAhead = Math.round(p.count - expectedByNow);
-
   const finishDateStr = finishDate.toLocaleDateString([], { month: 'short', day: 'numeric',
     year: finishDate.getFullYear() !== now.getFullYear() ? 'numeric' : undefined });
+
+  // Burgers ahead/behind: actual count vs. where you should be on a straight line
+  // from Memorial Day (0 burgers) to Labor Day (100 burgers)
+  const elapsedMs    = Math.max(0, now - CHALLENGE_START);
+  const expectedByNow = Math.min(100, (elapsedMs / CHALLENGE_MS) * 100);
+  const burgersAhead  = Math.round(p.count - expectedByNow);
 
   let status;
   if (burgersAhead > 3)       status = 'ahead';
@@ -6533,7 +6533,7 @@ function renderPaceTab() {
     let badgeClass, badgeLabel;
     if (ps.status === 'done')         { badgeClass = 'pace-done';    badgeLabel = '✓ Finished'; }
     else if (ps.status === 'ahead')   { badgeClass = 'pace-ahead';   badgeLabel = `+${ps.burgersAhead}🍔 ahead`; }
-    else if (ps.status === 'behind')  { badgeClass = 'pace-behind';  badgeLabel = `${ps.burgersAhead}🍔 behind`; }
+    else if (ps.status === 'behind')  { badgeClass = 'pace-behind';  badgeLabel = `${Math.abs(ps.burgersAhead)}🍔 behind`; }
     else if (ps.status === 'ontrack') { badgeClass = 'pace-ontrack'; badgeLabel = 'On track'; }
     else                              { badgeClass = 'pace-behind';  badgeLabel = 'Inactive'; }
 
