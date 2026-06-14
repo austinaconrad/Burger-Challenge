@@ -282,6 +282,7 @@ header #spectator-pill{
   pointer-events: none;
   z-index: 2;
   animation: shimmerSweep 7s ease-in-out infinite;
+  animation-fill-mode: backwards; /* hold 0% keyframe (off-screen) during delay period */
 }
 /* Stagger each card type so sweeps don't all fire simultaneously */
 .msg-card::after       { animation-delay: 1.4s; }
