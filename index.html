@@ -6484,8 +6484,8 @@ function computePaceStats(p) {
   // Burgers ahead/behind: actual count vs. where you should be on a straight line
   // from Memorial Day (0 burgers) to Labor Day (100 burgers)
   const elapsedMs    = Math.max(0, now - CHALLENGE_START);
-  const expectedByNow = Math.min(100, (elapsedMs / CHALLENGE_MS) * 100);
-  const burgersAhead  = Math.round(p.count - expectedByNow);
+  const expectedByNow = Math.floor(Math.min(100, (elapsedMs / CHALLENGE_MS) * 100));
+  const burgersAhead  = p.count - expectedByNow;
 
   let status;
   if (burgersAhead > 0)      status = 'ahead';
