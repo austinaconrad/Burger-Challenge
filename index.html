@@ -3456,21 +3456,24 @@ function compressAvatarImage(file) {
   });
 }
 
-function compressImage(file) {
+// maxPx and quality are optional; callers can pass smaller values to produce
+// a thumbnail-sized result (e.g. burger log photos stored in Firestore need
+// to stay tiny to respect the 1 MB document-size limit).
+function compressImage(file, maxPx = MAX_IMAGE_PX, quality = JPEG_QUALITY) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = e => {
       const img = new Image();
       img.onload = () => {
         let w = img.width, h = img.height;
-        if (w > MAX_IMAGE_PX || h > MAX_IMAGE_PX) {
-          if (w > h) { h = Math.round(h * MAX_IMAGE_PX / w); w = MAX_IMAGE_PX; }
-          else       { w = Math.round(w * MAX_IMAGE_PX / h); h = MAX_IMAGE_PX; }
+        if (w > maxPx || h > maxPx) {
+          if (w > h) { h = Math.round(h * maxPx / w); w = maxPx; }
+          else       { w = Math.round(w * maxPx / h); h = maxPx; }
         }
         const canvas = document.createElement('canvas');
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', JPEG_QUALITY));
+        resolve(canvas.toDataURL('image/jpeg', quality));
       };
       img.onerror = reject;
       img.src = e.target.result;
@@ -5665,7 +5668,15 @@ async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null
       }
     }
     renderBurgerMap();
-  }catch(e){showToast('⚠️ Sync error — check connection')}
+  }catch(e){
+    console.error('[burger log] Firestore write failed:', e);
+    const msg = (e?.message || '').toLowerCase();
+    if (msg.includes('exceed') || msg.includes('size') || msg.includes('bytes')) {
+      showToast('⚠️ Photo too large for log — try a smaller image');
+    } else {
+      showToast('⚠️ Sync error — check connection');
+    }
+  }
 }
 
 window.changeMyCount = async function(delta){
