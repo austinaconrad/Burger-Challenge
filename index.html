@@ -219,22 +219,7 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,8vw,50px);font-weigh
 .empty-state-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.06em;color:var(--text);opacity:0.7}
 .empty-state-sub{font-size:13px;color:var(--muted2);line-height:1.5;max-width:220px}
 
-/* ── Scroll-linked header ─────────────────────────────────────────────── */
-header{transition:padding 0.25s ease,gap 0.25s ease}
-header.scrolled .burger-deco,
-header.scrolled h1,
-header.scrolled #stat-pills-row,
-header.scrolled #spectator-pill{
-  opacity:0;max-height:0;overflow:hidden;pointer-events:none;
-  transition:opacity 0.25s ease,max-height 0.25s ease;
-}
-header .burger-deco,
-header h1,
-header #stat-pills-row,
-header #spectator-pill{
-  transition:opacity 0.25s ease,max-height 0.25s ease;
-  max-height:120px;
-}
+/* Scroll-linked header compression removed — caused layout-shift feedback loop on ranks tab */
 
 /* ═══════════════════════════════════════════════════════════════════════════
    PREMIUM VISUAL SUITE
@@ -7954,28 +7939,9 @@ requestAnimationFrame(() => {
 const _prevCounts = {};
 const _prevRanks  = {};
 
-// ── Scroll-linked header compression ─────────────────────────────────────────
-// Compresses the header when the user scrolls down on feed/list tabs.
-// Uses the main window scroll (the app is not in an inner scroll container at the top level).
-let _headerScrollTicking = false;
-const _scrollThreshold = 40;
-window.addEventListener('scroll', () => {
-  if (_headerScrollTicking) return;
-  _headerScrollTicking = true;
-  requestAnimationFrame(() => {
-    _headerScrollTicking = false;
-    // Only apply on tabs that don't already force-compress the header via body class
-    const isCompressedTab = document.body.classList.contains('feed-active') ||
-                            document.body.classList.contains('map-active') ||
-                            document.body.classList.contains('racing-active') ||
-                            document.body.classList.contains('duel-active');
-    if (isCompressedTab) return;
-    const header = document.querySelector('header');
-    if (!header) return;
-    const scrolled = window.scrollY > _scrollThreshold;
-    header.classList.toggle('scrolled', scrolled);
-  });
-}, { passive: true });
+// Scroll-linked header compression removed — the max-height layout transition
+// caused a feedback loop: collapsing the header shifted content up, changing
+// window.scrollY, which re-triggered the threshold check and created a jump.
 </script>
 </body>
 </html>
