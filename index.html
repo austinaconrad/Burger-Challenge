@@ -6488,9 +6488,9 @@ function computePaceStats(p) {
   const burgersAhead  = Math.round(p.count - expectedByNow);
 
   let status;
-  if (burgersAhead > 3)       status = 'ahead';
-  else if (burgersAhead < -3) status = 'behind';
-  else                        status = 'ontrack';
+  if (burgersAhead > 0)      status = 'ahead';
+  else if (burgersAhead < 0) status = 'behind';
+  else                       status = 'ontrack';
 
   return { status, weeklyPace, finishDateStr, finishDate, burgersAhead, neededPace };
 }
