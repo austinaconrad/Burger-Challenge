@@ -235,6 +235,101 @@ header #spectator-pill{
   transition:opacity 0.25s ease,max-height 0.25s ease;
   max-height:120px;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PREMIUM VISUAL SUITE
+   1. Specular shimmer sweep on glass cards
+   2. Color-matched avatar glow
+   3. Bottom nav active glow dot
+   4. Map pin styles (SVG teardrop defined in JS)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Specular shimmer sweep ──────────────────────────────────────────────
+   A single thin light stripe drifts across glass surfaces every ~7 s.
+   The stripe is fully transparent for most of the cycle (opacity:0 from 22%→100%)
+   so the card reads as calm until the moment of shimmer.                        */
+@keyframes shimmerSweep {
+  0%   { transform: translateX(-140%) skewX(-18deg); opacity:1; }
+  22%  { transform: translateX(280%)  skewX(-18deg); opacity:1; }
+  22.01% { opacity:0; }
+  100% { transform: translateX(280%)  skewX(-18deg); opacity:0; }
+}
+/* Cards that receive the shimmer — must have overflow:hidden + position:relative */
+.pl-row,
+.msg-card,
+.milestone-card,
+.tr-card,
+.setup-card,
+.grill-card,
+.duel-stat-row {
+  overflow: hidden;
+}
+.pl-row::after,
+.msg-card::after,
+.milestone-card::after,
+.tr-card::after,
+.setup-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(255,255,255,0.055) 50%,
+    rgba(255,255,255,0.028) 55%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: 2;
+  animation: shimmerSweep 7s ease-in-out infinite;
+}
+/* Stagger each card type so sweeps don't all fire simultaneously */
+.msg-card::after       { animation-delay: 1.4s; }
+.milestone-card::after { animation-delay: 2.8s; }
+.tr-card::after        { animation-delay: 4.2s; }
+.setup-card::after     { animation-delay: 0.7s; }
+/* Odd/even stagger within the ranks list */
+.pl-row:nth-child(even)::after { animation-delay: 3.5s; }
+.pl-row:nth-child(odd)::after  { animation-delay: 6.3s; }
+
+/* ── 2. Color-matched avatar glow ───────────────────────────────────────────
+   The inline style on each .pl-avatar already sets border color via ${c}44.
+   We layer a CSS var(--av-glow) box-shadow that JS sets per-avatar.          */
+.pl-avatar {
+  transition: box-shadow 0.3s ease;
+}
+
+/* ── 3. Bottom nav active glow dot ─────────────────────────────────────────
+   A radial amber orb sits behind the active tab emoji, giving the tab bar
+   an iOS 18-style ambient glow treatment on the selected button.              */
+.tab-btn.active::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 38px;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 40%,
+    rgba(245,158,11,0.38) 0%,
+    rgba(245,158,11,0.18) 40%,
+    transparent 72%
+  );
+  filter: blur(5px);
+  z-index: 0;
+  pointer-events: none;
+  animation: tabGlowPulse 3s ease-in-out infinite;
+}
+@keyframes tabGlowPulse {
+  0%,100% { opacity: 0.85; transform: translateX(-50%) scaleX(1); }
+  50%      { opacity: 1;    transform: translateX(-50%) scaleX(1.12); }
+}
+/* Ensure emoji and label sit above the glow orb */
+.tab-btn .tab-emoji,
+.tab-btn .tab-label,
+.tab-btn .tab-unread { position: relative; z-index: 1; }
+
 .lb-card{
   background:var(--surface);
   backdrop-filter:var(--glass-blur);
@@ -6305,7 +6400,7 @@ function renderBentoList() {
     const lastSeenHtml = lastSeen ? `<span style="font-size:9px;color:var(--muted);font-weight:500;margin-left:4px">${lastSeen}</span>` : '';
     return `<div class="pl-row ${rankCls}" data-pid="${escHtml(p.id)}" style="animation-delay:${Math.min(i*0.04,0.35)}s;cursor:pointer" onclick="openCalModal('${p.id}')" title="View burger history">
       <div class="pl-rank">${rank}</div>
-      <div class="pl-avatar" style="background:${c}20;color:${c};border:1.5px solid ${c}44;${p.avatar ? 'overflow:hidden;padding:0' : ''}">${p.avatar ? `<img src="${p.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:9px" alt="${escHtml(p.name)}"/>` : initials(p.name)}</div>
+      <div class="pl-avatar" style="background:${c}20;color:${c};border:1.5px solid ${c}55;box-shadow:0 0 10px ${c}44,0 0 22px ${c}1a;${p.avatar ? 'overflow:hidden;padding:0' : ''}">${p.avatar ? `<img src="${p.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:9px" alt="${escHtml(p.name)}"/>` : initials(p.name)}</div>
       <div class="pl-info">
         <div class="pl-name">
           ${escHtml(p.name)}
@@ -7705,8 +7800,16 @@ function renderBurgerMap() {
       const coord = [lat, lng];
       const icon = L.divIcon({
         className: '',
-        html: `<div style="width:28px;height:28px;border-radius:50%;background:${color};border:2.5px solid rgba(255,255,255,0.85);display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,0.6)">🍔</div>`,
-        iconSize: [28,28], iconAnchor: [14,14]
+        html: `<div style="position:relative;width:30px;height:38px;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.7))">
+          <svg viewBox="0 0 30 38" width="30" height="38" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 0C6.716 0 0 6.716 0 15c0 9.5 15 23 15 23S30 24.5 30 15C30 6.716 23.284 0 15 0z" fill="${color}"/>
+            <path d="M15 2C7.82 2 2 7.82 2 15c0 8.4 13 20.5 13 20.5S28 23.4 28 15C28 7.82 22.18 2 15 2z" fill="rgba(255,255,255,0.14)"/>
+            <circle cx="15" cy="15" r="9.5" fill="rgba(0,0,0,0.22)"/>
+          </svg>
+          <span style="position:absolute;top:6px;left:50%;transform:translateX(-50%);font-size:13px;line-height:1;user-select:none">🍔</span>
+        </div>`,
+        iconSize: [30, 38],
+        iconAnchor: [15, 38]
       });
       const ini = p.name.trim().split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
       const timeStr = ts ? formatTime(ts) : '';
