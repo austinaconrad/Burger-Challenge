@@ -6505,7 +6505,7 @@ function renderPaceTab() {
 
   const sorted = [...players].sort((a, b) => b.count - a.count);
   const totalBurgers = players.reduce((s, p) => s + (p.count || 0), 0);
-  const aheadCount   = players.filter(p => computePaceStats(p).status === 'ahead').length;
+  const aheadCount   = players.filter(p => { const s = computePaceStats(p).status; return s === 'ahead' || s === 'ontrack'; }).length;
   const doneCount    = players.filter(p => p.count >= 100).length;
 
   // ── Summary row ──────────────────────────────────────────────────────────
@@ -6543,8 +6543,16 @@ function renderPaceTab() {
       ? `<div class="pace-projection" style="color:#4ADE80">🏆 <span>Challenge complete!</span></div>`
       : `<div class="pace-projection">Not enough recent data to project</div>`;
 
-    const paceStr   = ps.weeklyPace != null ? ps.weeklyPace.toFixed(1) : '—';
-    const neededStr = ps.neededPace != null ? ps.neededPace.toFixed(1) : '—';
+    const paceStr = ps.weeklyPace != null ? ps.weeklyPace.toFixed(1) : '—';
+
+    // Best day: max burgers logged in a single day
+    const dayTotals = {};
+    (p.logs || []).filter(e => typeof e === 'object' && e.ts).forEach(e => {
+      const d = (safeDate(e.ts) || new Date()).toLocaleDateString();
+      dayTotals[d] = (dayTotals[d] || 0) + 1;
+    });
+    const bestDay = Object.values(dayTotals).length ? Math.max(...Object.values(dayTotals)) : 0;
+    const bestDayStr = bestDay > 0 ? bestDay + (bestDay === 1 ? ' 🍔' : ' 🍔') : '—';
 
     let statusColor = ps.status === 'ahead' ? '#4ADE80' : ps.status === 'behind' ? '#F87171' : ps.status === 'done' ? '#4ADE80' : 'var(--amber)';
 
@@ -6569,8 +6577,8 @@ function renderPaceTab() {
           <div class="pace-stat-lbl">Per week</div>
         </div>
         <div class="pace-stat">
-          <div class="pace-stat-val">${ps.status === 'done' ? '✓' : neededStr}</div>
-          <div class="pace-stat-lbl">Needed</div>
+          <div class="pace-stat-val">${bestDayStr}</div>
+          <div class="pace-stat-lbl">Best day</div>
         </div>
         <div class="pace-stat">
           <div class="pace-stat-val">${p.count}</div>
