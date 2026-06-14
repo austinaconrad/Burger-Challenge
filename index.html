@@ -546,10 +546,10 @@ body.map-active header .burger-deco,
 body.map-active header h1,
 body.map-active header #stat-pills-row,
 body.map-active header #spectator-pill,
-body.racing-active header .burger-deco,
-body.racing-active header h1,
-body.racing-active header #stat-pills-row,
-body.racing-active header #spectator-pill,
+body.pace-active header .burger-deco,
+body.pace-active header h1,
+body.pace-active header #stat-pills-row,
+body.pace-active header #spectator-pill,
 body.tally-active header .burger-deco,
 body.tally-active header h1,
 body.tally-active header #stat-pills-row,
@@ -564,13 +564,13 @@ body.duel-active header #stat-pills-row,
 body.duel-active header #spectator-pill{display:none!important}
 body.feed-active header,
 body.map-active header,
-body.racing-active header,
+body.pace-active header,
 body.tally-active header,
 body.leaderboard-active header,
 body.duel-active header{padding:6px 0 0!important;gap:0!important}
 body.feed-active .tabs,
 body.map-active .tabs,
-body.racing-active .tabs,
+body.pace-active .tabs,
 body.tally-active .tabs,
 body.leaderboard-active .tabs,
 body.duel-active .tabs{
@@ -878,11 +878,6 @@ body.duel-active .tabs{
   filter: drop-shadow(0 2px 6px rgba(0,0,0,0.7)) drop-shadow(0 0 8px rgba(251,191,36,0.6));
 }
 
-/* ── Racing-specific expansion ── */
-body.racing-active #race-track-container {
-  height: calc(100dvh - 130px - 80px);
-  min-height: 320px;
-}
 /* ── Map-specific expansions ── */
 body.map-active .map-wrap{
   border-radius:10px;
@@ -2083,127 +2078,79 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 .sticker-label.locked { color: rgba(255,255,255,0.45); }
 
 /* ══════════════════════════════════════════════
-   🏇 RACING TAB
+   📈 PACE TAB
    ══════════════════════════════════════════════ */
-#race-track-wrap { padding: 4px 0 16px; }
-#race-track-container {
+#pace-root { padding: 4px 0 16px; }
+.pace-summary-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.pace-summary-card {
+  background: rgba(22,13,2,0.7);
+  border: 1px solid rgba(245,158,11,0.14);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+.pace-summary-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  line-height: 1;
+  color: var(--amber);
+}
+.pace-summary-lbl {
+  font-size: 10px;
+  color: var(--muted2);
+  margin-top: 3px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.pace-card {
+  background: rgba(18,10,1,0.72);
+  border: 1px solid rgba(245,158,11,0.13);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 8px;
   position: relative;
-  height: 600px;
-  border-radius: 16px;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: var(--shadow-card);
-  background: linear-gradient(90deg, #0a2e10 0%, #1a5c28 35%, #226e32 65%, #1a5c28 100%);
-  margin-bottom: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s;
 }
-/* Horizontal grass texture stripes */
-#race-track-container::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0px, transparent 22px,
-    rgba(0,0,0,0.05) 22px, rgba(0,0,0,0.05) 44px
-  );
-  pointer-events: none;
-  z-index: 0;
+.pace-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-card), 0 6px 20px rgba(0,0,0,0.3); }
+.pace-card.pace-leader { border-color: rgba(245,158,11,0.42); }
+.pace-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.pace-avatar {
+  width: 36px; height: 36px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800; font-family: 'Barlow', sans-serif;
+  flex-shrink: 0;
 }
-#race-lanes {
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  inset: 0;
-  z-index: 2;
+.pace-name { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1; }
+.pace-sub  { font-size: 11px; color: var(--muted2); margin-top: 2px; }
+.pace-status-badge {
+  margin-left: auto; font-size: 10px; font-weight: 700;
+  padding: 3px 9px; border-radius: 999px; white-space: nowrap;
+  letter-spacing: 0.03em; flex-shrink: 0;
 }
-.jockey-lane {
-  flex: 1;
-  position: relative;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  min-height: 0;
-  overflow: visible;
+.pace-ahead  { background: rgba(34,197,94,0.15); color: #4ADE80; border: 1px solid rgba(34,197,94,0.3); }
+.pace-behind { background: rgba(248,113,113,0.12); color: #F87171; border: 1px solid rgba(248,113,113,0.25); }
+.pace-ontrack{ background: rgba(245,158,11,0.12); color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
+.pace-done   { background: rgba(34,197,94,0.12); color: #4ADE80; border: 1px solid rgba(34,197,94,0.25); }
+.pace-track-wrap {
+  height: 5px; background: rgba(255,255,255,0.07);
+  border-radius: 999px; overflow: hidden; margin-bottom: 8px;
 }
-.jockey-lane:last-child { border-bottom: none; }
-/* Horse moves left → right */
-.jockey-horse {
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  transition: left 2.8s cubic-bezier(0.25, 1, 0.5, 1);
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 2px;
-  z-index: 10;
-  cursor: pointer;
+.pace-track-fill { height: 100%; border-radius: 999px; transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+.pace-projection {
+  font-size: 11px; color: var(--muted2); text-align: center;
+  padding: 5px 8px; background: rgba(255,255,255,0.03);
+  border-radius: 7px; border: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 8px;
 }
-.jockey-horse:hover { z-index: 20; }
-/* Gallop bob — vertical */
-.horse-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-  animation: gallopBob var(--gallop-dur, 1.4s) ease-in-out infinite var(--gallop-delay, 0s);
+.pace-projection span { color: var(--text); font-weight: 600; }
+.pace-stats-row {
+  display: flex; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;
 }
-@keyframes gallopBob {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-3px); }
-}
-/* Horse faces right — flip the naturally-left emoji */
-.horse-emoji {
-  font-size: 20px;
-  line-height: 1;
-  display: block;
-  transform: scaleX(-1);
-  filter: drop-shadow(0 2px 5px rgba(0,0,0,0.7));
-}
-.jockey-horse:hover .horse-emoji { filter: drop-shadow(0 2px 10px rgba(255,255,255,0.4)) drop-shadow(0 2px 5px rgba(0,0,0,0.7)); }
-/* Dust — appears to the LEFT (behind horse going right), order:-1 forces it first in flex row */
-.dust-trail {
-  font-size: 12px;
-  line-height: 1;
-  transform: scaleX(-1);
-  order: -1;
-  animation: dustFloat 0.7s ease-in-out infinite;
-  opacity: 0.8;
-}
-@keyframes dustFloat {
-  0%, 100% { transform: scaleX(-1) scale(1);   opacity: 0.8; }
-  50%       { transform: scaleX(-1) scale(1.2); opacity: 0.35; }
-}
-.jockey-badge {
-  color: #fff;
-  font-size: 6px;
-  font-weight: 800;
-  padding: 1px 4px;
-  border-radius: 3px;
-  white-space: nowrap;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.5);
-  font-family: 'Inter', sans-serif;
-  letter-spacing: 0.02em;
-}
-/* Player initial label pinned on left edge */
-.lane-player-label {
-  position: absolute;
-  left: 3px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 7px;
-  font-weight: 800;
-  font-family: 'Inter', sans-serif;
-  pointer-events: none;
-  z-index: 8;
-  opacity: 0.65;
-}
-@keyframes racePopupIn {
-  from { opacity: 0; transform: scale(0.85) translateY(6px); }
-  to   { opacity: 1; transform: scale(1) translateY(0); }
-}
-@keyframes finishGlow {
-  0%,100% { box-shadow: 2px 0 8px rgba(255,215,0,0.2); }
-  50%      { box-shadow: 2px 0 20px rgba(255,215,0,0.5); }
-}
+.pace-stat { flex: 1; text-align: center; }
+.pace-stat:not(:last-child) { border-right: 1px solid rgba(255,255,255,0.06); }
+.pace-stat-val { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1; }
+.pace-stat-lbl { font-size: 9px; color: var(--muted2); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.05em; }
 
 /* ── MAP FEED ── */
 .map-feed-wrap{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
@@ -2768,7 +2715,7 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
       <button class="tab-btn" onclick="switchTab('map',this)"><span class="tab-emoji">🗺</span><span class="tab-label">Map</span></button>
       <button class="tab-btn" onclick="switchTab('leaderboard',this)"><span class="tab-emoji">🏅</span><span class="tab-label">Badges</span></button>
       <button class="tab-btn" onclick="switchTab('duel',this)"><span class="tab-emoji">🥊</span><span class="tab-label">Duel</span></button>
-      <button class="tab-btn" onclick="switchTab('racing',this)"><span class="tab-emoji">🏇</span><span class="tab-label">Racing</span></button>
+      <button class="tab-btn" onclick="switchTab('pace',this)"><span class="tab-emoji">📈</span><span class="tab-label">Pace</span></button>
     </div>
 
     <!-- LEADERBOARD TAB -->
@@ -2803,14 +2750,9 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
       </div>
     </div>
 
-    <!-- RACING TAB -->
-    <div class="tab-panel" id="tab-racing">
-      <div id="race-track-wrap">
-        <div id="race-track-container">
-          <div id="race-milestones"></div>
-          <div id="race-lanes"></div>
-        </div>
-        </div>
+    <!-- PACE TAB -->
+    <div class="tab-panel" id="tab-pace">
+      <div id="pace-root"></div>
     </div>
 
     <!-- LIST TAB -->
@@ -4125,7 +4067,7 @@ function render(){
   renderDailyCard(players);
   if(document.getElementById('tab-feed')?.classList.contains('active')) renderUnifiedFeed();
   if(document.getElementById('tab-list')?.classList.contains('active')) renderBentoList();
-  if(document.getElementById('tab-racing')?.classList.contains('active')) renderRaceTrack();
+  if(document.getElementById('tab-pace')?.classList.contains('active')) renderPaceTab();
   if(document.getElementById('tab-duel')?.classList.contains('active')) { populateDuelSelects(); renderDuel(); }
   // Update players pill count
   const pill = document.getElementById('players-pill-btn');
@@ -6467,7 +6409,7 @@ window.openPlayerHistory=function(pid){
 };
 
 
-// ── HORSE RACING ─────────────────────────────────────────────────
+// ── PACE TAB ─────────────────────────────────────────────────────
 
 function timeAgo(p) {
   const ts = (p.logs || []).map(e => typeof e === 'object' ? e.ts : e).filter(Boolean)
@@ -6502,190 +6444,142 @@ function projectedFinish(p) {
   };
 }
 
-window.showRacePopup = function(pid, evt) {
-  evt.stopPropagation();
-  const p = players.find(pl => pl.id === pid);
-  if (!p) return;
-  const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
+// ── Compute per-player pace stats ────────────────────────────────────────────
+// Returns { weeklyPace, finishDate, finishDateStr, weeksAhead, status }
+// status: 'done' | 'ahead' | 'ontrack' | 'behind' | 'inactive'
+// Challenge deadline: 52 weeks (1 year) from the first log in the room.
+function computePaceStats(p) {
+  if (p.count >= 100) return { status: 'done', weeklyPace: null, finishDateStr: null, weeksAhead: null, buffer: null };
+
+  const logs = (p.logs || []).filter(e => typeof e === 'object' && e.ts);
+  if (logs.length < 2) return { status: 'inactive', weeklyPace: 0, finishDateStr: null, weeksAhead: null, buffer: null };
+
+  const now = new Date();
+
+  // Weekly pace: based on last 28 days of activity
+  const cutoff = new Date(now - 28 * 86400000);
+  const recent = logs.filter(e => (safeDate(e.ts) || new Date(0)) >= cutoff);
+  const weeksElapsed = recent.length
+    ? Math.max(0.5, (now - (safeDate(recent.reduce((a,b) =>
+        (safeDate(a.ts)||new Date(0)) < (safeDate(b.ts)||new Date(0)) ? a : b).ts) || now)) / 604800000)
+    : 4;
+  const weeklyPace = recent.length ? recent.length / weeksElapsed : 0;
+
+  if (weeklyPace <= 0) return { status: 'inactive', weeklyPace: 0, finishDateStr: null, weeksAhead: null, buffer: null };
+
+  // Deadline: first log date + 52 weeks
+  const allTs = logs.map(e => safeDate(e.ts)).filter(Boolean);
+  const firstLog = allTs.length ? new Date(Math.min(...allTs)) : now;
+  const deadline = new Date(firstLog.getTime() + 52 * 7 * 86400000);
+  const weeksToDeadline = Math.max(0, (deadline - now) / 604800000);
+  const neededPace = weeksToDeadline > 0 ? (100 - p.count) / weeksToDeadline : Infinity;
+
+  // Projected finish
+  const weeksLeft = (100 - p.count) / weeklyPace;
+  const finishDate = new Date(now.getTime() + weeksLeft * 7 * 86400000);
+  const weeksAhead = weeksToDeadline - weeksLeft; // positive = early, negative = late
+
+  const finishDateStr = finishDate.toLocaleDateString([], { month: 'short', day: 'numeric',
+    year: finishDate.getFullYear() !== now.getFullYear() ? 'numeric' : undefined });
+
+  let status;
+  if (weeksAhead > 2)       status = 'ahead';
+  else if (weeksAhead < -2) status = 'behind';
+  else                      status = 'ontrack';
+
+  return { status, weeklyPace, finishDateStr, finishDate, weeksAhead: Math.round(weeksAhead), neededPace };
+}
+
+function renderPaceTab() {
+  const root = document.getElementById('pace-root');
+  if (!root) return;
+  if (!players.length) {
+    root.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📈</div><div class="empty-state-title">No Players Yet</div><div class="empty-state-sub">Join the challenge to see pace projections</div></div>`;
+    return;
+  }
+
   const sorted = [...players].sort((a, b) => b.count - a.count);
-  const rank = sorted.findIndex(pl => pl.id === pid) + 1;
+  const totalBurgers = players.reduce((s, p) => s + (p.count || 0), 0);
+  const aheadCount   = players.filter(p => computePaceStats(p).status === 'ahead').length;
+  const doneCount    = players.filter(p => p.count >= 100).length;
 
-  // Remove any existing race popup
-  document.getElementById('race-popup')?.remove();
+  // ── Summary row ──────────────────────────────────────────────────────────
+  const summaryHtml = `
+    <div class="section-label">Overview</div>
+    <div class="pace-summary-row">
+      <div class="pace-summary-card">
+        <div class="pace-summary-val">${totalBurgers}</div>
+        <div class="pace-summary-lbl">Group total</div>
+      </div>
+      <div class="pace-summary-card">
+        <div class="pace-summary-val" style="color:#4ADE80">${doneCount > 0 ? doneCount + ' done' : aheadCount + ' ahead'}</div>
+        <div class="pace-summary-lbl">${doneCount > 0 ? 'Finished' : 'On or ahead of pace'}</div>
+      </div>
+    </div>`;
 
-  const popup = document.createElement('div');
-  popup.id = 'race-popup';
+  // ── Player cards ─────────────────────────────────────────────────────────
+  const cardsHtml = sorted.map((p, i) => {
+    const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
+    const ini   = initials(p.name);
+    const isMe  = p.id === myPlayerId;
+    const ps    = computePaceStats(p);
+    const pct   = Math.min(100, p.count);
 
-  // Position near the click, staying within viewport
-  const x = Math.min(evt.clientX, window.innerWidth - 160);
-  const y = Math.max(evt.clientY - 80, 10);
+    let badgeClass, badgeLabel;
+    if (ps.status === 'done')     { badgeClass = 'pace-done';    badgeLabel = '✓ Finished'; }
+    else if (ps.status === 'ahead')   { badgeClass = 'pace-ahead';   badgeLabel = `+${ps.weeksAhead}w ahead`; }
+    else if (ps.status === 'behind')  { badgeClass = 'pace-behind';  badgeLabel = `${ps.weeksAhead}w behind`; }
+    else if (ps.status === 'ontrack') { badgeClass = 'pace-ontrack'; badgeLabel = 'On track'; }
+    else                              { badgeClass = 'pace-behind';  badgeLabel = 'Inactive'; }
 
-  popup.style.cssText = `
-    position:fixed;left:${x}px;top:${y}px;z-index:950;
-    background:rgba(22,22,22,0.96);
-    border:1px solid ${color}55;
-    border-radius:12px;
-    padding:10px 14px;
-    box-shadow:0 4px 20px rgba(0,0,0,0.6),0 0 0 1px ${color}22;
-    min-width:130px;
-    animation:racePopupIn 0.2s cubic-bezier(0.34,1.2,0.64,1) both;
-    pointer-events:none;
-  `;
-  const proj = projectedFinish(p);
-  const projHtml = proj
-    ? `<div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.08)">
-        <div style="font-size:9px;color:#6B7280;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px">At current pace (${proj.pace}/day)</div>
-        <div style="font-size:12px;font-weight:700;color:${color}">🏁 Finishes ~${proj.dateStr}</div>
-       </div>`
-    : p.count >= 100
-      ? `<div style="font-size:11px;color:#22C55E;font-weight:700;margin-top:6px">✅ Finished!</div>`
-      : '';
-  popup.innerHTML = `
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;font-weight:800;color:${color};letter-spacing:-0.02em;margin-bottom:4px">${escHtml(p.name)}</div>
-    <div style="font-size:12px;color:#9CA3AF;font-weight:500">🏇 Rank #${rank}</div>
-    <div style="font-size:22px;font-weight:900;font-family:'Bebas Neue',sans-serif;color:#fff;letter-spacing:-0.03em;line-height:1.2;margin-top:4px">${p.count} <span style="font-size:13px;color:#9CA3AF;font-weight:500">/ 100 🍔</span></div>
-    ${projHtml}
-  `;
-  document.body.appendChild(popup);
+    const projHtml = ps.finishDateStr
+      ? `<div class="pace-projection">Projected finish: <span>${escHtml(ps.finishDateStr)}</span></div>`
+      : ps.status === 'done'
+      ? `<div class="pace-projection" style="color:#4ADE80">🏆 <span>Challenge complete!</span></div>`
+      : `<div class="pace-projection">Not enough recent data to project</div>`;
 
-  // Auto-dismiss after 2.5s
-  setTimeout(() => popup.remove(), 2500);
-};
+    const paceStr   = ps.weeklyPace != null ? ps.weeklyPace.toFixed(1) : '—';
+    const neededStr = ps.neededPace != null ? ps.neededPace.toFixed(1) : '—';
 
-// Dismiss race popup on any tap outside
-document.addEventListener('click', () => document.getElementById('race-popup')?.remove());
+    let statusColor = ps.status === 'ahead' ? '#4ADE80' : ps.status === 'behind' ? '#F87171' : ps.status === 'done' ? '#4ADE80' : 'var(--amber)';
 
-const RACE_LEFT_START = 8;   // % from left for start line
-let _raceAnimateFromStart = false;
-const RACE_LEFT_END   = 93;  // % from left for finish line
-const RACE_LEFT_RANGE = RACE_LEFT_END - RACE_LEFT_START;
-const RACE_GATE_PAD   = 2;   // % gap between start line and resting horses
-const RACE_CEILINGS   = [25, 50, 75, 100];
-const RACE_MILESTONE_NAMES = {25:'QUARTERWAY MARK', 50:'HALFWAY MARK', 75:'FINAL STRETCH', 100:'FINISH LINE'};
-
-function racePosFor(count, ceiling) {
-  return RACE_LEFT_START + (Math.min(count, ceiling) / ceiling) * RACE_LEFT_RANGE;
-}
-// Horses at 0 burgers sit BEHIND the start line; all others race normally
-function raceHorsePosFor(count, ceiling) {
-  if (count === 0) return RACE_LEFT_START - 2.5;
-  return racePosFor(count, ceiling);
-}
-
-function renderRaceTrack() {
-  const lanesEl      = document.getElementById('race-lanes');
-  const milestonesEl = document.getElementById('race-milestones');
-  if (!lanesEl) return;
-
-  const sorted = [...players].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
-  const laneOrder = [...players].sort((a, b) => {
-    const ha = a.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-    const hb = b.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-    return ha - hb;
-  });
-
-  const topCount = sorted[0]?.count || 0;
-  const ceiling  = RACE_CEILINGS.find(c => c > topCount) || 100;
-  const leaderId = sorted[0]?.id || null;
-
-  // Rebuild milestones when ceiling changes
-  if (milestonesEl) {
-    const prevCeiling = parseInt(milestonesEl.dataset.ceiling || '0');
-    if (prevCeiling !== ceiling) {
-      milestonesEl.dataset.ceiling = ceiling;
-      milestonesEl.style.cssText = 'position:absolute;inset:0;z-index:5;pointer-events:none';
-      const innerMilestones = RACE_CEILINGS.filter(m => m < ceiling);
-      milestonesEl.innerHTML = innerMilestones.map(m => `
-        <div style="position:absolute;left:${racePosFor(m,ceiling)}%;top:0;bottom:0;width:6px;z-index:5;pointer-events:none;
-          background-color:rgba(255,255,255,0.55);
-          background-image:linear-gradient(45deg,rgba(0,0,0,0.55) 25%,transparent 25%,transparent 75%,rgba(0,0,0,0.55) 75%),linear-gradient(45deg,rgba(0,0,0,0.55) 25%,transparent 25%,transparent 75%,rgba(0,0,0,0.55) 75%);
-          background-size:6px 6px;background-position:0 0,3px 3px">
-          <div style="position:absolute;top:6px;left:50%;transform:translateX(-50%);
-            background:rgba(20,20,20,0.85);border:1px solid rgba(255,255,255,0.3);border-radius:3px;
-            padding:3px 6px;white-space:nowrap;font-family:'Press Start 2P',monospace;font-size:5px;
-            color:rgba(255,255,255,0.9);letter-spacing:0.05em;box-shadow:0 2px 6px rgba(0,0,0,0.7);z-index:10">
-            ${m} ${RACE_MILESTONE_NAMES[m] || ''}
-          </div>
-        </div>`).join('') +
-        `<div style="position:absolute;left:${racePosFor(ceiling,ceiling)}%;top:0;bottom:0;width:8px;z-index:6;pointer-events:none;animation:finishGlow 2s ease-in-out infinite;
-          background-color:#FFD700;
-          background-image:linear-gradient(45deg,#1C0A00 25%,transparent 25%,transparent 75%,#1C0A00 75%),linear-gradient(45deg,#1C0A00 25%,transparent 25%,transparent 75%,#1C0A00 75%);
-          background-size:8px 8px;background-position:0 0,4px 4px">
-          <div style="position:absolute;top:6px;right:calc(100% + 4px);left:auto;
-            background:#FFD700;border:1.5px solid #1C0A00;border-radius:3px;
-            padding:3px 7px;white-space:nowrap;font-family:'Press Start 2P',monospace;font-size:5px;
-            color:#1C0A00;letter-spacing:0.05em;box-shadow:0 2px 8px rgba(0,0,0,0.8);z-index:10">
-            🏁 ${ceiling} ${RACE_MILESTONE_NAMES[ceiling] || ''}
-          </div>
+    return `<div class="pace-card${i === 0 ? ' pace-leader' : ''}" style="animation-delay:${Math.min(i*0.05,0.3)}s">
+      <div class="pace-card-top">
+        <div class="pace-avatar" style="background:${color}20;color:${color};border:1.5px solid ${color}55;box-shadow:0 0 10px ${color}44">
+          ${p.avatar ? `<img src="${escHtml(p.avatar)}" style="width:100%;height:100%;object-fit:cover;border-radius:8px" alt="${escHtml(p.name)}"/>` : ini}
         </div>
-        <div style="position:absolute;left:${RACE_LEFT_START}%;top:0;bottom:0;border-left:2px solid rgba(255,255,255,0.35);z-index:5;pointer-events:none"></div>`;
-    }
-  }
-
-  const existingHorses = lanesEl.querySelectorAll('.jockey-horse');
-  const existingIds    = [...existingHorses].map(h => h.dataset.pid);
-  const currentIds     = laneOrder.map(p => p.id);
-  const needsRebuild   = existingIds.join(',') !== currentIds.join(',');
-
-  if (needsRebuild) {
-    lanesEl.innerHTML = `<div style="flex:0 0 28px;position:relative;background:rgba(0,0,0,0.28);border-bottom:1px solid rgba(255,255,255,0.10);"></div>` +
-    laneOrder.map((p, i) => {
-      const color    = RING_COLORS[p.colorIdx % RING_COLORS.length];
-      const ini      = initials(p.name);
-      const pct      = raceHorsePosFor(p.count, ceiling);
-      const isLeader = p.count > 0 && p.count === topCount;
-      // Stagger delays and vary durations so horses bob independently
-      const delay = ((i * 137) % 1400) / 1000; // prime step gives varied spread
-      const dur   = isLeader ? (1.0 + (i % 3) * 0.15) : (1.2 + (i % 5) * 0.12);
-      return `<div class="jockey-lane" style="background:${i%2===0?'rgba(0,0,0,0.07)':'rgba(255,255,255,0.04)'}">
-        <div class="lane-player-label" style="color:${color}">${ini}</div>
-        <div class="jockey-horse${isLeader?' leader-horse':''}" data-pid="${p.id}" style="left:${pct}%" onclick="showRacePopup('${p.id}',event)">
-          ${isLeader ? '<div class="dust-trail">💨</div>' : ''}
-          <div class="horse-inner" style="--gallop-dur:${dur.toFixed(2)}s;--gallop-delay:-${delay.toFixed(2)}s">
-            <div class="horse-emoji">🏇</div>
-            <div class="jockey-badge" style="background:${color}">${ini} (${p.count})</div>
-          </div>
+        <div>
+          <div class="pace-name">${escHtml(p.name)}${isMe ? ' <span style="font-size:9px;background:rgba(245,158,11,0.12);color:var(--amber);border:1px solid rgba(245,158,11,0.3);padding:2px 6px;border-radius:999px;vertical-align:middle;font-weight:700">You</span>' : ''}</div>
+          <div class="pace-sub">${p.count} / 100 burgers · ${paceStr}/week</div>
         </div>
-      </div>`;
-    }).join('');
-  } else {
-    existingHorses.forEach(horse => {
-      const p = players.find(pl => pl.id === horse.dataset.pid);
-      if (!p) return;
-      horse.style.left = raceHorsePosFor(p.count, ceiling) + '%';
-      const badge = horse.querySelector('.jockey-badge');
-      if (badge) badge.textContent = initials(p.name) + ' (' + p.count + ')';
-      const isLeader = p.count > 0 && p.count === topCount;
-      horse.classList.toggle('leader-horse', isLeader);
-      let dust = horse.querySelector('.dust-trail');
-      if (isLeader && !dust) {
-        dust = document.createElement('div');
-        dust.className = 'dust-trail';
-        dust.textContent = '💨';
-        horse.appendChild(dust); // append after horse-inner so dust is below
-      } else if (!isLeader && dust) {
-        dust.remove();
-      }
-    });
-  }
+        <div class="pace-status-badge ${badgeClass}">${badgeLabel}</div>
+      </div>
+      <div class="pace-track-wrap">
+        <div class="pace-track-fill" style="width:${pct}%;background:${color}"></div>
+      </div>
+      ${projHtml}
+      <div class="pace-stats-row">
+        <div class="pace-stat">
+          <div class="pace-stat-val">${paceStr}</div>
+          <div class="pace-stat-lbl">Per week</div>
+        </div>
+        <div class="pace-stat">
+          <div class="pace-stat-val">${ps.status === 'done' ? '✓' : neededStr}</div>
+          <div class="pace-stat-lbl">Needed</div>
+        </div>
+        <div class="pace-stat">
+          <div class="pace-stat-val">${p.count}</div>
+          <div class="pace-stat-lbl">Logged</div>
+        </div>
+        <div class="pace-stat">
+          <div class="pace-stat-val" style="color:${statusColor}">${100 - p.count > 0 ? 100 - p.count + ' left' : 'Done!'}</div>
+          <div class="pace-stat-lbl">Remaining</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 
-  // ── Gate-break animation: snap to start, then run to real positions ──
-  if (_raceAnimateFromStart) {
-    _raceAnimateFromStart = false;
-    const allHorses = lanesEl.querySelectorAll('.jockey-horse');
-    // Snapshot the real target positions that were just set
-    const targets = new Map();
-    allHorses.forEach(h => targets.set(h, h.style.left));
-    // Snap all horses to the starting gate with no transition
-    allHorses.forEach(h => { h.style.transition = 'none'; h.style.left = (RACE_LEFT_START - 2.5) + '%'; });
-    // Two rAFs guarantees the browser has painted the gate position before we restore the transition
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      allHorses.forEach(h => {
-        h.style.transition = ''; // restore CSS transition
-        h.style.left = targets.get(h) || h.style.left;
-      });
-    }));
-  }
+  root.innerHTML = summaryHtml + `<div class="section-label" style="margin-top:4px">Player projections</div>` + cardsHtml;
 }
 
 // ── Restaurant Leaderboard ────────────────────────────────────────────────────
@@ -7257,7 +7151,7 @@ window.switchTab=function(name,btn){
   // Compact header for Feed + Map + Racing + Tally + Badges; restore for all other tabs
   document.body.classList.toggle('feed-active',        name==='feed');
   document.body.classList.toggle('map-active',         name==='map');
-  document.body.classList.toggle('racing-active',      name==='racing');
+  document.body.classList.toggle('pace-active',         name==='pace');
   document.body.classList.toggle('tally-active',       name==='tally');
   document.body.classList.toggle('leaderboard-active', name==='leaderboard');
   document.body.classList.toggle('duel-active',        name==='duel');
@@ -7291,14 +7185,14 @@ window.switchTab=function(name,btn){
   }
   if(name==='leaderboard') { _openAlbumId = null; const s=[...players].sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name)); renderLeaderboard(s); }
   if(name==='duel') { populateDuelSelects(); renderDuel(); }
-  if(name==='racing') { _raceAnimateFromStart = true; renderRaceTrack(); }
+  if(name==='pace') renderPaceTab();
 };
 
 window.switchToPlayers = function() {
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-players').classList.add('active');
-  document.body.classList.remove('feed-active','map-active','racing-active','tally-active','leaderboard-active');
+  document.body.classList.remove('feed-active','map-active','pace-active','tally-active','leaderboard-active');
   const pill = document.getElementById('players-pill-btn');
   if(pill) pill.classList.add('active');
 };
