@@ -233,6 +233,13 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,8vw,50px);font-weigh
    A single thin light stripe drifts across glass surfaces every ~7 s.
    The stripe is fully transparent for most of the cycle (opacity:0 from 22%→100%)
    so the card reads as calm until the moment of shimmer.                        */
+@keyframes cardReveal {
+  from { opacity:0; transform:translateY(16px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.card-reveal {
+  animation: cardReveal 0.38s cubic-bezier(0.22,1,0.36,1) both;
+}
 @keyframes shimmerSweep {
   0%   { transform: translateX(-140%) skewX(-18deg); opacity:1; }
   22%  { transform: translateX(280%)  skewX(-18deg); opacity:1; }
@@ -246,12 +253,14 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,8vw,50px);font-weigh
 .tr-card,
 .setup-card,
 .grill-card,
+.grill-feed-card,
 .duel-stat-row {
   overflow: hidden;
 }
 .pl-row::after,
 .msg-card::after,
 .milestone-card::after,
+.grill-feed-card::after,
 .tr-card::after,
 .setup-card::after {
   content: '';
@@ -259,10 +268,11 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,8vw,50px);font-weigh
   inset: 0;
   background: linear-gradient(
     105deg,
-    transparent 35%,
-    rgba(255,255,255,0.055) 50%,
-    rgba(255,255,255,0.028) 55%,
-    transparent 65%
+    transparent 28%,
+    rgba(220,38,38,0.07)   38%,
+    rgba(255,255,255,0.07) 50%,
+    rgba(37,99,235,0.07)   62%,
+    transparent 72%
   );
   pointer-events: none;
   z-index: 2;
@@ -270,10 +280,12 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,8vw,50px);font-weigh
   animation-fill-mode: backwards; /* hold 0% keyframe (off-screen) during delay period */
 }
 /* Stagger each card type so sweeps don't all fire simultaneously */
-.msg-card::after       { animation-delay: 1.4s; }
-.milestone-card::after { animation-delay: 2.8s; }
-.tr-card::after        { animation-delay: 4.2s; }
-.setup-card::after     { animation-delay: 0.7s; }
+.msg-card::after          { animation-delay: 1.4s; }
+.milestone-card::after    { animation-delay: 2.8s; }
+.tr-card::after           { animation-delay: 4.2s; }
+.setup-card::after        { animation-delay: 0.7s; }
+.grill-feed-card::after   { animation-delay: 5.6s; }
+.grill-feed-card:nth-child(even)::after { animation-delay: 3.1s; }
 /* Odd/even stagger within the ranks list */
 .pl-row:nth-child(even)::after { animation-delay: 3.5s; }
 .pl-row:nth-child(odd)::after  { animation-delay: 6.3s; }
@@ -524,12 +536,18 @@ button{transition:transform 0.2s ease}
 .bg-progress-fill{height:100%;border-radius:999px;transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1)}
 .bg-pct{font-family:'Bebas Neue',sans-serif;font-size:13px;font-weight:700;color:var(--av-text);flex-shrink:0;min-width:40px;text-align:right}
 .social-wrap{display:flex;flex-direction:column;height:calc(100dvh - 310px);min-height:360px}
-.social-feed{flex:1;overflow-y:auto;display:flex;flex-direction:column-reverse;gap:6px;padding:4px 2px 10px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+.social-feed{flex:1;overflow-y:auto;display:flex;flex-direction:column-reverse;gap:10px;padding:6px 2px 14px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
 .social-feed::-webkit-scrollbar{width:4px}
 .social-feed::-webkit-scrollbar-track{background:transparent}
 .social-feed::-webkit-scrollbar-thumb{background:var(--border2);border-radius:999px}
-.msg-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 13px;animation:slideIn 0.25s ease both;box-shadow:0 1px 4px rgba(0,0,0,0.05)}
-.msg-card.mine{background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.18)}
+/* ── Inline comment preview (Instagram-style) ── */
+.feed-comment-preview{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px;padding:6px 14px 2px;cursor:pointer}
+.grill-card-inner .feed-comment-preview{padding-left:18px}
+.fcp-name{font-size:12px;font-weight:700;color:var(--text)}
+.fcp-text{font-size:12px;color:rgba(255,255,255,0.55);flex:1;min-width:0;line-height:1.4}
+.fcp-viewall{font-size:11px;color:var(--muted);width:100%;margin-top:1px;font-style:italic}
+.msg-card{background:var(--surface);border-radius:14px;padding:10px 13px;animation:slideIn 0.25s ease both;box-shadow:0 2px 16px rgba(0,0,0,0.38),0 1px 4px rgba(0,0,0,0.22)}
+.msg-card.mine{background:rgba(245,158,11,0.08);box-shadow:0 2px 16px rgba(245,158,11,0.08),0 1px 4px rgba(0,0,0,0.2)}
 .msg-header{display:flex;align-items:center;gap:8px;margin-bottom:5px}
 /* Cinematic: name + timestamp on one line */
 .msg-header-info{flex:1;min-width:0;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
@@ -910,11 +928,11 @@ body.feed-active .social-input-area{
   box-shadow:0 -4px 24px rgba(0,0,0,0.35);
 }
 /* ── Unified feed: burger card action bar + comment threads ── */
-.feed-card-actions{display:flex;align-items:center;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)}
-.feed-react-btn{background:none;border:none;padding:4px 7px;border-radius:999px;cursor:pointer;flex-shrink:0;color:rgba(255,255,255,0.28);display:flex;align-items:center;justify-content:center;transition:color 0.2s ease,transform 0.2s ease,background 0.2s ease;line-height:0}
+.feed-card-actions{display:flex;align-items:center;gap:8px;margin-top:10px;padding:10px 0 4px;border-top:1px solid rgba(255,255,255,0.07)}
+.feed-react-btn{background:none;border:none;padding:7px 10px;border-radius:999px;cursor:pointer;flex-shrink:0;color:rgba(255,255,255,0.32);display:flex;align-items:center;justify-content:center;transition:color 0.2s ease,transform 0.2s ease,background 0.2s ease;line-height:0}
 .feed-react-btn:hover,.feed-react-btn:focus-visible{color:#fff;transform:scale(1.15);background:rgba(255,255,255,0.08);outline:none}
 .feed-react-btn:active{transform:scale(0.92)}
-.feed-comment-btn{background:none;border:none;color:rgba(255,255,255,0.35);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;transition:background 0.15s,color 0.15s;font-family:'Barlow',sans-serif}
+.feed-comment-btn{background:none;border:none;color:rgba(255,255,255,0.4);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;transition:background 0.15s,color 0.15s;font-family:'Barlow',sans-serif}
 .feed-comment-btn:hover{background:rgba(255,255,255,0.07);color:var(--text)}
 .feed-comment-btn.active{background:rgba(245,158,11,0.10);color:var(--amber)}
 .feed-comment-btn .comment-count{font-size:11px;color:var(--muted2)}
@@ -1556,7 +1574,7 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 
 /* ── Photo hero layout (burger card with attached photo) ── */
 .grill-photo-hero{position:relative;overflow:hidden}
-.grill-photo-hero-img{width:100%;height:230px;object-fit:cover;display:block;cursor:zoom-in}
+.grill-photo-hero-img{width:100%;height:280px;object-fit:cover;display:block;cursor:zoom-in}
 /* top-to-bottom dark fade so text at bottom is always readable */
 .grill-photo-scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.48) 36%,rgba(0,0,0,0.10) 64%,transparent 100%);pointer-events:none}
 /* frosted-glass stamp badge top-left */
@@ -2154,6 +2172,55 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 .pace-sparkline-wrap { margin-bottom: 8px; }
 .pace-sparkline-label { font-size: 9px; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; font-weight: 600; }
 
+/* ── JULY 4TH BANNER ── */
+.july4-banner {
+  flex-shrink: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 10px;
+  position: relative;
+  border: 1px solid rgba(220,38,38,0.35);
+  background: linear-gradient(135deg, rgba(30,4,4,0.92) 0%, rgba(4,8,30,0.92) 100%);
+  box-shadow: 0 0 24px rgba(220,38,38,0.18), 0 0 24px rgba(37,99,235,0.12), inset 0 1px 0 rgba(255,255,255,0.06);
+  animation: july4Pulse 3s ease-in-out infinite;
+}
+@keyframes july4Pulse {
+  0%,100% { box-shadow: 0 0 20px rgba(220,38,38,0.18), 0 0 20px rgba(37,99,235,0.12), inset 0 1px 0 rgba(255,255,255,0.06); }
+  50%      { box-shadow: 0 0 36px rgba(220,38,38,0.28), 0 0 36px rgba(37,99,235,0.22), inset 0 1px 0 rgba(255,255,255,0.06); }
+}
+.july4-stripe {
+  height: 4px;
+  background: linear-gradient(90deg, #DC2626 0%, #DC2626 33%, #fff 33%, #fff 66%, #2563EB 66%, #2563EB 100%);
+}
+.july4-body {
+  padding: 14px 16px 16px;
+  text-align: center;
+}
+.july4-emojis {
+  font-size: 22px;
+  letter-spacing: 6px;
+  margin-bottom: 6px;
+  display: block;
+}
+.july4-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  background: linear-gradient(90deg, #DC2626, #fff 40%, #2563EB);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+.july4-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 /* ── MAP FEED ── */
 .map-feed-wrap{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
 .map-feed-empty{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px}
@@ -2340,12 +2407,11 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 /* ── Card shell ── */
 .grill-feed-card {
   position: relative;
-  border-radius: 12px;
-  background: rgba(26,26,26,0.7);
+  border-radius: 14px;
+  background: rgba(26,26,26,0.75);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.42), 0 1px 4px rgba(0,0,0,0.28);
   overflow: hidden;
   animation: grillCardIn 0.28s ease both;
 }
@@ -2406,19 +2472,18 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
   justify-content: space-between;
   position: relative;
 }
-.grill-banner-left { display: flex; align-items: center; gap: 9px; }
+.grill-banner-left { display: flex; align-items: center; gap: 10px; }
 .grill-banner-avatar {
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
   flex-shrink: 0;
   font-family: 'Inter', sans-serif;
-  /* color/background set via inline style using player color */
 }
 .grill-banner-name {
   font-family: 'Poppins', sans-serif;
@@ -2426,6 +2491,17 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
   font-weight: 700;
   color: #F3F4F6;
   letter-spacing: 0.01em;
+  line-height: 1.2;
+}
+.grill-banner-meta {
+  font-size: 10px;
+  color: rgba(255,255,255,0.38);
+  font-weight: 500;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
   line-height: 1;
 }
 .grill-banner-you {
@@ -2434,17 +2510,15 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
   color: #6B7280;
 }
 .grill-banner-badge {
-  font-size: 9px;
-  font-weight: 600;
-  background: rgba(255,255,255,0.05);
-  color: #9CA3AF;
-  border: 1.5px solid transparent; /* overridden inline with player color */
-  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1.5px solid transparent;
+  padding: 3px 10px;
   border-radius: 999px;
   white-space: nowrap;
   flex-shrink: 0;
   font-family: 'Inter', sans-serif;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
 }
 
 /* ── Patty stamp ── */
@@ -4492,6 +4566,21 @@ window.loadMoreFeed = function() {
   renderUnifiedFeed();
 };
 
+// Returns a relative "X ago" string given a Date object
+function dateAgo(d) {
+  if (!d || isNaN(d)) return '';
+  const diff = Date.now() - d.getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(diff / 3600000);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(diff / 86400000);
+  if (days < 7) return `${days}d ago`;
+  return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+}
+
+
 function renderUnifiedFeed() {
   const feed = document.getElementById('unified-feed');
   const empty = document.getElementById('social-empty');
@@ -4581,7 +4670,21 @@ function renderUnifiedFeed() {
        </div>`
     : '';
 
-  feed.innerHTML = loadMoreHtml + visibleItems.map((item, i) => {
+  // July 4th banner (only on July 4th)
+  const _today = new Date();
+  const _july4Banner = (_today.getMonth() === 6 && _today.getDate() === 4)
+    ? `<div class="july4-banner">
+        <div class="july4-stripe"></div>
+        <div class="july4-body">
+          <span class="july4-emojis">🇺🇸 🦅 🇺🇸</span>
+          <div class="july4-title">Happy 4th of July!</div>
+          <div class="july4-sub">America's 250th Birthday · Summer of Burgers</div>
+        </div>
+        <div class="july4-stripe"></div>
+      </div>`
+    : '';
+
+  feed.innerHTML = _july4Banner + loadMoreHtml + visibleItems.map((item, i) => {
     const idx = visibleOffset + i;
     if (item.type === 'message') {
       const m = item.data;
@@ -4640,7 +4743,8 @@ function renderUnifiedFeed() {
       // ── Regular message card ────────────────────────────────────────────────
       const isMe = m.playerId === myPlayerId;
       const cc = colorClass(m.colorIdx ?? 0);
-      const timeStr = formatTime(m.createdAt);
+      const msgDate = m.createdAt?.toDate ? m.createdAt.toDate() : (m.createdAt ? new Date(m.createdAt) : null);
+      const msgTimeAgo = dateAgo(msgDate);
       const targetId = m.id;
       const imgHtml = m.imageBase64
         ? `<div class="msg-img-wrap" onclick="openLightbox('${m.id}')"><img src="${escHtml(m.imageBase64)}" alt="photo"/></div>`
@@ -4650,14 +4754,21 @@ function renderUnifiedFeed() {
       const reactionsHtml = `<div class="msg-reactions" data-msg-id="${targetId}">${pillsHtml}</div>`;
       const msgComments = comments.filter(c => c.targetId === targetId);
       const commentLabel = msgComments.length ? `💬 ${msgComments.length}` : '💬';
+      const msgLatestComment = msgComments.length > 0 ? msgComments[msgComments.length - 1] : null;
+      const msgInlineComment = msgLatestComment
+        ? `<div class="feed-comment-preview" onclick="toggleComments('${targetId}')">
+            <span class="fcp-name">${escHtml(msgLatestComment.playerName || '?')}</span>
+            <span class="fcp-text">${escHtml(msgLatestComment.text.length > 90 ? msgLatestComment.text.slice(0, 90) + '…' : msgLatestComment.text)}</span>
+            ${msgComments.length > 1 ? `<div class="fcp-viewall">View all ${msgComments.length} comments</div>` : ''}
+          </div>`
+        : '';
       return `<div class="msg-card ${isMe?'mine':''} ${cc}" data-id="${m.id}">
         <div class="msg-header">
-          ${miniAvatarHTML(m.playerName||'?', m.colorIdx??0, 34, players.find(p=>p.id===m.playerId)?.avatar||'')}
+          ${miniAvatarHTML(m.playerName||'?', m.colorIdx??0, 36, players.find(p=>p.id===m.playerId)?.avatar||'')}
           <div class="msg-header-info">
-            <div class="msg-name">${escHtml(m.playerName||'?')}</div>
-            <div class="msg-time">${timeStr}</div>
+            <div class="msg-name">${escHtml(m.playerName||'?')}${isMe ? ' <span class="msg-mine-tag">You</span>' : ''}</div>
+            <div class="msg-time">${msgTimeAgo}</div>
           </div>
-          ${isMe ? '<span class="msg-mine-tag">You</span>' : ''}
           <button class="msg-react-btn feed-react-btn" data-target-id="${targetId}" data-target-type="message" title="Add reaction">${_REACT_SVG}</button>
         </div>
         ${textHtml}${imgHtml}
@@ -4665,6 +4776,7 @@ function renderUnifiedFeed() {
         <div class="feed-card-actions">
           <button class="feed-comment-btn" data-target-id="${targetId}" onclick="toggleComments('${targetId}')">${commentLabel}</button>
         </div>
+        ${msgInlineComment}
         ${buildCommentHtml(targetId, 'message', msgComments)}
       </div>`;
     } else {
@@ -4715,16 +4827,31 @@ function renderUnifiedFeed() {
       const pillsHtml = buildReactionPills(rxns, targetId, 'burger');
       const burgerComments = comments.filter(c => c.targetId === targetId);
       const commentLabel = burgerComments.length ? `💬 ${burgerComments.length}` : '💬';
+      const cardDate = safeDate(item.ts);
+      const cardTimeAgo = dateAgo(cardDate);
+      const restaurantShort = item.restaurant.length > 22 ? item.restaurant.slice(0,22)+'…' : item.restaurant;
+      const bannerMeta = [restaurantShort, cardTimeAgo].filter(Boolean).join(' · ');
+      const latestComment = burgerComments.length > 0 ? burgerComments[burgerComments.length - 1] : null;
+      const inlineCommentHtml = latestComment
+        ? `<div class="feed-comment-preview" onclick="toggleComments('${targetId}')">
+            <span class="fcp-name">${escHtml(latestComment.playerName || '?')}</span>
+            <span class="fcp-text">${escHtml(latestComment.text.length > 90 ? latestComment.text.slice(0, 90) + '…' : latestComment.text)}</span>
+            ${burgerComments.length > 1 ? `<div class="fcp-viewall">View all ${burgerComments.length} comments</div>` : ''}
+          </div>`
+        : '';
       return `
-<div class="grill-feed-card ${pattyCount>=3?'triple-card':''}${item.rating===5?' perfect-rating':''}" style="animation-delay:${_feedInitialRenderDone ? '0s' : Math.min(idx*0.04,0.6)+'s'}">
+<div class="grill-feed-card ${pattyCount>=3?'triple-card':''}${item.rating===5?' perfect-rating':''}" data-player-id="${escHtml(item.player.id)}" style="animation-delay:${_feedInitialRenderDone ? '0s' : Math.min(idx*0.04,0.6)+'s'}">
   <div class="grill-card-inner">
     <div class="grill-left-accent" style="background:${color}"></div>
     <div class="grill-card-banner">
       <div class="grill-banner-left">
         <div class="grill-banner-avatar" style="background:${color}1A;color:${color};border:1.5px solid ${color}55;${item.player.avatar ? 'overflow:hidden;padding:0' : ''}">${item.player.avatar ? `<img src="${item.player.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="avatar"/>` : ini}</div>
-        <div class="grill-banner-name">${escHtml(item.player.name)}${isMe?' <span class="grill-banner-you">(you)</span>':''}</div>
+        <div>
+          <div class="grill-banner-name">${escHtml(item.player.name)}${isMe?' <span class="grill-banner-you">(you)</span>':''}</div>
+          ${bannerMeta ? `<div class="grill-banner-meta">${escHtml(bannerMeta)}</div>` : ''}
+        </div>
       </div>
-      <div class="grill-banner-badge" style="border-color:${color}55">🍔 #${burgerNum>0?burgerNum:'?'}</div>
+      <div class="grill-banner-badge" style="background:${color}18;color:${color};border-color:${color}40">🍔 #${burgerNum>0?burgerNum:'?'}</div>
     </div>
     ${item.photo ? `
     <div class="grill-photo-hero">
@@ -4759,6 +4886,7 @@ function renderUnifiedFeed() {
       <button class="feed-react-btn" data-target-id="${targetId}" data-target-type="burger" title="Add reaction">${_REACT_SVG}</button>
       <button class="feed-comment-btn" data-target-id="${targetId}" onclick="toggleComments('${targetId}')">${commentLabel}</button>
     </div>
+    ${inlineCommentHtml}
     ${buildCommentHtml(targetId, 'burger', burgerComments)}
   </div>
 </div>`.trim();
@@ -7291,6 +7419,19 @@ window.switchTab=function(name,btn){
   if(name==='leaderboard') { _openAlbumId = null; const s=[...players].sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name)); renderLeaderboard(s); }
   if(name==='duel') { populateDuelSelects(); renderDuel(); }
   if(name==='pace') renderPaceTab();
+
+  // Staggered card reveal on every tab switch
+  requestAnimationFrame(() => {
+    const panel = document.getElementById('tab-' + name);
+    if (!panel) return;
+    const cards = [...panel.querySelectorAll('.pl-row, .msg-card, .pace-card, .tr-card, .setup-card, .grill-card, .grill-feed-card, .duel-stat-row, .milestone-card, .restaurant-row')];
+    cards.forEach(c => { c.classList.remove('card-reveal'); c.style.animationDelay = ''; });
+    void panel.offsetWidth; // single reflow
+    cards.forEach((c, idx) => {
+      c.style.animationDelay = Math.min(idx * 0.055, 0.38) + 's';
+      c.classList.add('card-reveal');
+    });
+  });
 };
 
 window.switchToPlayers = function() {
@@ -7767,7 +7908,7 @@ function renderBurgerMap() {
       minZoom: 3,
       preferCanvas: true,
     });
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/">CARTO</a>',
       subdomains: 'abcd', maxZoom: 20
     }).addTo(burgerMap);
