@@ -73,8 +73,8 @@ body::after{
 .setup-card p{font-size:13px;color:var(--muted2);margin-bottom:20px;line-height:1.6}
 .setup-card label{font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:6px;margin-top:16px;font-weight:500}
 .setup-card label:first-of-type{margin-top:0}
-.setup-card input{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-xs);color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:11px 14px;outline:none;transition:border-color 0.2s,box-shadow 0.2s}
-.setup-card input:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(217,119,6,0.12)}
+.setup-card input{width:100%;background:rgba(255,255,255,0.45);border:1px solid rgba(30,110,170,0.15);border-radius:var(--radius-xs);color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:11px 14px;outline:none;transition:border-color 0.2s,box-shadow 0.2s}
+.setup-card input:focus{border-color:var(--sky-light);box-shadow:0 0 0 3px rgba(59,170,226,0.15)}
 .setup-card input::placeholder{color:var(--muted)}
 .setup-card .btn-row{display:flex;gap:8px;margin-top:20px}
 .btn-primary{flex:1;background:linear-gradient(135deg,var(--amber) 0%,var(--amber-dark) 100%);color:#fff;border:none;border-radius:var(--radius-xs);font-family:'Bebas Neue',sans-serif;font-size:15px;font-weight:700;padding:12px 20px;cursor:pointer;transition:opacity 0.15s,transform 0.1s;box-shadow:0 4px 12px rgba(217,119,6,0.3)}
@@ -370,7 +370,7 @@ button{transition:transform 0.2s ease}
 .mini-bar-wrap{height:3px;background:rgba(30,110,170,0.10);border-radius:999px;margin-top:6px;overflow:hidden;width:100%}
 .mini-bar-fill{height:100%;border-radius:999px;transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1)}
 .pace-indicator{font-size:10px;font-weight:700;margin-top:5px;letter-spacing:0.03em;white-space:nowrap;font-family:'Barlow',sans-serif}
-.pace-indicator.ahead{color:#4ADE80;text-shadow:0 0 8px rgba(74,222,128,0.35)}
+.pace-indicator.ahead{color:var(--text);text-shadow:none}
 .pace-indicator.behind{color:#F87171;text-shadow:0 0 8px rgba(248,113,113,0.25)}
 .pace-indicator.on-track{color:var(--muted2)}
 .badge-col{flex:1;display:flex;align-items:center;justify-content:center;min-width:0;padding:0 4px}
@@ -484,7 +484,8 @@ button{transition:transform 0.2s ease}
 .delete-btn{background:none;border:none;color:var(--muted);font-size:15px;cursor:pointer;padding:4px 8px;border-radius:6px;transition:color 0.15s,background 0.15s}
 .delete-btn:hover{color:var(--red);background:rgba(220,38,38,0.07)}
 .add-form{display:flex;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
-.add-form input{flex:1;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-xs);color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;padding:10px 14px;outline:none;transition:border-color 0.2s}
+.add-form input{flex:1;background:rgba(255,255,255,0.45);border:1px solid rgba(30,110,170,0.15);border-radius:var(--radius-xs);color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;padding:10px 14px;outline:none;transition:border-color 0.2s,box-shadow 0.2s}
+.add-form input:focus{border-color:var(--sky-light);box-shadow:0 0 0 3px rgba(59,170,226,0.15);outline:none}
 .add-form input:focus{border-color:var(--amber)}
 .add-form input::placeholder{color:var(--muted)}
 .add-form button{background:linear-gradient(135deg,var(--amber),var(--amber-dark));color:#fff;border:none;border-radius:var(--radius-xs);font-family:'Bebas Neue',sans-serif;font-size:14px;font-weight:700;padding:10px 18px;cursor:pointer;transition:opacity 0.15s;white-space:nowrap}
@@ -617,8 +618,8 @@ body.duel-active .tabs{
 .duel-picker-left .duel-picker-label { color: var(--duel-a-color, var(--amber)); }
 .duel-picker-right .duel-picker-label { color: var(--duel-b-color, #60A5FA); }
 .duel-select {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--border2);
+  background: rgba(255,255,255,0.45);
+  border: 1px solid rgba(30,110,170,0.15);
   border-radius: var(--radius-xs);
   color: var(--text);
   font-family: 'Barlow', sans-serif;
@@ -631,7 +632,7 @@ body.duel-active .tabs{
   outline: none;
   width: 100%;
 }
-.duel-select:focus { border-color: var(--amber); }
+.duel-select:focus { border-color: var(--sky-light); box-shadow: 0 0 0 3px rgba(59,170,226,0.15); outline: none; }
 .duel-vs-badge {
   font-size: 24px;
   flex-shrink: 0;
@@ -1519,6 +1520,7 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 .detail-confirm-btn:hover{opacity:0.9}
 .detail-confirm-btn:active{transform:scale(0.97)}
 .map-wrap{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border2);box-shadow:var(--shadow-card);margin:0 2px}
+.leaflet-tile-container{filter:contrast(0.95) saturate(0.9)}
 #burger-map{width:100%;height:520px}
 .leaflet-popup-content-wrapper{background:var(--surface2)!important;border:1px solid var(--border2)!important;border-radius:12px!important;box-shadow:0 4px 24px rgba(30,100,160,0.18)!important;color:var(--text)!important;padding:0!important}
 .leaflet-popup-content{margin:0!important;padding:0!important}
@@ -2125,7 +2127,7 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
   padding: 3px 9px; border-radius: 999px; white-space: nowrap;
   letter-spacing: 0.03em; flex-shrink: 0;
 }
-.pace-ahead  { background: rgba(34,197,94,0.15); color: #4ADE80; border: 1px solid rgba(34,197,94,0.3); }
+.pace-ahead  { background: rgba(34,197,94,0.15); color: var(--text); border: 1px solid rgba(34,197,94,0.3); }
 .pace-behind { background: rgba(248,113,113,0.12); color: #F87171; border: 1px solid rgba(248,113,113,0.25); }
 .pace-ontrack{ background: rgba(245,158,11,0.12); color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
 .pace-done   { background: rgba(34,197,94,0.12); color: #4ADE80; border: 1px solid rgba(34,197,94,0.25); }
@@ -6222,7 +6224,7 @@ function _renderCalendar() {
   let monthTotal = 0;
   let bestDay = 0;
   for (let d = 1; d <= daysInMonth; d++) {
-    const key = `${_calYear}-${String(_calMonth).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const key = `${_calYear}-${_calMonth}-${d}`;
     const count = dayMap[key] || 0;
     monthTotal += count;
     if (count > bestDay) bestDay = count;
@@ -6395,7 +6397,8 @@ function renderBentoList() {
     const st = computePlayerStats(p);
     const dr = rankMap[i];
     const isTied = countFreq[p.count] > 1;
-    const rankCls = dr === 1 ? 'pl-gold' : dr === 2 ? 'pl-silver' : dr === 3 ? 'pl-bronze' : '';
+    const isMe = p.id === myPlayerId;
+    const rankCls = isMe ? '' : (dr === 1 ? 'pl-gold' : dr === 2 ? 'pl-silver' : dr === 3 ? 'pl-bronze' : '');
     const rank = dr === 1 ? '🥇' : dr === 2 ? '🥈' : dr === 3 ? '🥉' : `#${dr}`;
     const pct = Math.min(100, p.count);
     const avgPill = st.avgRating > 0 ? `<span class="pl-pill">⭐ ${st.avgRating.toFixed(1)}</span>` : '';
@@ -6419,7 +6422,7 @@ function renderBentoList() {
       <div class="pl-info">
         <div class="pl-name" style="color:${c}">
           ${escHtml(p.name)}
-          ${p.id === myPlayerId ? '<span class="me-badge">You</span>' : ''}
+          ${isMe ? '<span class="me-badge">You</span>' : ''}
           ${p.count >= 100 ? '<span class="done-badge">✓</span>' : ''}
           ${tiedBadge}
           ${lastSeenHtml}
@@ -6596,7 +6599,7 @@ function renderPaceTab() {
         <div class="pace-summary-lbl">Group total</div>
       </div>
       <div class="pace-summary-card">
-        <div class="pace-summary-val" style="color:#4ADE80">${doneCount > 0 ? doneCount + ' done' : aheadCount + ' ahead'}</div>
+        <div class="pace-summary-val" style="color:var(--sky)">${doneCount > 0 ? doneCount + ' done' : aheadCount + ' ahead'}</div>
         <div class="pace-summary-lbl">${doneCount > 0 ? 'Finished' : 'On or ahead of pace'}</div>
       </div>
     </div>`;
@@ -6683,13 +6686,13 @@ function renderPaceTab() {
     // Horizontal grid lines at 25, 50, 75
     const gridLines = [25, 50, 75].map(v =>
       '<line x1="' + PX0 + '" y1="' + cntToY(v) + '" x2="' + PX1 + '" y2="' + cntToY(v) +
-      '" stroke="rgba(255,255,255,0.06)" stroke-width="0.5" stroke-dasharray="3 3"/>'
+      '" stroke="rgba(11,53,80,0.10)" stroke-width="0.5" stroke-dasharray="3 3"/>'
     ).join('');
 
     // Today vertical marker
     const todayLine = '<line x1="' + todayX + '" y1="' + PY0 + '" x2="' + todayX + '" y2="' + PY1 +
-      '" stroke="rgba(255,255,255,0.22)" stroke-width="0.8" stroke-dasharray="2 2"/>' +
-      '<text x="' + todayX + '" y="' + (PY0-1) + '" text-anchor="middle" font-size="6.5" fill="rgba(255,255,255,0.35)" font-family="Barlow,sans-serif">Today</text>';
+      '" stroke="rgba(11,53,80,0.30)" stroke-width="0.8" stroke-dasharray="2 2"/>' +
+      '<text x="' + todayX + '" y="' + (PY0-1) + '" text-anchor="middle" font-size="6.5" fill="rgba(11,53,80,0.55)" font-family="Barlow,sans-serif">Today</text>';
 
     const svgContent =
       '<defs><linearGradient id="' + gid + '" x1="0" y1="0" x2="0" y2="1">' +
@@ -6698,25 +6701,25 @@ function renderPaceTab() {
       '</linearGradient></defs>' +
       gridLines +
       // Axes
-      '<line x1="' + PX0 + '" y1="' + PY0 + '" x2="' + PX0 + '" y2="' + PY1 + '" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>' +
-      '<line x1="' + PX0 + '" y1="' + PY1 + '" x2="' + PX1 + '" y2="' + PY1 + '" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>' +
+      '<line x1="' + PX0 + '" y1="' + PY0 + '" x2="' + PX0 + '" y2="' + PY1 + '" stroke="rgba(11,53,80,0.35)" stroke-width="1"/>' +
+      '<line x1="' + PX0 + '" y1="' + PY1 + '" x2="' + PX1 + '" y2="' + PY1 + '" stroke="rgba(11,53,80,0.35)" stroke-width="1"/>' +
       // Axis labels
-      '<text x="9" y="' + ((PY0+PY1)/2+3).toFixed(0) + '" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.3)" font-family="Barlow,sans-serif" transform="rotate(-90,9,' + ((PY0+PY1)/2).toFixed(0) + ')">Burgers</text>' +
+      '<text x="9" y="' + ((PY0+PY1)/2+3).toFixed(0) + '" text-anchor="middle" font-size="8" fill="rgba(11,53,80,0.50)" font-family="Barlow,sans-serif" transform="rotate(-90,9,' + ((PY0+PY1)/2).toFixed(0) + ')">Burgers</text>' +
       // Today marker
       todayLine +
       // Pace line (amber dashed)
-      '<path d="' + paceD + '" fill="none" stroke="rgba(245,158,11,0.55)" stroke-width="1.3" stroke-dasharray="5 3"/>' +
-      '<text x="' + (PX0 + PW*0.72).toFixed(0) + '" y="' + (PY0 + PH*0.28 - 4).toFixed(0) + '" font-size="7" fill="rgba(245,158,11,0.65)" font-family="Barlow,sans-serif">On pace</text>' +
+      '<path d="' + paceD + '" fill="none" stroke="rgba(245,158,11,0.65)" stroke-width="1.3" stroke-dasharray="5 3"/>' +
+      '<text x="' + (PX0 + PW*0.68).toFixed(0) + '" y="' + (PY0 + PH*0.23 - 5).toFixed(0) + '" font-size="7" fill="rgba(217,119,6,0.85)" font-family="Barlow,sans-serif">On pace</text>' +
       // Progress area fill
       '<path d="' + progAreaD + '" fill="url(#' + gid + ')"/>' +
       // Progress line
       '<polyline points="' + progPolyPts + '" fill="none" stroke="' + color + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' +
       // Current position dot
-      '<circle cx="' + todayX + '" cy="' + cntToY(Math.min(p.count, 100)) + '" r="3" fill="' + color + '" stroke="rgba(0,0,0,0.5)" stroke-width="1.2"/>' +
+      '<circle cx="' + todayX + '" cy="' + cntToY(Math.min(p.count, 100)) + '" r="3" fill="' + color + '" stroke="rgba(255,255,255,0.8)" stroke-width="1.2"/>' +
       // Y labels
-      yLabels.map(l => '<text x="' + (PX0-4) + '" y="' + (+l.y+3).toFixed(1) + '" text-anchor="end" font-size="7.5" fill="rgba(255,255,255,0.4)" font-family="Barlow,sans-serif">' + l.v + '</text>').join('') +
+      yLabels.map(l => '<text x="' + (PX0-4) + '" y="' + (+l.y+3).toFixed(1) + '" text-anchor="end" font-size="7.5" fill="rgba(11,53,80,0.55)" font-family="Barlow,sans-serif">' + l.v + '</text>').join('') +
       // X labels
-      xLabels.map(l => '<text x="' + l.x + '" y="84" text-anchor="' + l.anchor + '" font-size="7.5" fill="rgba(255,255,255,0.4)" font-family="Barlow,sans-serif">' + l.lbl + '</text>').join('');
+      xLabels.map(l => '<text x="' + l.x + '" y="84" text-anchor="' + l.anchor + '" font-size="7.5" fill="rgba(11,53,80,0.55)" font-family="Barlow,sans-serif">' + l.lbl + '</text>').join('');
 
     const sparklineHtml = '<div class="pace-sparkline-wrap"><div class="pace-sparkline-label">Challenge progress</div>' +
       '<svg viewBox="0 0 280 90" width="100%" height="90" xmlns="http://www.w3.org/2000/svg" style="display:block">' + svgContent + '</svg></div>';
@@ -8043,43 +8046,64 @@ function initJuly4Stars() {
   document.body.prepend(canvas);
   const ctx = canvas.getContext('2d');
 
-  // Red, white (most common), blue
+  // Warm daytime embers — amber, cheese-yellow, hot grill orange, white cloud accent
   const COLORS = [
-    [220, 38,  38],  // red
-    [255, 255, 255], // white
-    [255, 255, 255], // white
-    [255, 255, 255], // white
-    [37,  99,  235], // blue
-    [255, 255, 255], // white
+    [245, 158,  11],  // amber
+    [217, 119,   6],  // amber-dark / deep ember
+    [234, 179,   8],  // sesame / cheese-yellow
+    [245, 158,  11],  // amber (weighted heavier)
+    [255, 200,  50],  // bright sun flare
+    [255, 255, 255],  // white cloud accent
   ];
 
-  let stars = [];
+  let embers = [];
 
   function populate() {
     canvas.width  = window.innerWidth;
     canvas.height = window.innerHeight;
-    const count = Math.round((canvas.width * canvas.height) / 6000); // density
-    stars = Array.from({ length: Math.max(60, Math.min(count, 180)) }, () => ({
+    const count = Math.round((canvas.width * canvas.height) / 7000);
+    embers = Array.from({ length: Math.max(40, Math.min(count, 120)) }, () => spawnEmber(true));
+  }
+
+  function spawnEmber(anywhere) {
+    return {
       x:     Math.random() * canvas.width,
-      y:     Math.random() * canvas.height,
-      r:     0.5 + Math.random() * 1.6,
+      // start near bottom when spawning fresh; anywhere for initial fill
+      y:     anywhere ? Math.random() * canvas.height : canvas.height + 8,
+      r:     0.8 + Math.random() * 2.0,
       rgb:   COLORS[Math.floor(Math.random() * COLORS.length)],
       phase: Math.random() * Math.PI * 2,
-      speed: 0.3 + Math.random() * 0.9,
-    }));
+      // slow vertical drift speed (px per second)
+      vy:    12 + Math.random() * 28,
+      // gentle horizontal wobble amplitude
+      wx:    10 + Math.random() * 24,
+      wf:    0.25 + Math.random() * 0.55, // wobble frequency
+      speed: 0.4 + Math.random() * 0.7,   // twinkle speed
+    };
   }
 
   populate();
   window.addEventListener('resize', populate);
 
+  let last = 0;
   (function draw(t) {
     requestAnimationFrame(draw);
+    const dt = Math.min((t - last) * 0.001, 0.05); // seconds, capped
+    last = t;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const now = t * 0.001;
-    for (const s of stars) {
-      const alpha = 0.18 + 0.82 * (0.5 + 0.5 * Math.sin(now * s.speed + s.phase));
+    for (let i = 0; i < embers.length; i++) {
+      const s = embers[i];
+      // drift upward
+      s.y -= s.vy * dt;
+      // gentle horizontal sine wobble
+      const xOff = Math.sin(now * s.wf + s.phase) * s.wx;
+      // respawn when drifted off top
+      if (s.y < -s.r * 2) embers[i] = spawnEmber(false);
+      // slow twinkle
+      const alpha = 0.10 + 0.35 * (0.5 + 0.5 * Math.sin(now * s.speed + s.phase));
       ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.arc(s.x + xOff, s.y, s.r, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(${s.rgb[0]},${s.rgb[1]},${s.rgb[2]},${alpha.toFixed(2)})`;
       ctx.fill();
     }
