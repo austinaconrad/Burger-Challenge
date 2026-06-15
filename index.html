@@ -6557,79 +6557,93 @@ function renderPaceTab() {
     const bestDay = Object.values(dayTotals).length ? Math.max(...Object.values(dayTotals)) : 0;
     const bestDayStr = bestDay > 0 ? bestDay + ' 🍔' : '—';
 
-    // Line graph: last 8 weeks of burger counts
-    const sparkWeeks = Array.from({length: 8}, (_, idx) => {
-      const end   = new Date(now.getTime() - (7 - idx) * 7 * 86400000);
-      const start = new Date(now.getTime() - (8 - idx) * 7 * 86400000);
-      return (p.logs || []).filter(e => {
-        const d = safeDate(e?.ts);
-        return d && d >= start && d < end;
-      }).length;
-    });
-    const sparkMax = Math.max(...sparkWeeks, 1);
+    // Challenge progress graph: cumulative burgers vs. full challenge timeline
     const gid = 'sg' + i;
+    const PX0 = 32, PX1 = 274, PY0 = 6, PY1 = 70;
+    const PW = PX1 - PX0, PH = PY1 - PY0; // 242 x 64
 
-    // Plot area inside viewBox 0 0 280 100
-    const PX0 = 30, PX1 = 274, PY0 = 6, PY1 = 66;
-    const PW = PX1 - PX0, PH = PY1 - PY0; // 244 x 60
-    const xStep = PW / 7;
+    const cMs  = CHALLENGE_END - CHALLENGE_START;
+    const dateToX = d => +(PX0 + Math.max(0, Math.min(1, (d - CHALLENGE_START) / cMs)) * PW).toFixed(1);
+    const cntToY  = c => +(PY1 - Math.min(c, 100) / 100 * PH).toFixed(1);
 
-    const spts = sparkWeeks.map((cnt, si) => ({
-      x: +(PX0 + si * xStep).toFixed(1),
-      y: +(PY1 - (cnt / sparkMax) * PH).toFixed(1),
-      cnt
-    }));
-
-    const polyPts = spts.map(pt => pt.x + ',' + pt.y).join(' ');
-    const areaD   = 'M' + spts[0].x + ',' + PY1 + ' ' +
-                    spts.map(pt => 'L' + pt.x + ',' + pt.y).join(' ') +
-                    ' L' + spts[7].x + ',' + PY1 + ' Z';
-
-    // Y axis: 0, mid, max
-    const yMid = Math.round(sparkMax / 2);
-    const yLabels = [
-      { y: PY1, v: '0' },
-      ...(sparkMax > 2 ? [{ y: (PY0 + PY1) / 2, v: yMid }] : []),
-      { y: PY0, v: sparkMax }
-    ];
-
-    // X axis: 4 labels at idx 0, 2, 5, 7
-    const xLabelIdxs = [0, 2, 5, 7];
-    const xLabels = xLabelIdxs.map(idx => {
-      const d = new Date(now.getTime() - (8 - idx) * 7 * 86400000);
-      return { x: spts[idx].x, lbl: d.toLocaleDateString([], { month: 'numeric', day: 'numeric' }) };
+    // Build cumulative progress step line from sorted logs
+    const sortedLogs = (p.logs || [])
+      .filter(e => typeof e === 'object' && e.ts && safeDate(e.ts))
+      .sort((a, b) => (safeDate(a.ts)||new Date(0)) - (safeDate(b.ts)||new Date(0)));
+    const progPts = [{ x: PX0, y: PY1 }]; // (challenge start, 0)
+    let cum = 0;
+    sortedLogs.forEach(e => {
+      const d = safeDate(e.ts);
+      if (!d) return;
+      const x = +dateToX(d);
+      progPts.push({ x, y: +cntToY(cum) }); // horizontal step at old count
+      cum++;
+      progPts.push({ x, y: +cntToY(cum) }); // vertical rise to new count
     });
+    // Extend horizontal line to today (or challenge end)
+    const todayX = +dateToX(now < CHALLENGE_END ? now : CHALLENGE_END);
+    progPts.push({ x: todayX, y: +cntToY(Math.min(p.count, 100)) });
 
-    const midY = ((PY0 + PY1) / 2).toFixed(1);
+    const progPolyPts = progPts.map(pt => pt.x + ',' + pt.y).join(' ');
+    const progAreaD = 'M' + PX0 + ',' + PY1 + ' ' +
+      progPts.slice(1).map(pt => 'L' + pt.x + ',' + pt.y).join(' ') +
+      ' L' + todayX + ',' + PY1 + ' Z';
+
+    // Pace line: straight diagonal from (start,0) → (end,100)
+    const paceD = 'M' + PX0 + ',' + PY1 + ' L' + PX1 + ',' + PY0;
+
+    // Y axis: 0, 25, 50, 75, 100
+    const yLabels = [0, 25, 50, 75, 100].map(v => ({ y: cntToY(v), v: v === 0 ? '0' : String(v) }));
+
+    // X axis: challenge key dates
+    const xAxisDates = [
+      { d: CHALLENGE_START,      lbl: 'May 25', anchor: 'start' },
+      { d: new Date(2026, 6, 1), lbl: 'Jul 1',  anchor: 'middle' },
+      { d: new Date(2026, 7, 1), lbl: 'Aug 1',  anchor: 'middle' },
+      { d: CHALLENGE_END,        lbl: 'Sep 7',  anchor: 'end' },
+    ];
+    const xLabels = xAxisDates.map(({ d, lbl, anchor }) => ({ x: dateToX(d), lbl, anchor }));
+
+    // Horizontal grid lines at 25, 50, 75
+    const gridLines = [25, 50, 75].map(v =>
+      '<line x1="' + PX0 + '" y1="' + cntToY(v) + '" x2="' + PX1 + '" y2="' + cntToY(v) +
+      '" stroke="rgba(255,255,255,0.06)" stroke-width="0.5" stroke-dasharray="3 3"/>'
+    ).join('');
+
+    // Today vertical marker
+    const todayLine = '<line x1="' + todayX + '" y1="' + PY0 + '" x2="' + todayX + '" y2="' + PY1 +
+      '" stroke="rgba(255,255,255,0.22)" stroke-width="0.8" stroke-dasharray="2 2"/>' +
+      '<text x="' + todayX + '" y="' + (PY0-1) + '" text-anchor="middle" font-size="6.5" fill="rgba(255,255,255,0.35)" font-family="Barlow,sans-serif">Today</text>';
+
     const svgContent =
       '<defs><linearGradient id="' + gid + '" x1="0" y1="0" x2="0" y2="1">' +
-        '<stop offset="0%" stop-color="' + color + '" stop-opacity="0.22"/>' +
-        '<stop offset="100%" stop-color="' + color + '" stop-opacity="0.02"/>' +
+        '<stop offset="0%" stop-color="' + color + '" stop-opacity="0.28"/>' +
+        '<stop offset="100%" stop-color="' + color + '" stop-opacity="0.03"/>' +
       '</linearGradient></defs>' +
-      // axes
-      '<line x1="' + PX0 + '" y1="' + PY0 + '" x2="' + PX0 + '" y2="' + PY1 + '" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>' +
-      '<line x1="' + PX0 + '" y1="' + PY1 + '" x2="' + PX1 + '" y2="' + PY1 + '" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>' +
-      // mid grid
-      '<line x1="' + PX0 + '" y1="' + midY + '" x2="' + PX1 + '" y2="' + midY + '" stroke="rgba(255,255,255,0.06)" stroke-width="0.5" stroke-dasharray="3 3"/>' +
-      // axis titles
-      '<text x="' + ((PX0 + PX1)/2).toFixed(0) + '" y="98" text-anchor="middle" font-size="7.5" fill="rgba(255,255,255,0.3)" font-family="Barlow,sans-serif">Week</text>' +
-      '<text x="10" y="' + ((PY0+PY1)/2+3).toFixed(0) + '" text-anchor="middle" font-size="7.5" fill="rgba(255,255,255,0.3)" font-family="Barlow,sans-serif" transform="rotate(-90,10,' + ((PY0+PY1)/2).toFixed(0) + ')">🍔</text>' +
-      // area fill
-      '<path d="' + areaD + '" fill="url(#' + gid + ')"/>' +
-      // line
-      '<polyline points="' + polyPts + '" fill="none" stroke="' + color + '" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" opacity="0.95"/>' +
-      // dots
-      spts.map(pt => pt.cnt > 0
-        ? '<circle cx="' + pt.x + '" cy="' + pt.y + '" r="2.8" fill="' + color + '" stroke="rgba(0,0,0,0.4)" stroke-width="1"/>'
-        : '<circle cx="' + pt.x + '" cy="' + pt.y + '" r="1.5" fill="rgba(255,255,255,0.12)"/>'
-      ).join('') +
+      gridLines +
+      // Axes
+      '<line x1="' + PX0 + '" y1="' + PY0 + '" x2="' + PX0 + '" y2="' + PY1 + '" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>' +
+      '<line x1="' + PX0 + '" y1="' + PY1 + '" x2="' + PX1 + '" y2="' + PY1 + '" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>' +
+      // Axis labels
+      '<text x="9" y="' + ((PY0+PY1)/2+3).toFixed(0) + '" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.3)" font-family="Barlow,sans-serif" transform="rotate(-90,9,' + ((PY0+PY1)/2).toFixed(0) + ')">Burgers</text>' +
+      // Today marker
+      todayLine +
+      // Pace line (amber dashed)
+      '<path d="' + paceD + '" fill="none" stroke="rgba(245,158,11,0.55)" stroke-width="1.3" stroke-dasharray="5 3"/>' +
+      '<text x="' + (PX0 + PW*0.72).toFixed(0) + '" y="' + (PY0 + PH*0.28 - 4).toFixed(0) + '" font-size="7" fill="rgba(245,158,11,0.65)" font-family="Barlow,sans-serif">On pace</text>' +
+      // Progress area fill
+      '<path d="' + progAreaD + '" fill="url(#' + gid + ')"/>' +
+      // Progress line
+      '<polyline points="' + progPolyPts + '" fill="none" stroke="' + color + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' +
+      // Current position dot
+      '<circle cx="' + todayX + '" cy="' + cntToY(Math.min(p.count, 100)) + '" r="3" fill="' + color + '" stroke="rgba(0,0,0,0.5)" stroke-width="1.2"/>' +
       // Y labels
-      yLabels.map(l => '<text x="' + (PX0-5) + '" y="' + (+l.y+3.5).toFixed(1) + '" text-anchor="end" font-size="8" fill="rgba(255,255,255,0.4)" font-family="Barlow,sans-serif">' + l.v + '</text>').join('') +
+      yLabels.map(l => '<text x="' + (PX0-4) + '" y="' + (+l.y+3).toFixed(1) + '" text-anchor="end" font-size="7.5" fill="rgba(255,255,255,0.4)" font-family="Barlow,sans-serif">' + l.v + '</text>').join('') +
       // X labels
-      xLabels.map(l => '<text x="' + l.x + '" y="80" text-anchor="middle" font-size="7.5" fill="rgba(255,255,255,0.4)" font-family="Barlow,sans-serif">' + l.lbl + '</text>').join('');
+      xLabels.map(l => '<text x="' + l.x + '" y="84" text-anchor="' + l.anchor + '" font-size="7.5" fill="rgba(255,255,255,0.4)" font-family="Barlow,sans-serif">' + l.lbl + '</text>').join('');
 
-    const sparklineHtml = '<div class="pace-sparkline-wrap"><div class="pace-sparkline-label">8-week activity</div>' +
-      '<svg viewBox="0 0 280 102" width="100%" height="102" xmlns="http://www.w3.org/2000/svg" style="display:block">' + svgContent + '</svg></div>';
+    const sparklineHtml = '<div class="pace-sparkline-wrap"><div class="pace-sparkline-label">Challenge progress</div>' +
+      '<svg viewBox="0 0 280 90" width="100%" height="90" xmlns="http://www.w3.org/2000/svg" style="display:block">' + svgContent + '</svg></div>';
 
     let statusColor = ps.status === 'ahead' ? '#4ADE80' : ps.status === 'behind' ? '#F87171' : ps.status === 'done' ? '#4ADE80' : 'var(--amber)';
 
