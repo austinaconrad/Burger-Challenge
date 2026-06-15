@@ -546,7 +546,7 @@ button{transition:transform 0.2s ease}
 .fcp-name{font-size:12px;font-weight:700;color:var(--text)}
 .fcp-text{font-size:12px;color:rgba(255,255,255,0.55);flex:1;min-width:0;line-height:1.4}
 .fcp-viewall{font-size:11px;color:var(--muted);width:100%;margin-top:1px;font-style:italic}
-.msg-card{background:var(--surface);border-radius:14px;padding:10px 13px;animation:slideIn 0.25s ease both;box-shadow:0 2px 16px rgba(0,0,0,0.38),0 1px 4px rgba(0,0,0,0.22)}
+.msg-card{position:relative;background:var(--surface);border-radius:14px;padding:10px 13px 10px 18px;animation:slideIn 0.25s ease both;box-shadow:0 2px 16px rgba(0,0,0,0.38),0 1px 4px rgba(0,0,0,0.22)}
 .msg-card.mine{background:rgba(245,158,11,0.08);box-shadow:0 2px 16px rgba(245,158,11,0.08),0 1px 4px rgba(0,0,0,0.2)}
 .msg-header{display:flex;align-items:center;gap:8px;margin-bottom:5px}
 /* Cinematic: name + timestamp on one line */
@@ -2462,11 +2462,9 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
   border-radius: 0;
 }
 
-/* ── Banner row ── */
+/* ── Banner row — same visual weight as .msg-header ── */
 .grill-card-banner {
-  background: rgba(255,255,255,0.03);
-  border-bottom: 1px solid rgba(255,255,255,0.07);
-  padding: 9px 14px 9px 18px;
+  padding: 10px 13px 10px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -4762,7 +4760,9 @@ function renderUnifiedFeed() {
             ${msgComments.length > 1 ? `<div class="fcp-viewall">View all ${msgComments.length} comments</div>` : ''}
           </div>`
         : '';
+      const msgColor = RING_COLORS[(m.colorIdx ?? 0) % RING_COLORS.length];
       return `<div class="msg-card ${isMe?'mine':''} ${cc}" data-id="${m.id}">
+        <div class="grill-left-accent" style="background:${msgColor}"></div>
         <div class="msg-header">
           ${miniAvatarHTML(m.playerName||'?', m.colorIdx??0, 36, players.find(p=>p.id===m.playerId)?.avatar||'')}
           <div class="msg-header-info">
@@ -4867,12 +4867,10 @@ function renderUnifiedFeed() {
       <div class="grill-pill-row">${locPill}${timePill}${weatherPill}</div>
     </div>
     ` : `
-    <div class="grill-stripe"></div>
-    <div class="grill-patty-stamp ${stampCls}">${stampText}</div>
     <div class="grill-card-body">
       <div class="grill-card-body-content">
         <div class="grill-restaurant-name">${escHtml(item.restaurant)}</div>
-        <div class="grill-pill-row">${locPill}${timePill}${weatherPill}</div>
+        <div class="grill-pill-row"><span class="grill-patty-stamp ${stampCls} grill-stamp-pill-inline">${stampText}</span>${locPill}${timePill}${weatherPill}</div>
         <div class="grill-rating-row">${ratingStars}</div>
       </div>
       <div class="burger-stack-wrap">
