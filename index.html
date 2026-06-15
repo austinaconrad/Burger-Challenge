@@ -538,7 +538,7 @@ button{transition:transform 0.2s ease}
 .fcp-text{font-size:12px;color:rgba(255,255,255,0.55);flex:1;min-width:0;line-height:1.4}
 .fcp-viewall{font-size:11px;color:var(--muted);width:100%;margin-top:1px;font-style:italic}
 /* ── Option A: unified minimal feed row ── */
-.feed-row{display:flex;gap:10px;padding:11px 2px;border-bottom:.5px solid rgba(255,255,255,0.07);animation:slideIn 0.25s ease both;position:relative}
+.feed-row{display:flex;gap:10px;padding:11px 2px;border-bottom:1px solid rgba(255,255,255,0.12);animation:slideIn 0.25s ease both;position:relative}
 .feed-row:last-child{border-bottom:none}
 .feed-row-body{flex:1;min-width:0}
 .feed-row-header{display:flex;align-items:baseline;gap:5px;margin-bottom:3px;flex-wrap:wrap}
@@ -4613,13 +4613,15 @@ function renderUnifiedFeed() {
     });
   });
 
-  // Build message items
-  const msgItems = messages.map(m => ({
-    type: 'message',
-    ts: m.createdAt?.toDate?.()?.toISOString() || '',
-    sortTs: m.createdAt?.toDate?.() || new Date(0),
-    data: m,
-  }));
+  // Build message items (exclude milestone posts — those live outside the feed)
+  const msgItems = messages
+    .filter(m => m.type !== 'milestone')
+    .map(m => ({
+      type: 'message',
+      ts: m.createdAt?.toDate?.()?.toISOString() || '',
+      sortTs: m.createdAt?.toDate?.() || new Date(0),
+      data: m,
+    }));
 
   // Merge: oldest first so column-reverse CSS shows newest at top
   const allItems = [...burgerItems, ...msgItems];
@@ -4818,7 +4820,7 @@ function renderUnifiedFeed() {
       const commentLabel = burgerComments.length ? `💬 ${burgerComments.length}` : '💬';
       const cardDate = safeDate(item.ts);
       const cardTimeAgo = dateAgo(cardDate);
-      const bannerMeta = [escHtml(item.restaurant), cardTimeAgo].filter(Boolean).join(' · ');
+      const bannerMeta = cardTimeAgo || '';
       const latestComment = burgerComments.length > 0 ? burgerComments[burgerComments.length - 1] : null;
       const inlineCommentHtml = latestComment
         ? `<div class="feed-comment-preview" onclick="toggleComments('${targetId}')">
@@ -4835,12 +4837,20 @@ function renderUnifiedFeed() {
             ${bannerMeta ? `<span class="feed-row-meta">${bannerMeta}</span>` : ''}
             <span class="feed-row-badge" style="color:${color};border-color:${color}44;background:${color}12">🍔 #${burgerNum>0?burgerNum:'?'}</span>
           </div>
-          ${item.photo ? `<div class="feed-row-photo" onclick="openLightboxSrc(this.querySelector('img').src)"><img src="${item.photo}" alt="burger photo"/></div>` : ''}
-          <div class="grill-pill-row" style="margin-top:6px">
+          ${item.photo ? `
+          <div class="feed-row-photo" onclick="openLightboxSrc(this.querySelector('img').src)" style="position:relative">
+            <img src="${item.photo}" alt="burger photo"/>
+            <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.62) 0%,transparent 55%);border-radius:10px;pointer-events:none"></div>
+            <div style="position:absolute;bottom:9px;left:11px;right:11px;pointer-events:none">
+              <div style="font-size:15px;font-weight:800;color:#fff;letter-spacing:-0.02em;text-shadow:0 1px 6px rgba(0,0,0,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(item.restaurant)}</div>
+              ${item.rating > 0 ? `<div class="grill-rating-row" style="margin-top:2px">${ratingStars}</div>` : ''}
+            </div>
+          </div>` : `<div style="font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.02em;margin:4px 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(item.restaurant)}</div>`}
+          <div class="grill-pill-row" style="margin-top:${item.photo?'6':'0'}px">
             <span class="grill-pill ${stampCls==='stamp-triple'?'grill-pill-triple':''}">${stampText}</span>
             ${locPill}${weatherPill}
           </div>
-          ${item.rating > 0 ? `<div class="grill-rating-row" style="margin-top:6px">${ratingStars}</div>` : ''}
+          ${!item.photo && item.rating > 0 ? `<div class="grill-rating-row" style="margin-top:6px">${ratingStars}</div>` : ''}
           <div class="msg-reactions" data-burger-id="${targetId}">${pillsHtml}</div>
           <div class="feed-card-actions">
             <button class="feed-react-btn" data-target-id="${targetId}" data-target-type="burger" title="Add reaction">${_REACT_SVG}</button>
