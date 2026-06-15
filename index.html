@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#a8d4ed">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -95,7 +98,7 @@ body::after{
 .live-dot::before{content:'';width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 1.5s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)}}
 .offline-dot{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--muted2);background:rgba(255,255,255,0.03);border:1px solid var(--border);padding:3px 10px;border-radius:999px}
-header{padding:22px 0 16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
+header{padding:calc(22px + env(safe-area-inset-top)) 0 16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
 .header-top{display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:4px}
 .leave-btn{background:none;border:1px solid var(--border);color:var(--muted2);font-family:'Barlow',sans-serif;font-size:11px;font-weight:500;padding:5px 12px;border-radius:999px;cursor:pointer;transition:border-color 0.2s,color 0.2s}
 .leave-btn:hover{border-color:var(--border3);color:var(--text)}
@@ -1065,8 +1068,8 @@ body.feed-active .social-input-area.comment-focus-hide{opacity:0;transform:trans
   50%{box-shadow:0 4px 24px rgba(30,100,160,0.35),0 0 0 5px rgba(11,53,80,0.25)}
 }
 #log-fab.pulse{animation:fabPulse 1.4s ease-in-out 3}
-/* lift above feed input bar */
-body.feed-active #log-fab{bottom:88px}
+/* lift above feed input bar — 60px bar height + 12px gap + safe area */
+body.feed-active #log-fab{bottom:calc(72px + env(safe-area-inset-bottom, 0px))}
 /* hide when modal is open */
 body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 /* ── Log Burger Bottom Sheet Modal ── */
