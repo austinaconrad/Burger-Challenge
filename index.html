@@ -2151,6 +2151,8 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 .pace-stat:not(:last-child) { border-right: 1px solid rgba(255,255,255,0.06); }
 .pace-stat-val { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1; }
 .pace-stat-lbl { font-size: 9px; color: var(--muted2); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.05em; }
+.pace-sparkline-wrap { margin-bottom: 8px; }
+.pace-sparkline-label { font-size: 9px; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; font-weight: 600; }
 
 /* ── MAP FEED ── */
 .map-feed-wrap{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
@@ -6552,7 +6554,31 @@ function renderPaceTab() {
       dayTotals[d] = (dayTotals[d] || 0) + 1;
     });
     const bestDay = Object.values(dayTotals).length ? Math.max(...Object.values(dayTotals)) : 0;
-    const bestDayStr = bestDay > 0 ? bestDay + (bestDay === 1 ? ' 🍔' : ' 🍔') : '—';
+    const bestDayStr = bestDay > 0 ? bestDay + ' 🍔' : '—';
+
+    // Sparkline: last 8 weeks of burger counts
+    const sparkWeeks = Array.from({length: 8}, (_, idx) => {
+      const end   = new Date(now.getTime() - (7 - idx - 1) * 7 * 86400000);
+      const start = new Date(now.getTime() - (8 - idx) * 7 * 86400000);
+      return (p.logs || []).filter(e => {
+        const d = safeDate(e?.ts);
+        return d && d >= start && d < end;
+      }).length;
+    });
+    const sparkMax = Math.max(...sparkWeeks, 1);
+    // viewBox: 8 bars × 20px wide, 7 gaps × 5px = 195px wide, 36px tall
+    const sparkBars = sparkWeeks.map((cnt, idx) => {
+      const barH = cnt > 0 ? Math.max(4, Math.round((cnt / sparkMax) * 36)) : 3;
+      const x    = idx * 25;
+      const y    = 36 - barH;
+      const alpha = cnt === 0 ? 0.12 : (0.35 + (idx / 7) * 0.65).toFixed(2);
+      const fill  = cnt === 0 ? 'rgba(255,255,255,0.15)' : color;
+      return `<rect x="${x}" y="${y}" width="20" height="${barH}" rx="3" fill="${fill}" opacity="${alpha}"/>`;
+    }).join('');
+    const sparklineHtml = `<div class="pace-sparkline-wrap">
+      <div class="pace-sparkline-label">8-week activity</div>
+      <svg viewBox="0 0 195 36" width="100%" height="36" xmlns="http://www.w3.org/2000/svg" style="display:block;overflow:visible">${sparkBars}</svg>
+    </div>`;
 
     let statusColor = ps.status === 'ahead' ? '#4ADE80' : ps.status === 'behind' ? '#F87171' : ps.status === 'done' ? '#4ADE80' : 'var(--amber)';
 
@@ -6571,6 +6597,7 @@ function renderPaceTab() {
         <div class="pace-track-fill" style="width:${pct}%;background:${color}"></div>
       </div>
       ${projHtml}
+      ${sparklineHtml}
       <div class="pace-stats-row">
         <div class="pace-stat">
           <div class="pace-stat-val">${paceStr}</div>
