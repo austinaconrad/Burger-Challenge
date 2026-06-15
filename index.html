@@ -6500,6 +6500,7 @@ function computePaceStats(p) {
 function renderPaceTab() {
   const root = document.getElementById('pace-root');
   if (!root) return;
+  const now = new Date();
   if (!players.length) {
     root.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📈</div><div class="empty-state-title">No Players Yet</div><div class="empty-state-sub">Join the challenge to see pace projections</div></div>`;
     return;
