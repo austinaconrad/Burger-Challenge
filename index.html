@@ -2172,6 +2172,24 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 .pace-sparkline-wrap { margin-bottom: 8px; }
 .pace-sparkline-label { font-size: 9px; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; font-weight: 600; }
 
+/* ── JULY 4TH BACKGROUND ── */
+/* Overrides the amber glow with a deep navy glow on July 4th */
+body.july4-bg::before {
+  background:
+    radial-gradient(ellipse 110% 55% at 50% 105%, rgba(15,10,50,0.70) 0%, transparent 65%),
+    radial-gradient(ellipse 60%  35% at 50% 100%, rgba(8,6,36,0.50)  0%, transparent 55%),
+    radial-gradient(ellipse 40%  20% at 20% 100%, rgba(40,10,10,0.20) 0%, transparent 50%),
+    radial-gradient(ellipse 40%  20% at 80% 100%, rgba(10,10,40,0.20) 0%, transparent 50%),
+    radial-gradient(ellipse 80%  40% at 50% 0%,   rgba(5,5,25,0.30)  0%, transparent 60%);
+}
+#stars-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+}
 /* ── JULY 4TH BANNER ── */
 .july4-banner {
   flex-shrink: 0;
@@ -2492,14 +2510,14 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
   line-height: 1.2;
 }
 .grill-banner-meta {
-  font-size: 10px;
-  color: rgba(255,255,255,0.38);
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
   font-weight: 500;
   margin-top: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 180px;
+  max-width: 220px;
   line-height: 1;
 }
 .grill-banner-you {
@@ -2540,20 +2558,9 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 .grill-patty-stamp.stamp-double,
 .grill-patty-stamp.stamp-single { /* inherits base styles */ }
 
-/* ── Card body — content left, burger stack right ── */
+/* ── Card body — plain content block, no side graphic ── */
 .grill-card-body {
-  padding: 11px 14px 13px 18px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 12px;
-}
-.grill-card-body-content {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+  padding: 8px 14px 12px 18px;
 }
 
 /* Restaurant name */
@@ -4829,8 +4836,7 @@ function renderUnifiedFeed() {
       const commentLabel = burgerComments.length ? `💬 ${burgerComments.length}` : '💬';
       const cardDate = safeDate(item.ts);
       const cardTimeAgo = dateAgo(cardDate);
-      const restaurantShort = item.restaurant.length > 22 ? item.restaurant.slice(0,22)+'…' : item.restaurant;
-      const bannerMeta = [restaurantShort, cardTimeAgo].filter(Boolean).join(' · ');
+      const bannerMeta = [escHtml(item.restaurant), cardTimeAgo].filter(Boolean).join(' · ');
       const latestComment = burgerComments.length > 0 ? burgerComments[burgerComments.length - 1] : null;
       const inlineCommentHtml = latestComment
         ? `<div class="feed-comment-preview" onclick="toggleComments('${targetId}')">
@@ -4848,7 +4854,7 @@ function renderUnifiedFeed() {
         <div class="grill-banner-avatar" style="background:${color}1A;color:${color};border:1.5px solid ${color}55;${item.player.avatar ? 'overflow:hidden;padding:0' : ''}">${item.player.avatar ? `<img src="${item.player.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="avatar"/>` : ini}</div>
         <div>
           <div class="grill-banner-name">${escHtml(item.player.name)}${isMe?' <span class="grill-banner-you">(you)</span>':''}</div>
-          ${bannerMeta ? `<div class="grill-banner-meta">${escHtml(bannerMeta)}</div>` : ''}
+          ${bannerMeta ? `<div class="grill-banner-meta">${bannerMeta}</div>` : ''}
         </div>
       </div>
       <div class="grill-banner-badge" style="background:${color}18;color:${color};border-color:${color}40">🍔 #${burgerNum>0?burgerNum:'?'}</div>
@@ -4868,15 +4874,8 @@ function renderUnifiedFeed() {
     </div>
     ` : `
     <div class="grill-card-body">
-      <div class="grill-card-body-content">
-        <div class="grill-restaurant-name">${escHtml(item.restaurant)}</div>
-        <div class="grill-pill-row"><span class="grill-patty-stamp ${stampCls} grill-stamp-pill-inline">${stampText}</span>${locPill}${timePill}${weatherPill}</div>
-        <div class="grill-rating-row">${ratingStars}</div>
-      </div>
-      <div class="burger-stack-wrap">
-        ${item.rating===5?'<div class="perfect-star">⭐</div>':''}
-        ${miniBurgerStack(pattyCount)}
-      </div>
+      <div class="grill-pill-row"><span class="grill-patty-stamp ${stampCls} grill-stamp-pill-inline">${stampText}</span>${locPill}${weatherPill}</div>
+      ${item.rating > 0 ? `<div class="grill-rating-row" style="margin-top:8px">${ratingStars}</div>` : ''}
     </div>
     `}
     <div class="msg-reactions" data-burger-id="${targetId}">${pillsHtml}</div>
@@ -8080,6 +8079,63 @@ const _prevRanks  = {};
 // Scroll-linked header compression removed — the max-height layout transition
 // caused a feedback loop: collapsing the header shifted content up, changing
 // window.scrollY, which re-triggered the threshold check and created a jump.
+
+// ── July 4th animated starfield ───────────────────────────────────────────
+function initJuly4Stars() {
+  const d = new Date();
+  if (d.getMonth() !== 6 || d.getDate() !== 4) return;
+
+  document.body.classList.add('july4-bg');
+
+  const canvas = document.createElement('canvas');
+  canvas.id = 'stars-canvas';
+  document.body.prepend(canvas);
+  const ctx = canvas.getContext('2d');
+
+  // Red, white (most common), blue
+  const COLORS = [
+    [220, 38,  38],  // red
+    [255, 255, 255], // white
+    [255, 255, 255], // white
+    [255, 255, 255], // white
+    [37,  99,  235], // blue
+    [255, 255, 255], // white
+  ];
+
+  let stars = [];
+
+  function populate() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const count = Math.round((canvas.width * canvas.height) / 6000); // density
+    stars = Array.from({ length: Math.max(60, Math.min(count, 180)) }, () => ({
+      x:     Math.random() * canvas.width,
+      y:     Math.random() * canvas.height,
+      r:     0.5 + Math.random() * 1.6,
+      rgb:   COLORS[Math.floor(Math.random() * COLORS.length)],
+      phase: Math.random() * Math.PI * 2,
+      speed: 0.3 + Math.random() * 0.9,
+    }));
+  }
+
+  populate();
+  window.addEventListener('resize', populate);
+
+  (function draw(t) {
+    requestAnimationFrame(draw);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const now = t * 0.001;
+    for (const s of stars) {
+      const alpha = 0.18 + 0.82 * (0.5 + 0.5 * Math.sin(now * s.speed + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${s.rgb[0]},${s.rgb[1]},${s.rgb[2]},${alpha.toFixed(2)})`;
+      ctx.fill();
+    }
+  })(0);
+}
+
+initJuly4Stars();
 </script>
 </body>
 </html>
