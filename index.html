@@ -186,8 +186,7 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,8vw,50px);font-weigh
 /* ── Card hover lift ──────────────────────────────────────────────────── */
 .pl-row{transition:border-color 0.2s,transform 0.18s ease,box-shadow 0.18s ease}
 .pl-row:hover{transform:translateY(-2px);box-shadow:var(--shadow-card),0 6px 20px rgba(0,0,0,0.3),0 0 0 1px rgba(245,158,11,0.12)}
-.msg-card{transition:transform 0.18s ease,box-shadow 0.18s ease,border-color 0.18s}
-.msg-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.25),0 0 0 1px rgba(245,158,11,0.1)}
+/* .msg-card hover removed — replaced by .feed-row */
 .milestone-card{transition:transform 0.18s ease,box-shadow 0.18s ease}
 .milestone-card:hover{transform:translateY(-2px);box-shadow:0 0 0 1px rgba(245,158,11,0.18),0 12px 40px rgba(245,158,11,0.18),0 6px 20px rgba(0,0,0,0.6)}
 .tr-card{transition:transform 0.18s ease,box-shadow 0.18s ease}
@@ -248,19 +247,15 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,8vw,50px);font-weigh
 }
 /* Cards that receive the shimmer — must have overflow:hidden + position:relative */
 .pl-row,
-.msg-card,
 .milestone-card,
 .tr-card,
 .setup-card,
 .grill-card,
-.grill-feed-card,
 .duel-stat-row {
   overflow: hidden;
 }
 .pl-row::after,
-.msg-card::after,
 .milestone-card::after,
-.grill-feed-card::after,
 .tr-card::after,
 .setup-card::after {
   content: '';
@@ -280,12 +275,9 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,8vw,50px);font-weigh
   animation-fill-mode: backwards; /* hold 0% keyframe (off-screen) during delay period */
 }
 /* Stagger each card type so sweeps don't all fire simultaneously */
-.msg-card::after          { animation-delay: 1.4s; }
 .milestone-card::after    { animation-delay: 2.8s; }
 .tr-card::after           { animation-delay: 4.2s; }
 .setup-card::after        { animation-delay: 0.7s; }
-.grill-feed-card::after   { animation-delay: 5.6s; }
-.grill-feed-card:nth-child(even)::after { animation-delay: 3.1s; }
 /* Odd/even stagger within the ranks list */
 .pl-row:nth-child(even)::after { animation-delay: 3.5s; }
 .pl-row:nth-child(odd)::after  { animation-delay: 6.3s; }
@@ -353,7 +345,7 @@ button{transition:transform 0.2s ease}
 .map-feed-card:active{transform:scale(0.98)}
 .lb-card:active{transform:scale(0.98)}
 .player-row:active{transform:scale(0.98)}
-.grill-feed-card:active{transform:scale(0.99)}
+/* .grill-feed-card:active removed — no card box */
 .ach-badge{transition:transform 0.2s ease,box-shadow 0.2s,filter 0.2s,opacity 0.2s}
 .lb-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.22),rgba(245,158,11,0.28),rgba(255,255,255,0.22),transparent);opacity:1}
 .lb-card.first-place{
@@ -536,23 +528,32 @@ button{transition:transform 0.2s ease}
 .bg-progress-fill{height:100%;border-radius:999px;transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1)}
 .bg-pct{font-family:'Bebas Neue',sans-serif;font-size:13px;font-weight:700;color:var(--av-text);flex-shrink:0;min-width:40px;text-align:right}
 .social-wrap{display:flex;flex-direction:column;height:calc(100dvh - 310px);min-height:360px}
-.social-feed{flex:1;overflow-y:auto;display:flex;flex-direction:column-reverse;gap:10px;padding:6px 2px 14px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+.social-feed{flex:1;overflow-y:auto;display:flex;flex-direction:column-reverse;gap:0;padding:6px 2px 14px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
 .social-feed::-webkit-scrollbar{width:4px}
 .social-feed::-webkit-scrollbar-track{background:transparent}
 .social-feed::-webkit-scrollbar-thumb{background:var(--border2);border-radius:999px}
 /* ── Inline comment preview (Instagram-style) ── */
-.feed-comment-preview{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px;padding:6px 14px 2px;cursor:pointer}
-.grill-card-inner .feed-comment-preview{padding-left:18px}
+.feed-comment-preview{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px;padding:6px 0 2px;cursor:pointer}
 .fcp-name{font-size:12px;font-weight:700;color:var(--text)}
 .fcp-text{font-size:12px;color:rgba(255,255,255,0.55);flex:1;min-width:0;line-height:1.4}
 .fcp-viewall{font-size:11px;color:var(--muted);width:100%;margin-top:1px;font-style:italic}
-.msg-card{position:relative;background:var(--surface);border-radius:14px;padding:10px 13px 10px 18px;animation:slideIn 0.25s ease both;box-shadow:0 2px 16px rgba(0,0,0,0.38),0 1px 4px rgba(0,0,0,0.22)}
-.msg-card.mine{background:rgba(245,158,11,0.08);box-shadow:0 2px 16px rgba(245,158,11,0.08),0 1px 4px rgba(0,0,0,0.2)}
+/* ── Option A: unified minimal feed row ── */
+.feed-row{display:flex;gap:10px;padding:11px 2px;border-bottom:.5px solid rgba(255,255,255,0.07);animation:slideIn 0.25s ease both;position:relative}
+.feed-row:last-child{border-bottom:none}
+.feed-row-body{flex:1;min-width:0}
+.feed-row-header{display:flex;align-items:baseline;gap:5px;margin-bottom:3px;flex-wrap:wrap}
+.feed-row-name{font-size:13px;font-weight:600;color:#F2EDE4;white-space:nowrap}
+.feed-row-you{font-size:10px;color:rgba(255,255,255,0.3);font-weight:400}
+.feed-row-meta{font-size:11px;color:rgba(255,255,255,0.32);margin-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.feed-row-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:999px;border:.5px solid;white-space:nowrap;flex-shrink:0;margin-left:auto;align-self:flex-start}
+.feed-row-photo{margin-top:7px;border-radius:10px;overflow:hidden;cursor:zoom-in}
+.feed-row-photo img{width:100%;max-height:220px;object-fit:cover;display:block}
+/* keep legacy class names for backward compat */
+.msg-card{animation:slideIn 0.25s ease both}
 .msg-header{display:flex;align-items:center;gap:8px;margin-bottom:5px}
-/* Cinematic: name + timestamp on one line */
 .msg-header-info{flex:1;min-width:0;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.msg-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.msg-time{font-size:10px;color:var(--muted2);font-weight:400;white-space:nowrap;margin-top:0}
+.msg-name{font-size:13px;font-weight:700;color:var(--text)}
+.msg-time{font-size:10px;color:var(--muted2);font-weight:400}
 /* Cinematic: cap photo height so portraits don't swamp the feed */
 .msg-img-wrap img{max-height:240px;object-fit:cover;border-radius:12px;width:100%;display:block}
 /* ── Compact header: shared rules for Social + Map + Base tabs ── */
@@ -2422,21 +2423,8 @@ body.july4-bg::before {
   margin-bottom: 6px;
 }
 
-/* ── Card shell ── */
-.grill-feed-card {
-  position: relative;
-  border-radius: 14px;
-  background: rgba(26,26,26,0.75);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  box-shadow: 0 2px 16px rgba(0,0,0,0.42), 0 1px 4px rgba(0,0,0,0.28);
-  overflow: hidden;
-  animation: grillCardIn 0.28s ease both;
-}
-@keyframes grillCardIn {
-  from { opacity:0; transform: translateY(8px); }
-  to   { opacity:1; transform: translateY(0); }
-}
+/* .grill-feed-card — shell replaced by .feed-row; kept as no-op for any stray refs */
+.grill-feed-card { position: relative; }
 /* Perfect 5-star rating — standard border, big watermark star */
 .grill-feed-card.perfect-rating {
   border-color: var(--border);
@@ -2464,12 +2452,8 @@ body.july4-bg::before {
 /* Triple card — no special border, inherits standard card style */
 .grill-feed-card.triple-card {}
 
-/* Inner wrapper — just for positioning the accent strip */
+/* .grill-card-inner — no longer needed in feed row layout */
 .grill-card-inner { position: relative; }
-/* Reactions, actions, and comment threads inside burger cards need the same left indent as the card body */
-.grill-card-inner .msg-reactions,
-.grill-card-inner .feed-card-actions { padding-left: 18px; padding-right: 14px; }
-.grill-card-inner .feed-comment-thread { padding-left: 0; padding-right: 0; }
 
 /* Left accent strip — player color injected via inline style */
 .grill-left-accent {
@@ -4767,24 +4751,22 @@ function renderUnifiedFeed() {
             ${msgComments.length > 1 ? `<div class="fcp-viewall">View all ${msgComments.length} comments</div>` : ''}
           </div>`
         : '';
-      const msgColor = RING_COLORS[(m.colorIdx ?? 0) % RING_COLORS.length];
-      return `<div class="msg-card ${isMe?'mine':''} ${cc}" data-id="${m.id}">
-        <div class="grill-left-accent" style="background:${msgColor}"></div>
-        <div class="msg-header">
-          ${miniAvatarHTML(m.playerName||'?', m.colorIdx??0, 36, players.find(p=>p.id===m.playerId)?.avatar||'')}
-          <div class="msg-header-info">
-            <div class="msg-name">${escHtml(m.playerName||'?')}${isMe ? ' <span class="msg-mine-tag">You</span>' : ''}</div>
-            <div class="msg-time">${msgTimeAgo}</div>
+      return `<div class="feed-row ${isMe?'mine':''}" data-id="${m.id}" style="animation-delay:${_feedInitialRenderDone?'0s':Math.min(idx*0.04,0.6)+'s'}">
+        ${miniAvatarHTML(m.playerName||'?', m.colorIdx??0, 34, players.find(p=>p.id===m.playerId)?.avatar||'')}
+        <div class="feed-row-body">
+          <div class="feed-row-header">
+            <span class="feed-row-name">${escHtml(m.playerName||'?')}${isMe?' <span class="feed-row-you">(you)</span>':''}</span>
+            <span class="feed-row-meta">${msgTimeAgo}</span>
           </div>
-          <button class="msg-react-btn feed-react-btn" data-target-id="${targetId}" data-target-type="message" title="Add reaction">${_REACT_SVG}</button>
+          ${textHtml}${imgHtml}
+          ${reactionsHtml}
+          <div class="feed-card-actions">
+            <button class="msg-react-btn feed-react-btn" data-target-id="${targetId}" data-target-type="message" title="Add reaction">${_REACT_SVG}</button>
+            <button class="feed-comment-btn" data-target-id="${targetId}" onclick="toggleComments('${targetId}')">${commentLabel}</button>
+          </div>
+          ${msgInlineComment}
+          ${buildCommentHtml(targetId, 'message', msgComments)}
         </div>
-        ${textHtml}${imgHtml}
-        ${reactionsHtml}
-        <div class="feed-card-actions">
-          <button class="feed-comment-btn" data-target-id="${targetId}" onclick="toggleComments('${targetId}')">${commentLabel}</button>
-        </div>
-        ${msgInlineComment}
-        ${buildCommentHtml(targetId, 'message', msgComments)}
       </div>`;
     } else {
       // Burger card
@@ -4845,48 +4827,29 @@ function renderUnifiedFeed() {
             ${burgerComments.length > 1 ? `<div class="fcp-viewall">View all ${burgerComments.length} comments</div>` : ''}
           </div>`
         : '';
-      return `
-<div class="grill-feed-card ${pattyCount>=3?'triple-card':''}${item.rating===5?' perfect-rating':''}" data-player-id="${escHtml(item.player.id)}" style="animation-delay:${_feedInitialRenderDone ? '0s' : Math.min(idx*0.04,0.6)+'s'}">
-  <div class="grill-card-inner">
-    <div class="grill-left-accent" style="background:${color}"></div>
-    <div class="grill-card-banner">
-      <div class="grill-banner-left">
-        <div class="grill-banner-avatar" style="background:${color}1A;color:${color};border:1.5px solid ${color}55;${item.player.avatar ? 'overflow:hidden;padding:0' : ''}">${item.player.avatar ? `<img src="${item.player.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="avatar"/>` : ini}</div>
-        <div>
-          <div class="grill-banner-name">${escHtml(item.player.name)}${isMe?' <span class="grill-banner-you">(you)</span>':''}</div>
-          ${bannerMeta ? `<div class="grill-banner-meta">${bannerMeta}</div>` : ''}
+      return `<div class="feed-row" data-player-id="${escHtml(item.player.id)}" style="animation-delay:${_feedInitialRenderDone?'0s':Math.min(idx*0.04,0.6)+'s'}">
+        <div class="${colorClass(item.player.colorIdx)}" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--av-bg);color:var(--av-text);flex-shrink:0;overflow:hidden;font-family:'Barlow',sans-serif">${item.player.avatar?`<img src="${item.player.avatar}" style="width:100%;height:100%;object-fit:cover" alt="avatar"/>`:`${ini}`}</div>
+        <div class="feed-row-body">
+          <div class="feed-row-header">
+            <span class="feed-row-name">${escHtml(item.player.name)}${isMe?' <span class="feed-row-you">(you)</span>':''}</span>
+            ${bannerMeta ? `<span class="feed-row-meta">${bannerMeta}</span>` : ''}
+            <span class="feed-row-badge" style="color:${color};border-color:${color}44;background:${color}12">🍔 #${burgerNum>0?burgerNum:'?'}</span>
+          </div>
+          ${item.photo ? `<div class="feed-row-photo" onclick="openLightboxSrc(this.querySelector('img').src)"><img src="${item.photo}" alt="burger photo"/></div>` : ''}
+          <div class="grill-pill-row" style="margin-top:6px">
+            <span class="grill-pill ${stampCls==='stamp-triple'?'grill-pill-triple':''}">${stampText}</span>
+            ${locPill}${weatherPill}
+          </div>
+          ${item.rating > 0 ? `<div class="grill-rating-row" style="margin-top:6px">${ratingStars}</div>` : ''}
+          <div class="msg-reactions" data-burger-id="${targetId}">${pillsHtml}</div>
+          <div class="feed-card-actions">
+            <button class="feed-react-btn" data-target-id="${targetId}" data-target-type="burger" title="Add reaction">${_REACT_SVG}</button>
+            <button class="feed-comment-btn" data-target-id="${targetId}" onclick="toggleComments('${targetId}')">${commentLabel}</button>
+          </div>
+          ${inlineCommentHtml}
+          ${buildCommentHtml(targetId, 'burger', burgerComments)}
         </div>
-      </div>
-      <div class="grill-banner-badge" style="background:${color}18;color:${color};border-color:${color}40">🍔 #${burgerNum>0?burgerNum:'?'}</div>
-    </div>
-    ${item.photo ? `
-    <div class="grill-photo-hero">
-      <img class="grill-photo-hero-img" src="${item.photo}" alt="burger photo" onclick="openLightboxSrc(this.src)"/>
-      <div class="grill-photo-scrim"></div>
-      <div class="grill-photo-overlay">
-        <div class="grill-restaurant-name">${escHtml(item.restaurant)}</div>
-        <div class="grill-rating-row">${ratingStars}</div>
-      </div>
-    </div>
-    <div class="grill-photo-details">
-      <div class="grill-patty-stamp ${stampCls} grill-stamp-pill-inline">${stampText}</div>
-      <div class="grill-pill-row">${locPill}${timePill}${weatherPill}</div>
-    </div>
-    ` : `
-    <div class="grill-card-body">
-      <div class="grill-pill-row"><span class="grill-patty-stamp ${stampCls} grill-stamp-pill-inline">${stampText}</span>${locPill}${weatherPill}</div>
-      ${item.rating > 0 ? `<div class="grill-rating-row" style="margin-top:8px">${ratingStars}</div>` : ''}
-    </div>
-    `}
-    <div class="msg-reactions" data-burger-id="${targetId}">${pillsHtml}</div>
-    <div class="feed-card-actions">
-      <button class="feed-react-btn" data-target-id="${targetId}" data-target-type="burger" title="Add reaction">${_REACT_SVG}</button>
-      <button class="feed-comment-btn" data-target-id="${targetId}" onclick="toggleComments('${targetId}')">${commentLabel}</button>
-    </div>
-    ${inlineCommentHtml}
-    ${buildCommentHtml(targetId, 'burger', burgerComments)}
-  </div>
-</div>`.trim();
+      </div>`.trim();
     }
   }).join('\n');
 
@@ -7421,7 +7384,7 @@ window.switchTab=function(name,btn){
   requestAnimationFrame(() => {
     const panel = document.getElementById('tab-' + name);
     if (!panel) return;
-    const cards = [...panel.querySelectorAll('.pl-row, .msg-card, .pace-card, .tr-card, .setup-card, .grill-card, .grill-feed-card, .duel-stat-row, .milestone-card, .restaurant-row')];
+    const cards = [...panel.querySelectorAll('.pl-row, .feed-row, .pace-card, .tr-card, .setup-card, .grill-card, .duel-stat-row, .milestone-card, .restaurant-row')];
     cards.forEach(c => { c.classList.remove('card-reveal'); c.style.animationDelay = ''; });
     void panel.offsetWidth; // single reflow
     cards.forEach((c, idx) => {
