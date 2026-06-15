@@ -6557,9 +6557,9 @@ function renderPaceTab() {
     const bestDay = Object.values(dayTotals).length ? Math.max(...Object.values(dayTotals)) : 0;
     const bestDayStr = bestDay > 0 ? bestDay + ' 🍔' : '—';
 
-    // Sparkline: last 8 weeks of burger counts
+    // Line graph: last 8 weeks of burger counts
     const sparkWeeks = Array.from({length: 8}, (_, idx) => {
-      const end   = new Date(now.getTime() - (7 - idx - 1) * 7 * 86400000);
+      const end   = new Date(now.getTime() - (7 - idx) * 7 * 86400000);
       const start = new Date(now.getTime() - (8 - idx) * 7 * 86400000);
       return (p.logs || []).filter(e => {
         const d = safeDate(e?.ts);
@@ -6567,19 +6567,69 @@ function renderPaceTab() {
       }).length;
     });
     const sparkMax = Math.max(...sparkWeeks, 1);
-    // viewBox: 8 bars × 20px wide, 7 gaps × 5px = 195px wide, 36px tall
-    const sparkBars = sparkWeeks.map((cnt, idx) => {
-      const barH = cnt > 0 ? Math.max(4, Math.round((cnt / sparkMax) * 36)) : 3;
-      const x    = idx * 25;
-      const y    = 36 - barH;
-      const alpha = cnt === 0 ? 0.12 : (0.35 + (idx / 7) * 0.65).toFixed(2);
-      const fill  = cnt === 0 ? 'rgba(255,255,255,0.15)' : color;
-      return `<rect x="${x}" y="${y}" width="20" height="${barH}" rx="3" fill="${fill}" opacity="${alpha}"/>`;
-    }).join('');
-    const sparklineHtml = `<div class="pace-sparkline-wrap">
-      <div class="pace-sparkline-label">8-week activity</div>
-      <svg viewBox="0 0 195 36" width="100%" height="36" xmlns="http://www.w3.org/2000/svg" style="display:block;overflow:visible">${sparkBars}</svg>
-    </div>`;
+    const gid = 'sg' + i;
+
+    // Plot area inside viewBox 0 0 280 100
+    const PX0 = 30, PX1 = 274, PY0 = 6, PY1 = 66;
+    const PW = PX1 - PX0, PH = PY1 - PY0; // 244 x 60
+    const xStep = PW / 7;
+
+    const spts = sparkWeeks.map((cnt, si) => ({
+      x: +(PX0 + si * xStep).toFixed(1),
+      y: +(PY1 - (cnt / sparkMax) * PH).toFixed(1),
+      cnt
+    }));
+
+    const polyPts = spts.map(pt => pt.x + ',' + pt.y).join(' ');
+    const areaD   = 'M' + spts[0].x + ',' + PY1 + ' ' +
+                    spts.map(pt => 'L' + pt.x + ',' + pt.y).join(' ') +
+                    ' L' + spts[7].x + ',' + PY1 + ' Z';
+
+    // Y axis: 0, mid, max
+    const yMid = Math.round(sparkMax / 2);
+    const yLabels = [
+      { y: PY1, v: '0' },
+      ...(sparkMax > 2 ? [{ y: (PY0 + PY1) / 2, v: yMid }] : []),
+      { y: PY0, v: sparkMax }
+    ];
+
+    // X axis: 4 labels at idx 0, 2, 5, 7
+    const xLabelIdxs = [0, 2, 5, 7];
+    const xLabels = xLabelIdxs.map(idx => {
+      const d = new Date(now.getTime() - (8 - idx) * 7 * 86400000);
+      return { x: spts[idx].x, lbl: d.toLocaleDateString([], { month: 'numeric', day: 'numeric' }) };
+    });
+
+    const midY = ((PY0 + PY1) / 2).toFixed(1);
+    const svgContent =
+      '<defs><linearGradient id="' + gid + '" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0%" stop-color="' + color + '" stop-opacity="0.22"/>' +
+        '<stop offset="100%" stop-color="' + color + '" stop-opacity="0.02"/>' +
+      '</linearGradient></defs>' +
+      // axes
+      '<line x1="' + PX0 + '" y1="' + PY0 + '" x2="' + PX0 + '" y2="' + PY1 + '" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>' +
+      '<line x1="' + PX0 + '" y1="' + PY1 + '" x2="' + PX1 + '" y2="' + PY1 + '" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>' +
+      // mid grid
+      '<line x1="' + PX0 + '" y1="' + midY + '" x2="' + PX1 + '" y2="' + midY + '" stroke="rgba(255,255,255,0.06)" stroke-width="0.5" stroke-dasharray="3 3"/>' +
+      // axis titles
+      '<text x="' + ((PX0 + PX1)/2).toFixed(0) + '" y="98" text-anchor="middle" font-size="7.5" fill="rgba(255,255,255,0.3)" font-family="Barlow,sans-serif">Week</text>' +
+      '<text x="10" y="' + ((PY0+PY1)/2+3).toFixed(0) + '" text-anchor="middle" font-size="7.5" fill="rgba(255,255,255,0.3)" font-family="Barlow,sans-serif" transform="rotate(-90,10,' + ((PY0+PY1)/2).toFixed(0) + ')">🍔</text>' +
+      // area fill
+      '<path d="' + areaD + '" fill="url(#' + gid + ')"/>' +
+      // line
+      '<polyline points="' + polyPts + '" fill="none" stroke="' + color + '" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" opacity="0.95"/>' +
+      // dots
+      spts.map(pt => pt.cnt > 0
+        ? '<circle cx="' + pt.x + '" cy="' + pt.y + '" r="2.8" fill="' + color + '" stroke="rgba(0,0,0,0.4)" stroke-width="1"/>'
+        : '<circle cx="' + pt.x + '" cy="' + pt.y + '" r="1.5" fill="rgba(255,255,255,0.12)"/>'
+      ).join('') +
+      // Y labels
+      yLabels.map(l => '<text x="' + (PX0-5) + '" y="' + (+l.y+3.5).toFixed(1) + '" text-anchor="end" font-size="8" fill="rgba(255,255,255,0.4)" font-family="Barlow,sans-serif">' + l.v + '</text>').join('') +
+      // X labels
+      xLabels.map(l => '<text x="' + l.x + '" y="80" text-anchor="middle" font-size="7.5" fill="rgba(255,255,255,0.4)" font-family="Barlow,sans-serif">' + l.lbl + '</text>').join('');
+
+    const sparklineHtml = '<div class="pace-sparkline-wrap"><div class="pace-sparkline-label">8-week activity</div>' +
+      '<svg viewBox="0 0 280 102" width="100%" height="102" xmlns="http://www.w3.org/2000/svg" style="display:block">' + svgContent + '</svg></div>';
 
     let statusColor = ps.status === 'ahead' ? '#4ADE80' : ps.status === 'behind' ? '#F87171' : ps.status === 'done' ? '#4ADE80' : 'var(--amber)';
 
