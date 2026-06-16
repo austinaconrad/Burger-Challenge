@@ -43,6 +43,7 @@
 /* Poppins headings — tight tracking across the board */
 [class*="tally-name"],[class*="bg-name"],[class*="hl-name"],[class*="lb-count"],
 .grill-banner-name,.setup-card h2{letter-spacing:-0.03em}
+html{background:#7ec3e8}
 body{background:linear-gradient(175deg,#7ec3e8 0%,#a8d4ed 30%,#c2e3f4 65%,#d8eefd 100%);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;overflow-x:hidden}
 /* ── Cloud blobs — soft white radial glows float in the sky ── */
 body::before{content:'';position:fixed;inset:0;z-index:0;background:
@@ -1068,8 +1069,7 @@ body.feed-active .social-input-area.comment-focus-hide{opacity:0;transform:trans
   50%{box-shadow:0 4px 24px rgba(30,100,160,0.35),0 0 0 5px rgba(11,53,80,0.25)}
 }
 #log-fab.pulse{animation:fabPulse 1.4s ease-in-out 3}
-/* lift above feed input bar — 60px bar height + 12px gap + safe area */
-body.feed-active #log-fab{bottom:calc(72px + env(safe-area-inset-bottom, 0px))}
+/* FAB stays fixed at same position on all tabs */
 /* hide when modal is open */
 body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 /* ── Log Burger Bottom Sheet Modal ── */
@@ -4824,17 +4824,18 @@ function renderUnifiedFeed() {
           ${item.photo ? `
           <div class="feed-row-photo" onclick="openLightboxSrc(this.querySelector('img').src)" style="position:relative">
             <img src="${item.photo}" alt="burger photo"/>
-            <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.62) 0%,transparent 55%);border-radius:10px;pointer-events:none"></div>
-            <div style="position:absolute;bottom:9px;left:11px;right:11px;pointer-events:none">
-              <div style="font-size:15px;font-weight:800;color:#fff;letter-spacing:-0.02em;text-shadow:0 1px 6px rgba(0,0,0,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📍 ${escHtml(item.restaurant)}</div>
-              ${item.rating > 0 ? `<div class="grill-rating-row" style="margin-top:2px">${ratingStars}</div>` : ''}
+            <div style="position:absolute;bottom:9px;left:9px;right:9px;pointer-events:none">
+              <div style="display:inline-flex;align-items:center;gap:4px;background:rgba(0,0,0,0.58);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);border-radius:999px;padding:4px 12px 4px 9px;max-width:100%;overflow:hidden">
+                <span style="font-size:13px;line-height:1;flex-shrink:0">📍</span>
+                <span style="font-size:13px;font-weight:700;color:#fff;letter-spacing:-0.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(item.restaurant)}</span>
+              </div>
             </div>
           </div>` : `<div style="font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.02em;margin:4px 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📍 ${escHtml(item.restaurant)}</div>`}
-          <div class="grill-pill-row" style="margin-top:${item.photo?'6':'0'}px">
+          ${item.rating > 0 ? `<div class="grill-rating-row" style="margin-top:6px">${ratingStars}</div>` : ''}
+          <div class="grill-pill-row" style="margin-top:6px">
             <span class="grill-pill ${stampCls==='stamp-triple'?'grill-pill-triple':''}">${stampText}</span>
             ${locPill}${weatherPill}
           </div>
-          ${!item.photo && item.rating > 0 ? `<div class="grill-rating-row" style="margin-top:6px">${ratingStars}</div>` : ''}
           <div class="msg-reactions" data-burger-id="${targetId}">${pillsHtml}</div>
           <div class="feed-card-actions">
             <button class="feed-react-btn" data-target-id="${targetId}" data-target-type="burger" title="Add reaction">${_REACT_SVG}</button>
