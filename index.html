@@ -4475,7 +4475,11 @@ function renderHeaderTally() {
   const me = players.find(p => p.id === myPlayerId);
   if (!me) return;
   const c = RING_COLORS[me.colorIdx % RING_COLORS.length];
-  strip.style.display = 'block';
+  strip.dataset.hadPlayer = '1';
+  // Only show if not on the Ranks tab
+  if (!document.body.classList.contains('list-active') && !document.getElementById('tab-list')?.classList.contains('active')) {
+    strip.style.display = 'block';
+  }
   document.getElementById('header-ring-avatar').innerHTML = ringAvatarHTML(me, 36);
   const nameEl = document.getElementById('header-tally-name');
   const countEl = document.getElementById('header-tally-count');
@@ -7266,6 +7270,9 @@ window.switchTab=function(name,btn){
   document.body.classList.toggle('tally-active',       name==='tally');
   document.body.classList.toggle('leaderboard-active', name==='leaderboard');
   document.body.classList.toggle('duel-active',        name==='duel');
+  // Hide personal progress card on Ranks tab — it lives on other tabs
+  const _strip = document.getElementById('header-tally-strip');
+  if (_strip) _strip.style.display = name === 'list' ? 'none' : (_strip.dataset.hadPlayer === '1' ? 'block' : 'none');
   // Clear players pill active state when switching via tabs
   document.getElementById('players-pill-btn')?.classList.remove('active');
   if(name==='feed'){
