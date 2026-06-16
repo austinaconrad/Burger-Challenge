@@ -13,6 +13,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Bebas+Neue&family=Press+Start+2P&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 <style>
 :root {
@@ -43,10 +46,11 @@
 /* Poppins headings — tight tracking across the board */
 [class*="tally-name"],[class*="bg-name"],[class*="hl-name"],[class*="lb-count"],
 .grill-banner-name,.setup-card h2{letter-spacing:-0.03em}
-html{background:#7ec3e8}
+html{background:linear-gradient(175deg,#7ec3e8 0%,#a8d4ed 30%,#c2e3f4 65%,#d8eefd 100%)}
 body{background:linear-gradient(175deg,#7ec3e8 0%,#a8d4ed 30%,#c2e3f4 65%,#d8eefd 100%);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;overflow-x:hidden}
 /* ── Cloud blobs — soft white radial glows float in the sky ── */
-body::before{content:'';position:fixed;inset:0;z-index:0;background:
+body::before{content:'';position:fixed;top:calc(-1 * env(safe-area-inset-top, 0px));left:0;right:0;bottom:0;z-index:0;background:
+  radial-gradient(ellipse 45% 14% at 50% 2%,  rgba(255,255,255,0.78) 0%,transparent 70%),
   radial-gradient(ellipse 40% 16% at 12% 10%, rgba(255,255,255,0.80) 0%,transparent 70%),
   radial-gradient(ellipse 55% 20% at 70% 7%,  rgba(255,255,255,0.75) 0%,transparent 70%),
   radial-gradient(ellipse 30% 12% at 38% 18%, rgba(255,255,255,0.65) 0%,transparent 65%),
@@ -58,7 +62,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:
   filter:blur(28px);pointer-events:none}
 /* ── Subtle grain — very faint, blends into sky ── */
 body::after{
-  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  content:'';position:fixed;top:calc(-1 * env(safe-area-inset-top, 0px));left:0;right:0;bottom:0;z-index:0;pointer-events:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23g)'/%3E%3C/svg%3E");
   background-size:256px 256px;
   opacity:0.12;
@@ -171,7 +175,7 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,8vw,50px);font-weigh
 .pl-row:hover{transform:translateY(-2px);box-shadow:var(--shadow-card),0 6px 20px rgba(30,100,160,0.18),0 0 0 1px rgba(30,110,170,0.18)}
 /* .msg-card hover removed — replaced by .feed-row */
 .milestone-card{transition:transform 0.18s ease,box-shadow 0.18s ease}
-.milestone-card:hover{transform:translateY(-2px);box-shadow:0 0 0 1px rgba(245,158,11,0.18),0 12px 40px rgba(245,158,11,0.18),0 6px 20px rgba(0,0,0,0.6)}
+.milestone-card:hover{transform:translateY(-2px);box-shadow:0 0 0 1px rgba(30,110,170,0.20),0 12px 40px rgba(30,100,160,0.18),0 6px 20px rgba(30,100,160,0.10)}
 .tr-card{transition:transform 0.18s ease,box-shadow 0.18s ease}
 .tr-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-card),0 6px 20px rgba(0,0,0,0.25)}
 
@@ -1169,13 +1173,12 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
   right:16px;
   z-index:1000;
   width:260px;
-  background:#1C1C1C;
-  border:2px solid #555;
-  box-shadow:
-    inset -2px -2px 0 #111,
-    inset  2px  2px 0 #444,
-    0 4px 24px rgba(0,0,0,0.7);
-  image-rendering:pixelated;
+  background:rgba(220,240,253,0.97);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,0.78);
+  border-radius:14px;
+  box-shadow:0 8px 32px rgba(30,100,160,0.18),inset 0 1px 0 rgba(255,255,255,0.90);
+  overflow:hidden;
   opacity:0;
   transform:translateX(290px);
   transition:transform 0.35s cubic-bezier(0.34,1.2,0.64,1), opacity 0.25s ease;
@@ -1186,12 +1189,12 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
   transform:translateX(0);
 }
 .mc-toast-header{
-  background:#2A2A00;
-  border-bottom:2px solid #555;
+  background:linear-gradient(90deg,var(--sky),var(--sky-light));
+  border-bottom:none;
   padding:5px 10px;
   font-family:'Press Start 2P',monospace;
   font-size:6px;
-  color:#FFD700;
+  color:#fff;
   letter-spacing:0.05em;
   display:flex;
   align-items:center;
@@ -1205,13 +1208,12 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 }
 .mc-toast-icon{
   width:36px;height:36px;
-  border:2px solid #666;
-  box-shadow:inset -1px -1px 0 #222, inset 1px 1px 0 #888;
-  background:#2B2B2B;
+  border:1px solid rgba(30,110,170,0.25);
+  border-radius:10px;
+  background:rgba(30,110,170,0.08);
   display:flex;align-items:center;justify-content:center;
   font-size:20px;
   flex-shrink:0;
-  image-rendering:pixelated;
 }
 .mc-toast-text{
   display:flex;flex-direction:column;gap:3px;
@@ -1219,13 +1221,13 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 .mc-toast-title{
   font-family:'Press Start 2P',monospace;
   font-size:6px;
-  color:#FFD700;
+  color:var(--sky);
   line-height:1.4;
 }
 .mc-toast-desc{
   font-family:'Press Start 2P',monospace;
   font-size:5px;
-  color:#E0E0E0;
+  color:var(--muted2);
   line-height:1.6;
 }
 .section-label{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px}
@@ -1524,6 +1526,10 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 .detail-confirm-btn:active{transform:scale(0.97)}
 .map-wrap{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border2);box-shadow:var(--shadow-card);margin:0 2px}
 .leaflet-tile-container{filter:contrast(0.95) saturate(0.9)}
+/* Cluster icon overrides — sky blue theme */
+.marker-cluster-small,.marker-cluster-medium,.marker-cluster-large{background:rgba(26,112,170,0.22)!important}
+.marker-cluster-small div,.marker-cluster-medium div,.marker-cluster-large div{background:rgba(26,112,170,0.72)!important;color:#fff!important;font-weight:700!important;font-family:'Barlow',sans-serif!important;font-size:13px!important}
+.marker-cluster{box-shadow:0 2px 12px rgba(26,112,170,0.35)!important;border:2px solid rgba(255,255,255,0.8)!important}
 #burger-map{width:100%;height:520px}
 .leaflet-popup-content-wrapper{background:var(--surface2)!important;border:1px solid var(--border2)!important;border-radius:12px!important;box-shadow:0 4px 24px rgba(30,100,160,0.18)!important;color:var(--text)!important;padding:0!important}
 .leaflet-popup-content{margin:0!important;padding:0!important}
@@ -2155,6 +2161,30 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 .pace-stat-lbl { font-size: 9px; color: var(--muted2); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.05em; }
 .pace-sparkline-wrap { margin-bottom: 8px; }
 .pace-sparkline-label { font-size: 9px; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; font-weight: 600; }
+/* Multi-player combined chart */
+.pace-chart-card { background:var(--surface);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius);padding:14px 14px 10px;margin-bottom:10px;box-shadow:var(--shadow-card); }
+.pace-chart-title { font-size:9px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.10em;font-weight:600;margin-bottom:8px; }
+.pace-legend { display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;padding-top:8px;border-top:1px solid rgba(30,110,170,0.10); }
+.pace-legend-item { display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--text); }
+.pace-legend-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0; }
+/* Pull-to-refresh indicator */
+#ptr-indicator { display:flex;align-items:center;justify-content:center;gap:7px;height:0;overflow:hidden;transition:height 0.2s ease;font-size:12px;font-weight:600;color:var(--muted2);font-family:'Barlow',sans-serif; }
+#ptr-indicator.ptr-active { height:48px; }
+.ptr-icon { font-size:16px;display:inline-block;transition:transform 0.25s ease; }
+#ptr-indicator.ptr-loading .ptr-icon { animation:spin 0.7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+/* Reaction pill updates */
+.reaction-pill { background:rgba(30,110,170,0.07);border:1.5px solid rgba(30,110,170,0.12); }
+.reaction-pill:hover { background:rgba(30,110,170,0.13); }
+.reaction-pill.mine { background:rgba(30,110,170,0.18);border-color:rgba(30,110,170,0.50); }
+.reaction-pill.mine .rp-count { color:var(--sky); }
+/* Comment breathing room */
+.feed-comment-thread-inner { padding:12px 14px 14px; }
+.feed-comment-list { gap:10px;margin-bottom:11px; }
+.comment-text { font-size:13px;line-height:1.5; }
+.pace-track-wrap { background:rgba(30,110,170,0.10); }
+.pace-stat:not(:last-child) { border-right:1px solid rgba(30,110,170,0.10); }
+.pace-stats-row { border-top:1px solid rgba(30,110,170,0.10); }
 
 /* ── JULY 4TH BACKGROUND ── */
 /* Overrides the amber glow with a deep navy glow on July 4th */
@@ -2336,28 +2366,29 @@ body.july4-bg::before {
 
 /* ── Milestone Feed Card ── */
 .milestone-card{
-  background:rgba(20,12,0,0.95);
-  border:1px solid rgba(245,158,11,0.45);
+  background:var(--surface2);
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  border:1px solid var(--border);
   border-radius:16px;
   overflow:hidden;
-  box-shadow:0 0 0 1px rgba(245,158,11,0.12),0 8px 32px rgba(245,158,11,0.15),0 4px 16px rgba(0,0,0,0.6);
+  box-shadow:var(--shadow-card);
   animation:slideIn 0.35s ease both;
 }
-.mc-top-bar{height:4px;background:linear-gradient(90deg,#92400E,#F59E0B,#FCD34D,#F59E0B,#92400E)}
+.mc-top-bar{height:4px;background:linear-gradient(90deg,var(--sky),var(--sky-light),#7dd3fc,var(--sky-light),var(--sky))}
 .mc-header{display:flex;align-items:center;gap:12px;padding:14px 16px 10px}
-.mc-avatar{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0;border:2px solid rgba(255,255,255,0.12)}
+.mc-avatar{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0;border:2px solid rgba(30,110,170,0.25)}
 .mc-header-info{flex:1;min-width:0}
 .mc-player-name{font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mc-timestamp{font-size:10px;color:var(--muted2);margin-top:1px}
 .mc-hero{text-align:center;padding:4px 16px 14px}
-.mc-milestone-num{font-family:'Bebas Neue',sans-serif;font-size:64px;font-weight:400;line-height:1;letter-spacing:4px;color:#F59E0B;text-shadow:0 0 30px rgba(245,158,11,0.5),0 0 60px rgba(245,158,11,0.2)}
-.mc-milestone-label{font-family:'Bebas Neue',sans-serif;font-size:11px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:rgba(245,158,11,0.7);margin-top:-4px}
-.mc-tagline{font-size:13px;color:#D4C5A0;margin-top:8px;font-weight:500;line-height:1.4}
-.mc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,0.05);border-top:1px solid rgba(245,158,11,0.12);border-bottom:1px solid rgba(245,158,11,0.12)}
-.mc-stat{background:rgba(14,9,0,0.8);padding:10px 8px;text-align:center}
-.mc-stat-val{font-family:'Bebas Neue',sans-serif;font-size:16px;font-weight:900;color:#F5F5F5;line-height:1}
-.mc-stat-lbl{font-size:8px;color:#6B7280;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;margin-top:3px}
-.mc-spots{padding:10px 16px 12px;font-size:11px;color:#9CA3AF;display:flex;gap:14px;flex-wrap:wrap}
+.mc-milestone-num{font-family:'Bebas Neue',sans-serif;font-size:64px;font-weight:400;line-height:1;letter-spacing:4px;color:var(--sky);text-shadow:0 0 30px rgba(30,100,160,0.25),0 0 60px rgba(30,100,160,0.10)}
+.mc-milestone-label{font-family:'Bebas Neue',sans-serif;font-size:11px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted2);margin-top:-4px}
+.mc-tagline{font-size:13px;color:var(--muted2);margin-top:8px;font-weight:500;line-height:1.4}
+.mc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(30,110,170,0.08);border-top:1px solid rgba(30,110,170,0.12);border-bottom:1px solid rgba(30,110,170,0.12)}
+.mc-stat{background:rgba(255,255,255,0.45);padding:10px 8px;text-align:center}
+.mc-stat-val{font-family:'Bebas Neue',sans-serif;font-size:16px;font-weight:900;color:var(--text);line-height:1}
+.mc-stat-lbl{font-size:8px;color:var(--muted2);font-weight:600;text-transform:uppercase;letter-spacing:0.07em;margin-top:3px}
+.mc-spots{padding:10px 16px 12px;font-size:11px;color:var(--muted2);display:flex;gap:14px;flex-wrap:wrap}
 .mc-spots span{display:flex;align-items:center;gap:4px}
 .top-rated-wrap{display:flex;flex-direction:column;gap:8px;padding:4px 0 24px}
 .tr-card{background:var(--surface);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-card);animation:slideIn 0.25s ease both}
@@ -2834,6 +2865,7 @@ body.july4-bg::before {
       </div>
       <!-- Unified feed panel -->
       <div id="unified-feed-panel">
+        <div id="ptr-indicator"><span class="ptr-icon">↓</span><span class="ptr-label">Pull to refresh</span></div>
         <div class="social-wrap">
           <div class="weekly-digest" id="weekly-digest" style="display:none"></div>
           <div class="social-empty empty-state" id="social-empty" style="display:none">
@@ -5966,6 +5998,7 @@ async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null
     });
     if(delta>0){
       const isMilestone = [25,50,75,100].includes(newCount);
+      if (navigator.vibrate) navigator.vibrate(isMilestone ? [80,40,80,40,120] : [60,30,80]);
       fireConfetti(isMilestone);
       if(newCount===100){
         showMcAdvancement('🏆','Reached the FINISH!','100 burgers. You are a legend.');
@@ -6595,7 +6628,7 @@ function renderPaceTab() {
   const aheadCount   = players.filter(p => { const s = computePaceStats(p).status; return s === 'ahead' || s === 'ontrack'; }).length;
   const doneCount    = players.filter(p => p.count >= 100).length;
 
-  // ── Summary row ──────────────────────────────────────────────────────────
+  // ── Summary row ───────────────────────────────────────────────────────────
   const summaryHtml = `
     <div class="section-label">Overview</div>
     <div class="pace-summary-row">
@@ -6609,166 +6642,154 @@ function renderPaceTab() {
       </div>
     </div>`;
 
-  // ── Player cards ─────────────────────────────────────────────────────────
-  const cardsHtml = sorted.map((p, i) => {
-    const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
-    const ini   = initials(p.name);
-    const isMe  = p.id === myPlayerId;
-    const ps    = computePaceStats(p);
-    const pct   = Math.min(100, p.count);
+  // ── Combined SVG Chart ────────────────────────────────────────────────────
+  const PX0=36, PX1=290, PY0=22, PY1=192;
+  const PW=PX1-PX0, PH=PY1-PY0;
+  const cMs=CHALLENGE_END-CHALLENGE_START;
+  const dateToX=d=>PX0+Math.max(0,Math.min(1,(d-CHALLENGE_START)/cMs))*PW;
+  const cntToY=c=>PY1-Math.min(c,100)/100*PH;
+  const todayX=dateToX(now<CHALLENGE_END?now:CHALLENGE_END);
 
-    let badgeClass, badgeLabel;
-    if (ps.status === 'done')         { badgeClass = 'pace-done';    badgeLabel = '✓ Finished'; }
-    else if (ps.status === 'ahead')   { badgeClass = 'pace-ahead';   badgeLabel = `+${ps.burgersAhead}🍔 ahead`; }
-    else if (ps.status === 'behind')  { badgeClass = 'pace-behind';  badgeLabel = `${Math.abs(ps.burgersAhead)}🍔 behind`; }
-    else if (ps.status === 'ontrack') { badgeClass = 'pace-ontrack'; badgeLabel = 'On track'; }
-    else                              { badgeClass = 'pace-behind';  badgeLabel = 'Inactive'; }
+  const gridLines=[25,50,75].map(v=>{
+    const gy=cntToY(v).toFixed(1);
+    return `<line x1="${PX0}" y1="${gy}" x2="${PX1}" y2="${gy}" stroke="rgba(11,53,80,0.08)" stroke-width="0.7" stroke-dasharray="4 3"/>`;
+  }).join('');
 
-    const projHtml = ps.finishDateStr
-      ? `<div class="pace-projection">Projected finish: <span>${escHtml(ps.finishDateStr)}</span></div>`
-      : ps.status === 'done'
-      ? `<div class="pace-projection" style="color:#4ADE80">🏆 <span>Challenge complete!</span></div>`
-      : `<div class="pace-projection">Not enough recent data to project</div>`;
+  const axes=
+    `<line x1="${PX0}" y1="${PY0}" x2="${PX0}" y2="${PY1}" stroke="rgba(11,53,80,0.25)" stroke-width="1"/>` +
+    `<line x1="${PX0}" y1="${PY1}" x2="${PX1}" y2="${PY1}" stroke="rgba(11,53,80,0.25)" stroke-width="1"/>`;
 
-    const paceStr = ps.weeklyPace != null ? ps.weeklyPace.toFixed(1) : '—';
+  const yLabels=[0,25,50,75,100].map(v=>
+    `<text x="${PX0-4}" y="${(cntToY(v)+3.5).toFixed(1)}" text-anchor="end" font-size="8" fill="rgba(11,53,80,0.45)" font-family="Barlow,sans-serif">${v}</text>`
+  ).join('');
+  const yTitle=`<text x="10" y="${((PY0+PY1)/2+3).toFixed(0)}" text-anchor="middle" font-size="8" fill="rgba(11,53,80,0.40)" font-family="Barlow,sans-serif" transform="rotate(-90,10,${((PY0+PY1)/2).toFixed(0)})">Burgers</text>`;
 
-    // Best day: max burgers logged in a single day
-    const dayTotals = {};
-    (p.logs || []).filter(e => typeof e === 'object' && e.ts).forEach(e => {
-      const d = (safeDate(e.ts) || new Date()).toLocaleDateString();
-      dayTotals[d] = (dayTotals[d] || 0) + 1;
+  const xDates=[
+    {d:CHALLENGE_START,lbl:'May 25',anchor:'start'},
+    {d:new Date(2026,6,1),lbl:'Jul 1',anchor:'middle'},
+    {d:new Date(2026,7,1),lbl:'Aug 1',anchor:'middle'},
+    {d:CHALLENGE_END,lbl:'Sep 7',anchor:'end'},
+  ];
+  const xLabels=xDates.map(({d,lbl,anchor})=>
+    `<text x="${dateToX(d).toFixed(1)}" y="${PY1+13}" text-anchor="${anchor}" font-size="8" fill="rgba(11,53,80,0.45)" font-family="Barlow,sans-serif">${lbl}</text>`
+  ).join('');
+
+  const todayMarker=
+    `<line x1="${todayX.toFixed(1)}" y1="${PY0}" x2="${todayX.toFixed(1)}" y2="${PY1}" stroke="rgba(11,53,80,0.18)" stroke-width="0.8" stroke-dasharray="2 2"/>` +
+    `<text x="${todayX.toFixed(1)}" y="${PY0-5}" text-anchor="middle" font-size="7" fill="rgba(11,53,80,0.38)" font-family="Barlow,sans-serif">Today</text>`;
+
+  const paceLabelX=(PX0+PW*0.52).toFixed(0);
+  const paceLabelY=(cntToY(45)-6).toFixed(0);
+  const paceLayer=
+    `<path d="M${PX0},${PY1} L${PX1},${PY0}" fill="none" stroke="rgba(245,158,11,0.55)" stroke-width="1.5" stroke-dasharray="6 3"/>` +
+    `<text x="${paceLabelX}" y="${paceLabelY}" font-size="7.5" fill="rgba(217,119,6,0.75)" font-family="Barlow,sans-serif" transform="rotate(-34,${paceLabelX},${paceLabelY})">On pace</text>`;
+
+  // Build per-player defs + layers
+  let svgDefs='', playerLayers='';
+  sorted.forEach((p,i)=>{
+    const color=RING_COLORS[p.colorIdx%RING_COLORS.length];
+    const ini=initials(p.name);
+    const gid='pag'+i, cpid='pac'+i;
+    const sortedLogs=(p.logs||[])
+      .filter(e=>typeof e==='object'&&e.ts&&safeDate(e.ts))
+      .sort((a,b)=>(safeDate(a.ts)||new Date(0))-(safeDate(b.ts)||new Date(0)));
+    const pts=[{x:PX0,y:PY1}];
+    let cum=0;
+    sortedLogs.forEach(e=>{
+      const d=safeDate(e.ts); if(!d)return;
+      const x=dateToX(d);
+      pts.push({x,y:cntToY(cum)}); cum++;
+      pts.push({x,y:cntToY(cum)});
     });
-    const bestDay = Object.values(dayTotals).length ? Math.max(...Object.values(dayTotals)) : 0;
-    const bestDayStr = bestDay > 0 ? bestDay + ' 🍔' : '—';
+    const ex=todayX, ey=cntToY(Math.min(p.count,100));
+    pts.push({x:ex,y:ey});
+    const polyPts=pts.map(pt=>`${pt.x.toFixed(1)},${pt.y.toFixed(1)}`).join(' ');
+    const areaD=`M${PX0},${PY1} `+pts.slice(1).map(pt=>`L${pt.x.toFixed(1)},${pt.y.toFixed(1)}`).join(' ')+` L${ex.toFixed(1)},${PY1} Z`;
+    svgDefs+=`<linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity="0.18"/><stop offset="100%" stop-color="${color}" stop-opacity="0.01"/></linearGradient>`;
+    svgDefs+=`<clipPath id="${cpid}"><circle cx="${ex.toFixed(1)}" cy="${ey.toFixed(1)}" r="9"/></clipPath>`;
+    playerLayers+=
+      `<path d="${areaD}" fill="url(#${gid})"/>` +
+      `<polyline points="${polyPts}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="0.85"/>` +
+      `<circle cx="${ex.toFixed(1)}" cy="${ey.toFixed(1)}" r="10" fill="${color}" stroke="rgba(255,255,255,0.9)" stroke-width="2"/>` +
+      (p.avatar
+        ? `<image href="${p.avatar}" x="${(ex-9).toFixed(1)}" y="${(ey-9).toFixed(1)}" width="18" height="18" clip-path="url(#${cpid})" preserveAspectRatio="xMidYMid slice"/>`
+        : `<text x="${ex.toFixed(1)}" y="${(ey+3.5).toFixed(1)}" text-anchor="middle" font-size="7.5" font-weight="700" fill="white" font-family="Barlow,sans-serif">${ini.substring(0,2)}</text>`);
+  });
 
-    // Challenge progress graph: cumulative burgers vs. full challenge timeline
-    const gid = 'sg' + i;
-    const PX0 = 32, PX1 = 274, PY0 = 6, PY1 = 70;
-    const PW = PX1 - PX0, PH = PY1 - PY0; // 242 x 64
+  const svgHtml=`<svg viewBox="0 0 320 215" width="100%" xmlns="http://www.w3.org/2000/svg" style="display:block;overflow:visible">
+    <defs>${svgDefs}</defs>
+    ${gridLines}${axes}${yTitle}${yLabels}${xLabels}${todayMarker}${paceLayer}${playerLayers}
+  </svg>`;
 
-    const cMs  = CHALLENGE_END - CHALLENGE_START;
-    const dateToX = d => +(PX0 + Math.max(0, Math.min(1, (d - CHALLENGE_START) / cMs)) * PW).toFixed(1);
-    const cntToY  = c => +(PY1 - Math.min(c, 100) / 100 * PH).toFixed(1);
+  // Legend
+  const legendHtml=sorted.map(p=>{
+    const color=RING_COLORS[p.colorIdx%RING_COLORS.length];
+    const ps=computePaceStats(p);
+    let badge='';
+    if(ps.status==='ahead')badge=`<span style="font-size:9px;color:#4ADE80;font-weight:700"> +${ps.burgersAhead}🍔</span>`;
+    else if(ps.status==='behind')badge=`<span style="font-size:9px;color:#F87171;font-weight:700"> ${ps.burgersAhead}🍔</span>`;
+    else if(ps.status==='done')badge=`<span style="font-size:9px;color:#4ADE80;font-weight:700"> ✓</span>`;
+    return `<div class="pace-legend-item"><div class="pace-legend-dot" style="background:${color}"></div><span>${escHtml(p.name)} <span style="color:var(--muted2);font-weight:400">(${p.count})</span>${badge}</span></div>`;
+  }).join('');
 
-    // Build cumulative progress step line from sorted logs
-    const sortedLogs = (p.logs || [])
-      .filter(e => typeof e === 'object' && e.ts && safeDate(e.ts))
-      .sort((a, b) => (safeDate(a.ts)||new Date(0)) - (safeDate(b.ts)||new Date(0)));
-    const progPts = [{ x: PX0, y: PY1 }]; // (challenge start, 0)
-    let cum = 0;
-    sortedLogs.forEach(e => {
-      const d = safeDate(e.ts);
-      if (!d) return;
-      const x = +dateToX(d);
-      progPts.push({ x, y: +cntToY(cum) }); // horizontal step at old count
-      cum++;
-      progPts.push({ x, y: +cntToY(cum) }); // vertical rise to new count
+  const chartHtml=`
+    <div class="section-label" style="margin-top:4px">Challenge Progress</div>
+    <div class="pace-chart-card">
+      <div class="pace-chart-title">Cumulative burgers vs. pace line</div>
+      ${svgHtml}
+      <div class="pace-legend">${legendHtml}</div>
+    </div>`;
+
+  // ── Player stat cards (compact) ───────────────────────────────────────────
+  const cardsHtml=sorted.map((p,i)=>{
+    const color=RING_COLORS[p.colorIdx%RING_COLORS.length];
+    const ini=initials(p.name);
+    const isMe=p.id===myPlayerId;
+    const ps=computePaceStats(p);
+    const pct=Math.min(100,p.count);
+    const paceStr=ps.weeklyPace!=null?ps.weeklyPace.toFixed(1):'—';
+    let badgeClass,badgeLabel;
+    if(ps.status==='done'){badgeClass='pace-done';badgeLabel='✓ Finished';}
+    else if(ps.status==='ahead'){badgeClass='pace-ahead';badgeLabel=`+${ps.burgersAhead}🍔 ahead`;}
+    else if(ps.status==='behind'){badgeClass='pace-behind';badgeLabel=`${Math.abs(ps.burgersAhead)}🍔 behind`;}
+    else if(ps.status==='ontrack'){badgeClass='pace-ontrack';badgeLabel='On track';}
+    else{badgeClass='pace-behind';badgeLabel='Inactive';}
+    const projHtml=ps.finishDateStr
+      ?`<div class="pace-projection">Projected finish: <span>${escHtml(ps.finishDateStr)}</span></div>`
+      :ps.status==='done'
+      ?`<div class="pace-projection" style="color:#4ADE80">🏆 <span>Challenge complete!</span></div>`
+      :`<div class="pace-projection">Not enough recent data to project</div>`;
+    const dayTotals={};
+    (p.logs||[]).filter(e=>typeof e==='object'&&e.ts).forEach(e=>{
+      const d=(safeDate(e.ts)||new Date()).toLocaleDateString();
+      dayTotals[d]=(dayTotals[d]||0)+1;
     });
-    // Extend horizontal line to today (or challenge end)
-    const todayX = +dateToX(now < CHALLENGE_END ? now : CHALLENGE_END);
-    progPts.push({ x: todayX, y: +cntToY(Math.min(p.count, 100)) });
-
-    const progPolyPts = progPts.map(pt => pt.x + ',' + pt.y).join(' ');
-    const progAreaD = 'M' + PX0 + ',' + PY1 + ' ' +
-      progPts.slice(1).map(pt => 'L' + pt.x + ',' + pt.y).join(' ') +
-      ' L' + todayX + ',' + PY1 + ' Z';
-
-    // Pace line: straight diagonal from (start,0) → (end,100)
-    const paceD = 'M' + PX0 + ',' + PY1 + ' L' + PX1 + ',' + PY0;
-
-    // Y axis: 0, 25, 50, 75, 100
-    const yLabels = [0, 25, 50, 75, 100].map(v => ({ y: cntToY(v), v: v === 0 ? '0' : String(v) }));
-
-    // X axis: challenge key dates
-    const xAxisDates = [
-      { d: CHALLENGE_START,      lbl: 'May 25', anchor: 'start' },
-      { d: new Date(2026, 6, 1), lbl: 'Jul 1',  anchor: 'middle' },
-      { d: new Date(2026, 7, 1), lbl: 'Aug 1',  anchor: 'middle' },
-      { d: CHALLENGE_END,        lbl: 'Sep 7',  anchor: 'end' },
-    ];
-    const xLabels = xAxisDates.map(({ d, lbl, anchor }) => ({ x: dateToX(d), lbl, anchor }));
-
-    // Horizontal grid lines at 25, 50, 75
-    const gridLines = [25, 50, 75].map(v =>
-      '<line x1="' + PX0 + '" y1="' + cntToY(v) + '" x2="' + PX1 + '" y2="' + cntToY(v) +
-      '" stroke="rgba(11,53,80,0.10)" stroke-width="0.5" stroke-dasharray="3 3"/>'
-    ).join('');
-
-    // Today vertical marker
-    const todayLine = '<line x1="' + todayX + '" y1="' + PY0 + '" x2="' + todayX + '" y2="' + PY1 +
-      '" stroke="rgba(11,53,80,0.30)" stroke-width="0.8" stroke-dasharray="2 2"/>' +
-      '<text x="' + todayX + '" y="' + (PY0-1) + '" text-anchor="middle" font-size="6.5" fill="rgba(11,53,80,0.55)" font-family="Barlow,sans-serif">Today</text>';
-
-    const svgContent =
-      '<defs><linearGradient id="' + gid + '" x1="0" y1="0" x2="0" y2="1">' +
-        '<stop offset="0%" stop-color="' + color + '" stop-opacity="0.28"/>' +
-        '<stop offset="100%" stop-color="' + color + '" stop-opacity="0.03"/>' +
-      '</linearGradient></defs>' +
-      gridLines +
-      // Axes
-      '<line x1="' + PX0 + '" y1="' + PY0 + '" x2="' + PX0 + '" y2="' + PY1 + '" stroke="rgba(11,53,80,0.35)" stroke-width="1"/>' +
-      '<line x1="' + PX0 + '" y1="' + PY1 + '" x2="' + PX1 + '" y2="' + PY1 + '" stroke="rgba(11,53,80,0.35)" stroke-width="1"/>' +
-      // Axis labels
-      '<text x="9" y="' + ((PY0+PY1)/2+3).toFixed(0) + '" text-anchor="middle" font-size="8" fill="rgba(11,53,80,0.50)" font-family="Barlow,sans-serif" transform="rotate(-90,9,' + ((PY0+PY1)/2).toFixed(0) + ')">Burgers</text>' +
-      // Today marker
-      todayLine +
-      // Pace line (amber dashed)
-      '<path d="' + paceD + '" fill="none" stroke="rgba(245,158,11,0.65)" stroke-width="1.3" stroke-dasharray="5 3"/>' +
-      '<text x="' + (PX0 + PW*0.68).toFixed(0) + '" y="' + (PY0 + PH*0.23 - 5).toFixed(0) + '" font-size="7" fill="rgba(217,119,6,0.85)" font-family="Barlow,sans-serif">On pace</text>' +
-      // Progress area fill
-      '<path d="' + progAreaD + '" fill="url(#' + gid + ')"/>' +
-      // Progress line
-      '<polyline points="' + progPolyPts + '" fill="none" stroke="' + color + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' +
-      // Current position dot
-      '<circle cx="' + todayX + '" cy="' + cntToY(Math.min(p.count, 100)) + '" r="3" fill="' + color + '" stroke="rgba(255,255,255,0.8)" stroke-width="1.2"/>' +
-      // Y labels
-      yLabels.map(l => '<text x="' + (PX0-4) + '" y="' + (+l.y+3).toFixed(1) + '" text-anchor="end" font-size="7.5" fill="rgba(11,53,80,0.55)" font-family="Barlow,sans-serif">' + l.v + '</text>').join('') +
-      // X labels
-      xLabels.map(l => '<text x="' + l.x + '" y="84" text-anchor="' + l.anchor + '" font-size="7.5" fill="rgba(11,53,80,0.55)" font-family="Barlow,sans-serif">' + l.lbl + '</text>').join('');
-
-    const sparklineHtml = '<div class="pace-sparkline-wrap"><div class="pace-sparkline-label">Challenge progress</div>' +
-      '<svg viewBox="0 0 280 90" width="100%" height="90" xmlns="http://www.w3.org/2000/svg" style="display:block">' + svgContent + '</svg></div>';
-
-    let statusColor = ps.status === 'ahead' ? '#4ADE80' : ps.status === 'behind' ? '#F87171' : ps.status === 'done' ? '#4ADE80' : 'var(--amber)';
-
-    return `<div class="pace-card${i === 0 ? ' pace-leader' : ''}" style="animation-delay:${Math.min(i*0.05,0.3)}s">
+    const bestDay=Object.values(dayTotals).length?Math.max(...Object.values(dayTotals)):0;
+    const bestDayStr=bestDay>0?bestDay+' 🍔':'—';
+    const statusColor=ps.status==='ahead'?'#4ADE80':ps.status==='behind'?'#F87171':ps.status==='done'?'#4ADE80':'var(--amber)';
+    return `<div class="pace-card${i===0?' pace-leader':''}" style="animation-delay:${Math.min(i*0.05,0.3)}s">
       <div class="pace-card-top">
         <div class="pace-avatar" style="background:${color}20;color:${color};border:1.5px solid ${color}55;box-shadow:0 0 10px ${color}44">
-          ${p.avatar ? `<img src="${escHtml(p.avatar)}" style="width:100%;height:100%;object-fit:cover;border-radius:8px" alt="${escHtml(p.name)}"/>` : ini}
+          ${p.avatar?`<img src="${escHtml(p.avatar)}" style="width:100%;height:100%;object-fit:cover;border-radius:8px" alt="${escHtml(p.name)}"/>`:ini}
         </div>
         <div>
-          <div class="pace-name">${escHtml(p.name)}${isMe ? ' <span style="font-size:9px;background:rgba(245,158,11,0.12);color:var(--amber);border:1px solid rgba(245,158,11,0.3);padding:2px 6px;border-radius:999px;vertical-align:middle;font-weight:700">You</span>' : ''}</div>
+          <div class="pace-name">${escHtml(p.name)}${isMe?' <span style="font-size:9px;background:rgba(30,110,170,0.12);color:var(--sky);border:1px solid rgba(30,110,170,0.25);padding:2px 6px;border-radius:999px;vertical-align:middle;font-weight:700">You</span>':''}</div>
           <div class="pace-sub">${p.count} / 100 burgers · ${paceStr}/week</div>
         </div>
         <div class="pace-status-badge ${badgeClass}">${badgeLabel}</div>
       </div>
-      <div class="pace-track-wrap">
-        <div class="pace-track-fill" style="width:${pct}%;background:${color}"></div>
-      </div>
+      <div class="pace-track-wrap"><div class="pace-track-fill" style="width:${pct}%;background:${color}"></div></div>
       ${projHtml}
-      ${sparklineHtml}
       <div class="pace-stats-row">
-        <div class="pace-stat">
-          <div class="pace-stat-val">${paceStr}</div>
-          <div class="pace-stat-lbl">Per week</div>
-        </div>
-        <div class="pace-stat">
-          <div class="pace-stat-val">${bestDayStr}</div>
-          <div class="pace-stat-lbl">Best day</div>
-        </div>
-        <div class="pace-stat">
-          <div class="pace-stat-val">${p.count}</div>
-          <div class="pace-stat-lbl">Logged</div>
-        </div>
-        <div class="pace-stat">
-          <div class="pace-stat-val" style="color:${statusColor}">${100 - p.count > 0 ? 100 - p.count + ' left' : 'Done!'}</div>
-          <div class="pace-stat-lbl">Remaining</div>
-        </div>
+        <div class="pace-stat"><div class="pace-stat-val">${paceStr}</div><div class="pace-stat-lbl">Per week</div></div>
+        <div class="pace-stat"><div class="pace-stat-val">${bestDayStr}</div><div class="pace-stat-lbl">Best day</div></div>
+        <div class="pace-stat"><div class="pace-stat-val">${p.count}</div><div class="pace-stat-lbl">Logged</div></div>
+        <div class="pace-stat"><div class="pace-stat-val" style="color:${statusColor}">${100-p.count>0?100-p.count+' left':'Done!'}</div><div class="pace-stat-lbl">Remaining</div></div>
       </div>
     </div>`;
   }).join('');
 
-  root.innerHTML = summaryHtml + `<div class="section-label" style="margin-top:4px">Player projections</div>` + cardsHtml;
+  root.innerHTML=summaryHtml+chartHtml+`<div class="section-label" style="margin-top:4px">Player projections</div>`+cardsHtml;
 }
 
 // ── Restaurant Leaderboard ────────────────────────────────────────────────────
@@ -7636,6 +7657,49 @@ window.switchFeedTab = function(tab, btn) {
   }
 };
 
+// ── Pull-to-refresh ───────────────────────────────────────────────────────
+(function(){
+  let ptY0=0, ptDist=0, ptTracking=false;
+  const THRESHOLD=64;
+  const ptr=()=>document.getElementById('ptr-indicator');
+  const feed=()=>document.getElementById('unified-feed');
+  document.addEventListener('touchstart',e=>{
+    const f=feed();
+    if(!f||!document.body.classList.contains('feed-active'))return;
+    if(f.scrollTop>4)return;
+    ptY0=e.touches[0].clientY; ptTracking=true; ptDist=0;
+  },{passive:true});
+  document.addEventListener('touchmove',e=>{
+    if(!ptTracking)return;
+    const f=feed();
+    if(!f||f.scrollTop>4){ptTracking=false;return;}
+    ptDist=Math.max(0,e.touches[0].clientY-ptY0);
+    const p=ptr(); if(!p||ptDist<=0)return;
+    p.classList.add('ptr-active');
+    p.classList.toggle('ptr-ready',ptDist>=THRESHOLD);
+    const pct=Math.min(ptDist/THRESHOLD,1);
+    const icon=p.querySelector('.ptr-icon');
+    if(icon)icon.style.transform=`rotate(${pct*180}deg) scale(${0.7+pct*0.4})`;
+    const lbl=p.querySelector('.ptr-label');
+    if(lbl)lbl.textContent=ptDist>=THRESHOLD?'Release to refresh':'Pull to refresh';
+  },{passive:true});
+  document.addEventListener('touchend',()=>{
+    if(!ptTracking)return; ptTracking=false;
+    const p=ptr(); if(!p)return;
+    if(ptDist>=THRESHOLD){
+      const lbl=p.querySelector('.ptr-label'); if(lbl)lbl.textContent='Refreshing…';
+      const icon=p.querySelector('.ptr-icon'); if(icon)icon.style.transform='';
+      p.classList.add('ptr-loading'); p.classList.remove('ptr-ready');
+      renderUnifiedFeed();
+      setTimeout(()=>p.classList.remove('ptr-active','ptr-loading'),900);
+    } else {
+      p.classList.remove('ptr-active','ptr-ready');
+      const icon=p.querySelector('.ptr-icon'); if(icon)icon.style.transform='';
+    }
+    ptDist=0;
+  });
+})();
+
 function buildBurgerPreview(pattyCount, toppings) {
   const toppingOrder = ['Mayo','Ketchup','Mustard','Special Sauce','Lettuce','Tomatoes','Pickles','Green Peppers','Mushrooms','Onions','Bacon','Cheese','Blue Cheese'];
   const toppingClass = {
@@ -7788,6 +7852,7 @@ window.panMapToSpot = function(lat, lng) {
 
 let burgerMap = null;
 let mapMarkers = [];
+let mapClusterGroup = null;
 let myLocationMarker = null;
 
 window.flyToMyLocation = function() {
@@ -7869,8 +7934,14 @@ function renderBurgerMap() {
       subdomains: 'abcd', maxZoom: 20
     }).addTo(burgerMap);
   }
-  mapMarkers.forEach(m => m.remove());
   mapMarkers = [];
+  if (mapClusterGroup) { burgerMap.removeLayer(mapClusterGroup); }
+  mapClusterGroup = L.markerClusterGroup({
+    maxClusterRadius: 50,
+    showCoverageOnHover: false,
+    spiderfyOnMaxZoom: true,
+    disableClusteringAtZoom: 16,
+  });
   const legend = document.getElementById('map-legend');
   if (legend) {
     legend.innerHTML = players.map(p => {
@@ -7913,11 +7984,13 @@ function renderBurgerMap() {
         <div class="map-popup-stars">${starsHtml(rating)}</div>
         <div class="map-popup-time">🕐 ${timeStr}</div>
       </div>`;
-      const marker = L.marker(coord, {icon}).addTo(burgerMap).bindPopup(popup, {maxWidth:260});
+      const marker = L.marker(coord, {icon}).bindPopup(popup, {maxWidth:260});
       marker._feedKey = `${p.id}_${ts}`;
+      mapClusterGroup.addLayer(marker);
       mapMarkers.push(marker);
     });
   });
+  burgerMap.addLayer(mapClusterGroup);
   burgerMap.invalidateSize();
 
   // ── ACTIVITY FEED ──────────────────────────────────────────────
