@@ -2513,7 +2513,7 @@ body.july4-bg::before {
       <button class="tab-btn" onclick="switchTab('map',this)"><span class="tab-emoji">🗺</span><span class="tab-label">Map</span></button>
       <button class="tab-btn" onclick="switchTab('leaderboard',this)"><span class="tab-emoji">🏅</span><span class="tab-label">Badges</span></button>
       <button class="tab-btn" onclick="switchTab('pace',this)"><span class="tab-emoji">📈</span><span class="tab-label">Pace</span></button>
-      <button class="tab-btn" onclick="switchTab('game',this)"><span class="tab-emoji">🎮</span><span class="tab-label">Game</span></button>
+      <button class="tab-btn" onclick="switchTab('game',this)"><span class="tab-emoji">🍔</span><span class="tab-label">Stackz</span></button>
     </div>
 
     <!-- LEADERBOARD TAB -->
@@ -4584,7 +4584,7 @@ function renderUnifiedFeed() {
             ${burgerComments.length > 1 ? `<div class="fcp-viewall">View all ${burgerComments.length} comments</div>` : ''}
           </div>`
         : '';
-      return `<div class="feed-row" data-player-id="${escHtml(item.player.id)}" style="animation-delay:${_feedInitialRenderDone?'0s':Math.min(idx*0.04,0.6)+'s'}">
+      return `<div class="feed-row" data-player-id="${escHtml(item.player.id)}" data-burger-id="${escHtml(targetId)}" style="animation-delay:${_feedInitialRenderDone?'0s':Math.min(idx*0.04,0.6)+'s'}">
         <div class="${colorClass(item.player.colorIdx)}" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--av-bg);color:var(--av-text);flex-shrink:0;overflow:hidden;font-family:'Outfit',sans-serif">${item.player.avatar?`<img src="${item.player.avatar}" style="width:100%;height:100%;object-fit:cover" alt="avatar"/>`:`${ini}`}</div>
         <div class="feed-row-body">
           <div class="feed-row-header">
@@ -4621,6 +4621,12 @@ function renderUnifiedFeed() {
 
   // Mark initial render done so subsequent re-renders skip the stagger delay
   _feedInitialRenderDone = true;
+
+  // Build a fast lookup map from burgerId → item for the receipt tap handler
+  window._feedBurgerMap = window._feedBurgerMap || {};
+  visibleItems.forEach(item => {
+    if (item.type === 'burger' && item.burgerId) window._feedBurgerMap[item.burgerId] = item;
+  });
 
   // Lazy reverse-geocode visible burger entries (cache-first: only fetch when not already resolved)
   let geocodeDelay = 0;
@@ -5019,6 +5025,57 @@ window.closeReceipt = function() {
   const r = document.getElementById('order-receipt');
   if (r) { r.classList.remove('show'); r.classList.add('hide'); }
 };
+
+// ── View-only receipt for historical feed cards ───────────────────────────────
+function openFeedReceipt(item) {
+  const receipt = document.getElementById('order-receipt');
+  if (!receipt) return;
+  const d = safeDate(item.ts);
+  const dateStr = d
+    ? ((d.getMonth()+1).toString().padStart(2,'0') + '/' + d.getDate().toString().padStart(2,'0') + '/' + d.getFullYear())
+    : '—';
+  const timeStr = d ? d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', hour12:true}) : '—';
+  const pattyCount = (item.patties != null && item.patties > 0) ? item.patties : 1;
+  const burgerLabel = item.menuItem
+    ? `${item.menuEmoji || '🍔'} ${escHtml(item.menuItem)}`
+    : (pattyCount >= 3 ? '🙏 THE HOLY TRINITY' : pattyCount === 2 ? '🥩 DOUBLE OR NOTHING' : '🍔 THE SOLO DOLO');
+  const fireDisplay = (() => {
+    if (!item.rating) return '';
+    let s = '';
+    for (let i = 1; i <= 5; i++) s += item.rating >= i ? '⭐' : '<span style="opacity:0.22">⭐</span>';
+    return s;
+  })();
+  receipt.innerHTML = `
+    <div class="receipt-card" onclick="event.stopPropagation()">
+      <div class="receipt-top-bar"></div>
+      <div class="receipt-hero-section">
+        <span class="receipt-burger-icon">🍔</span>
+        <div class="receipt-challenge-title">100 Burger Challenge</div>
+        <div class="receipt-challenge-sub">The Summer Grind &middot; Room ${escHtml(roomId)}</div>
+      </div>
+      <hr class="receipt-perf"/>
+      <div class="receipt-main-section">
+        <div class="receipt-logged-tag">✓ Logged</div>
+        <div class="receipt-restaurant-name">${escHtml(item.restaurant || '?')}</div>
+        <div class="receipt-menu-pill">${burgerLabel}</div>
+        ${item.rating ? `<div class="receipt-fire-row">${fireDisplay}</div><div class="receipt-rating-txt">${item.rating} / 5</div>` : ''}
+      </div>
+      <div class="receipt-count-section">
+        <div class="receipt-plus-block">
+          <div class="receipt-plus-num" style="font-size:22px">🍔</div>
+          <div class="receipt-plus-unit">burger<br>log</div>
+        </div>
+        <div class="receipt-meta-col">${dateStr}<br>${timeStr}<br>${escHtml(item.player?.name || '?')}</div>
+      </div>
+      <div class="receipt-foot">Keep grinding! 💪<br>Room: ${escHtml(roomId)}</div>
+      <button class="receipt-done-btn" onclick="closeReceipt()">Close</button>
+    </div>
+  `;
+  receipt.onclick = (e) => { if (e.target === receipt) closeReceipt(); };
+  receipt.classList.remove('hide');
+  void receipt.offsetWidth;
+  receipt.classList.add('show');
+}
 
 function showShareToast(msg) {
   const t = document.getElementById('share-toast');
@@ -6996,40 +7053,41 @@ function renderRestaurantLB() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 🎮  BURGER STACK GAME
+// 🍔  STACKZ — Premium Burger Stack Game
 // ═══════════════════════════════════════════════════════════════════════════
 (function() {
-  const PIECE_H = 26;
+  const PIECE_H = 30;
+
+  // Each layer carries a semantic `type` used by the vector draw dispatcher
   const LAYERS = [
-    { label:'Bottom Bun', fill:'#D4956A', stroke:'#A06030' },
-    { label:'Patty',      fill:'#5C2E0A', stroke:'#3D1A04' },
-    { label:'Cheese',     fill:'#F5C518', stroke:'#C49A00' },
-    { label:'Lettuce',    fill:'#22C55E', stroke:'#15803D' },
-    { label:'Tomato',     fill:'#EF4444', stroke:'#B91C1C' },
-    { label:'Bacon',      fill:'#C2410C', stroke:'#9A3412' },
-    { label:'Onion',      fill:'#C084FC', stroke:'#9333EA' },
-    { label:'Pickle',     fill:'#4ADE80', stroke:'#16A34A' },
-    { label:'Top Bun',    fill:'#D4A56A', stroke:'#A06030' },
+    { type:'bun_bot', label:'Bottom Bun', fill:'#D4956A', stroke:'#A06030' },
+    { type:'patty',   label:'Patty',      fill:'#5C2E0A', stroke:'#3D1A04' },
+    { type:'cheese',  label:'Cheese',     fill:'#F5C518', stroke:'#C49A00' },
+    { type:'lettuce', label:'Lettuce',    fill:'#22C55E', stroke:'#15803D' },
+    { type:'tomato',  label:'Tomato',     fill:'#EF4444', stroke:'#B91C1C' },
+    { type:'bacon',   label:'Bacon',      fill:'#C2410C', stroke:'#9A3412' },
+    { type:'onion',   label:'Onion',      fill:'#C084FC', stroke:'#9333EA' },
+    { type:'pickle',  label:'Pickle',     fill:'#4ADE80', stroke:'#16A34A' },
+    { type:'bun_top', label:'Top Bun',    fill:'#D4A56A', stroke:'#A06030' },
   ];
 
   const W = 320, H = 500;
   let canvas, ctx, DPR;
-  let raf = null;
-  let state  = 'idle'; // idle | playing | over
-  let score  = 0;
-  let speed  = 2.5;
-  let stack  = [];
-  let cur    = null;
+  let raf     = null;
+  let state   = 'idle';   // idle | playing | over
+  let score   = 0;
+  let speed   = 2.5;
+  let stack   = [];
+  let cur     = null;
   let falling = [];
-  let camY   = 0;
+  let cameraY = 0;        // positive = world shifts DOWN (tower grows up)
   let layerIdx = 0;
   let bsTopScore = 0, bsTopName = '';
   let spaceDown = false;
 
-  // ── DOM refs ──────────────────────────────────────────────
   function $id(id){ return document.getElementById(id); }
 
-  // ── Firebase top-score ───────────────────────────────────
+  // ── Firebase top-score ────────────────────────────────────
   function loadBsTop() {
     if (!db || !roomId) return;
     getDoc(doc(db, 'rooms', roomId)).then(snap => {
@@ -7038,20 +7096,18 @@ function renderRestaurantLB() {
       if (t) { bsTopScore = t.score || 0; bsTopName = t.name || ''; refreshScoreBoard(); }
     }).catch(() => {});
   }
-
   function saveBsTop(name, sc) {
     if (!db || !roomId) return;
     updateDoc(doc(db, 'rooms', roomId), { burgerStackTop: { name, score: sc, ts: Date.now() } })
       .then(() => { bsTopScore = sc; bsTopName = name; refreshScoreBoard(); })
       .catch(() => {});
   }
-
   function refreshScoreBoard() {
     const el = $id('bs-top-score');
     if (el) el.textContent = bsTopScore > 0 ? bsTopName + '  ' + bsTopScore : '—';
   }
 
-  // ── Canvas setup ─────────────────────────────────────────
+  // ── Canvas setup ──────────────────────────────────────────
   function setupCanvas() {
     canvas = $id('burger-stack-canvas');
     if (!canvas) return false;
@@ -7067,7 +7123,7 @@ function renderRestaurantLB() {
 
   // ── Game lifecycle ────────────────────────────────────────
   function resetGame() {
-    score = 0; speed = 2.5; layerIdx = 0; camY = 0; falling = [];
+    score = 0; speed = 2.5; layerIdx = 0; cameraY = 0; falling = [];
     const startW = 190, startX = (W - startW) / 2;
     stack = [{ x: startX, w: startW, y: H - PIECE_H - 8, ...LAYERS[0] }];
     layerIdx = 1;
@@ -7083,31 +7139,29 @@ function renderRestaurantLB() {
 
   function drop() {
     if (state !== 'playing' || !cur) return;
-    const top = stack[stack.length - 1];
+    const top   = stack[stack.length - 1];
     const left  = Math.max(cur.x, top.x);
     const right = Math.min(cur.x + cur.w, top.x + top.w);
     const overlap = right - left;
-
     if (overlap <= 2) { endGame(); return; }
 
     const isPerfect = Math.abs(cur.x - top.x) <= 3;
     const newX = isPerfect ? top.x : left;
-    const newW = isPerfect ? top.w  : overlap;
+    const newW = isPerfect ? top.w : overlap;
+    const { type, label, fill, stroke } = cur;
+    const fragY = top.y - PIECE_H - 2;
 
-    // falling cut-off fragments
     if (!isPerfect) {
       if (cur.x < top.x)
-        falling.push({ x: cur.x, y: top.y - PIECE_H - 2, w: top.x - cur.x, vy: -0.5, fill: cur.fill, stroke: cur.stroke });
+        falling.push({ x: cur.x,        y: fragY, w: top.x - cur.x,                        h: PIECE_H, vy: -0.5, type, label:'', fill, stroke });
       if (cur.x + cur.w > top.x + top.w)
-        falling.push({ x: top.x + top.w, y: top.y - PIECE_H - 2, w: (cur.x + cur.w) - (top.x + top.w), vy: -0.5, fill: cur.fill, stroke: cur.stroke });
+        falling.push({ x: top.x + top.w, y: fragY, w: (cur.x + cur.w) - (top.x + top.w), h: PIECE_H, vy: -0.5, type, label:'', fill, stroke });
     }
 
-    stack.push({ x: newX, w: newW, y: top.y - PIECE_H - 2, fill: cur.fill, stroke: cur.stroke, label: cur.label });
+    stack.push({ x: newX, w: newW, y: fragY, type, label, fill, stroke });
     score++;
     speed = Math.min(10, 2.5 + Math.floor(score / 4) * 0.35);
     spawnCurrent();
-
-    // tiny vibration on drop
     if (navigator.vibrate) navigator.vibrate(18);
   }
 
@@ -7129,201 +7183,501 @@ function renderRestaurantLB() {
   function update() {
     if (!cur) return;
     cur.x += cur.dir * speed;
-    if (cur.x <= 0)            { cur.x = 0;            cur.dir =  1; }
-    if (cur.x + cur.w >= W)    { cur.x = W - cur.w;    cur.dir = -1; }
+    if (cur.x <= 0)          { cur.x = 0;         cur.dir =  1; }
+    if (cur.x + cur.w >= W)  { cur.x = W - cur.w; cur.dir = -1; }
 
     falling.forEach(f => { f.vy += 0.55; f.y += f.vy; });
     falling = falling.filter(f => f.y < H + 120);
 
-    // smooth camera scroll: keep top of stack at ~32% from top
+    // Dynamic viewport camera: once the tower top rises past 40% of canvas,
+    // smoothly translate the world downward to keep the landing zone visible.
     const topPiece = stack[stack.length - 1];
-    const targetCam = topPiece.y - H * 0.32;
-    if (targetCam > camY) camY += (targetCam - camY) * 0.1;
+    const targetCamY = Math.max(0, H * 0.40 - topPiece.y);
+    cameraY += (targetCamY - cameraY) * 0.12;
   }
 
-  // ── Drawing ───────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────
+  // VECTOR DRAW LIBRARY — one premium function per ingredient
+  // ─────────────────────────────────────────────────────────
+
+  // Shared rounded-rect path helper (no fill/stroke — caller decides)
+  function bsRR(x, y, w, h, r) {
+    r = Math.max(0, Math.min(r, w / 2, h / 2));
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  // Shared label renderer — white bold text at reduced opacity
+  function drawLabel(x, y, w, h, text) {
+    if (!text || w < 44) return;
+    ctx.save();
+    ctx.globalAlpha = 0.70;
+    ctx.fillStyle = '#fff';
+    ctx.shadowColor = 'rgba(0,0,0,0.60)'; ctx.shadowBlur = 4;
+    const fs = Math.max(7, Math.min(10, w / 17));
+    ctx.font = `700 ${fs}px 'Outfit', sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(text, x + w / 2, y + h * 0.60);
+    ctx.restore();
+  }
+
+  // ── TOP BUN — warm golden dome with sesame seeds ──────────
+  function drawBunTop(x, y, w, h) {
+    const cx = x + w / 2;
+    const domeH = h * 1.05; // crown height above y
+
+    // Dome body
+    ctx.save();
+    ctx.shadowColor = 'rgba(100,40,0,0.38)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 4;
+    ctx.beginPath();
+    ctx.moveTo(x + 4, y + h);
+    ctx.lineTo(x + 4, y + h * 0.60);
+    ctx.quadraticCurveTo(x, y + h * 0.55, x + w * 0.08, y - domeH * 0.48);
+    ctx.quadraticCurveTo(cx, y - domeH, cx, y - domeH);
+    ctx.quadraticCurveTo(x + w * 0.92, y - domeH * 0.48, x + w - 4, y + h * 0.55);
+    ctx.lineTo(x + w - 4, y + h);
+    ctx.closePath();
+    const grd = ctx.createLinearGradient(0, y - domeH, 0, y + h);
+    grd.addColorStop(0, '#EDAF5A');
+    grd.addColorStop(0.50, '#D4956A');
+    grd.addColorStop(1,   '#B8753A');
+    ctx.fillStyle = grd; ctx.fill();
+    ctx.restore();
+
+    // Outline
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x + 4, y + h);
+    ctx.lineTo(x + 4, y + h * 0.60);
+    ctx.quadraticCurveTo(x, y + h * 0.55, x + w * 0.08, y - domeH * 0.48);
+    ctx.quadraticCurveTo(cx, y - domeH, cx, y - domeH);
+    ctx.quadraticCurveTo(x + w * 0.92, y - domeH * 0.48, x + w - 4, y + h * 0.55);
+    ctx.lineTo(x + w - 4, y + h);
+    ctx.strokeStyle = '#9A5520'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.restore();
+
+    // Sesame seeds — fixed positions for render stability
+    const seeds = [[0.22,0.32],[0.50,0.12],[0.78,0.32],[0.36,0.57],[0.64,0.55]];
+    seeds.forEach(([sx, sy]) => {
+      const seedX = x + w * sx;
+      const seedY = (y - domeH) + (h + domeH) * sy;
+      ctx.save();
+      ctx.fillStyle = '#F5E5C5';
+      ctx.shadowColor = 'rgba(80,30,0,0.18)'; ctx.shadowBlur = 2;
+      ctx.beginPath();
+      ctx.ellipse(seedX, seedY, 5, 2.8, 0.18, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    });
+
+    // Specular sheen
+    ctx.save();
+    ctx.globalAlpha = 0.22;
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.ellipse(cx - w * 0.10, y - domeH * 0.60, w * 0.17, domeH * 0.18, -0.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // ── BOTTOM BUN — flat golden platform, rounded bottom corners ─
+  function drawBunBottom(x, y, w, h) {
+    const r = Math.min(6, h * 0.35);
+    ctx.save();
+    ctx.shadowColor = 'rgba(100,40,0,0.30)'; ctx.shadowBlur = 7; ctx.shadowOffsetY = 3;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + w, y);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.closePath();
+    const grd = ctx.createLinearGradient(0, y, 0, y + h);
+    grd.addColorStop(0, '#E8A84C'); grd.addColorStop(0.5, '#D4956A'); grd.addColorStop(1, '#A86030');
+    ctx.fillStyle = grd; ctx.fill();
+    ctx.restore();
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + w, y);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.strokeStyle = '#9A5520'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.restore();
+    // Top-edge highlight
+    ctx.save(); ctx.globalAlpha = 0.28; ctx.fillStyle = '#fff';
+    ctx.fillRect(x + 2, y, w - 4, 3);
+    ctx.restore();
+  }
+
+  // ── PATTY — thick dark slab with sin-wave craggy edge + grill marks ──
+  function drawPatty(x, y, w, h) {
+    const segs = 14;
+    const jag  = h * 0.22;
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.50)'; ctx.shadowBlur = 9; ctx.shadowOffsetY = 5;
+    ctx.beginPath();
+    // Craggy top edge — sin-based for frame-stability (no Math.random)
+    for (let i = 0; i <= segs; i++) {
+      const px = x + (w / segs) * i;
+      const py = y + jag * (Math.sin(i * 1.9) * 0.5 + 0.12);
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.lineTo(x + w, y + h);
+    ctx.lineTo(x, y + h);
+    ctx.closePath();
+    const grd = ctx.createLinearGradient(0, y, 0, y + h);
+    grd.addColorStop(0, '#7A3A10'); grd.addColorStop(0.35, '#5C2E0A'); grd.addColorStop(1, '#3D1A04');
+    ctx.fillStyle = grd; ctx.fill();
+    ctx.restore();
+    // Grill marks — lighter horizontal streaks
+    ctx.save(); ctx.globalAlpha = 0.22; ctx.fillStyle = '#A06040';
+    for (let i = 0; i < 3; i++)
+      ctx.fillRect(x + w * 0.08, y + jag + h * 0.10 + i * h * 0.26, w * 0.84, 2.5);
+    ctx.restore();
+    // Edge stroke
+    ctx.save(); ctx.strokeStyle = '#3D1A04'; ctx.lineWidth = 1.5;
+    bsRR(x, y + jag * 0.4, w, h - jag * 0.4, 4); ctx.stroke();
+    ctx.restore();
+  }
+
+  // ── CHEESE — bright yellow layer with dripping corner triangles ──
+  function drawCheese(x, y, w, h) {
+    ctx.save();
+    ctx.shadowColor = 'rgba(180,140,0,0.42)'; ctx.shadowBlur = 5; ctx.shadowOffsetY = 2;
+    bsRR(x, y, w, h, 3);
+    const grd = ctx.createLinearGradient(0, y, 0, y + h);
+    grd.addColorStop(0, '#FFD84A'); grd.addColorStop(1, '#F5C518');
+    ctx.fillStyle = grd; ctx.fill();
+    ctx.restore();
+    // Dripping cheese triangles at two points
+    [[x + w * 0.18, -3], [x + w * 0.78, 3]].forEach(([dx, tilt]) => {
+      ctx.save();
+      ctx.fillStyle = '#F5C518';
+      ctx.shadowColor = 'rgba(180,140,0,0.32)'; ctx.shadowBlur = 4; ctx.shadowOffsetY = 3;
+      ctx.beginPath();
+      ctx.moveTo(dx - 8, y + h);
+      ctx.lineTo(dx + 8, y + h);
+      ctx.lineTo(dx + tilt, y + h + 11);
+      ctx.closePath(); ctx.fill();
+      ctx.restore();
+    });
+    ctx.save(); ctx.strokeStyle = '#C49A00'; ctx.lineWidth = 1;
+    bsRR(x, y, w, h, 3); ctx.stroke();
+    ctx.restore();
+  }
+
+  // ── LETTUCE — organic wavy green zigzag ribbon ────────────
+  function drawLettuce(x, y, w, h) {
+    const waves = 7;
+    const waveW = w / waves;
+    const amp   = h * 0.55;
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,80,20,0.22)'; ctx.shadowBlur = 5; ctx.shadowOffsetY = 2;
+    ctx.beginPath();
+    ctx.moveTo(x, y + h * 0.68);
+    for (let i = 0; i < waves; i++) {
+      const cpX = x + waveW * i + waveW * 0.5;
+      const cpY = i % 2 === 0 ? y : y + amp;
+      const eX  = x + waveW * (i + 1);
+      ctx.quadraticCurveTo(cpX, cpY, eX, y + h * 0.68);
+    }
+    ctx.lineTo(x + w, y + h);
+    ctx.lineTo(x, y + h);
+    ctx.closePath();
+    const grd = ctx.createLinearGradient(0, y, 0, y + h);
+    grd.addColorStop(0, '#4ADE80'); grd.addColorStop(1, '#22C55E');
+    ctx.fillStyle = grd; ctx.fill();
+    ctx.restore();
+    // Wave top-edge outline
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x, y + h * 0.68);
+    for (let i = 0; i < waves; i++) {
+      const cpX = x + waveW * i + waveW * 0.5;
+      const cpY = i % 2 === 0 ? y : y + amp;
+      const eX  = x + waveW * (i + 1);
+      ctx.quadraticCurveTo(cpX, cpY, eX, y + h * 0.68);
+    }
+    ctx.strokeStyle = '#15803D'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.restore();
+  }
+
+  // ── TOMATO — shiny red slab with specular gleam ───────────
+  function drawTomato(x, y, w, h) {
+    ctx.save();
+    ctx.shadowColor = 'rgba(120,0,0,0.38)'; ctx.shadowBlur = 7; ctx.shadowOffsetY = 3;
+    bsRR(x + 2, y, w - 4, h, 5);
+    const grd = ctx.createLinearGradient(0, y, 0, y + h);
+    grd.addColorStop(0, '#F87171'); grd.addColorStop(0.5, '#EF4444'); grd.addColorStop(1, '#B91C1C');
+    ctx.fillStyle = grd; ctx.fill();
+    ctx.restore();
+    // Specular ellipse gleam
+    ctx.save(); ctx.globalAlpha = 0.40; ctx.fillStyle = '#FFD0D0';
+    ctx.beginPath();
+    ctx.ellipse(x + w * 0.25, y + h * 0.28, w * 0.14, h * 0.18, -0.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    // Bright top-edge highlight line
+    ctx.save(); ctx.globalAlpha = 0.52; ctx.strokeStyle = '#FFB0B0'; ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.12, y + 2.5); ctx.lineTo(x + w * 0.88, y + 2.5); ctx.stroke();
+    ctx.restore();
+    ctx.save(); ctx.strokeStyle = '#B91C1C'; ctx.lineWidth = 1;
+    bsRR(x + 2, y, w - 4, h, 5); ctx.stroke();
+    ctx.restore();
+  }
+
+  // ── BACON — wavy alternating crimson + pink strips ────────
+  function drawBacon(x, y, w, h) {
+    const strips = 4;
+    const stripH = h / strips;
+    ctx.save();
+    ctx.shadowColor = 'rgba(80,0,0,0.38)'; ctx.shadowBlur = 6; ctx.shadowOffsetY = 3;
+    // Clip to piece bounds so waves stay contained
+    bsRR(x, y, w, h, 4); ctx.clip();
+    for (let s = 0; s < strips; s++) {
+      const sy   = y + s * stripH;
+      const dark = s % 2 === 0;
+      const segs = 6;
+      const segW = w / segs;
+      ctx.beginPath();
+      ctx.moveTo(x, sy);
+      for (let i = 0; i < segs; i++) {
+        const mx = x + segW * i + segW * 0.5;
+        const my = sy + (i % 2 === 0 ? -stripH * 0.28 : stripH * 0.28);
+        ctx.quadraticCurveTo(mx, my, x + segW * (i + 1), sy);
+      }
+      ctx.lineTo(x + w, sy + stripH);
+      ctx.lineTo(x, sy + stripH);
+      ctx.closePath();
+      const grd = ctx.createLinearGradient(0, sy, 0, sy + stripH);
+      if (dark) { grd.addColorStop(0,'#9A2510'); grd.addColorStop(1,'#7A1A08'); }
+      else       { grd.addColorStop(0,'#F4A0A0'); grd.addColorStop(1,'#E08080'); }
+      ctx.fillStyle = grd; ctx.fill();
+    }
+    ctx.restore();
+    ctx.save(); ctx.strokeStyle = '#7A1A08'; ctx.lineWidth = 1.5;
+    bsRR(x, y, w, h, 4); ctx.stroke();
+    ctx.restore();
+  }
+
+  // ── ONION — purple rings layer ────────────────────────────
+  function drawOnion(x, y, w, h) {
+    ctx.save();
+    ctx.shadowColor = 'rgba(100,0,150,0.28)'; ctx.shadowBlur = 5; ctx.shadowOffsetY = 2;
+    bsRR(x + 1, y, w - 2, h, 5);
+    const grd = ctx.createLinearGradient(0, y, 0, y + h);
+    grd.addColorStop(0, '#E0AAFF'); grd.addColorStop(1, '#C084FC');
+    ctx.fillStyle = grd; ctx.fill();
+    ctx.restore();
+    // Semi-transparent ring ovals
+    ctx.save(); ctx.globalAlpha = 0.22; ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5;
+    const ringW = w * 0.22, ringH = h * 0.70, offsets = [0.18, 0.42, 0.66];
+    offsets.forEach(ox => {
+      ctx.beginPath();
+      ctx.ellipse(x + w * ox + ringW / 2, y + h * 0.5, ringW * 0.5, ringH * 0.5, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+    ctx.restore();
+    ctx.save(); ctx.strokeStyle = '#9333EA'; ctx.lineWidth = 1;
+    bsRR(x + 1, y, w - 2, h, 5); ctx.stroke();
+    ctx.restore();
+  }
+
+  // ── PICKLE — green slab with characteristic bumps ─────────
+  function drawPickle(x, y, w, h) {
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,100,40,0.28)'; ctx.shadowBlur = 5; ctx.shadowOffsetY = 2;
+    bsRR(x + 2, y, w - 4, h, 5);
+    const grd = ctx.createLinearGradient(0, y, 0, y + h);
+    grd.addColorStop(0, '#6EE79C'); grd.addColorStop(1, '#4ADE80');
+    ctx.fillStyle = grd; ctx.fill();
+    ctx.restore();
+    // Pickle bump dots
+    ctx.save(); ctx.fillStyle = '#15803D'; ctx.globalAlpha = 0.48;
+    const bumpCount = Math.max(2, Math.floor(w / 22));
+    for (let i = 0; i < bumpCount; i++) {
+      ctx.beginPath();
+      ctx.arc(x + 12 + i * ((w - 16) / Math.max(1, bumpCount - 1)), y + h * 0.50, 3.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+    ctx.save(); ctx.strokeStyle = '#16A34A'; ctx.lineWidth = 1;
+    bsRR(x + 2, y, w - 4, h, 5); ctx.stroke();
+    ctx.restore();
+  }
+
+  // ── Dispatcher: routes to the correct vector function ─────
+  function drawIngredient(piece) {
+    const { x, y, w, type, label, fill, stroke } = piece;
+    const h = piece.h != null ? piece.h : PIECE_H;
+    if (w < 1) return;
+    switch (type) {
+      case 'bun_top': drawBunTop(x, y, w, h);    break;
+      case 'bun_bot': drawBunBottom(x, y, w, h); break;
+      case 'patty':   drawPatty(x, y, w, h);     break;
+      case 'cheese':  drawCheese(x, y, w, h);    break;
+      case 'lettuce': drawLettuce(x, y, w, h);   break;
+      case 'tomato':  drawTomato(x, y, w, h);    break;
+      case 'bacon':   drawBacon(x, y, w, h);     break;
+      case 'onion':   drawOnion(x, y, w, h);     break;
+      case 'pickle':  drawPickle(x, y, w, h);    break;
+      default:
+        // Fallback generic pill
+        ctx.save();
+        ctx.shadowColor = 'rgba(11,53,80,0.22)'; ctx.shadowBlur = 7; ctx.shadowOffsetY = 3;
+        bsRR(x, y, w, h, Math.min(8, h / 2, w / 2));
+        ctx.fillStyle = fill || '#888'; ctx.fill();
+        ctx.restore();
+        ctx.strokeStyle = stroke || '#555'; ctx.lineWidth = 1.5;
+        bsRR(x, y, w, h, Math.min(8, h / 2, w / 2)); ctx.stroke();
+    }
+    drawLabel(x, y, w, h, label);
+  }
+
+  // ── Frame drawing ─────────────────────────────────────────
   function drawFrame() {
     ctx.clearRect(0, 0, W, H);
 
-    // Sky gradient BG
+    // Sky gradient background
     const bg = ctx.createLinearGradient(0, 0, 0, H);
     bg.addColorStop(0, '#7ec4e6'); bg.addColorStop(1, '#c4e3f5');
     ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
 
-    // Subtle grid lines for depth
-    ctx.strokeStyle = 'rgba(255,255,255,0.12)'; ctx.lineWidth = 1;
-    for (let gx = 0; gx < W; gx += 40) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
+    // Subtle depth grid
+    ctx.strokeStyle = 'rgba(255,255,255,0.10)'; ctx.lineWidth = 1;
+    for (let gx = 0; gx < W; gx += 40) {
+      ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke();
+    }
 
+    // ── Camera transform — everything inside scrolls with the tower ──
     ctx.save();
-    ctx.translate(0, -camY);
+    ctx.translate(0, cameraY);
 
-    // Stack pieces
-    stack.forEach(p => drawPiece(p.x, p.y, p.w, PIECE_H, p.fill, p.stroke, p.label));
+    stack.forEach(p => drawIngredient(p));
 
-    // Falling cut-offs
     falling.forEach(f => {
-      ctx.save(); ctx.globalAlpha = 0.65;
-      drawPiece(f.x, f.y, f.w, PIECE_H, f.fill, f.stroke, '');
+      ctx.save(); ctx.globalAlpha = 0.58;
+      drawIngredient({ ...f, label: '' });
       ctx.restore();
     });
 
-    // Moving current piece (floats above the stack)
     if (cur && state === 'playing') {
-      const top = stack[stack.length - 1];
-      const curY = top.y - PIECE_H - 16;
-      drawPiece(cur.x, curY, cur.w, PIECE_H, cur.fill, cur.stroke, cur.label);
+      const top  = stack[stack.length - 1];
+      const curY = top.y - PIECE_H - 18;
+      drawIngredient({ ...cur, y: curY, h: PIECE_H });
 
-      // ghost drop line
+      // Ghost guide line
       ctx.save();
-      ctx.setLineDash([3,4]); ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=1;
-      ctx.beginPath(); ctx.moveTo(cur.x+cur.w/2, curY+PIECE_H); ctx.lineTo(cur.x+cur.w/2, top.y); ctx.stroke();
+      ctx.setLineDash([3, 5]);
+      ctx.strokeStyle = 'rgba(255,255,255,0.22)'; ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(cur.x + cur.w / 2, curY + PIECE_H);
+      ctx.lineTo(cur.x + cur.w / 2, top.y);
+      ctx.stroke();
       ctx.setLineDash([]); ctx.restore();
     }
 
-    ctx.restore(); // end camera
+    ctx.restore(); // ── end camera ──
 
-    // HUD
+    // HUD — always fixed over the canvas, unaffected by camera
     ctx.save();
-    // Score pill
     ctx.fillStyle = 'rgba(11,53,80,0.55)';
-    roundRect(ctx, 10, 10, 110, 34, 10); ctx.fill();
+    bsRR(10, 10, 115, 34, 10); ctx.fill();
     ctx.fillStyle = '#fff';
-    ctx.font = "700 18px 'Russo One', sans-serif"; ctx.textAlign = 'left';
-    ctx.fillText('🍔  ' + score, 20, 32);
+    ctx.font = "700 18px 'Russo One', sans-serif";
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    ctx.shadowColor = 'rgba(0,0,0,0.4)'; ctx.shadowBlur = 3;
+    ctx.fillText('🍔  ' + score, 20, 33);
+    ctx.shadowBlur = 0;
 
-    // Speed dots (top-right)
     const dots = Math.min(Math.floor((speed - 2.5) / 0.35) + 1, 10);
     for (let i = 0; i < 10; i++) {
       ctx.fillStyle = i < dots ? '#1a70aa' : 'rgba(255,255,255,0.18)';
-      ctx.beginPath(); ctx.arc(W - 14 - (9-i)*13, 27, 4.5, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(W - 14 - (9 - i) * 13, 27, 4.5, 0, Math.PI * 2); ctx.fill();
     }
     ctx.restore();
   }
 
-  function drawPiece(x, y, w, h, fill, stroke, label) {
-    if (w < 1) return;
-    const r = Math.min(8, h/2, w/2);
-    ctx.save();
-    ctx.shadowColor = 'rgba(11,53,80,0.22)'; ctx.shadowBlur = 7; ctx.shadowOffsetY = 3;
-    roundRect(ctx, x, y, w, h, r);
-    ctx.fillStyle = fill; ctx.fill();
-    ctx.restore();
-    roundRect(ctx, x, y, w, h, r);
-    ctx.strokeStyle = stroke; ctx.lineWidth = 1.5; ctx.stroke();
-    // Sheen highlight
-    ctx.save();
-    ctx.clip();
-    const sh = ctx.createLinearGradient(0, y, 0, y + h * 0.5);
-    sh.addColorStop(0,'rgba(255,255,255,0.28)'); sh.addColorStop(1,'rgba(255,255,255,0)');
-    ctx.fillStyle = sh; ctx.fillRect(x, y, w, h * 0.5);
-    ctx.restore();
-    if (label && w > 48) {
-      ctx.fillStyle = 'rgba(255,255,255,0.9)';
-      const fs = Math.min(10, w / 12);
-      ctx.font = `600 ${fs}px 'Outfit', sans-serif`; ctx.textAlign = 'center';
-      ctx.fillText(label, x + w/2, y + h * 0.70);
-    }
-  }
-
-  function roundRect(ctx, x, y, w, h, r) {
-    r = Math.max(0, Math.min(r, w/2, h/2));
-    ctx.beginPath();
-    ctx.moveTo(x+r, y);
-    ctx.lineTo(x+w-r, y); ctx.quadraticCurveTo(x+w, y, x+w, y+r);
-    ctx.lineTo(x+w, y+h-r); ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
-    ctx.lineTo(x+r, y+h); ctx.quadraticCurveTo(x, y+h, x, y+h-r);
-    ctx.lineTo(x, y+r); ctx.quadraticCurveTo(x, y, x+r, y);
-    ctx.closePath();
-  }
-
-  // ── Idle title screen ────────────────────────────────────
+  // ── Idle title screen ─────────────────────────────────────
   function drawIdle() {
     if (!ctx) return;
     ctx.clearRect(0, 0, W, H);
     const bg = ctx.createLinearGradient(0, 0, 0, H);
-    bg.addColorStop(0,'#7ec4e6'); bg.addColorStop(1,'#c4e3f5');
+    bg.addColorStop(0, '#7ec4e6'); bg.addColorStop(1, '#c4e3f5');
     ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-    // Demo burger stack centered
-    const demoLayers = [
-      { fill:'#D4956A', stroke:'#A06030', label:'Bottom Bun' },
-      { fill:'#5C2E0A', stroke:'#3D1A04', label:'Patty' },
-      { fill:'#F5C518', stroke:'#C49A00', label:'Cheese' },
-      { fill:'#22C55E', stroke:'#15803D', label:'Lettuce' },
-      { fill:'#D4A56A', stroke:'#A06030', label:'Top Bun' },
+
+    const demoStack = [
+      { type:'bun_bot', label:'Bottom Bun', fill:'#D4956A', stroke:'#A06030' },
+      { type:'patty',   label:'Patty',      fill:'#5C2E0A', stroke:'#3D1A04' },
+      { type:'cheese',  label:'Cheese',     fill:'#F5C518', stroke:'#C49A00' },
+      { type:'lettuce', label:'Lettuce',    fill:'#22C55E', stroke:'#15803D' },
+      { type:'tomato',  label:'Tomato',     fill:'#EF4444', stroke:'#B91C1C' },
+      { type:'bun_top', label:'Top Bun',    fill:'#D4A56A', stroke:'#A06030' },
     ];
     const cx = W / 2;
-    demoLayers.forEach((l, i) => {
-      const w = 170 - i * 4;
-      const y = H * 0.68 - i * (PIECE_H + 3);
-      drawPiece(cx - w/2, y, w, PIECE_H, l.fill, l.stroke, l.label);
+    demoStack.forEach((layer, i) => {
+      const bw = 164 - i * 4;
+      const by = H * 0.76 - i * (PIECE_H + 3);
+      drawIngredient({ x: cx - bw / 2, y: by, w: bw, h: PIECE_H, ...layer });
     });
   }
 
-  // ── Overlay logic ────────────────────────────────────────
+  // ── Overlay ───────────────────────────────────────────────
   function showOverlay(isGameOver) {
-    const ov = $id('bs-overlay');
-    const res = $id('bs-result');
+    const ov      = $id('bs-overlay');
+    const res     = $id('bs-result');
     const playBtn = $id('bs-play-btn');
-    const againBtn = $id('bs-again-btn');
+    const againBtn= $id('bs-again-btn');
     const scoreEl = $id('bs-result-score');
     const msgEl   = $id('bs-result-msg');
-
     if (!ov) return;
     ov.style.display = 'flex';
-
     if (isGameOver) {
-      if (res) res.style.display = 'flex';
-      if (scoreEl) scoreEl.textContent = score;
+      if (res)     res.style.display    = 'flex';
+      if (scoreEl) scoreEl.textContent  = score;
       if (playBtn) playBtn.style.display = 'none';
-      if (againBtn) againBtn.style.display = '';
+      if (againBtn)againBtn.style.display= '';
       if (msgEl) {
-        if (score > bsTopScore) {
-          msgEl.textContent = '🏆 NEW ROOM RECORD!';
-          saveBsTop(myName || 'Player', score);
-        } else if (score === bsTopScore && score > 0) {
-          msgEl.textContent = '🤝 Tied the record!';
-        } else if (bsTopScore > 0) {
-          msgEl.textContent = 'Room record: ' + bsTopName + ' — ' + bsTopScore;
-        } else {
-          msgEl.textContent = 'Nice try! Keep stacking.';
-        }
+        if (score > bsTopScore)                   { msgEl.textContent = '🏆 NEW ROOM RECORD!'; saveBsTop(myName || 'Player', score); }
+        else if (score === bsTopScore && score > 0){ msgEl.textContent = '🤝 Tied the record!'; }
+        else if (bsTopScore > 0)                   { msgEl.textContent = 'Room record: ' + bsTopName + ' — ' + bsTopScore; }
+        else                                        { msgEl.textContent = 'Nice try! Keep stacking.'; }
       }
     } else {
-      if (res) res.style.display = 'none';
+      if (res)     res.style.display    = 'none';
       if (playBtn) playBtn.style.display = '';
-      if (againBtn) againBtn.style.display = 'none';
+      if (againBtn)againBtn.style.display= 'none';
     }
   }
 
   function hideOverlay() {
-    const ov = $id('bs-overlay');
-    if (ov) ov.style.display = 'none';
+    const ov = $id('bs-overlay'); if (ov) ov.style.display = 'none';
   }
 
   function startGame() {
-    hideOverlay();
-    state = 'playing';
-    resetGame();
+    hideOverlay(); state = 'playing'; resetGame();
     if (raf) cancelAnimationFrame(raf);
     raf = requestAnimationFrame(loop);
   }
 
-  // ── Input wiring ─────────────────────────────────────────
-  function onCanvasTap(e) {
-    e.preventDefault();
-    if (state === 'playing') drop();
-  }
-
-  function onSpaceKey(e) {
-    if (e.code === 'Space' && !spaceDown) {
-      e.preventDefault();
-      spaceDown = true;
-      if (state === 'playing') drop();
-    }
+  // ── Input ─────────────────────────────────────────────────
+  function onCanvasTap(e) { e.preventDefault(); if (state === 'playing') drop(); }
+  function onSpaceKey(e)  {
+    if (e.code === 'Space' && !spaceDown) { e.preventDefault(); spaceDown = true; if (state === 'playing') drop(); }
   }
   function onSpaceUp(e) { if (e.code === 'Space') spaceDown = false; }
 
-  // ── Public API ───────────────────────────────────────────
+  // ── Public API ────────────────────────────────────────────
   window.initBurgerStack = function() {
     if (!canvas) {
       if (!setupCanvas()) return;
@@ -7334,10 +7688,7 @@ function renderRestaurantLB() {
       document.addEventListener('keyup',   onSpaceUp);
     }
     loadBsTop();
-    if (state !== 'playing') {
-      drawIdle();
-      showOverlay(false);
-    }
+    if (state !== 'playing') { drawIdle(); showOverlay(false); }
   };
 
   window.pauseBurgerStack = function() {
@@ -7438,6 +7789,19 @@ document.getElementById('setup-room').addEventListener('input',e=>{e.target.valu
 
 // ── Hide bottom send bar while a comment input is focused ──
 // Use event delegation so it works for dynamically-added comment inputs
+// ── Delegated tap → receipt modal on burger feed cards ────────────────────────
+// Ignores taps on buttons, reactions, comments, and photo lightbox to prevent
+// conflicts with confetti particles and other interactive overlays.
+document.getElementById('unified-feed').addEventListener('click', e => {
+  const row = e.target.closest('.feed-row[data-burger-id]');
+  if (!row) return;
+  if (e.target.closest('button, .msg-reactions, .feed-card-actions, .feed-comment-preview, .feed-row-photo, a, [onclick]')) return;
+  const burgerId = row.dataset.burgerId;
+  const item = window._feedBurgerMap?.[burgerId];
+  if (!item) return;
+  openFeedReceipt(item);
+});
+
 document.getElementById('unified-feed').addEventListener('focusin', e => {
   if (e.target.closest('.comment-input-row')) {
     document.querySelector('.social-input-area')?.classList.add('comment-focus-hide');
@@ -8133,6 +8497,8 @@ function initJuly4Stars() {
 
   const canvas = document.createElement('canvas');
   canvas.id = 'stars-canvas';
+  canvas.style.pointerEvents = 'none';
+  canvas.style.zIndex = '0';
   document.body.prepend(canvas);
   const ctx = canvas.getContext('2d');
 
