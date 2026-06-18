@@ -2339,41 +2339,6 @@ body.july4-bg::before {
 .resto-score{font-family:'Russo One',sans-serif;font-size:13px;font-weight:800;color:var(--amber)}
 .resto-unrated{font-size:11px;color:var(--muted);font-weight:500}
 
-/* ── Weekly Digest Card ── */
-.weekly-digest{
-  background:var(--surface2);
-  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
-  border:1px solid var(--border);
-  border-radius:14px;
-  overflow:hidden;
-  margin-bottom:10px;
-  flex-shrink:0;
-  box-shadow:var(--shadow-card);
-}
-.wd-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:8px 14px 6px;
-  border-bottom:1px solid rgba(30,110,170,0.12);
-}
-.wd-title{
-  font-family:'Press Start 2P',monospace;
-  font-size:7px;
-  color:var(--sky);
-  letter-spacing:0.06em;
-  text-shadow:none;
-  line-height:1.4;
-}
-.wd-dates{font-size:9px;color:var(--muted2);font-family:monospace;letter-spacing:0.08em}
-.wd-items{display:grid;grid-template-columns:repeat(3,1fr)}
-.wd-item{padding:10px 10px 12px;border-right:1px solid rgba(30,110,170,0.10);display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px}
-.wd-item:last-child{border-right:none}
-.wd-item-label{font-family:'Press Start 2P',monospace;font-size:5px;color:var(--muted2);letter-spacing:0.08em;line-height:1.4;text-transform:uppercase}
-.wd-item-emoji{font-size:22px;line-height:1;filter:drop-shadow(0 2px 6px rgba(30,100,160,0.20))}
-.wd-item-name{font-family:'Russo One',sans-serif;font-size:12px;font-weight:800;color:var(--text);line-height:1.2;letter-spacing:-0.2px;margin-top:1px}
-.wd-item-sub{font-size:9px;color:var(--muted2);font-weight:500;line-height:1.3}
-.wd-item-val{font-family:'Russo One',sans-serif;font-size:14px;font-weight:900;color:var(--sky);line-height:1;letter-spacing:0;text-shadow:none}
-.wd-empty{padding:18px;text-align:center;font-size:11px;color:var(--muted);font-family:monospace}
-
 /* ── Milestone Feed Card ── */
 .milestone-card{
   background:var(--surface2);
@@ -2877,7 +2842,7 @@ body.july4-bg::before {
       <div id="unified-feed-panel">
         <div id="ptr-indicator"><span class="ptr-icon">↓</span><span class="ptr-label">Pull to refresh</span></div>
         <div class="social-wrap">
-          <div class="weekly-digest" id="weekly-digest" style="display:none"></div>
+
           <div class="social-empty empty-state" id="social-empty" style="display:none">
             <div class="empty-state-icon">🍔</div>
             <div class="empty-state-title">No Activity Yet</div>
@@ -4632,8 +4597,6 @@ function renderUnifiedFeed() {
     }
   }
 
-  renderWeeklyDigest();
-
   // Build burger entries from all players
   const burgerItems = [];
   players.forEach(p => {
@@ -5500,7 +5463,7 @@ async function generateReceiptCanvas(d) {
   const rL2Y = y + 57;   // "date 📅  ·  time 🕐" baseline
 
   ctx.textAlign = 'right';
-  ctx.font = "700 16px 'Outfit', sans-serif";
+  ctx.font = "700 22px 'Outfit', sans-serif";
   ctx.fillStyle = 'rgba(11,53,80,0.7)';
   ctx.fillText(d.count + '/100 🍔', rightX, rL1Y);
   ctx.font = "400 12px 'Outfit', sans-serif";
@@ -7284,102 +7247,6 @@ function renderRestaurantLB() {
     : '';
 
   wrap.innerHTML = cardsHtml + loadMoreRestoHtml;
-}
-
-// ── Weekly Digest Card ────────────────────────────────────────────────────────
-function renderWeeklyDigest() {
-  const el = document.getElementById('weekly-digest');
-  if (!el) return;
-
-  const monday = getThisMonday();
-  const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
-  const fmt = d => `${d.getMonth()+1}/${d.getDate()}`;
-  const dateRange = `${fmt(monday)} – ${fmt(sunday)}`;
-
-  // All logs this week across all players
-  const allLogs = [];
-  players.forEach(p => {
-    (p.logs || []).forEach(entry => {
-      if (typeof entry !== 'object' || !entry.ts) return;
-      if ((safeDate(entry.ts) || new Date(0)) >= monday) allLogs.push({ ...entry, _player: p });
-    });
-  });
-
-  if (!allLogs.length) { el.style.display = 'none'; return; }
-  el.style.display = '';
-
-  // 1. Most burgers logged this week (by player)
-  const byPlayer = {};
-  allLogs.forEach(e => {
-    const id = e._player.id;
-    byPlayer[id] = byPlayer[id] || { player: e._player, count: 0 };
-    byPlayer[id].count++;
-  });
-  const topPlayer = Object.values(byPlayer).sort((a, b) => b.count - a.count)[0];
-
-  // 2. Most stacked burger this week (most toppings, tie-break: most patties)
-  const stackedLogs = allLogs
-    .filter(e => e.toppings?.length > 0 || e.patties > 1)
-    .sort((a, b) => {
-      const tA = (a.toppings?.length || 0), tB = (b.toppings?.length || 0);
-      if (tB !== tA) return tB - tA;
-      return (b.patties || 1) - (a.patties || 1);
-    });
-  const topStacked = stackedLogs[0] || null;
-
-  // 3. Biggest rank jump this week
-  // For each player: rank before week = sort by (count - logsThisWeek), rank now = sort by count
-  const weekCounts = {};
-  allLogs.forEach(e => {
-    weekCounts[e._player.id] = (weekCounts[e._player.id] || 0) + 1;
-  });
-  const rankNow = [...players].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
-  const rankBefore = [...players].sort((a, b) => {
-    const aC = (a.count || 0) - (weekCounts[a.id] || 0);
-    const bC = (b.count || 0) - (weekCounts[b.id] || 0);
-    return bC - aC || a.name.localeCompare(b.name);
-  });
-  let biggestJumper = null, biggestJump = 0;
-  players.forEach(p => {
-    if (!(weekCounts[p.id] > 0)) return; // only consider players active this week
-    const before = rankBefore.findIndex(x => x.id === p.id) + 1;
-    const now    = rankNow.findIndex(x => x.id === p.id) + 1;
-    const jump   = before - now; // positive = moved up
-    if (jump > biggestJump) { biggestJump = jump; biggestJumper = { player: p, jump, now }; }
-  });
-
-  el.innerHTML = `
-<div class="wd-header">
-  <div class="wd-title" style="white-space:nowrap;font-size:clamp(9px,2.5vw,13px)">THIS WEEK'S SPECIAL MENU</div>
-  <div class="wd-dates">${dateRange}</div>
-</div>
-<div class="wd-items">
-  <div class="wd-item">
-    <div class="wd-item-label">Top Eater</div>
-    <div class="wd-item-emoji">🍔</div>
-    <div class="wd-item-val">${topPlayer.count}</div>
-    <div class="wd-item-name">${escHtml(topPlayer.player.name)}</div>
-    <div class="wd-item-sub">burger${topPlayer.count !== 1 ? 's' : ''} this week</div>
-  </div>
-  <div class="wd-item">
-    <div class="wd-item-label">Most Stacked</div>
-    <div class="wd-item-emoji">🏗️</div>
-    ${topStacked ? `
-      <div class="wd-item-val">${topStacked.toppings?.length || 0}</div>
-      <div class="wd-item-name">${escHtml(topStacked.restaurant || 'Unknown')}</div>
-      <div class="wd-item-sub">${escHtml(topStacked._player.name)} · ${'🥩'.repeat(Math.min(topStacked.patties||1,3))} ${topStacked.toppings?.length || 0} toppings</div>
-    ` : `<div class="wd-item-sub" style="margin-top:6px">No toppings logged</div>`}
-  </div>
-  <div class="wd-item">
-    <div class="wd-item-label">Biggest Jump</div>
-    <div class="wd-item-emoji">📈</div>
-    ${biggestJumper ? `
-      <div class="wd-item-val" style="color:#4ADE80;text-shadow:0 0 10px rgba(74,222,128,0.35)">+${biggestJumper.jump}</div>
-      <div class="wd-item-name">${escHtml(biggestJumper.player.name)}</div>
-      <div class="wd-item-sub">now #${biggestJumper.now} overall</div>
-    ` : `<div class="wd-item-sub" style="margin-top:6px">No rank changes</div>`}
-  </div>
-</div>`;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
