@@ -5479,24 +5479,33 @@ async function generateReceiptCanvas(d) {
   ctx.stroke();
   ctx.restore();
 
-  // Player name — leftX aligned
+  // Player name — leftX aligned, navy, vertically centered in PCRD_H
   let nameFs = 46;
   ctx.font = `700 ${nameFs}px 'Russo One', sans-serif`;
   while (ctx.measureText(d.name).width > rightX - leftX - 160 && nameFs > 20) {
     nameFs--;
     ctx.font = `700 ${nameFs}px 'Russo One', sans-serif`;
   }
+  // Center vertically: baseline = y + (PCRD_H + capHeight) / 2
+  const nameCap = Math.round(nameFs * 0.72);
+  const nameBaseY = y + Math.round((PCRD_H + nameCap) / 2);
   ctx.textAlign = 'left';
-  ctx.fillStyle = playerColor;
-  ctx.fillText(d.name, leftX, y + Math.round(nameFs * 0.78) + 10);
+  ctx.fillStyle = '#0b3550';   // navy — unified with the rest of the card
+  ctx.fillText(d.name, leftX, nameBaseY);
+
+  // Right-side two-line pair — vertically centered as a unit
+  // Pair span (top of line1 cap → bottom of line2 descender) ≈ 34px
+  // Center of pair at PCRD_H/2 → line1 baseline = PCRD_H/2 - 4 = 39
+  const rL1Y = y + 39;   // "34/100 🍔" baseline
+  const rL2Y = y + 57;   // "date 📅  ·  time 🕐" baseline
 
   ctx.textAlign = 'right';
   ctx.font = "700 16px 'Outfit', sans-serif";
   ctx.fillStyle = 'rgba(11,53,80,0.7)';
-  ctx.fillText('Log #' + d.count + ' / 100', rightX, y + 30);
+  ctx.fillText(d.count + '/100 🍔', rightX, rL1Y);
   ctx.font = "400 12px 'Outfit', sans-serif";
   ctx.fillStyle = 'rgba(11,53,80,0.45)';
-  ctx.fillText(d.dateStr + '  ·  ' + d.timeStr, rightX, y + 50);
+  ctx.fillText(d.dateStr + ' 📅  ·  ' + d.timeStr + ' 🕐', rightX, rL2Y);
 
   y += PCRD_H + 18;
 
