@@ -5363,7 +5363,7 @@ function _drawStar(ctx, cx, cy, spikes, outerR, innerR) {
 
 async function generateReceiptCanvas(d) {
   const W = 800, H = 1200, DPR = 2;
-  const PAD = 36; // horizontal padding inside borders
+  const PAD = 40;
   await document.fonts.ready;
 
   // Player colour palette — matches c0–c17 CSS classes
@@ -5386,212 +5386,257 @@ async function generateReceiptCanvas(d) {
     });
   }
 
-  // Fixed 800 × 1200 trading card canvas (2× DPR for retina sharpness)
+  // Fixed 800 × 1200 canvas (2× DPR for retina sharpness)
   const canvas = document.createElement('canvas');
   canvas.width  = W * DPR;
   canvas.height = H * DPR;
   const ctx = canvas.getContext('2d');
   ctx.scale(DPR, DPR);
 
-  // ── BACKGROUND ────────────────────────────────────────────
-  ctx.fillStyle = '#F2F9FD';
+  // ── BACKGROUND: sky blue gradient ─────────────────────────
+  const bgGrad = ctx.createLinearGradient(0, 0, W * 0.6, H);
+  bgGrad.addColorStop(0,    '#8ec8e8');
+  bgGrad.addColorStop(0.45, '#a8d4ed');
+  bgGrad.addColorStop(1,    '#c4e3f5');
+  ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, W, H);
 
-  // Subtle diagonal stripe texture (gives it a premium card feel)
-  ctx.save();
-  ctx.strokeStyle = 'rgba(11,53,80,0.025)';
-  ctx.lineWidth = 1;
-  for (let i = -H; i < W + H; i += 18) {
-    ctx.beginPath();
-    ctx.moveTo(i, 0);
-    ctx.lineTo(i + H, H);
-    ctx.stroke();
-  }
-  ctx.restore();
+  // Atmospheric radial glows (cloud/sky depth)
+  const glow1 = ctx.createRadialGradient(W * 0.18, H * 0.08, 0, W * 0.18, H * 0.08, 360);
+  glow1.addColorStop(0, 'rgba(255,255,255,0.22)');
+  glow1.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = glow1; ctx.fillRect(0, 0, W, H);
 
-  // ── OUTER BORDER: 3px solid deep blue ─────────────────────
-  ctx.strokeStyle = '#0b3550';
-  ctx.lineWidth = 3;
+  const glow2 = ctx.createRadialGradient(W * 0.85, H * 0.6, 0, W * 0.85, H * 0.6, 300);
+  glow2.addColorStop(0, 'rgba(255,255,255,0.14)');
+  glow2.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = glow2; ctx.fillRect(0, 0, W, H);
+
+  // ── OUTER GLASS BORDER ────────────────────────────────────
+  ctx.strokeStyle = 'rgba(255,255,255,0.75)';
+  ctx.lineWidth = 2.5;
   ctx.setLineDash([]);
   ctx.strokeRect(1.5, 1.5, W - 3, H - 3);
 
-  // ── INNER DASHED BORDER: classic Americana ticket feel ─────
-  ctx.strokeStyle = 'rgba(11,53,80,0.3)';
+  // Inner soft dashed border
+  ctx.strokeStyle = 'rgba(255,255,255,0.35)';
   ctx.lineWidth = 1;
-  ctx.setLineDash([6, 4]);
+  ctx.setLineDash([6, 5]);
   ctx.strokeRect(14, 14, W - 28, H - 28);
   ctx.setLineDash([]);
 
-  // ── HEADER ────────────────────────────────────────────────
-  let y = 54; // 18px extra breathing room from top border
+  // ── HEADER GLASS BAND ─────────────────────────────────────
+  const HDR_H = 118;
+  const HDR_Y = 22;
+  // Base: semi-transparent deep navy glass
+  ctx.save();
+  _rcptRoundRect(ctx, 22, HDR_Y, W - 44, HDR_H, 16);
+  ctx.fillStyle = 'rgba(11,53,80,0.82)';
+  ctx.fill();
+  // Top sheen highlight
+  _rcptRoundRect(ctx, 22, HDR_Y, W - 44, HDR_H, 16);
+  const hdrSheen = ctx.createLinearGradient(0, HDR_Y, 0, HDR_Y + HDR_H);
+  hdrSheen.addColorStop(0, 'rgba(255,255,255,0.14)');
+  hdrSheen.addColorStop(0.5, 'rgba(255,255,255,0.03)');
+  hdrSheen.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = hdrSheen; ctx.fill();
+  // Glassy border
+  _rcptRoundRect(ctx, 22, HDR_Y, W - 44, HDR_H, 16);
+  ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+  ctx.restore();
 
-  // Challenge title
+  // Header text
+  let y = HDR_Y + 44;
   ctx.textAlign = 'center';
-  ctx.font = "700 44px 'Outfit', sans-serif";
-  ctx.fillStyle = '#0b3550';
-  ctx.fillText('🍔  100 BURGER CHALLENGE', W / 2, y + 40);
-  y += 62;
-
-  // Room / season subtitle
-  ctx.font = "500 15px 'Outfit', sans-serif";
-  ctx.fillStyle = 'rgba(11,53,80,0.42)';
+  ctx.font = "700 38px 'Outfit', sans-serif";
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText('🍔  100 BURGER CHALLENGE', W / 2, y);
+  y += 30;
+  ctx.font = "500 14px 'Outfit', sans-serif";
+  ctx.fillStyle = 'rgba(255,255,255,0.58)';
   ctx.fillText('THE SUMMER GRIND  ·  ROOM ' + (roomId || '—'), W / 2, y);
-  y += 24;
 
-  // Decorative full-width rule
-  const ruleG = ctx.createLinearGradient(PAD, 0, W - PAD, 0);
-  ruleG.addColorStop(0, 'rgba(11,53,80,0)');
-  ruleG.addColorStop(0.5, 'rgba(11,53,80,0.28)');
-  ruleG.addColorStop(1, 'rgba(11,53,80,0)');
-  ctx.fillStyle = ruleG;
-  ctx.fillRect(PAD, y, W - PAD * 2, 1.5);
-  y += 20;
+  y = HDR_Y + HDR_H + 20;
 
-  // Player name (left, in their color) + Log count badge (right)
-  let nameFs = 48;
-  ctx.font = `${nameFs}px 'Russo One', sans-serif`;
-  while (ctx.measureText(d.name).width > W - PAD * 2 - 180 && nameFs > 22) {
+  // ── PLAYER CARD GLASS PANEL ───────────────────────────────
+  const PCRD_H = 86;
+  ctx.save();
+  _rcptRoundRect(ctx, 22, y, W - 44, PCRD_H, 14);
+  ctx.fillStyle = 'rgba(255,255,255,0.58)';
+  ctx.fill();
+  const pcSheen = ctx.createLinearGradient(0, y, 0, y + PCRD_H);
+  pcSheen.addColorStop(0, 'rgba(255,255,255,0.22)');
+  pcSheen.addColorStop(1, 'rgba(255,255,255,0)');
+  _rcptRoundRect(ctx, 22, y, W - 44, PCRD_H, 14);
+  ctx.fillStyle = pcSheen; ctx.fill();
+  _rcptRoundRect(ctx, 22, y, W - 44, PCRD_H, 14);
+  ctx.strokeStyle = 'rgba(255,255,255,0.72)';
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+  ctx.restore();
+
+  // Player name
+  let nameFs = 46;
+  ctx.font = `700 ${nameFs}px 'Russo One', sans-serif`;
+  while (ctx.measureText(d.name).width > W - PAD * 2 - 200 && nameFs > 20) {
     nameFs--;
-    ctx.font = `${nameFs}px 'Russo One', sans-serif`;
+    ctx.font = `700 ${nameFs}px 'Russo One', sans-serif`;
   }
   ctx.textAlign = 'left';
   ctx.fillStyle = playerColor;
-  ctx.fillText(d.name, PAD + 6, y + Math.round(nameFs * 0.82));
+  ctx.fillText(d.name, PAD + 14, y + Math.round(nameFs * 0.78) + 10);
 
-  // Log count (right-aligned)
   ctx.textAlign = 'right';
-  ctx.font = "700 18px 'Courier New', monospace";
-  ctx.fillStyle = playerColor;
-  ctx.fillText('Log #' + d.count + ' / 100', W - PAD - 6, y + 22);
-  ctx.font = "500 13px 'Outfit', sans-serif";
-  ctx.fillStyle = 'rgba(11,53,80,0.4)';
-  ctx.fillText(d.dateStr + '  ·  ' + d.timeStr, W - PAD - 6, y + 42);
+  ctx.font = "700 16px 'Outfit', sans-serif";
+  ctx.fillStyle = 'rgba(11,53,80,0.7)';
+  ctx.fillText('Log #' + d.count + ' / 100', W - PAD - 14, y + 30);
+  ctx.font = "400 12px 'Outfit', sans-serif";
+  ctx.fillStyle = 'rgba(11,53,80,0.45)';
+  ctx.fillText(d.dateStr + '  ·  ' + d.timeStr, W - PAD - 14, y + 50);
 
-  y += nameFs + 20;
+  y += PCRD_H + 18;
 
-  // Decorative rule
-  ctx.fillStyle = ruleG;
-  ctx.fillRect(PAD, y, W - PAD * 2, 1.5);
-  y += 14;
-
-  // ── HERO PHOTO FRAME ──────────────────────────────────────
-  const PHOTO_SIZE = 650;
-  const photoX = Math.round((W - PHOTO_SIZE) / 2); // 75px either side
+  // ── HERO PHOTO ────────────────────────────────────────────
+  const PHOTO_SIZE = 636;
+  const photoX = Math.round((W - PHOTO_SIZE) / 2);
   const photoY = y;
+  const photoR = 14;
 
   if (burgerImg) {
-    // White mat with drop shadow behind photo
+    // Glass mat + drop shadow
     ctx.save();
-    ctx.shadowColor = 'rgba(11,53,80,0.24)';
-    ctx.shadowBlur = 22;
+    ctx.shadowColor = 'rgba(11,53,80,0.3)';
+    ctx.shadowBlur = 28;
     ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 7;
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(photoX - 6, photoY - 6, PHOTO_SIZE + 12, PHOTO_SIZE + 12);
+    ctx.shadowOffsetY = 8;
+    _rcptRoundRect(ctx, photoX - 8, photoY - 8, PHOTO_SIZE + 16, PHOTO_SIZE + 16, photoR + 4);
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.fill();
     ctx.restore();
-
-    // Center-crop photo into square (object-fit: cover)
+    // Clipped cover-crop photo
     ctx.save();
-    ctx.beginPath();
-    ctx.rect(photoX, photoY, PHOTO_SIZE, PHOTO_SIZE);
+    _rcptRoundRect(ctx, photoX, photoY, PHOTO_SIZE, PHOTO_SIZE, photoR);
     ctx.clip();
     const iw = burgerImg.naturalWidth, ih = burgerImg.naturalHeight;
-    const imgAR = iw / ih;
     let sx = 0, sy = 0, sw = iw, sh = ih;
-    if (imgAR > 1) { sw = ih; sx = (iw - sw) / 2; }
-    else           { sh = iw; sy = (ih - sh) / 2; }
+    if (iw / ih > 1) { sw = ih; sx = (iw - sw) / 2; }
+    else              { sh = iw; sy = (ih - sh) / 2; }
     ctx.drawImage(burgerImg, sx, sy, sw, sh, photoX, photoY, PHOTO_SIZE, PHOTO_SIZE);
     ctx.restore();
-
-    // 2px border over photo
-    ctx.strokeStyle = '#0b3550';
+    // Glassy white border over photo
+    _rcptRoundRect(ctx, photoX, photoY, PHOTO_SIZE, PHOTO_SIZE, photoR);
+    ctx.strokeStyle = 'rgba(255,255,255,0.7)';
     ctx.lineWidth = 2;
     ctx.setLineDash([]);
-    ctx.strokeRect(photoX, photoY, PHOTO_SIZE, PHOTO_SIZE);
+    ctx.stroke();
   } else {
     // Placeholder frame
-    ctx.fillStyle = '#ddeef8';
-    ctx.fillRect(photoX, photoY, PHOTO_SIZE, PHOTO_SIZE);
-    ctx.strokeStyle = '#0b3550';
+    ctx.save();
+    _rcptRoundRect(ctx, photoX, photoY, PHOTO_SIZE, PHOTO_SIZE, photoR);
+    ctx.fillStyle = 'rgba(255,255,255,0.38)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.65)';
     ctx.lineWidth = 2;
-    ctx.strokeRect(photoX, photoY, PHOTO_SIZE, PHOTO_SIZE);
-    ctx.font = '80px serif';
+    ctx.stroke();
+    ctx.restore();
+    ctx.font = '90px serif';
     ctx.textAlign = 'center';
-    ctx.fillStyle = 'rgba(11,53,80,0.15)';
-    ctx.fillText('🍔', W / 2, photoY + PHOTO_SIZE / 2 + 28);
+    ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.fillText('🍔', W / 2, photoY + PHOTO_SIZE / 2 + 32);
   }
 
-  y = photoY + PHOTO_SIZE + 22;
+  y = photoY + PHOTO_SIZE + 20;
 
-  // ── TEXT SHIELD: semi-transparent white panel ──────────────
-  // Ensures bottom stats are 100% legible over any photo bleed
-  ctx.fillStyle = 'rgba(255,255,255,0.88)';
-  ctx.fillRect(14, y - 10, W - 28, H - 14 - (y - 10));
+  // ── STATS GLASS PANEL ─────────────────────────────────────
+  const statsTop = y;
+  const statsH = H - statsTop - 22;
+  ctx.save();
+  _rcptRoundRect(ctx, 22, statsTop, W - 44, statsH, 14);
+  ctx.fillStyle = 'rgba(255,255,255,0.68)';
+  ctx.fill();
+  const stSheen = ctx.createLinearGradient(0, statsTop, 0, statsTop + statsH);
+  stSheen.addColorStop(0, 'rgba(255,255,255,0.28)');
+  stSheen.addColorStop(1, 'rgba(255,255,255,0.04)');
+  _rcptRoundRect(ctx, 22, statsTop, W - 44, statsH, 14);
+  ctx.fillStyle = stSheen; ctx.fill();
+  _rcptRoundRect(ctx, 22, statsTop, W - 44, statsH, 14);
+  ctx.strokeStyle = 'rgba(255,255,255,0.78)';
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+  ctx.restore();
 
-  // ── BOTTOM STATS PANE ─────────────────────────────────────
-  ctx.fillStyle = ruleG;
-  ctx.fillRect(PAD, y, W - PAD * 2, 1.5);
-  y += 18;
+  const ruleG = ctx.createLinearGradient(PAD, 0, W - PAD, 0);
+  ruleG.addColorStop(0, 'rgba(11,53,80,0)');
+  ruleG.addColorStop(0.5, 'rgba(11,53,80,0.18)');
+  ruleG.addColorStop(1, 'rgba(11,53,80,0)');
+
+  y = statsTop + 18;
 
   // Restaurant name (left) + build label (right)
   ctx.textAlign = 'left';
-  ctx.font = "700 22px 'Outfit', sans-serif";
+  ctx.font = "700 21px 'Outfit', sans-serif";
   ctx.fillStyle = '#0b3550';
   const restDisplay = '📍 ' + (d.restaurant || 'Unknown Spot');
-  ctx.fillText(restDisplay, PAD + 6, y + 24);
+  ctx.fillText(restDisplay, PAD + 14, y + 24);
 
   const buildLabel = d.menuItem
     ? `${d.menuEmoji || '🍔'} ${d.menuItem}`
     : `${d.pattyLabel}-Patty Smash`;
   ctx.textAlign = 'right';
-  ctx.font = "500 17px 'Outfit', sans-serif";
+  ctx.font = "500 15px 'Outfit', sans-serif";
   ctx.fillStyle = 'rgba(11,53,80,0.55)';
-  ctx.fillText(buildLabel, W - PAD - 6, y + 24);
-  y += 48;
+  ctx.fillText(buildLabel, W - PAD - 14, y + 24);
+  y += 46;
 
-  // Star rating (drawn stars + numeric label)
+  ctx.fillStyle = ruleG;
+  ctx.fillRect(PAD + 14, y, W - (PAD + 14) * 2, 1);
+  y += 16;
+
+  // Star rating
   if (d.rating) {
     const SR = 19, SG = 7;
-    let stx = PAD + 6;
+    let stx = PAD + 14;
     const sCY = y + SR;
     for (let i = 0; i < 5; i++) {
       const fill = i < Math.floor(d.rating);
       const half = !fill && i === Math.floor(d.rating) && (d.rating % 1) >= 0.5;
       ctx.save();
       _drawStar(ctx, stx + SR, sCY, 5, SR, SR * 0.42);
-      ctx.fillStyle = (fill || half) ? '#F59E0B' : 'rgba(11,53,80,0.13)';
+      ctx.fillStyle = (fill || half) ? '#F59E0B' : 'rgba(11,53,80,0.12)';
       ctx.globalAlpha = half ? 0.55 : 1;
       ctx.fill();
       ctx.restore();
       stx += SR * 2 + SG;
     }
     ctx.globalAlpha = 1;
-    ctx.font = "700 22px 'Outfit', sans-serif";
+    ctx.font = "700 20px 'Outfit', sans-serif";
     ctx.textAlign = 'left';
     ctx.fillStyle = '#F59E0B';
-    ctx.fillText(d.rating + ' / 5 Stars', stx + 10, y + SR + 8);
+    ctx.fillText(d.rating + ' / 5 Stars', stx + 10, y + SR + 6);
   }
-  y += 54;
+  y += 52;
 
-  // Toppings row
+  // Toppings pills
   if (d.toppings && d.toppings.length > 0) {
-    ctx.font = "400 12px 'Courier New', monospace";
+    ctx.font = "400 11px 'Courier New', monospace";
     ctx.textAlign = 'left';
-    ctx.fillStyle = 'rgba(11,53,80,0.38)';
-    ctx.fillText('TOPPINGS', PAD + 6, y);
-    y += 12;
+    ctx.fillStyle = 'rgba(11,53,80,0.4)';
+    ctx.fillText('TOPPINGS', PAD + 14, y);
+    y += 14;
 
-    ctx.font = "500 17px 'Outfit', sans-serif";
-    const PH = 36, PPX = 14, PGX = 8, PGY = 9;
-    let tx = PAD + 6, ty = y;
+    ctx.font = "500 15px 'Outfit', sans-serif";
+    const PH = 34, PPX = 13, PGX = 7, PGY = 8;
+    let tx = PAD + 14, ty = y;
     for (const top of d.toppings) {
       const tw = ctx.measureText(top).width + PPX * 2;
-      if (tx + tw > W - PAD - 6 && tx > PAD + 6) { tx = PAD + 6; ty += PH + PGY; }
+      if (tx + tw > W - PAD - 14 && tx > PAD + 14) { tx = PAD + 14; ty += PH + PGY; }
       ctx.save();
       _rcptRoundRect(ctx, tx, ty, tw, PH, PH / 2);
-      ctx.fillStyle = 'rgba(11,53,80,0.06)';
+      ctx.fillStyle = 'rgba(26,112,170,0.1)';
       ctx.fill();
-      ctx.strokeStyle = 'rgba(11,53,80,0.2)';
+      ctx.strokeStyle = 'rgba(26,112,170,0.3)';
       ctx.lineWidth = 1.2;
       ctx.stroke();
       ctx.restore();
@@ -5600,20 +5645,20 @@ async function generateReceiptCanvas(d) {
       ctx.fillText(top, tx + PPX, ty + PH * 0.665);
       tx += tw + PGX;
     }
-    y = ty + PH + 16;
+    y = ty + PH + 12;
   } else {
-    ctx.font = "500 17px 'Outfit', sans-serif";
+    ctx.font = "500 15px 'Outfit', sans-serif";
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(11,53,80,0.3)';
-    ctx.fillText('Classic build', PAD + 6, y + 17);
-    y += 36;
+    ctx.fillText('Classic build', PAD + 14, y + 17);
+    y += 34;
   }
 
   // ── FOOTER ───────────────────────────────────────────────
-  const footerY = H - 34;
+  const footerY = H - 20;
   ctx.textAlign = 'center';
-  ctx.font = "400 12px 'Courier New', monospace";
-  ctx.fillStyle = 'rgba(11,53,80,0.22)';
+  ctx.font = "400 11px 'Courier New', monospace";
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
   ctx.fillText('☀️  THE 100 BURGER SUMMER GRIND  ·  KEEP EATING BURGERS', W / 2, footerY);
 
   return canvas;
