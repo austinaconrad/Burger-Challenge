@@ -7058,17 +7058,19 @@ function renderRestaurantLB() {
 (function() {
   const PIECE_H = 30;
 
-  // Each layer carries a semantic `type` used by the vector draw dispatcher
-  const LAYERS = [
-    { type:'bun_bot', label:'Bottom Bun', fill:'#D4956A', stroke:'#A06030' },
-    { type:'patty',   label:'Patty',      fill:'#5C2E0A', stroke:'#3D1A04' },
-    { type:'cheese',  label:'Cheese',     fill:'#F5C518', stroke:'#C49A00' },
-    { type:'lettuce', label:'Lettuce',    fill:'#22C55E', stroke:'#15803D' },
-    { type:'tomato',  label:'Tomato',     fill:'#EF4444', stroke:'#B91C1C' },
-    { type:'bacon',   label:'Bacon',      fill:'#C2410C', stroke:'#9A3412' },
-    { type:'onion',   label:'Onion',      fill:'#C084FC', stroke:'#9333EA' },
-    { type:'pickle',  label:'Pickle',     fill:'#4ADE80', stroke:'#16A34A' },
-    { type:'bun_top', label:'Top Bun',    fill:'#D4A56A', stroke:'#A06030' },
+  // Fixed buns — not part of the drop cycle
+  const BUN_BOT = { type:'bun_bot', label:'Bottom Bun', fill:'#D4956A', stroke:'#A06030' };
+  const BUN_TOP = { type:'bun_top', label:'Top Bun',    fill:'#D4A56A', stroke:'#A06030' };
+
+  // Toppings only — what the player actually stacks
+  const TOPPINGS = [
+    { type:'patty',   label:'Patty',   fill:'#5C2E0A', stroke:'#3D1A04' },
+    { type:'cheese',  label:'Cheese',  fill:'#F5C518', stroke:'#C49A00' },
+    { type:'lettuce', label:'Lettuce', fill:'#22C55E', stroke:'#15803D' },
+    { type:'tomato',  label:'Tomato',  fill:'#EF4444', stroke:'#B91C1C' },
+    { type:'bacon',   label:'Bacon',   fill:'#C2410C', stroke:'#9A3412' },
+    { type:'onion',   label:'Onion',   fill:'#C084FC', stroke:'#9333EA' },
+    { type:'pickle',  label:'Pickle',  fill:'#4ADE80', stroke:'#16A34A' },
   ];
 
   const W = 320, H = 500;
@@ -7084,6 +7086,7 @@ function renderRestaurantLB() {
   let layerIdx = 0;
   let bsTopScore = 0, bsTopName = '';
   let spaceDown = false;
+  let endBun = null;      // animated top bun that falls on game over
 
   function $id(id){ return document.getElementById(id); }
 
@@ -7123,16 +7126,15 @@ function renderRestaurantLB() {
 
   // ── Game lifecycle ────────────────────────────────────────
   function resetGame() {
-    score = 0; speed = 2.5; layerIdx = 0; cameraY = 0; falling = [];
+    score = 0; speed = 2.5; layerIdx = 0; cameraY = 0; falling = []; endBun = null;
     const startW = 190, startX = (W - startW) / 2;
-    stack = [{ x: startX, w: startW, y: H - PIECE_H - 8, ...LAYERS[0] }];
-    layerIdx = 1;
+    stack = [{ x: startX, w: startW, y: H - PIECE_H - 8, ...BUN_BOT }];
     spawnCurrent();
   }
 
   function spawnCurrent() {
     const top = stack[stack.length - 1];
-    const layer = LAYERS[layerIdx % LAYERS.length];
+    const layer = TOPPINGS[layerIdx % TOPPINGS.length];
     cur = { x: 0, w: top.w, dir: 1, ...layer };
     layerIdx++;
   }
@@ -7168,8 +7170,40 @@ function renderRestaurantLB() {
   function endGame() {
     state = 'over';
     if (raf) { cancelAnimationFrame(raf); raf = null; }
+
+    // Drop a top bun from above the visible canvas onto the finished tower
+    const top = stack[stack.length - 1];
+    const bunW  = Math.min(top.w + 10, 190); // slightly wider than top piece
+    const bunX  = top.x + (top.w - bunW) / 2;
+    const landY = top.y - PIECE_H - 2;       // just above the top piece
+    endBun = {
+      x: bunX, w: bunW,
+      y: -cameraY - PIECE_H * 3,             // start above visible canvas top
+      vy: 0, landY, bounces: 0,
+    };
+    animateEndBun();
+  }
+
+  function animateEndBun() {
+    if (!endBun) return;
+    endBun.vy += 1.1;           // gravity
+    endBun.y  += endBun.vy;
+
+    if (endBun.y >= endBun.landY) {
+      endBun.y   = endBun.landY;
+      endBun.vy *= -0.38;       // bounce with energy loss
+      endBun.bounces++;
+      if (Math.abs(endBun.vy) < 1.5 || endBun.bounces >= 4) {
+        // Settled — draw final frame then reveal overlay after short pause
+        endBun.y  = endBun.landY;
+        endBun.vy = 0;
+        drawFrame();
+        setTimeout(() => showOverlay(true), 520);
+        return;
+      }
+    }
     drawFrame();
-    showOverlay(true);
+    requestAnimationFrame(animateEndBun);
   }
 
   // ── Game loop ─────────────────────────────────────────────
@@ -7585,6 +7619,11 @@ function renderRestaurantLB() {
       ctx.lineTo(cur.x + cur.w / 2, top.y);
       ctx.stroke();
       ctx.setLineDash([]); ctx.restore();
+    }
+
+    // Animated top bun — falls in on game over
+    if (endBun) {
+      drawIngredient({ x: endBun.x, y: endBun.y, w: endBun.w, h: PIECE_H, ...BUN_TOP });
     }
 
     ctx.restore(); // ── end camera ──
