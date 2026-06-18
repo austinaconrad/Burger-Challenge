@@ -5362,8 +5362,10 @@ function _drawStar(ctx, cx, cy, spikes, outerR, innerR) {
 }
 
 async function generateReceiptCanvas(d) {
-  const W = 800, H = 1200, DPR = 2;
-  const PAD = 40;
+  const W    = 800, H = 1200, DPR = 2;
+  const PAD  = 40;
+  const leftX  = PAD + 14;      // 54 — unified left text grid line
+  const rightX = W - PAD - 14;  // 746 — unified right text grid line
   await document.fonts.ready;
 
   // Player colour palette — matches c0–c17 CSS classes
@@ -5425,40 +5427,40 @@ async function generateReceiptCanvas(d) {
   ctx.strokeRect(14, 14, W - 28, H - 28);
   ctx.setLineDash([]);
 
-  // ── HEADER GLASS BAND ─────────────────────────────────────
-  const HDR_H = 118;
+  // ── HEADER GLASS BAND — text precisely centered vertically ─
+  const HDR_H = 140;   // taller band gives the title breathing room
   const HDR_Y = 22;
-  // Base: semi-transparent deep navy glass
   ctx.save();
   _rcptRoundRect(ctx, 22, HDR_Y, W - 44, HDR_H, 16);
   ctx.fillStyle = 'rgba(11,53,80,0.82)';
   ctx.fill();
-  // Top sheen highlight
   _rcptRoundRect(ctx, 22, HDR_Y, W - 44, HDR_H, 16);
   const hdrSheen = ctx.createLinearGradient(0, HDR_Y, 0, HDR_Y + HDR_H);
   hdrSheen.addColorStop(0, 'rgba(255,255,255,0.14)');
   hdrSheen.addColorStop(0.5, 'rgba(255,255,255,0.03)');
   hdrSheen.addColorStop(1, 'rgba(255,255,255,0)');
   ctx.fillStyle = hdrSheen; ctx.fill();
-  // Glassy border
   _rcptRoundRect(ctx, 22, HDR_Y, W - 44, HDR_H, 16);
   ctx.strokeStyle = 'rgba(255,255,255,0.28)';
   ctx.lineWidth = 1.2;
   ctx.stroke();
   ctx.restore();
 
-  // Header text
-  let y = HDR_Y + 44;
+  // Vertically center the two-line block inside the band:
+  // band center = HDR_Y + HDR_H/2 = 92.
+  // 38px title (cap≈28) + 28px leading + 14px subtitle (cap≈10) → block height≈66
+  // place title baseline so block is centered: 92 - 66/2 + 28 = 92 - 5 = 87
+  const titleY    = HDR_Y + Math.round(HDR_H * 0.48); // ≈ 89
+  const subtitleY = titleY + 28;
   ctx.textAlign = 'center';
   ctx.font = "700 38px 'Outfit', sans-serif";
   ctx.fillStyle = '#ffffff';
-  ctx.fillText('🍔  100 BURGER CHALLENGE', W / 2, y);
-  y += 30;
+  ctx.fillText('🍔  100 BURGER CHALLENGE', W / 2, titleY);
   ctx.font = "500 14px 'Outfit', sans-serif";
   ctx.fillStyle = 'rgba(255,255,255,0.58)';
-  ctx.fillText('THE SUMMER GRIND  ·  ROOM ' + (roomId || '—'), W / 2, y);
+  ctx.fillText('THE SUMMER GRIND  ·  ROOM ' + (roomId || '—'), W / 2, subtitleY);
 
-  y = HDR_Y + HDR_H + 20;
+  let y = HDR_Y + HDR_H + 20;
 
   // ── PLAYER CARD GLASS PANEL ───────────────────────────────
   const PCRD_H = 86;
@@ -5477,32 +5479,32 @@ async function generateReceiptCanvas(d) {
   ctx.stroke();
   ctx.restore();
 
-  // Player name
+  // Player name — leftX aligned
   let nameFs = 46;
   ctx.font = `700 ${nameFs}px 'Russo One', sans-serif`;
-  while (ctx.measureText(d.name).width > W - PAD * 2 - 200 && nameFs > 20) {
+  while (ctx.measureText(d.name).width > rightX - leftX - 160 && nameFs > 20) {
     nameFs--;
     ctx.font = `700 ${nameFs}px 'Russo One', sans-serif`;
   }
   ctx.textAlign = 'left';
   ctx.fillStyle = playerColor;
-  ctx.fillText(d.name, PAD + 14, y + Math.round(nameFs * 0.78) + 10);
+  ctx.fillText(d.name, leftX, y + Math.round(nameFs * 0.78) + 10);
 
   ctx.textAlign = 'right';
   ctx.font = "700 16px 'Outfit', sans-serif";
   ctx.fillStyle = 'rgba(11,53,80,0.7)';
-  ctx.fillText('Log #' + d.count + ' / 100', W - PAD - 14, y + 30);
+  ctx.fillText('Log #' + d.count + ' / 100', rightX, y + 30);
   ctx.font = "400 12px 'Outfit', sans-serif";
   ctx.fillStyle = 'rgba(11,53,80,0.45)';
-  ctx.fillText(d.dateStr + '  ·  ' + d.timeStr, W - PAD - 14, y + 50);
+  ctx.fillText(d.dateStr + '  ·  ' + d.timeStr, rightX, y + 50);
 
   y += PCRD_H + 18;
 
-  // ── HERO PHOTO ────────────────────────────────────────────
+  // ── HERO PHOTO — exactly centered: (800−636)/2 = 82px each side ──
   const PHOTO_SIZE = 636;
-  const photoX = Math.round((W - PHOTO_SIZE) / 2);
+  const photoX = (W - PHOTO_SIZE) / 2;  // = 82, symmetric margin
   const photoY = y;
-  const photoR = 14;
+  const photoR  = 14;
 
   if (burgerImg) {
     // Glass mat + drop shadow
@@ -5551,7 +5553,8 @@ async function generateReceiptCanvas(d) {
 
   // ── STATS GLASS PANEL ─────────────────────────────────────
   const statsTop = y;
-  const statsH = H - statsTop - 22;
+  // Reserve 52px at bottom for footer shield + breathing room
+  const statsH   = H - statsTop - 60;
   ctx.save();
   _rcptRoundRect(ctx, 22, statsTop, W - 44, statsH, 14);
   ctx.fillStyle = 'rgba(255,255,255,0.68)';
@@ -5567,19 +5570,18 @@ async function generateReceiptCanvas(d) {
   ctx.stroke();
   ctx.restore();
 
-  const ruleG = ctx.createLinearGradient(PAD, 0, W - PAD, 0);
+  const ruleG = ctx.createLinearGradient(leftX, 0, rightX, 0);
   ruleG.addColorStop(0, 'rgba(11,53,80,0)');
   ruleG.addColorStop(0.5, 'rgba(11,53,80,0.18)');
   ruleG.addColorStop(1, 'rgba(11,53,80,0)');
 
   y = statsTop + 18;
 
-  // Restaurant name (left) + build label (right)
+  // Restaurant + build — leftX / rightX aligned
   ctx.textAlign = 'left';
   ctx.font = "700 21px 'Outfit', sans-serif";
   ctx.fillStyle = '#0b3550';
-  const restDisplay = '📍 ' + (d.restaurant || 'Unknown Spot');
-  ctx.fillText(restDisplay, PAD + 14, y + 24);
+  ctx.fillText('📍 ' + (d.restaurant || 'Unknown Spot'), leftX, y + 24);
 
   const buildLabel = d.menuItem
     ? `${d.menuEmoji || '🍔'} ${d.menuItem}`
@@ -5587,17 +5589,17 @@ async function generateReceiptCanvas(d) {
   ctx.textAlign = 'right';
   ctx.font = "500 15px 'Outfit', sans-serif";
   ctx.fillStyle = 'rgba(11,53,80,0.55)';
-  ctx.fillText(buildLabel, W - PAD - 14, y + 24);
+  ctx.fillText(buildLabel, rightX, y + 24);
   y += 46;
 
   ctx.fillStyle = ruleG;
-  ctx.fillRect(PAD + 14, y, W - (PAD + 14) * 2, 1);
+  ctx.fillRect(leftX, y, rightX - leftX, 1);
   y += 16;
 
-  // Star rating
+  // Stars — leftX aligned
   if (d.rating) {
     const SR = 19, SG = 7;
-    let stx = PAD + 14;
+    let stx = leftX;
     const sCY = y + SR;
     for (let i = 0; i < 5; i++) {
       const fill = i < Math.floor(d.rating);
@@ -5618,20 +5620,20 @@ async function generateReceiptCanvas(d) {
   }
   y += 52;
 
-  // Toppings pills
+  // Toppings pills — leftX / rightX aligned
   if (d.toppings && d.toppings.length > 0) {
     ctx.font = "400 11px 'Courier New', monospace";
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(11,53,80,0.4)';
-    ctx.fillText('TOPPINGS', PAD + 14, y);
+    ctx.fillText('TOPPINGS', leftX, y);
     y += 14;
 
     ctx.font = "500 15px 'Outfit', sans-serif";
     const PH = 34, PPX = 13, PGX = 7, PGY = 8;
-    let tx = PAD + 14, ty = y;
+    let tx = leftX, ty = y;
     for (const top of d.toppings) {
       const tw = ctx.measureText(top).width + PPX * 2;
-      if (tx + tw > W - PAD - 14 && tx > PAD + 14) { tx = PAD + 14; ty += PH + PGY; }
+      if (tx + tw > rightX && tx > leftX) { tx = leftX; ty += PH + PGY; }
       ctx.save();
       _rcptRoundRect(ctx, tx, ty, tw, PH, PH / 2);
       ctx.fillStyle = 'rgba(26,112,170,0.1)';
@@ -5650,15 +5652,24 @@ async function generateReceiptCanvas(d) {
     ctx.font = "500 15px 'Outfit', sans-serif";
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(11,53,80,0.3)';
-    ctx.fillText('Classic build', PAD + 14, y + 17);
+    ctx.fillText('Classic build', leftX, y + 17);
     y += 34;
   }
 
-  // ── FOOTER ───────────────────────────────────────────────
-  const footerY = H - 20;
+  // ── FOOTER with legibility shield ─────────────────────────
+  // Pill-shaped frosted white backing guarantees readability over any photo
+  const footerY      = H - 18;
+  const shieldPad    = 10;
+  const shieldHeight = 34;
+  ctx.save();
+  _rcptRoundRect(ctx, 22, footerY - shieldHeight + shieldPad, W - 44, shieldHeight, 10);
+  ctx.fillStyle = 'rgba(255,255,255,0.65)';
+  ctx.fill();
+  ctx.restore();
+
   ctx.textAlign = 'center';
   ctx.font = "400 11px 'Courier New', monospace";
-  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.fillStyle = 'rgba(11,53,80,0.5)';
   ctx.fillText('☀️  THE 100 BURGER SUMMER GRIND  ·  KEEP EATING BURGERS', W / 2, footerY);
 
   return canvas;
