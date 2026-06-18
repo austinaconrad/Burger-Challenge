@@ -5315,37 +5315,272 @@ function showShareToast(msg) {
   if (!t) return;
   t.textContent = msg;
   t.classList.remove('show');
-  void t.offsetWidth; // force reflow so re-trigger animates cleanly
+  void t.offsetWidth;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function _rcptRoundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function _rcptDashedRule(ctx, x1, y, x2) {
+  ctx.save();
+  ctx.setLineDash([6, 5]);
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = '#D4CABF';
+  ctx.beginPath();
+  ctx.moveTo(x1, y);
+  ctx.lineTo(x2, y);
+  ctx.stroke();
+  ctx.restore();
+}
+
+async function generateReceiptCanvas(d) {
+  const W = 720, H = 900, DPR = 2;
+  const canvas = document.createElement('canvas');
+  canvas.width  = W * DPR;
+  canvas.height = H * DPR;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(DPR, DPR);
+  await document.fonts.ready;
+
+  // ── Amber gradient (reused for stripes) ──
+  const amberGrad = ctx.createLinearGradient(0, 0, W, 0);
+  amberGrad.addColorStop(0,   '#92400E');
+  amberGrad.addColorStop(0.3, '#F59E0B');
+  amberGrad.addColorStop(0.5, '#FCD34D');
+  amberGrad.addColorStop(0.7, '#F59E0B');
+  amberGrad.addColorStop(1,   '#92400E');
+
+  // ── Full cream background ──
+  ctx.fillStyle = '#F7F2E8';
+  ctx.fillRect(0, 0, W, H);
+
+  // ── Top amber stripe ──
+  ctx.fillStyle = amberGrad;
+  ctx.fillRect(0, 0, W, 10);
+
+  // ── Sky blue header (y=10 → 178) ──
+  const hdrGrad = ctx.createLinearGradient(0, 10, 0, 178);
+  hdrGrad.addColorStop(0, '#5ab5e2');
+  hdrGrad.addColorStop(1, '#9dd0ea');
+  ctx.fillStyle = hdrGrad;
+  ctx.fillRect(0, 10, W, 168);
+
+  // Header 🍔
+  ctx.font = '54px serif';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText('🍔', W / 2, 82);
+
+  // Challenge title
+  ctx.font = "18px 'Russo One', sans-serif";
+  ctx.fillStyle = 'rgba(255,255,255,0.97)';
+  ctx.fillText('100 BURGER CHALLENGE', W / 2, 120);
+
+  // Subtitle
+  ctx.font = "500 11px 'Outfit', sans-serif";
+  ctx.fillStyle = 'rgba(255,255,255,0.62)';
+  ctx.fillText('THE SUMMER GRIND  ·  ROOM ' + (roomId || '—'), W / 2, 146);
+
+  // ── Accent stripe under header ──
+  ctx.fillStyle = amberGrad;
+  ctx.fillRect(0, 178, W, 6);
+
+  // ── LOGGED badge ──
+  ctx.font = "700 10px 'Courier New', monospace";
+  const badge = '✓  BURGER LOGGED';
+  const bW = ctx.measureText(badge).width + 28, bH = 24;
+  const bX = (W - bW) / 2;
+  _rcptRoundRect(ctx, bX, 210, bW, bH, 5);
+  ctx.strokeStyle = '#D97706';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.fillStyle = '#B45309';
+  ctx.fillText(badge, W / 2, 226);
+
+  // ── Restaurant name ──
+  const restName = d.restaurant || 'Unknown Spot';
+  let restFontSize = 38;
+  ctx.font = `${restFontSize}px 'Russo One', sans-serif`;
+  while (ctx.measureText(restName).width > W - 80 && restFontSize > 22) {
+    restFontSize -= 2;
+    ctx.font = `${restFontSize}px 'Russo One', sans-serif`;
+  }
+  ctx.fillStyle = '#1A1A1A';
+  ctx.fillText(restName, W / 2, 280);
+
+  // ── Burger build line ──
+  const buildLabel = d.menuItem
+    ? `${d.menuEmoji || '🍔'} ${d.menuItem}`
+    : `${d.pattyLabel}-Patty Smash`;
+  ctx.font = "600 13px 'Outfit', sans-serif";
+  ctx.fillStyle = '#666';
+  ctx.fillText(buildLabel, W / 2, 316);
+
+  // ── Star rating ──
+  if (d.rating) {
+    const full = Math.floor(d.rating);
+    const half = d.rating % 1 >= 0.5;
+    ctx.font = '24px serif';
+    ctx.textAlign = 'left';
+    const starW = 28;
+    const starsTotal = 5;
+    let sx = (W - starsTotal * starW) / 2;
+    for (let i = 0; i < 5; i++) {
+      ctx.globalAlpha = i < full ? 1 : (i === full && half ? 0.55 : 0.18);
+      ctx.fillStyle = '#F59E0B';
+      ctx.fillText('⭐', sx, 352);
+      sx += starW;
+    }
+    ctx.globalAlpha = 1;
+    ctx.textAlign = 'center';
+    ctx.font = "400 10px 'Courier New', monospace";
+    ctx.fillStyle = '#999';
+    ctx.fillText(`${d.rating} / 5  STARS`, W / 2, 374);
+  }
+
+  // ── Dashed rule ──
+  _rcptDashedRule(ctx, 48, 398, W - 48);
+
+  // ── Count + meta row ──
+  // Big amber count (left)
+  ctx.textAlign = 'left';
+  ctx.font = "700 9px 'Courier New', monospace";
+  ctx.fillStyle = '#CCC';
+  ctx.letterSpacing = '2px';
+  ctx.fillText('BURGER NO.', 68, 424);
+  ctx.letterSpacing = '0px';
+
+  ctx.font = "400 76px 'Russo One', sans-serif";
+  ctx.fillStyle = '#B45309';
+  ctx.fillText('#' + d.count, 56, 502);
+
+  // Meta block (right)
+  ctx.textAlign = 'right';
+  ctx.font = "400 10px 'Courier New', monospace";
+  ctx.fillStyle = '#AAA';
+  const metaX = W - 56;
+  ctx.fillText(d.dateStr, metaX, 445);
+  ctx.fillText(d.timeStr, metaX, 464);
+  ctx.fillText('ROOM: ' + (roomId || '—'), metaX, 483);
+
+  // ── Dashed rule ──
+  _rcptDashedRule(ctx, 48, 528, W - 48);
+
+  // ── Toppings ──
+  ctx.textAlign = 'center';
+  ctx.font = "700 9px 'Courier New', monospace";
+  ctx.fillStyle = '#C0B8B0';
+  ctx.fillText('T  O  P  P  I  N  G  S', W / 2, 551);
+
+  if (d.toppings.length > 0) {
+    // Split into two rows if too wide
+    const joined = d.toppings.join('  ·  ');
+    ctx.font = "500 13px 'Outfit', sans-serif";
+    ctx.fillStyle = '#555';
+    if (ctx.measureText(joined).width <= W - 80) {
+      ctx.fillText(joined, W / 2, 576);
+    } else {
+      const mid = Math.ceil(d.toppings.length / 2);
+      ctx.fillText(d.toppings.slice(0, mid).join('  ·  '), W / 2, 571);
+      ctx.fillText(d.toppings.slice(mid).join('  ·  '),  W / 2, 590);
+    }
+  } else {
+    ctx.font = "400 12px 'Courier New', monospace";
+    ctx.fillStyle = '#BBB';
+    ctx.fillText('Classic build', W / 2, 576);
+  }
+
+  // ── Dashed rule ──
+  _rcptDashedRule(ctx, 48, 618, W - 48);
+
+  // ── Footer section ──
+  ctx.textAlign = 'center';
+  ctx.font = "400 26px 'Russo One', sans-serif";
+  ctx.fillStyle = '#0b3550';
+  ctx.fillText(d.name, W / 2, 660);
+
+  ctx.font = "600 15px 'Outfit', sans-serif";
+  ctx.fillStyle = '#1a70aa';
+  ctx.fillText('☀️  Pacing hot for Labor Day!  Can they hit 100?', W / 2, 692);
+
+  // URL watermark
+  ctx.font = "400 10px 'Courier New', monospace";
+  ctx.fillStyle = '#C8C0B8';
+  ctx.fillText(window.location.hostname || '100burgerchallenge.com', W / 2, 726);
+
+  // ── Receipt foot text ──
+  ctx.font = "400 9px 'Courier New', monospace";
+  ctx.fillStyle = '#D4CABF';
+  ctx.fillText('THANK YOU, ' + d.name.toUpperCase() + '!  KEEP EATING BURGERS!', W / 2, 752);
+
+  // ── Bottom amber stripe ──
+  ctx.fillStyle = amberGrad;
+  ctx.fillRect(0, H - 10, W, 10);
+
+  return canvas;
+}
+
+function downloadReceiptImage(canvas) {
+  const link = document.createElement('a');
+  link.download = '100-burger-receipt.png';
+  link.href = canvas.toDataURL('image/png');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
 window.shareReceipt = async function() {
   const d = _receiptShareData;
   if (!d) return;
-  const toppingsStr = d.toppings.length > 0 ? d.toppings.join(', ') : 'Classic';
-  const ratingStr   = d.rating ? `${d.rating}/5` : '?/5';
-  const text = [
-    `🍔 ${d.name} just logged Burger #${d.count} on the 100 Burger Challenge!`,
-    `✨ Spot: ${d.restaurant}`,
-    `🔥 Build: ${d.pattyLabel}-Patty Smash with ${toppingsStr}`,
-    `⭐ Score: ${ratingStr} Stars!`,
-    `☀️ Pacing hot for Labor Day! Can they hit 100?`
-  ].join('\n');
-  const url = window.location.href;
-  if (navigator.share) {
-    try {
-      await navigator.share({ text, url });
-    } catch(e) {
-      if (e.name !== 'AbortError') showToast('⚠️ Share failed');
-    }
+
+  // Show loading state
+  const btn = document.querySelector('.receipt-share-btn');
+  if (btn) { btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none'; btn.innerHTML = '⏳ Generating…'; }
+
+  let canvas;
+  try {
+    canvas = await generateReceiptCanvas(d);
+  } catch(err) {
+    showToast('⚠️ Could not generate image');
+    if (btn) { btn.style.opacity = ''; btn.style.pointerEvents = ''; btn.innerHTML = '<span style="font-size:15px">📤</span> Share Receipt'; }
+    return;
+  }
+
+  if (btn) { btn.style.opacity = ''; btn.style.pointerEvents = ''; btn.innerHTML = '<span style="font-size:15px">📤</span> Share Receipt'; }
+
+  // Try native image share (mobile Safari / Android Chrome)
+  if (navigator.share && navigator.canShare) {
+    canvas.toBlob(async (blob) => {
+      const file = new File([blob], '100-burger-receipt.png', { type: 'image/png' });
+      if (navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: '100 Burger Challenge' });
+          return;
+        } catch(e) {
+          if (e.name === 'AbortError') return;
+          // non-abort error → fall through to download
+        }
+      }
+      downloadReceiptImage(canvas);
+      showShareToast('🖼️ Receipt saved! Drop it in the group chat 🔥');
+    }, 'image/png');
   } else {
-    try {
-      await navigator.clipboard.writeText(text + '\n' + url);
-      showShareToast('📋 Cookout stats copied to clipboard! Share it with the group chat!');
-    } catch(e) {
-      showToast('⚠️ Could not copy — try again');
-    }
+    // Desktop: download directly
+    downloadReceiptImage(canvas);
+    showShareToast('🖼️ Receipt saved to your downloads! Drop it in the group chat 🔥');
   }
 };
 
@@ -5821,6 +6056,10 @@ window.confirmBurger = async function() {
       count: (_me?.count || 0) + 1,
       toppings: snapshotToppings,
       pattyLabel,
+      menuItem: snapshotMenuItemName,
+      menuEmoji: snapshotMenuEmoji,
+      dateStr,
+      timeStr,
     };
     const fireDisplay = (() => {
       if (!snapshotRating) return '';
