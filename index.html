@@ -5546,42 +5546,82 @@ window.shareReceipt = async function() {
   const d = _receiptShareData;
   if (!d) return;
 
-  // Show loading state
   const btn = document.querySelector('.receipt-share-btn');
-  if (btn) { btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none'; btn.innerHTML = '⏳ Generating…'; }
-
-  let canvas;
-  try {
-    canvas = await generateReceiptCanvas(d);
-  } catch(err) {
-    showToast('⚠️ Could not generate image');
+  const resetBtn = () => {
     if (btn) { btn.style.opacity = ''; btn.style.pointerEvents = ''; btn.innerHTML = '<span style="font-size:15px">📤</span> Share Receipt'; }
+  };
+  if (btn) { btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none'; btn.innerHTML = '⏳ Preparing…'; }
+
+  // Build structured share text
+  const toppingsStr = (d.toppings && d.toppings.length > 0) ? d.toppings.join(', ') : 'Classic';
+  const ratingStr   = d.rating ? `${d.rating}/5` : '—/5';
+  const buildLine   = d.menuItem ? `${d.menuEmoji || '🍔'} ${d.menuItem}` : `${d.pattyLabel}-Patty Smash`;
+
+  const shareText = [
+    '🍔 BURGER CHALLENGE UPDATE 🍔',
+    '────────────────────────',
+    `👤 Player: ${d.name}`,
+    `✨ Spot: ${d.restaurant}`,
+    `🔢 Burger: #${d.count} / 100`,
+    `⭐ Rating: ${ratingStr} Stars`,
+    '🔥 THE BUILD:',
+    `• ${buildLine}`,
+    `• Toppings: ${toppingsStr}`,
+    '☀️ Pacing hot for Labor Day! Can they hit 100?',
+  ].join('\n');
+
+  // Try to build a photo File from the base64 preview captured at receipt render time.
+  // If the Firebase upload finished by now, prefer that URL instead.
+  let photoFile = null;
+  let photoUrl  = null;
+  if (d.photo) {
+    try {
+      // Check if Firebase Storage URL is available on the freshly-written log
+      const me = players.find(p => p.id === myPlayerId);
+      const latestLog = me?.logs?.slice(-1)[0];
+      if (latestLog?.photo && latestLog.photo.startsWith('http')) {
+        photoUrl = latestLog.photo;
+        const res = await fetch(photoUrl);
+        const blob = await res.blob();
+        photoFile = new File([blob], 'burger.jpg', { type: blob.type || 'image/jpeg' });
+      } else {
+        // Fall back to base64 preview — convert via fetch(dataUrl)
+        const res = await fetch(d.photo);
+        const blob = await res.blob();
+        photoFile = new File([blob], 'burger.jpg', { type: blob.type || 'image/jpeg' });
+      }
+    } catch(e) {
+      console.warn('shareReceipt: photo prep failed, sharing text only', e);
+      photoFile = null;
+    }
+  }
+
+  // Mobile: native share sheet
+  if (navigator.share) {
+    const payload = { title: '100 Burger Challenge', text: shareText };
+    if (photoFile && navigator.canShare && navigator.canShare({ files: [photoFile] })) {
+      payload.files = [photoFile];
+    }
+    try {
+      await navigator.share(payload);
+    } catch(e) {
+      if (e.name !== 'AbortError') showToast('⚠️ Share failed');
+    }
+    resetBtn();
     return;
   }
 
-  if (btn) { btn.style.opacity = ''; btn.style.pointerEvents = ''; btn.innerHTML = '<span style="font-size:15px">📤</span> Share Receipt'; }
-
-  // Try native image share (mobile Safari / Android Chrome)
-  if (navigator.share && navigator.canShare) {
-    canvas.toBlob(async (blob) => {
-      const file = new File([blob], '100-burger-receipt.png', { type: 'image/png' });
-      if (navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({ files: [file], title: '100 Burger Challenge' });
-          return;
-        } catch(e) {
-          if (e.name === 'AbortError') return;
-          // non-abort error → fall through to download
-        }
-      }
-      downloadReceiptImage(canvas);
-      showShareToast('🖼️ Receipt saved! Drop it in the group chat 🔥');
-    }, 'image/png');
-  } else {
-    // Desktop: download directly
-    downloadReceiptImage(canvas);
-    showShareToast('🖼️ Receipt saved to your downloads! Drop it in the group chat 🔥');
+  // Desktop: clipboard fallback
+  const clipText = photoUrl
+    ? shareText + `\n📸 Photo: ${photoUrl}`
+    : shareText;
+  try {
+    await navigator.clipboard.writeText(clipText);
+    showShareToast('📋 Copied to clipboard! Drop it in the group chat 🔥');
+  } catch(e) {
+    showToast('⚠️ Could not copy to clipboard');
   }
+  resetBtn();
 };
 
 const ALL_TOPPINGS = ['Ketchup','Mustard','Mayo','Cheese','Blue Cheese','Lettuce','Pickles','Tomatoes','Onions','Bacon','Mushrooms','Green Peppers','Special Sauce'];
@@ -6060,6 +6100,7 @@ window.confirmBurger = async function() {
       menuEmoji: snapshotMenuEmoji,
       dateStr,
       timeStr,
+      photo: snapshotPhoto,         // base64 preview — for native file sharing
     };
     const fireDisplay = (() => {
       if (!snapshotRating) return '';
@@ -6760,7 +6801,7 @@ function renderBentoList() {
     const dr = rankMap[i];
     const isTied = countFreq[p.count] > 1;
     const isMe = p.id === myPlayerId;
-    const rankCls = isMe ? '' : (dr === 1 ? 'pl-gold' : dr === 2 ? 'pl-silver' : dr === 3 ? 'pl-bronze' : '');
+    const rankCls = isMe ? '' : (dr === 2 ? 'pl-silver' : dr === 3 ? 'pl-bronze' : '');
     const rank = dr === 1 ? '🥇' : dr === 2 ? '🥈' : dr === 3 ? '🥉' : `#${dr}`;
     const pct = Math.min(100, p.count);
     const avgPill = st.avgRating > 0 ? `<span class="pl-pill">⭐ ${st.avgRating.toFixed(1)}</span>` : '';
