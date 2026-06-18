@@ -7087,6 +7087,8 @@ function renderRestaurantLB() {
   let bsTopScore = 0, bsTopName = '';
   let spaceDown = false;
   let endBun = null;      // animated top bun that falls on game over
+  let perfectStreak = 0;  // consecutive perfect drops
+  let flashMsg = null;    // { text, alpha, worldY } — floats up on perfect
 
   function $id(id){ return document.getElementById(id); }
 
@@ -7126,7 +7128,7 @@ function renderRestaurantLB() {
 
   // ── Game lifecycle ────────────────────────────────────────
   function resetGame() {
-    score = 0; speed = 2.5; layerIdx = 0; cameraY = 0; falling = []; endBun = null;
+    score = 0; speed = 2.5; layerIdx = 0; cameraY = 0; falling = []; endBun = null; perfectStreak = 0; flashMsg = null;
     const startW = 190, startX = (W - startW) / 2;
     stack = [{ x: startX, w: startW, y: H - PIECE_H - 8, ...BUN_BOT }];
     spawnCurrent();
@@ -7161,10 +7163,28 @@ function renderRestaurantLB() {
     }
 
     stack.push({ x: newX, w: newW, y: fragY, type, label, fill, stroke });
-    score++;
+
+    if (isPerfect) {
+      perfectStreak++;
+      // Bonus points scale with streak: +1 extra on 1st, +2 on 2nd, +3 on 3rd+
+      const bonus = Math.min(perfectStreak, 3);
+      score += 1 + bonus;
+      const streakEmoji = perfectStreak >= 3 ? '🔥' : perfectStreak === 2 ? '⚡' : '✨';
+      const streakLabel = perfectStreak >= 3 ? ' HOT STREAK!' : perfectStreak === 2 ? ' DOUBLE!' : '';
+      flashMsg = {
+        text: `${streakEmoji} PERFECT! +${1 + bonus}${streakLabel}`,
+        alpha: 1.0,
+        worldY: fragY - 20,  // float up from just above the landed piece
+      };
+      if (navigator.vibrate) navigator.vibrate([12, 40, 24]);
+    } else {
+      perfectStreak = 0;
+      score++;
+      if (navigator.vibrate) navigator.vibrate(18);
+    }
+
     speed = Math.min(10, 2.5 + Math.floor(score / 4) * 0.35);
     spawnCurrent();
-    if (navigator.vibrate) navigator.vibrate(18);
   }
 
   function endGame() {
@@ -7222,6 +7242,13 @@ function renderRestaurantLB() {
 
     falling.forEach(f => { f.vy += 0.55; f.y += f.vy; });
     falling = falling.filter(f => f.y < H + 120);
+
+    // Fade & float the perfect-drop flash message
+    if (flashMsg) {
+      flashMsg.alpha  -= 0.030;
+      flashMsg.worldY -= 0.9;
+      if (flashMsg.alpha <= 0) flashMsg = null;
+    }
 
     // Dynamic viewport camera: once the tower top rises past 40% of canvas,
     // smoothly translate the world downward to keep the landing zone visible.
@@ -7626,6 +7653,18 @@ function renderRestaurantLB() {
       drawIngredient({ x: endBun.x, y: endBun.y, w: endBun.w, h: PIECE_H, ...BUN_TOP });
     }
 
+    // Perfect-drop flash message — floats up from the stack
+    if (flashMsg && flashMsg.alpha > 0) {
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, flashMsg.alpha);
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.font = "700 13px 'Russo One', sans-serif";
+      ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 6;
+      ctx.fillStyle = '#FFD700';
+      ctx.fillText(flashMsg.text, W / 2, flashMsg.worldY);
+      ctx.restore();
+    }
+
     ctx.restore(); // ── end camera ──
 
     // HUD — always fixed over the canvas, unaffected by camera
@@ -7639,6 +7678,13 @@ function renderRestaurantLB() {
     ctx.fillText('🍔  ' + score, 20, 33);
     ctx.shadowBlur = 0;
 
+    // Speed label
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.font = "600 8px 'Outfit', sans-serif";
+    ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText('SPEED', W - 10, 16);
+
+    // Speed dots
     const dots = Math.min(Math.floor((speed - 2.5) / 0.35) + 1, 10);
     for (let i = 0; i < 10; i++) {
       ctx.fillStyle = i < dots ? '#1a70aa' : 'rgba(255,255,255,0.18)';
