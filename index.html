@@ -5423,7 +5423,7 @@ async function generateReceiptCanvas(d) {
   ctx.setLineDash([]);
 
   // ── HEADER ────────────────────────────────────────────────
-  let y = 36;
+  let y = 54; // 18px extra breathing room from top border
 
   // Challenge title
   ctx.textAlign = 'center';
@@ -5522,6 +5522,11 @@ async function generateReceiptCanvas(d) {
   }
 
   y = photoY + PHOTO_SIZE + 22;
+
+  // ── TEXT SHIELD: semi-transparent white panel ──────────────
+  // Ensures bottom stats are 100% legible over any photo bleed
+  ctx.fillStyle = 'rgba(255,255,255,0.88)';
+  ctx.fillRect(14, y - 10, W - 28, H - 14 - (y - 10));
 
   // ── BOTTOM STATS PANE ─────────────────────────────────────
   ctx.fillStyle = ruleG;
