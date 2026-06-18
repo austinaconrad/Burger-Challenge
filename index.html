@@ -5347,7 +5347,29 @@ function _rcptDashedRule(ctx, x1, y, x2) {
 }
 
 async function generateReceiptCanvas(d) {
-  const W = 720, H = 900, DPR = 2;
+  const W = 720, DPR = 2;
+
+  // If a burger photo is attached, load it first so we know it's ready to draw
+  let burgerImg = null;
+  if (d.photo) {
+    try {
+      burgerImg = await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = d.photo;
+      });
+    } catch(e) {
+      burgerImg = null; // photo failed to load — skip it gracefully
+    }
+  }
+
+  // Extra vertical space when a photo is present
+  const PHOTO_H   = 270; // rendered height of the photo strip
+  const PHOTO_PAD = 38;  // space above + below label + gap
+  const photoBlockH = burgerImg ? (PHOTO_PAD + PHOTO_H) : 0;
+  const H = 900 + photoBlockH;
+
   const canvas = document.createElement('canvas');
   canvas.width  = W * DPR;
   canvas.height = H * DPR;
@@ -5506,25 +5528,68 @@ async function generateReceiptCanvas(d) {
   // ── Dashed rule ──
   _rcptDashedRule(ctx, 48, 618, W - 48);
 
-  // ── Footer section ──
+  // ── Burger photo (optional) ──
+  if (burgerImg) {
+    // Section label
+    ctx.textAlign = 'center';
+    ctx.font = "700 9px 'Courier New', monospace";
+    ctx.fillStyle = '#C0B8B0';
+    ctx.fillText('T  H  E  B  U  R  G  E  R', W / 2, 641);
+
+    // Rounded cover-crop photo
+    const px = 48, py = 651, pw = W - 96, ph = PHOTO_H, pr = 14;
+    ctx.save();
+    _rcptRoundRect(ctx, px, py, pw, ph, pr);
+    ctx.clip();
+    // Center-crop to fill the box (object-fit: cover)
+    const imgAR = burgerImg.naturalWidth / burgerImg.naturalHeight;
+    const boxAR = pw / ph;
+    let sx = 0, sy = 0, sw = burgerImg.naturalWidth, sh = burgerImg.naturalHeight;
+    if (imgAR > boxAR) {
+      sw = sh * boxAR;
+      sx = (burgerImg.naturalWidth - sw) / 2;
+    } else {
+      sh = sw / boxAR;
+      sy = (burgerImg.naturalHeight - sh) / 2;
+    }
+    ctx.drawImage(burgerImg, sx, sy, sw, sh, px, py, pw, ph);
+    ctx.restore();
+
+    // Subtle inner shadow overlay on photo edges
+    const vignette = ctx.createRadialGradient(W/2, py + ph/2, ph * 0.3, W/2, py + ph/2, ph * 0.8);
+    vignette.addColorStop(0, 'rgba(0,0,0,0)');
+    vignette.addColorStop(1, 'rgba(0,0,0,0.18)');
+    ctx.save();
+    _rcptRoundRect(ctx, px, py, pw, ph, pr);
+    ctx.clip();
+    ctx.fillStyle = vignette;
+    ctx.fillRect(px, py, pw, ph);
+    ctx.restore();
+
+    // Dashed rule after photo
+    _rcptDashedRule(ctx, 48, 618 + photoBlockH, W - 48);
+  }
+
+  // ── Footer section (shifted down when photo present) ──
+  const F = photoBlockH; // footer offset
   ctx.textAlign = 'center';
   ctx.font = "400 26px 'Russo One', sans-serif";
   ctx.fillStyle = '#0b3550';
-  ctx.fillText(d.name, W / 2, 660);
+  ctx.fillText(d.name, W / 2, 660 + F);
 
   ctx.font = "600 15px 'Outfit', sans-serif";
   ctx.fillStyle = '#1a70aa';
-  ctx.fillText('☀️  Pacing hot for Labor Day!  Can they hit 100?', W / 2, 692);
+  ctx.fillText('☀️  Pacing hot for Labor Day!  Can they hit 100?', W / 2, 692 + F);
 
   // URL watermark
   ctx.font = "400 10px 'Courier New', monospace";
   ctx.fillStyle = '#C8C0B8';
-  ctx.fillText(window.location.hostname || '100burgerchallenge.com', W / 2, 726);
+  ctx.fillText(window.location.hostname || '100burgerchallenge.com', W / 2, 726 + F);
 
   // ── Receipt foot text ──
   ctx.font = "400 9px 'Courier New', monospace";
   ctx.fillStyle = '#D4CABF';
-  ctx.fillText('THANK YOU, ' + d.name.toUpperCase() + '!  KEEP EATING BURGERS!', W / 2, 752);
+  ctx.fillText('THANK YOU, ' + d.name.toUpperCase() + '!  KEEP EATING BURGERS!', W / 2, 752 + F);
 
   // ── Bottom amber stripe ──
   ctx.fillStyle = amberGrad;
@@ -5550,78 +5615,41 @@ window.shareReceipt = async function() {
   const resetBtn = () => {
     if (btn) { btn.style.opacity = ''; btn.style.pointerEvents = ''; btn.innerHTML = '<span style="font-size:15px">📤</span> Share Receipt'; }
   };
-  if (btn) { btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none'; btn.innerHTML = '⏳ Preparing…'; }
+  if (btn) { btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none'; btn.innerHTML = '⏳ Generating…'; }
 
-  // Build structured share text
-  const toppingsStr = (d.toppings && d.toppings.length > 0) ? d.toppings.join(', ') : 'Classic';
-  const ratingStr   = d.rating ? `${d.rating}/5` : '—/5';
-  const buildLine   = d.menuItem ? `${d.menuEmoji || '🍔'} ${d.menuItem}` : `${d.pattyLabel}-Patty Smash`;
-
-  const shareText = [
-    '🍔 BURGER CHALLENGE UPDATE 🍔',
-    '────────────────────────',
-    `👤 Player: ${d.name}`,
-    `✨ Spot: ${d.restaurant}`,
-    `🔢 Burger: #${d.count} / 100`,
-    `⭐ Rating: ${ratingStr} Stars`,
-    '🔥 THE BUILD:',
-    `• ${buildLine}`,
-    `• Toppings: ${toppingsStr}`,
-    '☀️ Pacing hot for Labor Day! Can they hit 100?',
-  ].join('\n');
-
-  // Try to build a photo File from the base64 preview captured at receipt render time.
-  // If the Firebase upload finished by now, prefer that URL instead.
-  let photoFile = null;
-  let photoUrl  = null;
-  if (d.photo) {
-    try {
-      // Check if Firebase Storage URL is available on the freshly-written log
-      const me = players.find(p => p.id === myPlayerId);
-      const latestLog = me?.logs?.slice(-1)[0];
-      if (latestLog?.photo && latestLog.photo.startsWith('http')) {
-        photoUrl = latestLog.photo;
-        const res = await fetch(photoUrl);
-        const blob = await res.blob();
-        photoFile = new File([blob], 'burger.jpg', { type: blob.type || 'image/jpeg' });
-      } else {
-        // Fall back to base64 preview — convert via fetch(dataUrl)
-        const res = await fetch(d.photo);
-        const blob = await res.blob();
-        photoFile = new File([blob], 'burger.jpg', { type: blob.type || 'image/jpeg' });
-      }
-    } catch(e) {
-      console.warn('shareReceipt: photo prep failed, sharing text only', e);
-      photoFile = null;
-    }
-  }
-
-  // Mobile: native share sheet
-  if (navigator.share) {
-    const payload = { title: '100 Burger Challenge', text: shareText };
-    if (photoFile && navigator.canShare && navigator.canShare({ files: [photoFile] })) {
-      payload.files = [photoFile];
-    }
-    try {
-      await navigator.share(payload);
-    } catch(e) {
-      if (e.name !== 'AbortError') showToast('⚠️ Share failed');
-    }
+  // Generate the canvas receipt image
+  let canvas;
+  try {
+    canvas = await generateReceiptCanvas(d);
+  } catch(err) {
+    showToast('⚠️ Could not generate image');
     resetBtn();
     return;
   }
 
-  // Desktop: clipboard fallback
-  const clipText = photoUrl
-    ? shareText + `\n📸 Photo: ${photoUrl}`
-    : shareText;
-  try {
-    await navigator.clipboard.writeText(clipText);
-    showShareToast('📋 Copied to clipboard! Drop it in the group chat 🔥');
-  } catch(e) {
-    showToast('⚠️ Could not copy to clipboard');
-  }
   resetBtn();
+
+  // Try native image file share (mobile Safari / Android Chrome)
+  if (navigator.share && navigator.canShare) {
+    canvas.toBlob(async (blob) => {
+      const file = new File([blob], '100-burger-receipt.png', { type: 'image/png' });
+      if (navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: '100 Burger Challenge' });
+          return;
+        } catch(e) {
+          if (e.name === 'AbortError') return;
+          // non-abort error → fall through to download
+        }
+      }
+      downloadReceiptImage(canvas);
+      showShareToast('🖼️ Receipt saved! Drop it in the group chat 🔥');
+    }, 'image/png');
+  } else {
+    // Desktop: download the PNG directly
+    downloadReceiptImage(canvas);
+    showShareToast('🖼️ Receipt saved to your downloads! Drop it in the group chat 🔥');
+  }
 };
 
 const ALL_TOPPINGS = ['Ketchup','Mustard','Mayo','Cheese','Blue Cheese','Lettuce','Pickles','Tomatoes','Onions','Bacon','Mushrooms','Green Peppers','Special Sauce'];
