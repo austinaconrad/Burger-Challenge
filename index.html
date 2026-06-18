@@ -3284,6 +3284,7 @@ function showConfigBanner() {
 if (!IS_CONFIGURED) showConfigBanner();
 
 function initFirebase() {
+  if (app) return; // guard against double-initialization on retry
   app     = initializeApp(FIREBASE_CONFIG);
   db      = getFirestore(app);
   storage = getStorage(app);
@@ -5375,6 +5376,7 @@ async function generateReceiptCanvas(d) {
       img.onerror = () => res(null);
       img.src = d.photo;
     });
+  }
 
   // Scratch canvas (generous height — trimmed to content at the end)
   const SCRATCH_H = burgerImg ? 1700 : 1000;
