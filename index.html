@@ -236,8 +236,7 @@ h1{font-family:'Russo One',sans-serif;font-size:clamp(20px,5.5vw,36px);font-weig
 .milestone-card,
 .tr-card,
 .setup-card,
-.grill-card,
-.duel-stat-row {
+.grill-card {
   overflow: hidden;
 }
 .pl-row::after,
@@ -569,22 +568,16 @@ body.leaderboard-active header .burger-deco,
 body.leaderboard-active header h1,
 body.leaderboard-active header #stat-pills-row,
 body.leaderboard-active header #spectator-pill,
-body.duel-active header .burger-deco,
-body.duel-active header h1,
-body.duel-active header #stat-pills-row,
-body.duel-active header #spectator-pill{display:none!important}
 body.feed-active header,
 body.map-active header,
 body.pace-active header,
 body.tally-active header,
-body.leaderboard-active header,
-body.duel-active header{padding:6px 0 0!important;gap:0!important}
+body.leaderboard-active header{padding:6px 0 0!important;gap:0!important}
 body.feed-active .tabs,
 body.map-active .tabs,
 body.pace-active .tabs,
 body.tally-active .tabs,
-body.leaderboard-active .tabs,
-body.duel-active .tabs{
+body.leaderboard-active .tabs{
   position:sticky;top:0;z-index:20;
   background:rgba(168,212,237,0.85);
   backdrop-filter:var(--glass-blur);
@@ -593,301 +586,7 @@ body.duel-active .tabs{
   margin-bottom:10px;
   box-shadow:0 4px 24px rgba(30,100,160,0.16),inset 0 1px 0 rgba(255,255,255,0.90);
 }
-/* ═══════════════════════════════════════════════════════════
-   🥊 DUEL TAB
-   ═══════════════════════════════════════════════════════════ */
-#duel-root {
-  padding: var(--space-sm) var(--space-sm) 80px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-/* picker row */
-.duel-picker-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  background: var(--surface);
-  border: 1px solid var(--border2);
-  border-radius: var(--radius);
-  padding: var(--space-sm);
-  box-shadow: var(--shadow-card);
-}
-.duel-picker-side {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.duel-picker-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted2);
-  font-family: 'Outfit',sans-serif;
-}
-.duel-picker-left .duel-picker-label { color: var(--duel-a-color, var(--amber)); }
-.duel-picker-right .duel-picker-label { color: var(--duel-b-color, #60A5FA); }
-.duel-select {
-  background: rgba(255,255,255,0.45);
-  border: 1px solid rgba(30,110,170,0.15);
-  border-radius: var(--radius-xs);
-  color: var(--text);
-  font-family: 'Outfit',sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  padding: 7px 10px;
-  appearance: none;
-  -webkit-appearance: none;
-  cursor: pointer;
-  outline: none;
-  width: 100%;
-}
-.duel-select:focus { border-color: var(--sky-light); box-shadow: 0 0 0 3px rgba(59,170,226,0.15); outline: none; }
-.duel-vs-badge {
-  font-size: 24px;
-  flex-shrink: 0;
-  line-height: 1;
-  filter: drop-shadow(0 0 6px rgba(245,158,11,0.5));
-}
-/* section header */
-.duel-section-label {
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--muted2);
-  padding: 0 2px;
-  margin-bottom: -2px;
-}
-/* player header cards */
-.duel-player-headers {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: var(--space-xs);
-  align-items: center;
-}
-.duel-player-header {
-  background: var(--surface);
-  border: 1px solid var(--border2);
-  border-radius: var(--radius-sm);
-  padding: var(--space-sm);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  box-shadow: var(--shadow-card);
-  position: relative;
-  overflow: hidden;
-}
-.duel-player-header::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: var(--ph-color, var(--amber));
-  border-radius: 3px 3px 0 0;
-}
-.duel-player-header.winner-glow {
-  box-shadow: var(--shadow-card), 0 0 0 2px var(--ph-color, var(--amber)), 0 0 18px rgba(245,158,11,0.25);
-}
-.duel-player-name {
-  font-family: 'Russo One',sans-serif;
-  font-size: 17px;
-  letter-spacing: 0.03em;
-  color: var(--text);
-  text-align: center;
-  line-height: 1.1;
-}
-.duel-player-count {
-  font-family: 'Russo One',sans-serif;
-  font-size: 22px;
-  line-height: 1;
-}
-.duel-vs-mid {
-  font-size: 14px;
-  text-align: center;
-  color: var(--muted2);
-  font-family: 'Russo One',sans-serif;
-  letter-spacing: 0;
-}
-/* stat grid */
-.duel-stat-block {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  box-shadow: var(--shadow-card);
-}
-.duel-stat-block-title {
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted2);
-  padding: 10px 14px 6px;
-  border-bottom: 1px solid var(--border);
-  background: rgba(255,255,255,0.02);
-}
-.duel-stat-row {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  padding: 9px 14px;
-  border-bottom: 1px solid rgba(30,100,160,0.08);
-  gap: 6px;
-}
-.duel-stat-row:last-child { border-bottom: none; }
-.duel-stat-val {
-  font-family: 'Russo One',sans-serif;
-  font-size: 16px;
-  line-height: 1;
-}
-.duel-stat-val.side-a { color: var(--duel-a-color, var(--amber)); text-align: left; }
-.duel-stat-val.side-b { color: var(--duel-b-color, #60A5FA); text-align: right; }
-.duel-stat-val.winner { filter: brightness(1.15); }
-.duel-stat-val.loser  { opacity: 0.55; }
-.duel-stat-label {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--muted2);
-  text-align: center;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  font-family: 'Outfit',sans-serif;
-  line-height: 1.2;
-}
-.duel-stat-sub {
-  font-size: 10px;
-  color: var(--muted2);
-  font-family: 'Outfit',sans-serif;
-  font-weight: 500;
-}
-.duel-stat-sub.side-a { text-align: left; }
-.duel-stat-sub.side-b { text-align: right; }
-/* forecast colour helpers */
-.duel-forecast-green { color: #4ADE80; }
-.duel-forecast-amber { color: var(--amber); }
-.duel-forecast-red   { color: var(--red); }
-/* battlegrounds section */
-.duel-battleground-card {
-  background: rgba(255,255,255,0.02);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xs);
-  padding: 9px 12px;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: 6px;
-  align-items: center;
-  margin: 4px 10px;
-}
-.duel-battleground-card:first-child { margin-top: 8px; }
-.duel-battleground-card:last-child  { margin-bottom: 8px; }
-.duel-bg-name {
-  font-size: 12px;
-  font-weight: 700;
-  font-family: 'Outfit',sans-serif;
-  color: var(--text);
-  text-align: center;
-  grid-column: 1 / -1;
-  padding-bottom: 4px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 2px;
-}
-.duel-bg-rating { font-size: 13px; font-family: 'Outfit',sans-serif; font-weight: 600; }
-.duel-bg-rating.side-a { color: var(--duel-a-color, var(--amber)); text-align: left; }
-.duel-bg-rating.side-b { color: var(--duel-b-color, #60A5FA); text-align: right; }
-.duel-bg-vs { font-size: 11px; color: var(--muted); text-align: center; }
-/* prompt state */
-.duel-prompt {
-  text-align: center;
-  padding: 48px 24px;
-  color: var(--muted);
-  font-family: 'Outfit',sans-serif;
-  font-size: 14px;
-  line-height: 1.6;
-}
-.duel-prompt-icon { font-size: 40px; margin-bottom: 12px; }
 
-/* ── Duel fight animations ── */
-@keyframes duelClashLeft {
-  0%   { transform: translateX(0)    rotate(0deg); }
-  30%  { transform: translateX(46px) rotate(-6deg); }   /* rush in */
-  42%  { transform: translateX(42px) rotate(4deg);  }   /* impact bounce */
-  52%  { transform: translateX(48px) rotate(-3deg); }   /* recoil */
-  62%  { transform: translateX(44px) rotate(2deg);  }   /* settle clash */
-  78%  { transform: translateX(0)    rotate(0deg);  }   /* retreat */
-  100% { transform: translateX(0)    rotate(0deg);  }
-}
-@keyframes duelClashRight {
-  0%   { transform: translateX(0)     rotate(0deg); }
-  30%  { transform: translateX(-46px) rotate(6deg);  }
-  42%  { transform: translateX(-42px) rotate(-4deg); }
-  52%  { transform: translateX(-48px) rotate(3deg);  }
-  62%  { transform: translateX(-44px) rotate(-2deg); }
-  78%  { transform: translateX(0)     rotate(0deg);  }
-  100% { transform: translateX(0)     rotate(0deg);  }
-}
-.duel-clash-a {
-  animation: duelClashLeft  0.85s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
-  z-index: 2; position: relative;
-}
-.duel-clash-b {
-  animation: duelClashRight 0.85s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
-  z-index: 2; position: relative;
-}
-@keyframes duelImpactPop {
-  0%   { transform: scale(1)   rotate(0deg);  }
-  20%  { transform: scale(2.4) rotate(-12deg); }
-  45%  { transform: scale(1.9) rotate(8deg);  }
-  65%  { transform: scale(1.4) rotate(-4deg); }
-  85%  { transform: scale(1.1) rotate(2deg);  }
-  100% { transform: scale(1)   rotate(0deg);  }
-}
-.duel-impact-flash {
-  animation: duelImpactPop 0.45s cubic-bezier(0.34,1.56,0.64,1) forwards;
-  display: inline-block;
-  filter: drop-shadow(0 0 8px rgba(251,191,36,0.9));
-}
-
-/* victor banner */
-.duel-victor-banner {
-  text-align: center;
-  font-family: 'Russo One',sans-serif;
-  font-size: 16px;
-  letter-spacing: 0.02em;
-  padding: 2px 12px 6px;
-  min-height: 30px;
-  opacity: 0;
-}
-@keyframes duelVictorReveal {
-  0%   { opacity: 0; transform: translateY(-8px) scale(0.85); }
-  55%  { opacity: 1; transform: translateY(2px)  scale(1.06); }
-  100% { opacity: 1; transform: translateY(0)    scale(1);    }
-}
-.duel-victor-banner.visible {
-  animation: duelVictorReveal 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
-}
-
-/* crown */
-@keyframes duelCrownDrop {
-  0%   { transform: translateX(-50%) translateY(-22px) scale(0) rotate(-20deg); opacity: 0; }
-  55%  { transform: translateX(-50%) translateY(4px)   scale(1.3) rotate(6deg);  opacity: 1; }
-  75%  { transform: translateX(-50%) translateY(-3px)  scale(0.95) rotate(-2deg); }
-  100% { transform: translateX(-50%) translateY(0)     scale(1)   rotate(0deg);  opacity: 1; }
-}
-.duel-crown {
-  position: absolute;
-  top: -18px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 22px;
-  line-height: 1;
-  pointer-events: none;
-  animation: duelCrownDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.7)) drop-shadow(0 0 8px rgba(251,191,36,0.6));
-}
 
 /* ── Map-specific expansions ── */
 body.map-active .map-wrap{
@@ -2339,6 +2038,50 @@ body.july4-bg::before {
 .resto-score{font-family:'Russo One',sans-serif;font-size:13px;font-weight:800;color:var(--amber)}
 .resto-unrated{font-size:11px;color:var(--muted);font-weight:500}
 
+/* ── Burger Stack Game ── */
+.bs-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;padding:14px 12px 24px;max-width:360px;margin:0 auto}
+.bs-scoreboard{
+  width:100%;
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--surface2);
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  border:1px solid var(--border2);
+  border-radius:14px;
+  padding:12px 16px;
+  box-shadow:var(--shadow-card);
+}
+.bs-scoreboard-left{display:flex;flex-direction:column;gap:3px}
+.bs-scoreboard-label{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--muted2);letter-spacing:0.08em}
+.bs-top-score{font-family:'Russo One',sans-serif;font-size:18px;color:var(--sky);letter-spacing:-0.3px}
+.bs-trophy{font-size:28px;line-height:1;filter:drop-shadow(0 2px 6px rgba(245,158,11,0.4))}
+.bs-canvas-wrap{position:relative;border-radius:18px;overflow:hidden;box-shadow:0 8px 32px rgba(11,53,80,0.25);border:2px solid rgba(255,255,255,0.6)}
+#burger-stack-canvas{display:block}
+.bs-overlay{
+  position:absolute;inset:0;
+  background:rgba(8,28,46,0.82);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;
+}
+.bs-overlay-inner{display:flex;flex-direction:column;align-items:center;gap:16px;padding:24px;text-align:center}
+.bs-title{font-family:'Russo One',sans-serif;font-size:28px;color:#fff;line-height:1.15;text-shadow:0 0 24px rgba(168,212,237,0.5)}
+.bs-subtitle{font-size:13px;color:rgba(255,255,255,0.65);font-family:'Outfit',sans-serif;line-height:1.5;max-width:220px}
+.bs-result{display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:14px 28px}
+.bs-result-label{font-family:'Press Start 2P',monospace;font-size:7px;color:rgba(255,255,255,0.5);letter-spacing:0.1em}
+.bs-result-score{font-family:'Russo One',sans-serif;font-size:52px;color:#fff;line-height:1;text-shadow:0 0 20px rgba(168,212,237,0.6)}
+.bs-result-msg{font-size:12px;color:rgba(255,255,255,0.7);font-family:'Outfit',sans-serif;margin-top:2px}
+.bs-btn{
+  font-family:'Russo One',sans-serif;font-size:15px;letter-spacing:0.05em;
+  color:#fff;background:var(--sky);
+  border:none;border-radius:12px;
+  padding:13px 40px;cursor:pointer;
+  box-shadow:0 4px 16px rgba(26,112,170,0.45);
+  transition:transform 0.1s,box-shadow 0.1s;
+}
+.bs-btn:active{transform:scale(0.96);box-shadow:0 2px 8px rgba(26,112,170,0.3)}
+.bs-btn-again{background:rgba(255,255,255,0.12);box-shadow:none;border:1px solid rgba(255,255,255,0.2)}
+.bs-btn-again:active{transform:scale(0.96)}
+.bs-hint{font-size:11px;color:var(--muted);font-family:'Outfit',sans-serif;opacity:0.7}
+
 /* ── Milestone Feed Card ── */
 .milestone-card{
   background:var(--surface2);
@@ -2769,8 +2512,8 @@ body.july4-bg::before {
       <button class="tab-btn" onclick="switchTab('feed',this)"><span class="tab-emoji">🔥</span><span class="tab-label">Feed</span><span class="tab-unread" id="social-unread-dot"></span></button>
       <button class="tab-btn" onclick="switchTab('map',this)"><span class="tab-emoji">🗺</span><span class="tab-label">Map</span></button>
       <button class="tab-btn" onclick="switchTab('leaderboard',this)"><span class="tab-emoji">🏅</span><span class="tab-label">Badges</span></button>
-      <button class="tab-btn" onclick="switchTab('duel',this)"><span class="tab-emoji">🥊</span><span class="tab-label">Duel</span></button>
       <button class="tab-btn" onclick="switchTab('pace',this)"><span class="tab-emoji">📈</span><span class="tab-label">Pace</span></button>
+      <button class="tab-btn" onclick="switchTab('game',this)"><span class="tab-emoji">🎮</span><span class="tab-label">Game</span></button>
     </div>
 
     <!-- LEADERBOARD TAB -->
@@ -2779,30 +2522,6 @@ body.july4-bg::before {
       <div class="section-label">Player Badges</div>
       <div class="leaderboard" id="leaderboard"></div>
       <div id="lb-empty" class="empty" style="display:none"><div class="e-icon">🍔</div><p>No players yet!</p></div>
-    </div>
-
-    <!-- DUEL TAB -->
-    <div class="tab-panel" id="tab-duel">
-      <div id="duel-root">
-        <!-- Picker row -->
-        <div class="duel-picker-row">
-          <div class="duel-picker-side duel-picker-left">
-            <label class="duel-picker-label">Player 1</label>
-            <select class="duel-select" id="duel-sel-a" onchange="_activeDuelPlayerA=this.value;renderDuel()">
-              <option value="">— choose —</option>
-            </select>
-          </div>
-          <div class="duel-vs-badge">🥊</div>
-          <div class="duel-picker-side duel-picker-right">
-            <label class="duel-picker-label">Player 2</label>
-            <select class="duel-select" id="duel-sel-b" onchange="_activeDuelPlayerB=this.value;renderDuel()">
-              <option value="">— choose —</option>
-            </select>
-          </div>
-        </div>
-        <!-- Split-screen output -->
-        <div id="duel-grid"></div>
-      </div>
     </div>
 
     <!-- PACE TAB -->
@@ -2889,6 +2608,36 @@ body.july4-bg::before {
       </div>
       <div class="map-section-label">Recent Burger Spots</div>
       <div id="map-feed" class="map-feed-wrap"></div>
+    </div>
+
+    <!-- GAME TAB -->
+    <div class="tab-panel" id="tab-game">
+      <div class="bs-wrap">
+        <div class="bs-scoreboard">
+          <div class="bs-scoreboard-left">
+            <span class="bs-scoreboard-label">ROOM RECORD</span>
+            <span class="bs-top-score" id="bs-top-score">—</span>
+          </div>
+          <span class="bs-trophy">🏆</span>
+        </div>
+        <div class="bs-canvas-wrap">
+          <canvas id="burger-stack-canvas"></canvas>
+          <div class="bs-overlay" id="bs-overlay">
+            <div class="bs-overlay-inner">
+              <div class="bs-title">🍔<br>BURGER STACK</div>
+              <div class="bs-subtitle">Tap to drop each ingredient.<br>Don't miss or the burger falls!</div>
+              <div class="bs-result" id="bs-result" style="display:none">
+                <div class="bs-result-label">YOUR SCORE</div>
+                <div class="bs-result-score" id="bs-result-score">0</div>
+                <div class="bs-result-msg" id="bs-result-msg"></div>
+              </div>
+              <button class="bs-btn" id="bs-play-btn">▶&nbsp; PLAY</button>
+              <button class="bs-btn bs-btn-again" id="bs-again-btn" style="display:none">↺&nbsp; PLAY AGAIN</button>
+            </div>
+          </div>
+        </div>
+        <div class="bs-hint">Tap · Click · Space to drop</div>
+      </div>
     </div>
 
   </div>
@@ -4138,7 +3887,6 @@ function render(){
   if(document.getElementById('tab-feed')?.classList.contains('active')) renderUnifiedFeed();
   if(document.getElementById('tab-list')?.classList.contains('active')) renderBentoList();
   if(document.getElementById('tab-pace')?.classList.contains('active')) renderPaceTab();
-  if(document.getElementById('tab-duel')?.classList.contains('active')) { populateDuelSelects(); renderDuel(); }
   // Update players pill count
   const pill = document.getElementById('players-pill-btn');
   if(pill) pill.textContent = `👥 Players (${players.length})`;
@@ -5267,8 +5015,6 @@ let pendingToppings = [];
 let pendingPhoto = '';      // base64 preview shown in the UI thumbnail
 let pendingPhotoFile = null; // original File — uploaded to Storage at submit time
 let _receiptShareData = null; // populated at receipt render time for shareReceipt()
-let _activeDuelPlayerA = ''; // persists duel selections across tab switches
-let _activeDuelPlayerB = '';
 window.closeReceipt = function() {
   const r = document.getElementById('order-receipt');
   if (r) { r.classList.remove('show'); r.classList.add('hide'); }
@@ -7250,384 +6996,357 @@ function renderRestaurantLB() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 🥊  DUEL TAB — Head-to-Head comparisons
+// 🎮  BURGER STACK GAME
 // ═══════════════════════════════════════════════════════════════════════════
+(function() {
+  const PIECE_H = 26;
+  const LAYERS = [
+    { label:'Bottom Bun', fill:'#D4956A', stroke:'#A06030' },
+    { label:'Patty',      fill:'#5C2E0A', stroke:'#3D1A04' },
+    { label:'Cheese',     fill:'#F5C518', stroke:'#C49A00' },
+    { label:'Lettuce',    fill:'#22C55E', stroke:'#15803D' },
+    { label:'Tomato',     fill:'#EF4444', stroke:'#B91C1C' },
+    { label:'Bacon',      fill:'#C2410C', stroke:'#9A3412' },
+    { label:'Onion',      fill:'#C084FC', stroke:'#9333EA' },
+    { label:'Pickle',     fill:'#4ADE80', stroke:'#16A34A' },
+    { label:'Top Bun',    fill:'#D4A56A', stroke:'#A06030' },
+  ];
 
-function populateDuelSelects() {
-  const selA = document.getElementById('duel-sel-a');
-  const selB = document.getElementById('duel-sel-b');
-  if (!selA || !selB) return;
-  // Prefer the persisted globals; fall back to whatever the DOM currently has
-  const prevA = _activeDuelPlayerA || selA.value;
-  const prevB = _activeDuelPlayerB || selB.value;
-  const sorted = [...players].sort((a, b) => b.count - a.count);
-  const opts = sorted.map(p => `<option value="${escHtml(p.id)}">${escHtml(p.name)} (${p.count || 0})</option>`).join('');
-  selA.innerHTML = '<option value="">— choose —</option>' + opts;
-  selB.innerHTML = '<option value="">— choose —</option>' + opts;
-  // Restore previous selections if still valid
-  if (prevA && sorted.find(p => p.id === prevA)) { selA.value = prevA; _activeDuelPlayerA = prevA; }
-  if (prevB && sorted.find(p => p.id === prevB)) { selB.value = prevB; _activeDuelPlayerB = prevB; }
-}
+  const W = 320, H = 500;
+  let canvas, ctx, DPR;
+  let raf = null;
+  let state  = 'idle'; // idle | playing | over
+  let score  = 0;
+  let speed  = 2.5;
+  let stack  = [];
+  let cur    = null;
+  let falling = [];
+  let camY   = 0;
+  let layerIdx = 0;
+  let bsTopScore = 0, bsTopName = '';
+  let spaceDown = false;
 
-// ── Helper: compute duel stats for one player ────────────────────────────────
-function _duelStats(p) {
-  const raw = p.logs || [];
-  // Use normalizeLogs so legacy string entries aren't dropped
-  const logs = normalizeLogs(raw);
-  const count = p.count || 0;
-  const now = new Date();
+  // ── DOM refs ──────────────────────────────────────────────
+  function $id(id){ return document.getElementById(id); }
 
-  // ── Velocity: avg burgers per week based on span of all logs ──────────────
-  let velocity = 0;
-  const timestamps = logs.map(e => safeDate(e.ts)).filter(Boolean).sort((a, b) => a - b);
-  if (timestamps.length >= 2) {
-    const spanWeeks = (timestamps[timestamps.length - 1] - timestamps[0]) / (7 * 86400000);
-    velocity = spanWeeks > 0 ? (logs.length / spanWeeks) : logs.length;
-  } else if (timestamps.length === 1) {
-    // Less than 2 data points — use weeks since first log
-    const weeksElapsed = Math.max(0.143, (now - timestamps[0]) / (7 * 86400000));
-    velocity = 1 / weeksElapsed;
+  // ── Firebase top-score ───────────────────────────────────
+  function loadBsTop() {
+    if (!db || !roomId) return;
+    getDoc(doc(db, 'rooms', roomId)).then(snap => {
+      if (!snap.exists()) return;
+      const t = snap.data().burgerStackTop;
+      if (t) { bsTopScore = t.score || 0; bsTopName = t.name || ''; refreshScoreBoard(); }
+    }).catch(() => {});
   }
 
-  // ── Labor Day forecast ────────────────────────────────────────────────────
-  const ld = laborDay(now.getFullYear());
-  const weeksToLD = Math.max(0, (ld - now) / (7 * 86400000));
-  const ldForecast = Math.round(count + velocity * weeksToLD);
-
-  // ── Expected finish date ──────────────────────────────────────────────────
-  let finishDate = null;
-  if (count >= 100) {
-    finishDate = 'Already done! 🏆';
-  } else if (velocity > 0) {
-    const weeksLeft = (100 - count) / velocity;
-    const finish = new Date(now.getTime() + weeksLeft * 7 * 86400000);
-    finishDate = finish.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  } else {
-    finishDate = 'No pace yet';
+  function saveBsTop(name, sc) {
+    if (!db || !roomId) return;
+    updateDoc(doc(db, 'rooms', roomId), { burgerStackTop: { name, score: sc, ts: Date.now() } })
+      .then(() => { bsTopScore = sc; bsTopName = name; refreshScoreBoard(); })
+      .catch(() => {});
   }
 
-  // ── Weekly heat (last 7 days) ─────────────────────────────────────────────
-  const sevenDaysAgo = new Date(now - 7 * 86400000);
-  const weeklyHeat = logs.filter(e => { const d = safeDate(e.ts); return d && d >= sevenDaysAgo; }).length;
-
-  // ── Streak ────────────────────────────────────────────────────────────────
-  const daySet = {};
-  logs.forEach(e => {
-    const key = tsToDateKey(e.ts);
-    if (key) daySet[key] = true;
-  });
-  const dayKeys = Object.keys(daySet).sort((a, b) => {
-    const [ay, am, ad] = a.split('-').map(Number);
-    const [by, bm, bd] = b.split('-').map(Number);
-    return new Date(ay, am, ad) - new Date(by, bm, bd);
-  });
-  let currentStreak = 0, maxStreak = 0, streak = 1;
-  for (let i = 1; i < dayKeys.length; i++) {
-    const [py, pm, pd] = dayKeys[i-1].split('-').map(Number);
-    const [cy, cm, cd] = dayKeys[i].split('-').map(Number);
-    const diff = Math.round((new Date(cy, cm, cd) - new Date(py, pm, pd)) / 86400000);
-    if (diff === 1) { streak++; } else { streak = 1; }
-    maxStreak = Math.max(maxStreak, streak);
+  function refreshScoreBoard() {
+    const el = $id('bs-top-score');
+    if (el) el.textContent = bsTopScore > 0 ? bsTopName + '  ' + bsTopScore : '—';
   }
-  if (dayKeys.length > 0) { maxStreak = Math.max(maxStreak, 1); }
-  // Current streak: check if last logged day was today or yesterday
-  if (dayKeys.length > 0) {
-    const [ly, lm, ld2] = dayKeys[dayKeys.length - 1].split('-').map(Number);
-    const lastDate = new Date(ly, lm, ld2);
-    const todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const diff = Math.round((todayMid - lastDate) / 86400000);
-    if (diff <= 1) {
-      // Walk backwards from the end to find current streak length
-      let cs = 1;
-      for (let i = dayKeys.length - 2; i >= 0; i--) {
-        const [py, pm, pd] = dayKeys[i].split('-').map(Number);
-        const [cy, cm, cd] = dayKeys[i+1].split('-').map(Number);
-        const d = Math.round((new Date(cy, cm, cd) - new Date(py, pm, pd)) / 86400000);
-        if (d === 1) cs++; else break;
+
+  // ── Canvas setup ─────────────────────────────────────────
+  function setupCanvas() {
+    canvas = $id('burger-stack-canvas');
+    if (!canvas) return false;
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width  = W * DPR;
+    canvas.height = H * DPR;
+    canvas.style.width  = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx = canvas.getContext('2d');
+    ctx.scale(DPR, DPR);
+    return true;
+  }
+
+  // ── Game lifecycle ────────────────────────────────────────
+  function resetGame() {
+    score = 0; speed = 2.5; layerIdx = 0; camY = 0; falling = [];
+    const startW = 190, startX = (W - startW) / 2;
+    stack = [{ x: startX, w: startW, y: H - PIECE_H - 8, ...LAYERS[0] }];
+    layerIdx = 1;
+    spawnCurrent();
+  }
+
+  function spawnCurrent() {
+    const top = stack[stack.length - 1];
+    const layer = LAYERS[layerIdx % LAYERS.length];
+    cur = { x: 0, w: top.w, dir: 1, ...layer };
+    layerIdx++;
+  }
+
+  function drop() {
+    if (state !== 'playing' || !cur) return;
+    const top = stack[stack.length - 1];
+    const left  = Math.max(cur.x, top.x);
+    const right = Math.min(cur.x + cur.w, top.x + top.w);
+    const overlap = right - left;
+
+    if (overlap <= 2) { endGame(); return; }
+
+    const isPerfect = Math.abs(cur.x - top.x) <= 3;
+    const newX = isPerfect ? top.x : left;
+    const newW = isPerfect ? top.w  : overlap;
+
+    // falling cut-off fragments
+    if (!isPerfect) {
+      if (cur.x < top.x)
+        falling.push({ x: cur.x, y: top.y - PIECE_H - 2, w: top.x - cur.x, vy: -0.5, fill: cur.fill, stroke: cur.stroke });
+      if (cur.x + cur.w > top.x + top.w)
+        falling.push({ x: top.x + top.w, y: top.y - PIECE_H - 2, w: (cur.x + cur.w) - (top.x + top.w), vy: -0.5, fill: cur.fill, stroke: cur.stroke });
+    }
+
+    stack.push({ x: newX, w: newW, y: top.y - PIECE_H - 2, fill: cur.fill, stroke: cur.stroke, label: cur.label });
+    score++;
+    speed = Math.min(10, 2.5 + Math.floor(score / 4) * 0.35);
+    spawnCurrent();
+
+    // tiny vibration on drop
+    if (navigator.vibrate) navigator.vibrate(18);
+  }
+
+  function endGame() {
+    state = 'over';
+    if (raf) { cancelAnimationFrame(raf); raf = null; }
+    drawFrame();
+    showOverlay(true);
+  }
+
+  // ── Game loop ─────────────────────────────────────────────
+  function loop() {
+    if (state !== 'playing') return;
+    update();
+    drawFrame();
+    raf = requestAnimationFrame(loop);
+  }
+
+  function update() {
+    if (!cur) return;
+    cur.x += cur.dir * speed;
+    if (cur.x <= 0)            { cur.x = 0;            cur.dir =  1; }
+    if (cur.x + cur.w >= W)    { cur.x = W - cur.w;    cur.dir = -1; }
+
+    falling.forEach(f => { f.vy += 0.55; f.y += f.vy; });
+    falling = falling.filter(f => f.y < H + 120);
+
+    // smooth camera scroll: keep top of stack at ~32% from top
+    const topPiece = stack[stack.length - 1];
+    const targetCam = topPiece.y - H * 0.32;
+    if (targetCam > camY) camY += (targetCam - camY) * 0.1;
+  }
+
+  // ── Drawing ───────────────────────────────────────────────
+  function drawFrame() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Sky gradient BG
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#7ec4e6'); bg.addColorStop(1, '#c4e3f5');
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+    // Subtle grid lines for depth
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)'; ctx.lineWidth = 1;
+    for (let gx = 0; gx < W; gx += 40) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
+
+    ctx.save();
+    ctx.translate(0, -camY);
+
+    // Stack pieces
+    stack.forEach(p => drawPiece(p.x, p.y, p.w, PIECE_H, p.fill, p.stroke, p.label));
+
+    // Falling cut-offs
+    falling.forEach(f => {
+      ctx.save(); ctx.globalAlpha = 0.65;
+      drawPiece(f.x, f.y, f.w, PIECE_H, f.fill, f.stroke, '');
+      ctx.restore();
+    });
+
+    // Moving current piece (floats above the stack)
+    if (cur && state === 'playing') {
+      const top = stack[stack.length - 1];
+      const curY = top.y - PIECE_H - 16;
+      drawPiece(cur.x, curY, cur.w, PIECE_H, cur.fill, cur.stroke, cur.label);
+
+      // ghost drop line
+      ctx.save();
+      ctx.setLineDash([3,4]); ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(cur.x+cur.w/2, curY+PIECE_H); ctx.lineTo(cur.x+cur.w/2, top.y); ctx.stroke();
+      ctx.setLineDash([]); ctx.restore();
+    }
+
+    ctx.restore(); // end camera
+
+    // HUD
+    ctx.save();
+    // Score pill
+    ctx.fillStyle = 'rgba(11,53,80,0.55)';
+    roundRect(ctx, 10, 10, 110, 34, 10); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = "700 18px 'Russo One', sans-serif"; ctx.textAlign = 'left';
+    ctx.fillText('🍔  ' + score, 20, 32);
+
+    // Speed dots (top-right)
+    const dots = Math.min(Math.floor((speed - 2.5) / 0.35) + 1, 10);
+    for (let i = 0; i < 10; i++) {
+      ctx.fillStyle = i < dots ? '#1a70aa' : 'rgba(255,255,255,0.18)';
+      ctx.beginPath(); ctx.arc(W - 14 - (9-i)*13, 27, 4.5, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawPiece(x, y, w, h, fill, stroke, label) {
+    if (w < 1) return;
+    const r = Math.min(8, h/2, w/2);
+    ctx.save();
+    ctx.shadowColor = 'rgba(11,53,80,0.22)'; ctx.shadowBlur = 7; ctx.shadowOffsetY = 3;
+    roundRect(ctx, x, y, w, h, r);
+    ctx.fillStyle = fill; ctx.fill();
+    ctx.restore();
+    roundRect(ctx, x, y, w, h, r);
+    ctx.strokeStyle = stroke; ctx.lineWidth = 1.5; ctx.stroke();
+    // Sheen highlight
+    ctx.save();
+    ctx.clip();
+    const sh = ctx.createLinearGradient(0, y, 0, y + h * 0.5);
+    sh.addColorStop(0,'rgba(255,255,255,0.28)'); sh.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle = sh; ctx.fillRect(x, y, w, h * 0.5);
+    ctx.restore();
+    if (label && w > 48) {
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      const fs = Math.min(10, w / 12);
+      ctx.font = `600 ${fs}px 'Outfit', sans-serif`; ctx.textAlign = 'center';
+      ctx.fillText(label, x + w/2, y + h * 0.70);
+    }
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    r = Math.max(0, Math.min(r, w/2, h/2));
+    ctx.beginPath();
+    ctx.moveTo(x+r, y);
+    ctx.lineTo(x+w-r, y); ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+    ctx.lineTo(x+w, y+h-r); ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+    ctx.lineTo(x+r, y+h); ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+    ctx.lineTo(x, y+r); ctx.quadraticCurveTo(x, y, x+r, y);
+    ctx.closePath();
+  }
+
+  // ── Idle title screen ────────────────────────────────────
+  function drawIdle() {
+    if (!ctx) return;
+    ctx.clearRect(0, 0, W, H);
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0,'#7ec4e6'); bg.addColorStop(1,'#c4e3f5');
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+    // Demo burger stack centered
+    const demoLayers = [
+      { fill:'#D4956A', stroke:'#A06030', label:'Bottom Bun' },
+      { fill:'#5C2E0A', stroke:'#3D1A04', label:'Patty' },
+      { fill:'#F5C518', stroke:'#C49A00', label:'Cheese' },
+      { fill:'#22C55E', stroke:'#15803D', label:'Lettuce' },
+      { fill:'#D4A56A', stroke:'#A06030', label:'Top Bun' },
+    ];
+    const cx = W / 2;
+    demoLayers.forEach((l, i) => {
+      const w = 170 - i * 4;
+      const y = H * 0.68 - i * (PIECE_H + 3);
+      drawPiece(cx - w/2, y, w, PIECE_H, l.fill, l.stroke, l.label);
+    });
+  }
+
+  // ── Overlay logic ────────────────────────────────────────
+  function showOverlay(isGameOver) {
+    const ov = $id('bs-overlay');
+    const res = $id('bs-result');
+    const playBtn = $id('bs-play-btn');
+    const againBtn = $id('bs-again-btn');
+    const scoreEl = $id('bs-result-score');
+    const msgEl   = $id('bs-result-msg');
+
+    if (!ov) return;
+    ov.style.display = 'flex';
+
+    if (isGameOver) {
+      if (res) res.style.display = 'flex';
+      if (scoreEl) scoreEl.textContent = score;
+      if (playBtn) playBtn.style.display = 'none';
+      if (againBtn) againBtn.style.display = '';
+      if (msgEl) {
+        if (score > bsTopScore) {
+          msgEl.textContent = '🏆 NEW ROOM RECORD!';
+          saveBsTop(myName || 'Player', score);
+        } else if (score === bsTopScore && score > 0) {
+          msgEl.textContent = '🤝 Tied the record!';
+        } else if (bsTopScore > 0) {
+          msgEl.textContent = 'Room record: ' + bsTopName + ' — ' + bsTopScore;
+        } else {
+          msgEl.textContent = 'Nice try! Keep stacking.';
+        }
       }
-      currentStreak = cs;
-    }
-  }
-
-  // ── Weekend bias ──────────────────────────────────────────────────────────
-  const weekendLogs = logs.filter(e => { const d = safeDate(e.ts); if (!d) return false; const dow = d.getDay(); return dow === 5 || dow === 6 || dow === 0; }).length;
-  const weekendBias = logs.length > 0 ? Math.round((weekendLogs / logs.length) * 100) : 0;
-
-  // ── Average rating ────────────────────────────────────────────────────────
-  const ratedLogs = logs.filter(e => typeof e.rating === 'number' && e.rating > 0);
-  const avgRating = ratedLogs.length > 0
-    ? (ratedLogs.reduce((s, e) => s + e.rating, 0) / ratedLogs.length)
-    : null;
-
-  // ── Meat density (avg patties) ────────────────────────────────────────────
-  const pattyLogs = logs.filter(e => typeof e._raw?.patties === 'number' && e._raw.patties > 0);
-  const meatDensity = pattyLogs.length > 0
-    ? (pattyLogs.reduce((s, e) => s + e._raw.patties, 0) / pattyLogs.length)
-    : null;
-
-  // ── Per-restaurant ratings map (for battlegrounds) ────────────────────────
-  const restoRatings = {}; // key: lower-case name → { sum, count, ratings[] }
-  logs.forEach(e => {
-    if (!e.restaurant) return;
-    const key = e.restaurant.trim().toLowerCase();
-    if (!restoRatings[key]) restoRatings[key] = { name: e.restaurant.trim(), ratings: [] };
-    if (typeof e.rating === 'number' && e.rating > 0) restoRatings[key].ratings.push(e.rating);
-    else restoRatings[key].ratings.push(null); // visited but unrated
-    restoRatings[key].visitCount = (restoRatings[key].visitCount || 0) + 1;
-  });
-
-  return { count, velocity, ldForecast, finishDate, weeklyHeat, currentStreak, maxStreak, weekendBias, avgRating, meatDensity, restoRatings };
-}
-
-// ── starsInline: compact star display ─────────────────────────────────────────
-function _duelStars(n) {
-  if (n === null) return '<span style="color:var(--muted);font-size:12px">—</span>';
-  const full = Math.floor(n), half = (n % 1) >= 0.5;
-  return Array.from({length: 5}, (_, i) => {
-    if (i < full) return `<span style="color:var(--amber)">★</span>`;
-    if (i === full && half) return `<span style="color:var(--amber);opacity:0.5">★</span>`;
-    return `<span style="color:#333">★</span>`;
-  }).join('') + `<span style="font-size:11px;margin-left:3px;color:var(--muted2)">${n.toFixed(1)}</span>`;
-}
-
-// ── Main render ────────────────────────────────────────────────────────────────
-function renderDuel() {
-  const grid = document.getElementById('duel-grid');
-  if (!grid) return;
-  const selA = document.getElementById('duel-sel-a');
-  const selB = document.getElementById('duel-sel-b');
-  if (!selA || !selB) return;
-  const idA = selA.value, idB = selB.value;
-  if (!idA || !idB || idA === idB) {
-    grid.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🥊</div><div class="empty-state-title">Choose Your Fighters</div><div class="empty-state-sub">Select two different players above to begin the head-to-head showdown</div></div>`;
-    return;
-  }
-  const pA = players.find(p => p.id === idA);
-  const pB = players.find(p => p.id === idB);
-  if (!pA || !pB) { grid.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🔍</div><div class="empty-state-title">Player Not Found</div><div class="empty-state-sub">One of the selected players could not be loaded</div></div>`; return; }
-
-  const colorA = RING_COLORS[pA.colorIdx % RING_COLORS.length];
-  const colorB = RING_COLORS[pB.colorIdx % RING_COLORS.length];
-  // Set CSS variables for colour-coded sides
-  grid.style.setProperty('--duel-a-color', colorA);
-  grid.style.setProperty('--duel-b-color', colorB);
-
-  const sA = _duelStats(pA);
-  const sB = _duelStats(pB);
-
-  // ── Category win counting (used for victor) ──────────────────────────────
-  let _wA = 0, _wB = 0;
-  function _cmp(a, b) {
-    if (a === null || b === null) return;
-    const na = parseFloat(a), nb = parseFloat(b);
-    if (isNaN(na) || isNaN(nb)) return;
-    if (na > nb) _wA++; else if (nb > na) _wB++;
-  }
-  _cmp(sA.count,         sB.count);
-  _cmp(sA.velocity,      sB.velocity);
-  _cmp(sA.ldForecast,    sB.ldForecast);
-  _cmp(sA.weeklyHeat,    sB.weeklyHeat);
-  _cmp(sA.currentStreak, sB.currentStreak);
-  _cmp(sA.maxStreak,     sB.maxStreak);
-  _cmp(sA.weekendBias,   sB.weekendBias);
-  _cmp(sA.avgRating,     sB.avgRating);
-  _cmp(sA.meatDensity,   sB.meatDensity);
-  const winsA = _wA, winsB = _wB;
-
-  // ── Player header cards ────────────────────────────────────────────────────
-  const headerHtml = `
-<div class="duel-player-headers">
-  <div class="duel-player-header" id="duel-head-a" style="--ph-color:${colorA};overflow:hidden">
-    ${ringAvatarHTML(pA, 48)}
-    <div class="duel-player-name" style="color:${colorA}">${escHtml(pA.name)}</div>
-    <div class="duel-player-count" style="color:${colorA}">${sA.count}</div>
-  </div>
-  <div class="duel-vs-mid" id="duel-vs-mid">🥊</div>
-  <div class="duel-player-header" id="duel-head-b" style="--ph-color:${colorB};overflow:hidden">
-    ${ringAvatarHTML(pB, 48)}
-    <div class="duel-player-name" style="color:${colorB}">${escHtml(pB.name)}</div>
-    <div class="duel-player-count" style="color:${colorB}">${sB.count}</div>
-  </div>
-</div>
-<div class="duel-victor-banner" id="duel-victor-banner"></div>`;
-
-  // ── Helper: build one stat row ─────────────────────────────────────────────
-  function row(labelHtml, valA, valB, higherWins = true, subA = '', subB = '') {
-    let clsA = '', clsB = '';
-    if (valA !== null && valB !== null) {
-      const numA = parseFloat(String(valA).replace(/[^0-9.-]/g, ''));
-      const numB = parseFloat(String(valB).replace(/[^0-9.-]/g, ''));
-      if (!isNaN(numA) && !isNaN(numB) && numA !== numB) {
-        const aWins = higherWins ? numA > numB : numA < numB;
-        clsA = aWins ? 'winner' : 'loser';
-        clsB = aWins ? 'loser' : 'winner';
-      }
-    }
-    return `<div class="duel-stat-row">
-      <div>
-        <div class="duel-stat-val side-a ${clsA}">${valA ?? '—'}</div>
-        ${subA ? `<div class="duel-stat-sub side-a">${subA}</div>` : ''}
-      </div>
-      <div class="duel-stat-label">${labelHtml}</div>
-      <div>
-        <div class="duel-stat-val side-b ${clsB}">${valB ?? '—'}</div>
-        ${subB ? `<div class="duel-stat-sub side-b">${subB}</div>` : ''}
-      </div>
-    </div>`;
-  }
-
-  // ── Velocity & forecast rows ───────────────────────────────────────────────
-  const fmtVel = v => v > 0 ? v.toFixed(1) + '/wk' : '0/wk';
-
-  const ldClassA = sA.ldForecast >= 100 ? 'duel-forecast-green' : sA.ldForecast >= 75 ? 'duel-forecast-amber' : 'duel-forecast-red';
-  const ldClassB = sB.ldForecast >= 100 ? 'duel-forecast-green' : sB.ldForecast >= 75 ? 'duel-forecast-amber' : 'duel-forecast-red';
-  const ldRowHtml = `<div class="duel-stat-row">
-    <div>
-      <div class="duel-stat-val side-a ${ldClassA}">${sA.ldForecast}</div>
-    </div>
-    <div class="duel-stat-label">Labor Day<br>Forecast</div>
-    <div>
-      <div class="duel-stat-val side-b ${ldClassB}">${sB.ldForecast}</div>
-    </div>
-  </div>`;
-
-  const finishA = sA.finishDate || '—';
-  const finishB = sB.finishDate || '—';
-
-  // ── THE RACE LINE ──────────────────────────────────────────────────────────
-  const raceBlock = `<div class="duel-stat-block">
-    <div class="duel-stat-block-title">🏁 The Race Line</div>
-    ${row('Current<br>Count', sA.count, sB.count, true)}
-    ${row('Velocity', fmtVel(sA.velocity), fmtVel(sB.velocity), true)}
-    ${ldRowHtml}
-    <div class="duel-stat-row">
-      <div><div class="duel-stat-val side-a" style="font-size:13px;font-family:'Outfit',sans-serif;font-weight:700">${finishA}</div></div>
-      <div class="duel-stat-label">Expected<br>Finish</div>
-      <div><div class="duel-stat-val side-b" style="font-size:13px;font-family:'Outfit',sans-serif;font-weight:700">${finishB}</div></div>
-    </div>
-  </div>`;
-
-  // ── THE MOMENTUM ───────────────────────────────────────────────────────────
-  const streakA = `${sA.currentStreak} / ${sA.maxStreak}`;
-  const streakB = `${sB.currentStreak} / ${sB.maxStreak}`;
-  const momentumBlock = `<div class="duel-stat-block">
-    <div class="duel-stat-block-title">🔥 The Momentum</div>
-    ${row('Weekly<br>Heat', sA.weeklyHeat, sB.weeklyHeat, true)}
-    ${row('Cur / Max<br>Streak', streakA, streakB, true)}
-    ${row('Weekend<br>Bias', sA.weekendBias + '%', sB.weekendBias + '%', true)}
-  </div>`;
-
-  // ── THE PALATE ─────────────────────────────────────────────────────────────
-  const avgRA = sA.avgRating !== null ? sA.avgRating.toFixed(1) : null;
-  const avgRB = sB.avgRating !== null ? sB.avgRating.toFixed(1) : null;
-  const mdA = sA.meatDensity !== null ? sA.meatDensity.toFixed(1) + 'x' : null;
-  const mdB = sB.meatDensity !== null ? sB.meatDensity.toFixed(1) + 'x' : null;
-
-  // Battlegrounds: find mutual restaurants
-  const keysA = new Set(Object.keys(sA.restoRatings));
-  const keysB = new Set(Object.keys(sB.restoRatings));
-  const mutual = [...keysA].filter(k => keysB.has(k));
-
-  let battlegroundsHtml = '';
-  if (mutual.length > 0) {
-    const bgCards = mutual.map(k => {
-      const rA = sA.restoRatings[k];
-      const rB = sB.restoRatings[k];
-      const displayName = rA.name;
-      const avgA = rA.ratings.filter(r => r !== null).length > 0
-        ? rA.ratings.filter(r => r !== null).reduce((s, r) => s + r, 0) / rA.ratings.filter(r => r !== null).length
-        : null;
-      const avgB = rB.ratings.filter(r => r !== null).length > 0
-        ? rB.ratings.filter(r => r !== null).reduce((s, r) => s + r, 0) / rB.ratings.filter(r => r !== null).length
-        : null;
-      const visA = rA.visitCount || rA.ratings.length;
-      const visB = rB.visitCount || rB.ratings.length;
-      return `<div class="duel-battleground-card">
-        <div class="duel-bg-name">${escHtml(displayName)}</div>
-        <div class="duel-bg-rating side-a">${_duelStars(avgA)}<br><span style="font-size:10px;color:var(--muted2)">${visA} visit${visA!==1?'s':''}</span></div>
-        <div class="duel-bg-vs">VS</div>
-        <div class="duel-bg-rating side-b">${_duelStars(avgB)}<br><span style="font-size:10px;color:var(--muted2)">${visB} visit${visB!==1?'s':''}</span></div>
-      </div>`;
-    }).join('');
-    battlegroundsHtml = `<div style="padding:0 0 4px">${bgCards}</div>`;
-  } else {
-    battlegroundsHtml = `<div style="text-align:center;padding:14px 12px 12px;color:var(--muted);font-size:12px;font-family:'Outfit',sans-serif">No mutual spots yet — get out there together!</div>`;
-  }
-
-  const palateBlock = `<div class="duel-stat-block">
-    <div class="duel-stat-block-title">🍽️ The Palate</div>
-    ${row('Avg<br>Rating', avgRA, avgRB, true)}
-    ${row('Meat<br>Density', mdA, mdB, true)}
-    <div style="padding:8px 14px 4px;border-top:1px solid var(--border);font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted2)">⚔️ Battlegrounds — Mutual Spots</div>
-    ${battlegroundsHtml}
-  </div>`;
-
-  grid.innerHTML = headerHtml + raceBlock + momentumBlock + palateBlock;
-  // Apply color vars to the grid so child CSS vars resolve
-  grid.style.setProperty('--duel-a-color', colorA);
-  grid.style.setProperty('--duel-b-color', colorB);
-
-  // ── Fight animation + victor reveal ──────────────────────────────────────
-  requestAnimationFrame(() => _triggerDuelFight(winsA, winsB, pA.name, pB.name, colorA, colorB));
-}
-
-function _triggerDuelFight(winsA, winsB, nameA, nameB, colorA, colorB) {
-  const headA   = document.getElementById('duel-head-a');
-  const headB   = document.getElementById('duel-head-b');
-  const vsBadge = document.getElementById('duel-vs-mid');
-  const banner  = document.getElementById('duel-victor-banner');
-  if (!headA || !headB) return;
-
-  // 1. Both fighters rush at each other
-  headA.classList.add('duel-clash-a');
-  headB.classList.add('duel-clash-b');
-
-  // 2. Impact: swap VS to 💥 at peak collision (~30% of 850ms = 255ms)
-  setTimeout(() => {
-    if (vsBadge) {
-      vsBadge.textContent = '💥';
-      vsBadge.classList.add('duel-impact-flash');
-    }
-  }, 265);
-
-  // 3. Restore 🥊 as fighters recoil
-  setTimeout(() => {
-    if (vsBadge) {
-      vsBadge.classList.remove('duel-impact-flash');
-      vsBadge.textContent = '🥊';
-    }
-  }, 710);
-
-  // 4. Fighters settle; remove animation classes so layout returns to normal
-  setTimeout(() => {
-    headA.classList.remove('duel-clash-a');
-    headB.classList.remove('duel-clash-b');
-  }, 870);
-
-  // 5. Victor reveal — crown drops + banner appears
-  setTimeout(() => {
-    if (winsA > winsB) {
-      // Crown player A
-      headA.style.overflow = 'visible';
-      headA.insertAdjacentHTML('afterbegin', '<div class="duel-crown">👑</div>');
-      headA.classList.add('winner-glow');
-      if (banner) banner.innerHTML = `<span style="color:${colorA}">👑 ${escHtml(nameA)} wins the duel! &nbsp;${winsA}–${winsB}</span>`;
-    } else if (winsB > winsA) {
-      // Crown player B
-      headB.style.overflow = 'visible';
-      headB.insertAdjacentHTML('afterbegin', '<div class="duel-crown">👑</div>');
-      headB.classList.add('winner-glow');
-      if (banner) banner.innerHTML = `<span style="color:${colorB}">👑 ${escHtml(nameB)} wins the duel! &nbsp;${winsB}–${winsA}</span>`;
     } else {
-      if (banner) banner.innerHTML = `<span style="color:var(--muted2)">🤝 Dead even — ${winsA} categories each</span>`;
+      if (res) res.style.display = 'none';
+      if (playBtn) playBtn.style.display = '';
+      if (againBtn) againBtn.style.display = 'none';
     }
-    if (banner) banner.classList.add('visible');
-  }, 1020);
-}
+  }
 
-// ── expose for inline handlers ───────────────────────────────────────────────
-window.renderDuel = renderDuel;
-window.populateDuelSelects = populateDuelSelects;
+  function hideOverlay() {
+    const ov = $id('bs-overlay');
+    if (ov) ov.style.display = 'none';
+  }
+
+  function startGame() {
+    hideOverlay();
+    state = 'playing';
+    resetGame();
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(loop);
+  }
+
+  // ── Input wiring ─────────────────────────────────────────
+  function onCanvasTap(e) {
+    e.preventDefault();
+    if (state === 'playing') drop();
+  }
+
+  function onSpaceKey(e) {
+    if (e.code === 'Space' && !spaceDown) {
+      e.preventDefault();
+      spaceDown = true;
+      if (state === 'playing') drop();
+    }
+  }
+  function onSpaceUp(e) { if (e.code === 'Space') spaceDown = false; }
+
+  // ── Public API ───────────────────────────────────────────
+  window.initBurgerStack = function() {
+    if (!canvas) {
+      if (!setupCanvas()) return;
+      $id('bs-play-btn')?.addEventListener('click', startGame);
+      $id('bs-again-btn')?.addEventListener('click', startGame);
+      canvas.addEventListener('pointerdown', onCanvasTap);
+      document.addEventListener('keydown', onSpaceKey);
+      document.addEventListener('keyup',   onSpaceUp);
+    }
+    loadBsTop();
+    if (state !== 'playing') {
+      drawIdle();
+      showOverlay(false);
+    }
+  };
+
+  window.pauseBurgerStack = function() {
+    if (raf) { cancelAnimationFrame(raf); raf = null; }
+    if (state === 'playing') state = 'paused';
+  };
+})();
+
+
 
 function _movePillToBtn(btn) {
   const pill = document.getElementById('tab-pill-indicator');
@@ -7653,7 +7372,6 @@ window.switchTab=function(name,btn){
   document.body.classList.toggle('pace-active',         name==='pace');
   document.body.classList.toggle('tally-active',       name==='tally');
   document.body.classList.toggle('leaderboard-active', name==='leaderboard');
-  document.body.classList.toggle('duel-active',        name==='duel');
   // Hide personal progress card on Ranks tab — it lives on other tabs
   const _strip = document.getElementById('header-tally-strip');
   if (_strip) _strip.style.display = name === 'list' ? 'none' : (_strip.dataset.hadPlayer === '1' ? 'block' : 'none');
@@ -7686,14 +7404,16 @@ window.switchTab=function(name,btn){
     renderBentoList();
   }
   if(name==='leaderboard') { _openAlbumId = null; const s=[...players].sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name)); renderLeaderboard(s); }
-  if(name==='duel') { populateDuelSelects(); renderDuel(); }
   if(name==='pace') renderPaceTab();
+  if(name==='game') { if(typeof initBurgerStack==='function') initBurgerStack(); }
+  // Pause game when leaving game tab
+  if(name!=='game' && typeof pauseBurgerStack==='function') pauseBurgerStack();
 
   // Staggered card reveal on every tab switch
   requestAnimationFrame(() => {
     const panel = document.getElementById('tab-' + name);
     if (!panel) return;
-    const cards = [...panel.querySelectorAll('.pl-row, .feed-row, .pace-card, .tr-card, .setup-card, .grill-card, .duel-stat-row, .milestone-card, .restaurant-row')];
+    const cards = [...panel.querySelectorAll('.pl-row, .feed-row, .pace-card, .tr-card, .setup-card, .grill-card, .milestone-card, .restaurant-row')];
     cards.forEach(c => { c.classList.remove('card-reveal'); c.style.animationDelay = ''; });
     void panel.offsetWidth; // single reflow
     cards.forEach((c, idx) => {
