@@ -433,6 +433,11 @@ button{transition:transform 0.2s ease}
 /* Done / close button */
 .receipt-done-btn{display:block;width:calc(100% - 48px);margin:10px auto 16px;padding:11px;background:linear-gradient(135deg,#B45309,#F59E0B);color:#fff;border:none;border-radius:999px;font-family:'Russo One',sans-serif;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:0.02em;transition:opacity 0.15s,transform 0.1s}
 .receipt-done-btn:active{transform:scale(0.97);opacity:0.9}
+.receipt-share-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:calc(100% - 48px);margin:0 auto 14px;padding:10px;background:rgba(30,100,160,0.07);border:1.5px solid rgba(30,100,160,0.20);border-radius:999px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:#1a70aa;cursor:pointer;transition:background 0.15s,transform 0.18s cubic-bezier(0.34,1.56,0.64,1)}
+.receipt-share-btn:hover{background:rgba(30,100,160,0.12)}
+.receipt-share-btn:active{transform:scale(0.93)}
+#share-toast{position:fixed;top:calc(env(safe-area-inset-top,0px) + 16px);left:50%;transform:translateX(-50%) translateY(-90px);background:rgba(255,255,255,0.94);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,0.75);color:var(--text);font-size:13px;font-weight:600;padding:12px 22px;border-radius:999px;opacity:0;z-index:2000;white-space:normal;max-width:calc(100vw - 40px);text-align:center;box-shadow:0 4px 24px rgba(11,53,80,0.16),0 1px 4px rgba(11,53,80,0.08);font-family:'Outfit',sans-serif;transition:transform 0.38s cubic-bezier(0.34,1.56,0.64,1),opacity 0.3s;pointer-events:none}
+#share-toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 /* amber gradient stripe at very top */
 .receipt-top-bar{height:5px;background:linear-gradient(90deg,#92400E,#F59E0B,#D97706,#F59E0B,#92400E)}
 /* hero / header */
@@ -965,29 +970,35 @@ body.feed-active .feed-sub-tabs{display:none}
 /* ── Floating reaction tray ── */
 #reaction-tray{
   position:fixed;z-index:500;
-  background:rgba(28,28,28,0.92);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border:1px solid rgba(255,255,255,0.13);
-  border-radius:22px;
-  padding:5px 6px;
-  display:flex;gap:2px;
-  box-shadow:0 8px 32px rgba(0,0,0,0.55),0 2px 8px rgba(0,0,0,0.3);
+  background:rgba(255,255,255,0.92);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,0.80);
+  border-radius:20px;
+  padding:7px;
+  display:flex;
+  box-shadow:0 8px 32px rgba(11,53,80,0.18),0 2px 10px rgba(11,53,80,0.10);
   opacity:0;
-  transform:scale(0.75) translateY(8px);
+  transform:scale(0.72) translateY(10px);
   transform-origin:right bottom;
   pointer-events:none;
-  transition:opacity 0.16s ease,transform 0.2s cubic-bezier(0.175,0.885,0.32,1.275);
+  transition:opacity 0.15s ease,transform 0.2s cubic-bezier(0.175,0.885,0.32,1.275);
 }
 #reaction-tray.open{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}
+.tray-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:3px;
+}
 .tray-emoji-btn{
   background:none;border:none;
-  font-size:21px;line-height:1;
-  padding:5px 4px;
-  border-radius:13px;
+  font-size:22px;line-height:1;
+  width:42px;height:42px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:12px;
   cursor:pointer;
   transition:transform 0.12s cubic-bezier(0.175,0.885,0.32,1.275),background 0.1s;
 }
-.tray-emoji-btn:hover{background:rgba(255,255,255,0.10);transform:scale(1.28)}
+.tray-emoji-btn:hover{background:rgba(30,100,160,0.09);transform:scale(1.22)}
 .tray-emoji-btn:active{transform:scale(0.88)}
 /* ── Reaction pills below each post ── */
 .msg-reactions{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
@@ -2920,12 +2931,24 @@ body.july4-bg::before {
 
 <div id="bdg-tip"></div>
 <div id="reaction-tray">
-  <button class="tray-emoji-btn" data-emoji="❤️">❤️</button>
-  <button class="tray-emoji-btn" data-emoji="👍">👍</button>
-  <button class="tray-emoji-btn" data-emoji="👎">👎</button>
-  <button class="tray-emoji-btn" data-emoji="😂">😂</button>
-  <button class="tray-emoji-btn" data-emoji="❗">❗</button>
-  <button class="tray-emoji-btn" data-emoji="❓">❓</button>
+  <div class="tray-grid">
+    <button class="tray-emoji-btn" data-emoji="🔥">🔥</button>
+    <button class="tray-emoji-btn" data-emoji="😍">😍</button>
+    <button class="tray-emoji-btn" data-emoji="🤌">🤌</button>
+    <button class="tray-emoji-btn" data-emoji="💀">💀</button>
+    <button class="tray-emoji-btn" data-emoji="🍔">🍔</button>
+    <button class="tray-emoji-btn" data-emoji="🏆">🏆</button>
+    <button class="tray-emoji-btn" data-emoji="👑">👑</button>
+    <button class="tray-emoji-btn" data-emoji="⚡">⚡</button>
+    <button class="tray-emoji-btn" data-emoji="😭">😭</button>
+    <button class="tray-emoji-btn" data-emoji="🥵">🥵</button>
+    <button class="tray-emoji-btn" data-emoji="😂">😂</button>
+    <button class="tray-emoji-btn" data-emoji="🫡">🫡</button>
+    <button class="tray-emoji-btn" data-emoji="💯">💯</button>
+    <button class="tray-emoji-btn" data-emoji="🥇">🥇</button>
+    <button class="tray-emoji-btn" data-emoji="👎">👎</button>
+    <button class="tray-emoji-btn" data-emoji="❤️">❤️</button>
+  </div>
 </div>
 <div id="lightbox" onclick="closeLightbox()"><img id="lightbox-img" src="" alt=""/></div>
 
@@ -3178,6 +3201,7 @@ body.july4-bg::before {
   </div>
 </div>
 <div class="toast" id="toast"></div>
+<div id="share-toast"></div>
 <div id="mc-advancement-toast">
   <div class="mc-toast-header">⚡ Challenge Complete!</div>
   <div class="mc-toast-body">
@@ -4942,11 +4966,16 @@ function showReactionTray(targetId, targetType, anchorEl) {
   _trayTargetType = targetType;
   const tray = document.getElementById('reaction-tray');
   const rect = anchorEl.getBoundingClientRect();
-  const trayW = 230;
+  const trayW = 196; // 4 cols × 42px + gaps + padding
+  const trayH = 196; // 4 rows × 42px + gaps + padding
   let left = rect.right - trayW;
   if (left < 8) left = 8;
+  if (left + trayW > window.innerWidth - 8) left = window.innerWidth - trayW - 8;
+  // prefer above the button; flip below if not enough room
+  let top = rect.top - trayH - 8;
+  if (top < 8) top = rect.bottom + 8;
   tray.style.left = left + 'px';
-  tray.style.top  = Math.max(8, rect.top - 56) + 'px';
+  tray.style.top  = top + 'px';
   tray.classList.add('open');
 }
 
@@ -5273,11 +5302,51 @@ let pendingPattyCount = 0;
 let pendingToppings = [];
 let pendingPhoto = '';      // base64 preview shown in the UI thumbnail
 let pendingPhotoFile = null; // original File — uploaded to Storage at submit time
+let _receiptShareData = null; // populated at receipt render time for shareReceipt()
 let _activeDuelPlayerA = ''; // persists duel selections across tab switches
 let _activeDuelPlayerB = '';
 window.closeReceipt = function() {
   const r = document.getElementById('order-receipt');
   if (r) { r.classList.remove('show'); r.classList.add('hide'); }
+};
+
+function showShareToast(msg) {
+  const t = document.getElementById('share-toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.remove('show');
+  void t.offsetWidth; // force reflow so re-trigger animates cleanly
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+window.shareReceipt = async function() {
+  const d = _receiptShareData;
+  if (!d) return;
+  const toppingsStr = d.toppings.length > 0 ? d.toppings.join(', ') : 'Classic';
+  const ratingStr   = d.rating ? `${d.rating}/5` : '?/5';
+  const text = [
+    `🍔 ${d.name} just logged Burger #${d.count} on the 100 Burger Challenge!`,
+    `✨ Spot: ${d.restaurant}`,
+    `🔥 Build: ${d.pattyLabel}-Patty Smash with ${toppingsStr}`,
+    `⭐ Score: ${ratingStr} Stars!`,
+    `☀️ Pacing hot for Labor Day! Can they hit 100?`
+  ].join('\n');
+  const url = window.location.href;
+  if (navigator.share) {
+    try {
+      await navigator.share({ text, url });
+    } catch(e) {
+      if (e.name !== 'AbortError') showToast('⚠️ Share failed');
+    }
+  } else {
+    try {
+      await navigator.clipboard.writeText(text + '\n' + url);
+      showShareToast('📋 Cookout stats copied to clipboard! Share it with the group chat!');
+    } catch(e) {
+      showToast('⚠️ Could not copy — try again');
+    }
+  }
 };
 
 const ALL_TOPPINGS = ['Ketchup','Mustard','Mayo','Cheese','Blue Cheese','Lettuce','Pickles','Tomatoes','Onions','Bacon','Mushrooms','Green Peppers','Special Sauce'];
@@ -5743,6 +5812,16 @@ window.confirmBurger = async function() {
     const now = new Date();
     const dateStr = (now.getMonth()+1).toString().padStart(2,'0') + '/' + now.getDate().toString().padStart(2,'0') + '/' + now.getFullYear();
     const timeStr = now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', hour12:true});
+    // Capture share data while all snapshot vars are in scope
+    const _me = players.find(p => p.id === myPlayerId);
+    _receiptShareData = {
+      name: myName,
+      restaurant,
+      rating: snapshotRating,
+      count: (_me?.count || 0) + 1,
+      toppings: snapshotToppings,
+      pattyLabel,
+    };
     const fireDisplay = (() => {
       if (!snapshotRating) return '';
       const full = Math.floor(snapshotRating);
@@ -5776,6 +5855,9 @@ window.confirmBurger = async function() {
           <div class="receipt-meta-col">${dateStr}<br>${timeStr}<br>Room: ${escHtml(roomId)}</div>
         </div>
         <div class="receipt-foot">Thank you, ${escHtml(myName)}!<br>Keep eating burgers!</div>
+        <button class="receipt-share-btn" onclick="shareReceipt()">
+          <span style="font-size:15px">📤</span> Share Receipt
+        </button>
         <button class="receipt-done-btn" onclick="closeReceipt()">Done</button>
       </div>
     `;
