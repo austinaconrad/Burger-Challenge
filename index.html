@@ -551,7 +551,7 @@ button{transition:transform 0.2s ease}
 .fpc-burger-badge{font-size:10px;font-weight:700;color:#fff;background:rgba(0,0,0,0.45);border-radius:999px;padding:3px 10px;border:1px solid rgba(255,255,255,0.28);flex-shrink:0}
 .fpc-body{padding:9px 14px 6px;display:flex;flex-direction:column;gap:0}
 /* No-photo warm gradient header */
-.feed-no-photo-header{display:flex;align-items:center;gap:11px;padding:11px 14px 10px;background:linear-gradient(135deg,rgba(180,83,9,0.07),rgba(245,158,11,0.13));border-bottom:1px solid rgba(245,158,11,0.16);border-radius:14px 14px 0 0;margin-bottom:2px}
+.feed-no-photo-header{display:flex;align-items:center;gap:11px;padding:12px 16px 11px;background:linear-gradient(135deg,rgba(180,83,9,0.07),rgba(245,158,11,0.13));border-bottom:1px solid rgba(245,158,11,0.16)}
 .fnph-icon{font-size:26px;line-height:1;flex-shrink:0}
 .fnph-info{flex:1;min-width:0}
 .fnph-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.02em;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -4813,7 +4813,7 @@ function renderUnifiedFeed() {
               <div class="fnph-sub">${escHtml(item.player.name)}${isMe?' (you)':''} &nbsp;·&nbsp; ${bannerMeta} &nbsp;·&nbsp; 🍔 #${burgerNum>0?burgerNum:'?'}</div>
             </div>
           </div>
-          <div class="feed-row-body" style="padding:8px 0 0">
+          <div class="feed-row-body" style="padding:10px 14px 12px">
             ${item.rating > 0 ? `<div class="grill-rating-row" style="margin-top:0;margin-bottom:6px">${ratingStars}</div>` : ''}
             <div class="grill-pill-row" style="margin-top:0">
               <span class="grill-pill ${stampCls==='stamp-triple'?'grill-pill-triple':''}">${stampText}</span>
@@ -7022,6 +7022,9 @@ function renderBentoList() {
           font-size="${numSize}" font-weight="900"
           stroke="rgba(0,0,0,0.42)" stroke-width="4" stroke-linejoin="round"
           paint-order="stroke fill" fill="white">${p.count}</text>
+        <!-- Burger emoji centered below number, above hem stripe -->
+        <text x="60" y="112" text-anchor="middle" dominant-baseline="central"
+          font-size="12" opacity="0.90">🍔</text>
       </svg>
       <div class="jw-name">${escHtml(p.name)}${meBadge}${doneBadge}${tieBadge}</div>
       <div class="jw-rank">${rankLabel}</div>
