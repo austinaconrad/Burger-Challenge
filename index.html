@@ -7030,12 +7030,9 @@ function renderBentoList() {
     const numSize = numStr.length >= 3 ? 18 : numStr.length === 2 ? 25 : 33;
     const nameUpper = p.name.toUpperCase();
     const nameLen = nameUpper.length;
-    const nameFontSize = nameLen <= 4 ? 12 : nameLen <= 6 ? 10.5 : nameLen <= 8 ? 9 : 7.5;
-    const nameLetterSpacing = nameLen <= 4 ? 3.5 : nameLen <= 6 ? 2.5 : nameLen <= 8 ? 1.5 : 0.6;
+    const nameFontSize = nameLen <= 4 ? 12 : nameLen <= 6 ? 10.5 : nameLen <= 8 ? 9 : nameLen <= 11 ? 8 : nameLen <= 14 ? 7 : nameLen <= 17 ? 6.5 : 6;
+    const nameLetterSpacing = nameLen <= 4 ? 3.5 : nameLen <= 6 ? 2.5 : nameLen <= 8 ? 1.5 : nameLen <= 11 ? 0.5 : 0;
     const borderStyle = '';
-    // Hanger metal finish by rank
-    const hangerColor = dr === 1 ? '#F5C518' : dr === 2 ? '#C8CDD4' : dr === 3 ? '#CD8B4A' : '#a0aeb8';
-    const hangerGlow  = '';
     // Avatar overlay in top-left corner of card
     const avatarOverlay = p.avatar
       ? `<div style="position:absolute;top:10px;left:10px;width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,0.85);overflow:hidden;z-index:2;box-shadow:0 1px 3px rgba(0,0,0,0.22)"><img src="${escHtml(p.avatar)}" style="width:100%;height:100%;object-fit:cover;object-position:center top"/></div>`
@@ -7048,19 +7045,13 @@ function renderBentoList() {
         style="animation-delay:${Math.min(i*0.05,0.4)}s"
         onclick="openCalModal('${escHtml(p.id)}')" title="View ${escHtml(p.name)}'s burger history">
       ${avatarOverlay}
-      <svg viewBox="0 -28 120 158" class="jersey-svg" aria-hidden="true">
+      <svg viewBox="0 8 120 124" class="jersey-svg" aria-hidden="true">
         <defs>
           <pattern id="jw-mesh" x="0" y="0" width="4" height="4" patternUnits="userSpaceOnUse">
             <circle cx="2" cy="2" r="0.55" fill="rgba(0,0,0,0.09)"/>
           </pattern>
           <path id="jw-arc-${escHtml(p.id)}" d="M26,62 Q60,34 94,62"/>
         </defs>
-
-        <!-- Hanger hook — gold/silver/bronze/grey by rank -->
-        ${hangerGlow}
-        <line x1="60" y1="0" x2="60" y2="-15" stroke="${hangerColor}" stroke-width="2.5" stroke-linecap="round"/>
-        <path d="M60,-15 Q60,-26 70,-26 Q80,-26 80,-15"
-          fill="none" stroke="${hangerColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
 
         <!-- Jersey body — back view, round crew neck -->
         <path d="M20,22 L0,36 L0,62 L26,54 L22,130 L98,130 L94,54 L120,62 L120,36 L100,22 Q80,9 60,13 Q40,9 20,22 Z" fill="${c}"/>
