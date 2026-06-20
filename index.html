@@ -1519,6 +1519,60 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 .pl-count-lbl { font-size:8px; color:var(--muted2); text-transform:uppercase; letter-spacing:0.08em; font-weight:600; text-align:right; margin-top:2px; }
 
 /* ══════════════════════════════════════════════
+   🏈 JERSEY WALL — Player Ranks
+   ══════════════════════════════════════════════ */
+.jersey-wall { display:flex; flex-direction:column; gap:10px; padding:4px 0 24px; }
+.jw-hero-row { display:flex; justify-content:center; }
+.jw-mid-row  { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.jw-rest-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+.jersey-card {
+  display:flex; flex-direction:column; align-items:center;
+  cursor:pointer; border-radius:14px;
+  padding:10px 6px 10px;
+  background:var(--surface); backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow-card);
+  transition:transform 0.18s ease, box-shadow 0.18s ease;
+  position:relative; overflow:hidden;
+}
+.jersey-card:active { transform:scale(0.96); }
+.jersey-hero { padding:14px 14px 12px; }
+.jersey-mid  { padding:10px 8px 10px; }
+.jersey-small{ padding:8px 4px 8px; }
+.jersey-svg  { width:100%; display:block; }
+.jersey-hero  .jersey-svg { max-width:180px; }
+.jersey-mid   .jersey-svg { max-width:140px; }
+.jersey-small .jersey-svg { max-width:110px; }
+.jw-name {
+  font-family:'Outfit',sans-serif; font-size:13px; font-weight:700;
+  color:var(--text); margin-top:6px; text-align:center;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  max-width:100%; padding:0 4px;
+  display:flex; align-items:center; justify-content:center; gap:4px;
+}
+.jersey-small .jw-name { font-size:11px; margin-top:4px; }
+.jw-rank {
+  font-size:14px; margin-top:2px;
+}
+.jersey-small .jw-rank { font-size:12px; }
+.jw-me-badge {
+  font-size:8px; font-weight:700; color:var(--sky);
+  background:rgba(30,110,170,0.12); border:1px solid rgba(30,110,170,0.25);
+  border-radius:4px; padding:1px 5px; letter-spacing:0.03em; flex-shrink:0;
+}
+.jw-tie-badge {
+  font-size:8px; font-weight:700; color:var(--amber);
+  background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.28);
+  border-radius:4px; padding:1px 5px; letter-spacing:0.03em; flex-shrink:0;
+}
+@keyframes jerseyPop {
+  0%   { transform:scale(1); box-shadow:var(--shadow-card); }
+  35%  { transform:scale(1.06); box-shadow:0 0 0 3px rgba(255,215,0,0.45), var(--shadow-card); }
+  100% { transform:scale(1); box-shadow:var(--shadow-card); }
+}
+.jersey-card.just-logged { animation:jerseyPop 0.55s ease both; }
+
+/* ══════════════════════════════════════════════
    📅 BURGER HISTORY CALENDAR MODAL
    ══════════════════════════════════════════════ */
 .cal-modal-overlay {
@@ -6690,90 +6744,83 @@ function renderBentoList() {
   if (!sorted.length) { el.innerHTML = '<div class="empty"><div class="e-icon">🍔</div><p>No players yet!</p></div>'; return; }
 
   const colorFor = p => RING_COLORS[p.colorIdx % RING_COLORS.length];
-  const MEDALS = ['🥇','🥈','🥉'];
-  const RANK_CLS = ['pl-gold','pl-silver','pl-bronze'];
 
-  // Build a set of counts that appear more than once (ties)
+  // Tie-aware rank map
   const countFreq = {};
   sorted.forEach(p => { countFreq[p.count] = (countFreq[p.count] || 0) + 1; });
-
-  // Assign display ranks accounting for ties (two players at 12 both get rank 1)
   let displayRank = 1;
   const rankMap = sorted.map((p, i) => {
     if (i > 0 && sorted[i-1].count !== p.count) displayRank = i + 1;
     return displayRank;
   });
 
-  // Pulse + rank-flip: determine which players changed BEFORE DOM wipe,
-  // then apply CSS classes to new rows AFTER innerHTML is set.
+  // Track changes for animation (before DOM wipe)
   const _pulsePids = [];
-  const _flipPids  = [];
   sorted.forEach((p, i) => {
     if (_prevCounts[p.id] !== undefined && p.count > _prevCounts[p.id]) _pulsePids.push(p.id);
-    const newRank = rankMap[i];
-    if (_prevRanks[p.id] !== undefined && _prevRanks[p.id] !== newRank) _flipPids.push(p.id);
     _prevCounts[p.id] = p.count;
-    _prevRanks[p.id]  = newRank;
+    _prevRanks[p.id]  = rankMap[i];
   });
 
-  el.innerHTML = `<div class="pl-list">${sorted.map((p, i) => {
-    const c = colorFor(p);
-    const st = computePlayerStats(p);
-    const dr = rankMap[i];
-    const isTied = countFreq[p.count] > 1;
+  // Build one jersey SVG card
+  function jerseyCard(p, i, size) {
+    const c    = colorFor(p);
+    const dr   = rankMap[i];
     const isMe = p.id === myPlayerId;
-    const rankCls = isMe ? '' : (dr === 2 ? 'pl-silver' : dr === 3 ? 'pl-bronze' : '');
-    const rank = dr === 1 ? '🥇' : dr === 2 ? '🥈' : dr === 3 ? '🥉' : `#${dr}`;
-    const pct = Math.min(100, p.count);
-    const avgPill = st.avgRating > 0 ? `<span class="pl-pill">⭐ ${st.avgRating.toFixed(1)}</span>` : '';
-    const _rCounts = {};
-    (p.logs || []).filter(e => typeof e === 'object' && e.restaurant).forEach(e => { const r = e.restaurant.trim(); _rCounts[r] = (_rCounts[r] || 0) + 1; });
-    const _topSpot = Object.entries(_rCounts).sort((a,b) => b[1]-a[1])[0];
-    const loyaltyPill = _topSpot && _topSpot[1] > 1 ? `<span class="pl-pill">🔁 ${_topSpot[1]}× ${escHtml(_topSpot[0].length > 12 ? _topSpot[0].slice(0,12)+'…' : _topSpot[0])}</span>` : '';
-    const _now = new Date();
-    const _day = _now.getDay(); // 0=Sun,1=Mon,...
-    const _daysSinceMon = (_day + 6) % 7; // Mon=0, Tue=1, ... Sun=6
-    const _weekStart = new Date(_now.getFullYear(), _now.getMonth(), _now.getDate() - _daysSinceMon);
-    _weekStart.setHours(0, 0, 0, 0);
-    const thisWeek = (p.logs || []).filter(e => typeof e === 'object' && e.ts && (safeDate(e.ts) || new Date(0)) >= _weekStart).length;
-    const weekPill = thisWeek > 0 ? `<span class="pl-pill">🍔 ${thisWeek} this week</span>` : `<span class="pl-pill" style="opacity:0.5">🍔 0 this week</span>`;
-    const tiedBadge = isTied ? `<span style="font-size:9px;font-weight:700;color:var(--amber);background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);border-radius:4px;padding:1px 5px;margin-left:4px;letter-spacing:0.03em">TIE</span>` : '';
-    const lastSeen = timeAgo(p);
-    const lastSeenHtml = lastSeen ? `<span style="font-size:9px;color:var(--muted);font-weight:500;margin-left:4px">${lastSeen}</span>` : '';
-    return `<div class="pl-row ${rankCls}" data-pid="${escHtml(p.id)}" style="animation-delay:${Math.min(i*0.04,0.35)}s;cursor:pointer" onclick="openCalModal('${p.id}')" title="View burger history">
-      <div class="pl-rank">${rank}</div>
-      <div class="pl-avatar" style="background:${c}20;color:${c};border:1.5px solid ${c}55;box-shadow:0 0 10px ${c}44,0 0 22px ${c}1a;${p.avatar ? 'overflow:hidden;padding:0' : ''}">${p.avatar ? `<img src="${p.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:9px" alt="${escHtml(p.name)}"/>` : initials(p.name)}</div>
-      <div class="pl-info">
-        <div class="pl-name" style="color:${c}">
-          ${escHtml(p.name)}
-          ${isMe ? '<span class="me-badge">You</span>' : ''}
-          ${p.count >= 100 ? '<span class="done-badge">✓</span>' : ''}
-          ${tiedBadge}
-          ${lastSeenHtml}
-        </div>
-        <div class="pl-pills">${avgPill}${loyaltyPill}${weekPill}</div>
-      </div>
-      <div style="text-align:right;flex-shrink:0">
-        <div class="pl-count" style="color:${c}">${p.count}</div>
-        <div class="pl-count-lbl">burgers</div>
-      </div>
-    </div>`;
-  }).join('')}</div>`;
+    const done = p.count >= 100;
+    const isTied = countFreq[p.count] > 1;
+    const rankLabel = dr === 1 ? '🥇' : dr === 2 ? '🥈' : dr === 3 ? '🥉' : `#${dr}`;
+    const numStr = String(p.count);
+    const numSize = numStr.length >= 3 ? 17 : numStr.length === 2 ? 23 : 30;
+    const borderStyle = '';
+    // Avatar content inside chest circle
+    const chestContent = p.avatar
+      ? `<image href="${escHtml(p.avatar)}" x="42" y="30" width="36" height="36" clip-path="url(#jwcp-${escHtml(p.id)})" preserveAspectRatio="xMidYMid slice"/>
+         <clipPath id="jwcp-${escHtml(p.id)}"><circle cx="60" cy="48" r="18"/></clipPath>`
+      : `<text x="60" y="48" text-anchor="middle" dominant-baseline="central" font-family="'Outfit',sans-serif" font-size="13" font-weight="700" fill="white">${initials(p.name)}</text>`;
+    const meBadge  = isMe ? `<span class="jw-me-badge">You</span>` : '';
+    const tieBadge = isTied ? `<span class="jw-tie-badge">TIE</span>` : '';
+    const doneBadge = done ? `<span class="done-badge">✓</span>` : '';
 
-  // Apply pulse/flip classes to freshly rendered rows
+    return `<div class="jersey-card jersey-${size}" data-pid="${escHtml(p.id)}"
+        style="${borderStyle}animation-delay:${Math.min(i*0.05,0.4)}s"
+        onclick="openCalModal('${escHtml(p.id)}')" title="View ${escHtml(p.name)}'s burger history">
+      <svg viewBox="0 0 120 130" class="jersey-svg" aria-hidden="true">
+        <path d="M20,22 L0,36 L0,62 L26,54 L22,130 L98,130 L94,54 L120,62 L120,36 L100,22 L80,10 L65,30 L60,36 L55,30 L40,10 Z" fill="${c}"/>
+        <path d="M20,22 L0,36 L0,62 L26,54 L26,28 L20,22 Z" fill="rgba(0,0,0,0.28)"/>
+        <path d="M100,22 L120,36 L120,62 L94,54 L94,28 L100,22 Z" fill="rgba(0,0,0,0.28)"/>
+        <path d="M40,10 L55,30 L60,36 L65,30 L80,10 L68,4 L60,18 L52,4 Z" fill="rgba(0,0,0,0.28)"/>
+        <circle cx="60" cy="48" r="18" fill="rgba(255,255,255,0.22)"/>
+        ${chestContent}
+        <circle cx="60" cy="96" r="21" fill="none" stroke="rgba(255,255,255,0.32)" stroke-width="1.5"/>
+        <text x="60" y="96" text-anchor="middle" dominant-baseline="central"
+          font-family="'Russo One','Arial Black',sans-serif"
+          font-size="${numSize}" font-weight="900" fill="white" opacity="0.95">${p.count}</text>
+      </svg>
+      <div class="jw-name">${escHtml(p.name)}${meBadge}${doneBadge}${tieBadge}</div>
+      <div class="jw-rank">${rankLabel}</div>
+    </div>`;
+  }
+
+  // Layout: single hero (#1), 2-col mid (#2–3), 3-col rest (#4+)
+  const hero = sorted.slice(0, 1);
+  const mid  = sorted.slice(1, 3);
+  const rest = sorted.slice(3);
+
+  let html = '<div class="jersey-wall">';
+  if (hero.length) html += `<div class="jw-hero-row">${hero.map((p,i)=>jerseyCard(p,i,'hero')).join('')}</div>`;
+  if (mid.length)  html += `<div class="jw-mid-row">${mid.map((p,i)=>jerseyCard(p,i+1,'mid')).join('')}</div>`;
+  if (rest.length) html += `<div class="jw-rest-row">${rest.map((p,i)=>jerseyCard(p,i+3,'small')).join('')}</div>`;
+  html += '</div>';
+  el.innerHTML = html;
+
+  // Pulse animation for fresh burger logs
   requestAnimationFrame(() => {
     _pulsePids.forEach(pid => {
-      const row = el.querySelector(`.pl-row[data-pid="${pid}"]`);
-      if (row) {
-        row.classList.add('just-logged');
-        row.addEventListener('animationend', () => row.classList.remove('just-logged'), {once:true});
-      }
-    });
-    _flipPids.forEach(pid => {
-      const rankEl = el.querySelector(`.pl-row[data-pid="${pid}"] .pl-rank`);
-      if (rankEl) {
-        rankEl.classList.add('rank-changed');
-        rankEl.addEventListener('animationend', () => rankEl.classList.remove('rank-changed'), {once:true});
+      const card = el.querySelector(`.jersey-card[data-pid="${pid}"]`);
+      if (card) {
+        card.classList.add('just-logged');
+        card.addEventListener('animationend', () => card.classList.remove('just-logged'), {once:true});
       }
     });
   });
@@ -7089,6 +7136,10 @@ function renderRestaurantLB() {
   let endBun = null;      // animated top bun that falls on game over
   let perfectStreak = 0;  // consecutive perfect drops
   let flashMsg = null;    // { text, alpha, worldY } — floats up on perfect
+  let particles = [];     // burst sparks on perfect drop
+  let scoreScale = 1.0;   // spring-pops when score increases
+  let idleRaf = null;     // rAF handle for idle animation loop
+  let idleT = 0;          // idle animation clock (frames)
 
   function $id(id){ return document.getElementById(id); }
 
@@ -7129,6 +7180,7 @@ function renderRestaurantLB() {
   // ── Game lifecycle ────────────────────────────────────────
   function resetGame() {
     score = 0; speed = 2.5; layerIdx = 0; cameraY = 0; falling = []; endBun = null; perfectStreak = 0; flashMsg = null;
+    particles = []; scoreScale = 1.0;
     const startW = 190, startX = (W - startW) / 2;
     stack = [{ x: startX, w: startW, y: H - PIECE_H - 8, ...BUN_BOT }];
     spawnCurrent();
@@ -7177,11 +7229,26 @@ function renderRestaurantLB() {
         worldY: fragY - 20,  // float up from just above the landed piece
       };
       if (navigator.vibrate) navigator.vibrate([12, 40, 24]);
+      // Particle burst — spawn 14 sparks at landing centre
+      const cx = newX + newW / 2;
+      for (let i = 0; i < 14; i++) {
+        const angle = (Math.PI * 2 * i) / 14 + Math.random() * 0.3;
+        const spd   = 1.8 + Math.random() * 2.6;
+        particles.push({
+          x: cx, y: fragY + PIECE_H / 2,
+          vx: Math.cos(angle) * spd,
+          vy: Math.sin(angle) * spd - 1.2,
+          alpha: 1.0,
+          r: 3 + Math.random() * 2,
+          color: [fill, stroke, '#FFD700', '#fff'][Math.floor(Math.random() * 4)],
+        });
+      }
     } else {
       perfectStreak = 0;
       score++;
       if (navigator.vibrate) navigator.vibrate(18);
     }
+    scoreScale = 1.38;  // pop the score display
 
     speed = Math.min(10, 2.5 + Math.floor(score / 4) * 0.35);
     spawnCurrent();
@@ -7249,6 +7316,18 @@ function renderRestaurantLB() {
       flashMsg.worldY -= 0.9;
       if (flashMsg.alpha <= 0) flashMsg = null;
     }
+
+    // Tick particles (in world space, gravity applied)
+    particles.forEach(p => {
+      p.vy   += 0.18;
+      p.x    += p.vx;
+      p.y    += p.vy;
+      p.alpha -= 0.038;
+    });
+    particles = particles.filter(p => p.alpha > 0);
+
+    // Lerp score scale back to 1.0
+    scoreScale += (1.0 - scoreScale) * 0.20;
 
     // Dynamic viewport camera: once the tower top rises past 40% of canvas,
     // smoothly translate the world downward to keep the landing zone visible.
@@ -7635,6 +7714,13 @@ function renderRestaurantLB() {
     if (cur && state === 'playing') {
       const top  = stack[stack.length - 1];
       const curY = top.y - PIECE_H - 18;
+      // Landing shadow — shows where piece will land at its current X
+      ctx.save();
+      ctx.globalAlpha = 0.22;
+      ctx.fillStyle = cur.fill;
+      bsRR(cur.x, top.y - PIECE_H - 2, cur.w, PIECE_H, 5); ctx.fill();
+      ctx.restore();
+
       drawIngredient({ ...cur, y: curY, h: PIECE_H });
 
       // Ghost guide line
@@ -7665,10 +7751,27 @@ function renderRestaurantLB() {
       ctx.restore();
     }
 
+    // Particle burst sparks (world-space, inside camera transform)
+    particles.forEach(p => {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, p.alpha);
+      ctx.fillStyle = p.color;
+      ctx.shadowColor = p.color; ctx.shadowBlur = 6;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    });
+
     ctx.restore(); // ── end camera ──
 
-    // HUD — always fixed over the canvas, unaffected by camera
+    // ── HUD — fixed over canvas, unaffected by camera ─────────
     ctx.save();
+
+    // Score pill — scales when score pops
+    const pillCX = 67, pillCY = 27;
+    ctx.save();
+    ctx.translate(pillCX, pillCY);
+    ctx.scale(scoreScale, scoreScale);
+    ctx.translate(-pillCX, -pillCY);
     ctx.fillStyle = 'rgba(11,53,80,0.55)';
     bsRR(10, 10, 115, 34, 10); ctx.fill();
     ctx.fillStyle = '#fff';
@@ -7677,6 +7780,7 @@ function renderRestaurantLB() {
     ctx.shadowColor = 'rgba(0,0,0,0.4)'; ctx.shadowBlur = 3;
     ctx.fillText('🍔  ' + score, 20, 33);
     ctx.shadowBlur = 0;
+    ctx.restore();
 
     // Speed label
     ctx.fillStyle = 'rgba(255,255,255,0.55)';
@@ -7684,18 +7788,59 @@ function renderRestaurantLB() {
     ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
     ctx.fillText('SPEED', W - 10, 16);
 
-    // Speed dots
+    // Speed dots — green (0-3), yellow (4-6), red (7-9)
     const dots = Math.min(Math.floor((speed - 2.5) / 0.35) + 1, 10);
     for (let i = 0; i < 10; i++) {
-      ctx.fillStyle = i < dots ? '#1a70aa' : 'rgba(255,255,255,0.18)';
+      let litColor;
+      if (i <= 3)      litColor = '#22c55e';
+      else if (i <= 6) litColor = '#fbbf24';
+      else             litColor = '#ef4444';
+      ctx.fillStyle = i < dots ? litColor : 'rgba(255,255,255,0.18)';
       ctx.beginPath(); ctx.arc(W - 14 - (9 - i) * 13, 27, 4.5, 0, Math.PI * 2); ctx.fill();
     }
+
+    // Next piece preview (only during play)
+    if (state === 'playing' && cur) {
+      const nextLayer = TOPPINGS[layerIdx % TOPPINGS.length];
+      ctx.fillStyle = 'rgba(11,53,80,0.50)';
+      bsRR(10, 52, 100, 28, 8); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.48)';
+      ctx.font = "600 7px 'Outfit', sans-serif";
+      ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+      ctx.fillText('NEXT', 16, 63);
+      // colour swatch
+      ctx.fillStyle = nextLayer.fill;
+      bsRR(48, 57, 56, 17, 4); ctx.fill();
+      ctx.strokeStyle = nextLayer.stroke; ctx.lineWidth = 1;
+      bsRR(48, 57, 56, 17, 4); ctx.stroke();
+      ctx.fillStyle = '#fff';
+      ctx.font = "700 8px 'Outfit', sans-serif";
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 2;
+      ctx.fillText(nextLayer.label, 76, 65.5);
+      ctx.shadowBlur = 0;
+    }
+
+    // Streak counter badge — visible when perfectStreak >= 2
+    if (perfectStreak >= 2) {
+      const sEmoji = perfectStreak >= 5 ? '🔥' : perfectStreak >= 3 ? '⚡' : '✨';
+      ctx.fillStyle = perfectStreak >= 3 ? 'rgba(200,80,0,0.72)' : 'rgba(80,130,210,0.68)';
+      bsRR(10, 88, 100, 20, 8); ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = "700 9px 'Russo One', sans-serif";
+      ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(0,0,0,0.50)'; ctx.shadowBlur = 3;
+      ctx.fillText(`${sEmoji} ×${perfectStreak} STREAK`, 17, 98);
+      ctx.shadowBlur = 0;
+    }
+
     ctx.restore();
   }
 
   // ── Idle title screen ─────────────────────────────────────
-  function drawIdle() {
+  function drawIdle(bobOffset) {
     if (!ctx) return;
+    const bob = bobOffset || 0;
     ctx.clearRect(0, 0, W, H);
     const bg = ctx.createLinearGradient(0, 0, 0, H);
     bg.addColorStop(0, '#7ec4e6'); bg.addColorStop(1, '#c4e3f5');
@@ -7707,7 +7852,6 @@ function renderRestaurantLB() {
       { type:'cheese',  label:'Cheese',     fill:'#F5C518', stroke:'#C49A00' },
       { type:'lettuce', label:'Lettuce',    fill:'#22C55E', stroke:'#15803D' },
       { type:'tomato',  label:'Tomato',     fill:'#EF4444', stroke:'#B91C1C' },
-      { type:'bun_top', label:'Top Bun',    fill:'#D4A56A', stroke:'#A06030' },
     ];
     const cx = W / 2;
     demoStack.forEach((layer, i) => {
@@ -7715,6 +7859,19 @@ function renderRestaurantLB() {
       const by = H * 0.76 - i * (PIECE_H + 3);
       drawIngredient({ x: cx - bw / 2, y: by, w: bw, h: PIECE_H, ...layer });
     });
+    // Top bun bobs gently up and down
+    const topIdx = demoStack.length;
+    const bw = 164 - topIdx * 4;
+    const baseY = H * 0.76 - topIdx * (PIECE_H + 3);
+    drawIngredient({ x: cx - bw / 2, y: baseY + bob, w: bw, h: PIECE_H, ...BUN_TOP });
+  }
+
+  function idleLoop() {
+    if (state !== 'idle') { idleRaf = null; return; }
+    idleT++;
+    const bob = Math.sin(idleT * 0.045) * 5;
+    drawIdle(bob);
+    idleRaf = requestAnimationFrame(idleLoop);
   }
 
   // ── Overlay ───────────────────────────────────────────────
@@ -7750,7 +7907,9 @@ function renderRestaurantLB() {
   }
 
   function startGame() {
-    hideOverlay(); state = 'playing'; resetGame();
+    hideOverlay();
+    if (idleRaf) { cancelAnimationFrame(idleRaf); idleRaf = null; }
+    state = 'playing'; resetGame();
     if (raf) cancelAnimationFrame(raf);
     raf = requestAnimationFrame(loop);
   }
@@ -7773,11 +7932,16 @@ function renderRestaurantLB() {
       document.addEventListener('keyup',   onSpaceUp);
     }
     loadBsTop();
-    if (state !== 'playing') { drawIdle(); showOverlay(false); }
+    if (state !== 'playing') {
+      state = 'idle'; idleT = 0;
+      drawIdle(0); showOverlay(false);
+      if (!idleRaf) idleRaf = requestAnimationFrame(idleLoop);
+    }
   };
 
   window.pauseBurgerStack = function() {
     if (raf) { cancelAnimationFrame(raf); raf = null; }
+    if (idleRaf) { cancelAnimationFrame(idleRaf); idleRaf = null; }
     if (state === 'playing') state = 'paused';
   };
 })();
