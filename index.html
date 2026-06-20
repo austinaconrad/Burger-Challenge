@@ -4805,7 +4805,7 @@ function renderUnifiedFeed() {
         </div>`.trim();
       } else {
         // ── NO-PHOTO CARD: warm gradient header ──
-        return `<div class="feed-row" data-player-id="${escHtml(item.player.id)}" data-burger-id="${escHtml(targetId)}" style="flex-direction:column;padding:0;gap:0;animation-delay:${_feedInitialRenderDone?'0s':Math.min(idx*0.04,0.6)+'s'}">
+        return `<div class="feed-row" data-player-id="${escHtml(item.player.id)}" data-burger-id="${escHtml(targetId)}" style="flex-direction:column;padding:0;gap:0;border-bottom:none;border-radius:16px;overflow:hidden;margin:0 0 10px;background:var(--surface);box-shadow:var(--shadow-card);animation-delay:${_feedInitialRenderDone?'0s':Math.min(idx*0.04,0.6)+'s'}">
           <div class="feed-no-photo-header">
             <div class="fnph-icon">🍔</div>
             <div class="fnph-info">
@@ -6241,7 +6241,10 @@ window.confirmBurger = async function() {
       menuEmoji: snapshotMenuEmoji,
       dateStr,
       timeStr,
-      photo: snapshotPhoto,         // base64 preview — for native file sharing
+      // Use a blob URL of the original file for full-res canvas rendering.
+      // Falls back to compressed base64 if no raw file is available.
+      photo: snapshotPhotoFile ? URL.createObjectURL(snapshotPhotoFile) : snapshotPhoto,
+      _photoBlobUrl: snapshotPhotoFile ? true : false, // flag so we can revoke later
       colorIdx: _me?.colorIdx ?? 5, // for player name color on scorecard
     };
     const fireDisplay = (() => {
@@ -6335,6 +6338,12 @@ window.confirmBurger = async function() {
     try {
       showToast('📤 Uploading photo…');
       photoToSave = await uploadBurgerPhoto(snapshotPhotoFile);
+      // Upgrade receipt share data to use the high-quality Storage URL
+      // so "Share Receipt" always uses the best available image
+      if (_receiptShareData && photoToSave) {
+        _receiptShareData.photo = photoToSave;
+        _receiptShareData._photoBlobUrl = false;
+      }
     } catch (e) {
       console.warn('[photo upload] Firebase Storage failed, falling back to compressed base64:', e);
       // Graceful fallback: use the compressed base64 so the burger still logs
