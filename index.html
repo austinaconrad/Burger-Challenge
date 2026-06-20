@@ -551,10 +551,10 @@ button{transition:transform 0.2s ease}
 .fpc-burger-badge{font-size:10px;font-weight:700;color:#fff;background:rgba(0,0,0,0.45);border-radius:999px;padding:3px 10px;border:1px solid rgba(255,255,255,0.28);flex-shrink:0}
 .fpc-body{padding:9px 14px 6px;display:flex;flex-direction:column;gap:0}
 /* No-photo warm gradient header */
-.feed-no-photo-header{display:flex;align-items:center;gap:11px;padding:12px 16px 11px;background:linear-gradient(135deg,rgba(180,83,9,0.07),rgba(245,158,11,0.13));border-bottom:1px solid rgba(245,158,11,0.16)}
+.feed-no-photo-header{display:flex;align-items:center;gap:11px;padding:14px 16px 12px;background:linear-gradient(135deg,rgba(180,83,9,0.07),rgba(245,158,11,0.13));border-bottom:1px solid rgba(245,158,11,0.16)}
 .fnph-icon{font-size:26px;line-height:1;flex-shrink:0}
 .fnph-info{flex:1;min-width:0}
-.fnph-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.02em;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fnph-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.02em;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fnph-sub{font-size:10px;color:var(--muted2);margin-top:1px}
 /* keep legacy class names for backward compat */
 .msg-card{animation:slideIn 0.25s ease both}
@@ -1978,10 +1978,6 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 .pace-legend-item { display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--text); }
 .pace-legend-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0; }
 /* Pull-to-refresh indicator */
-#ptr-indicator { display:flex;align-items:center;justify-content:center;gap:7px;height:0;overflow:hidden;transition:height 0.2s ease;font-size:12px;font-weight:600;color:var(--muted2);font-family:'Outfit',sans-serif; }
-#ptr-indicator.ptr-active { height:48px; }
-.ptr-icon { font-size:16px;display:inline-block;transition:transform 0.25s ease; }
-#ptr-indicator.ptr-loading .ptr-icon { animation:spin 0.7s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
 /* Reaction pill updates */
 .reaction-pill { background:rgba(30,110,170,0.07);border:1.5px solid rgba(30,110,170,0.12); }
@@ -2723,7 +2719,6 @@ body.july4-bg::before {
       </div>
       <!-- Unified feed panel -->
       <div id="unified-feed-panel">
-        <div id="ptr-indicator"><span class="ptr-icon">↓</span><span class="ptr-label">Pull to refresh</span></div>
         <div class="social-wrap">
 
           <div class="social-empty empty-state" id="social-empty" style="display:none">
@@ -8504,48 +8499,6 @@ window.switchFeedTab = function(tab, btn) {
   }
 };
 
-// ── Pull-to-refresh ───────────────────────────────────────────────────────
-(function(){
-  let ptY0=0, ptDist=0, ptTracking=false;
-  const THRESHOLD=64;
-  const ptr=()=>document.getElementById('ptr-indicator');
-  const feed=()=>document.getElementById('unified-feed');
-  document.addEventListener('touchstart',e=>{
-    const f=feed();
-    if(!f||!document.body.classList.contains('feed-active'))return;
-    if(f.scrollTop>4)return;
-    ptY0=e.touches[0].clientY; ptTracking=true; ptDist=0;
-  },{passive:true});
-  document.addEventListener('touchmove',e=>{
-    if(!ptTracking)return;
-    const f=feed();
-    if(!f||f.scrollTop>4){ptTracking=false;return;}
-    ptDist=Math.max(0,e.touches[0].clientY-ptY0);
-    const p=ptr(); if(!p||ptDist<=0)return;
-    p.classList.add('ptr-active');
-    p.classList.toggle('ptr-ready',ptDist>=THRESHOLD);
-    const pct=Math.min(ptDist/THRESHOLD,1);
-    const icon=p.querySelector('.ptr-icon');
-    if(icon)icon.style.transform=`rotate(${pct*180}deg) scale(${0.7+pct*0.4})`;
-    const lbl=p.querySelector('.ptr-label');
-    if(lbl)lbl.textContent=ptDist>=THRESHOLD?'Release to refresh':'Pull to refresh';
-  },{passive:true});
-  document.addEventListener('touchend',()=>{
-    if(!ptTracking)return; ptTracking=false;
-    const p=ptr(); if(!p)return;
-    if(ptDist>=THRESHOLD){
-      const lbl=p.querySelector('.ptr-label'); if(lbl)lbl.textContent='Refreshing…';
-      const icon=p.querySelector('.ptr-icon'); if(icon)icon.style.transform='';
-      p.classList.add('ptr-loading'); p.classList.remove('ptr-ready');
-      renderUnifiedFeed();
-      setTimeout(()=>p.classList.remove('ptr-active','ptr-loading'),900);
-    } else {
-      p.classList.remove('ptr-active','ptr-ready');
-      const icon=p.querySelector('.ptr-icon'); if(icon)icon.style.transform='';
-    }
-    ptDist=0;
-  });
-})();
 
 function buildBurgerPreview(pattyCount, toppings) {
   const toppingOrder = ['Mayo','Ketchup','Mustard','Special Sauce','Lettuce','Tomatoes','Pickles','Green Peppers','Mushrooms','Onions','Bacon','Cheese','Blue Cheese'];
