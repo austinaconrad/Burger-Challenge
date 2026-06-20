@@ -2867,6 +2867,17 @@ body.july4-bg::before {
     </div>
     <!-- Scrollable form content -->
     <div id="log-modal-scroll">
+      <!-- Repeat last burger shortcut -->
+      <div id="repeat-last-burger-strip" style="display:none;padding:10px 16px 0">
+        <button id="repeat-last-burger-btn" onclick="repeatLastBurger()" style="width:100%;display:flex;align-items:center;gap:10px;background:rgba(194,123,32,0.10);border:1.5px dashed rgba(194,123,32,0.40);border-radius:10px;padding:10px 14px;cursor:pointer;font-family:'Outfit',sans-serif;text-align:left;transition:background 0.15s">
+          <span style="font-size:18px;flex-shrink:0">🔁</span>
+          <div style="min-width:0;flex:1">
+            <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#8B7355;font-weight:700;font-family:'Courier New',monospace;margin-bottom:2px">Repeat last order</div>
+            <div id="repeat-last-burger-label" style="font-size:13px;font-weight:700;color:#2C1810;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+          </div>
+          <span style="font-size:11px;color:#8B7355;flex-shrink:0">Tap to fill ↓</span>
+        </button>
+      </div>
       <!-- Step 1: Restaurant search -->
       <div class="restaurant-step" id="restaurant-step">
         <span class="restaurant-section-label">📍 Restaurant</span>
@@ -3775,6 +3786,18 @@ window.openFABLog = function() {
     // Complete strip
     const cs = document.getElementById('log-modal-complete-strip');
     if (cs) cs.style.display = isDone ? 'block' : 'none';
+    // Repeat last burger strip — show if player has at least one object-style log entry
+    const repeatStrip = document.getElementById('repeat-last-burger-strip');
+    const repeatLabel = document.getElementById('repeat-last-burger-label');
+    const recentLogs = (me.logs || []).filter(e => typeof e === 'object' && e.ts);
+    if (repeatStrip && recentLogs.length) {
+      const last = recentLogs.reduce((a, b) => ((safeDate(a.ts)||0) > (safeDate(b.ts)||0) ? a : b));
+      const parts = [last.restaurant, last.menuItem].filter(Boolean);
+      if (repeatLabel) repeatLabel.textContent = parts.join(' — ') || last.restaurant || 'Last burger';
+      repeatStrip.style.display = 'block';
+    } else if (repeatStrip) {
+      repeatStrip.style.display = 'none';
+    }
   }
   // Show default suggestions if not mid-entry
   if (!restaurantLocked && !document.getElementById('detail-restaurant')?.value.trim()) {
@@ -6144,6 +6167,67 @@ window.clearRestaurantSelection = function() {
   pendingPattyCount = 0;
   // Show default suggestions
   renderRestaurantSuggestions(OHIO_SPOTS.slice(0, 6));
+};
+
+// ── Repeat last burger ────────────────────────────────────────────────────────
+window.repeatLastBurger = function() {
+  const me = players.find(p => p.id === myPlayerId);
+  if (!me || !me.logs || !me.logs.length) return;
+  // Find most recent object-style log entry
+  const logs = (me.logs || []).filter(e => typeof e === 'object' && e.ts);
+  if (!logs.length) return;
+  const last = logs.reduce((a, b) => ((safeDate(a.ts) || 0) > (safeDate(b.ts) || 0) ? a : b));
+
+  const restaurant   = last.restaurant  || '';
+  const menuItem     = last.menuItem    || '';
+  const menuEmoji    = last.menuEmoji   || '';
+  const patties      = last.patties     || 1;
+  const rating       = typeof last.rating === 'number' ? last.rating : 0;
+  const toppings     = Array.isArray(last.toppings) ? [...last.toppings] : [];
+
+  // Lock restaurant + show menu if it's a known spot
+  if (restaurant) {
+    if (BURGER_MENUS[restaurant] && menuItem) {
+      lockRestaurantAndShowMenu(restaurant);
+      const menu = BURGER_MENUS[restaurant];
+      const idx = menu.items.findIndex(i => i.name === menuItem);
+      if (idx !== -1) {
+        window.selectMenuItem(restaurant, idx);
+      } else {
+        // Known restaurant but item not in menu — set manually
+        pendingMenuEmoji = menuEmoji;
+        pendingMenuItemName = menuItem;
+        window.selectPatties(patties);
+      }
+    } else {
+      lockRestaurant(restaurant, menuEmoji || '📍');
+      pendingMenuEmoji = menuEmoji;
+      pendingMenuItemName = menuItem;
+      window.selectPatties(patties);
+    }
+  } else {
+    window.selectPatties(patties);
+  }
+
+  // Apply toppings
+  pendingToppings = toppings;
+  updateBurgerToppingVisuals();
+  document.querySelectorAll('.topping-btn').forEach(btn => {
+    btn.classList.toggle('topping-active', pendingToppings.includes(btn.dataset.topping));
+  });
+
+  // Set rating
+  if (rating > 0) {
+    setRating(rating);
+    const slider = document.getElementById('rating-slider');
+    if (slider) slider.value = rating;
+    const scoreEl = document.getElementById('rating-score');
+    if (scoreEl) { scoreEl.value = rating.toFixed(1); scoreEl.style.color = ''; }
+  }
+
+  // Scroll down so the filled form is visible
+  const scroll = document.getElementById('log-modal-scroll');
+  if (scroll) setTimeout(() => scroll.scrollTo({ top: scroll.scrollHeight, behavior: 'smooth' }), 80);
 };
 
 window.showBuildOwn = function() {
