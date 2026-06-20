@@ -466,27 +466,12 @@ button{transition:transform 0.2s ease}
 .receipt-foot-thank{text-align:center;font-family:'Courier New',monospace;font-size:12px;font-weight:700;color:#7A6E60;letter-spacing:0.12em;text-transform:uppercase;padding:10px 24px 2px}
 .receipt-barcode{display:flex;justify-content:center;gap:1.5px;padding:8px 24px 12px;opacity:0.25}
 .receipt-barcode span{display:inline-block;width:2px;background:#333;border-radius:0}
-.my-tally-card.complete{border-color:rgba(34,197,94,0.30);box-shadow:0 0 0 1.5px rgba(34,197,94,0.20),0 4px 24px rgba(30,100,160,0.14)}
-.tally-bun-top{height:3px;background:linear-gradient(90deg,transparent,var(--amber-dark),#F59E0B,rgba(255,255,255,0.6),#F59E0B,var(--amber-dark),transparent);opacity:0.9}
-.tally-top{display:flex;align-items:center;gap:14px;padding:16px 16px 12px}
-.tally-info{flex:1}
-.tally-name{font-family:'Russo One',sans-serif;font-size:16px;color:var(--text);font-weight:800;letter-spacing:0}
-.tally-sub{font-size:12px;color:var(--muted2);margin-top:2px;font-weight:400}
-.tally-count{font-family:'Russo One',sans-serif;font-size:42px;font-weight:400;line-height:1;letter-spacing:0;transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1)}
-.tally-count.pop{transform:scale(1.3)}
-/* Tally progress ring */
-.tally-ring-wrap{display:flex;flex-direction:column;align-items:center;padding:12px 0 16px;gap:12px}
-.tally-ring-stats{display:flex;gap:28px;justify-content:center}
-.trs-item{display:flex;flex-direction:column;align-items:center;gap:2px}
-.trs-val{font-family:'Russo One',sans-serif;font-size:17px;font-weight:900;color:var(--text);line-height:1}
-.trs-lbl{font-size:9px;color:var(--muted2);font-weight:700;text-transform:uppercase;letter-spacing:0.06em}
 .progress-track{height:16px;background:rgba(30,100,160,0.10);margin:0 16px;border-radius:999px;overflow:visible;position:relative;box-shadow:inset 0 2px 4px rgba(30,100,160,0.15)}
 .progress-fill{height:100%;border-radius:999px;transition:width 0.5s cubic-bezier(0.34,1.56,0.64,1);position:relative;overflow:hidden;box-shadow:0 0 12px rgba(234,88,12,0.40),0 2px 6px rgba(0,0,0,0.30),inset 0 1px 0 rgba(255,255,255,0.18)}
 .progress-fill::before{content:'';position:absolute;top:0;bottom:0;width:40%;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.28) 50%,transparent 100%);animation:barShimmer 1.4s ease-in-out infinite}
 @keyframes barShimmer{0%{left:-40%}100%{left:130%}}
 .progress-burger{position:absolute;top:50%;transform:translate(-50%,-50%);font-size:20px;line-height:1;transition:left 0.5s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;z-index:2;filter:drop-shadow(0 1px 5px rgba(245,158,11,0.55));display:none}
 .progress-burger.visible{display:block}
-.tally-bun-bottom{height:3px;background:linear-gradient(90deg,var(--amber-dark),var(--sesame),var(--amber-dark));margin:12px 16px 0;border-radius:999px;opacity:0.4}
 .tally-controls{display:grid;grid-template-columns:60px 1fr 60px;margin-top:12px;border-top:1px solid var(--border)}
 .ctrl-btn{background:none;border:none;color:var(--muted2);font-size:24px;cursor:pointer;padding:14px;transition:color 0.15s,background 0.15s;display:flex;align-items:center;justify-content:center}
 .ctrl-btn:hover{background:rgba(255,255,255,0.06);color:var(--text)}
@@ -592,10 +577,6 @@ body.pace-active header .burger-deco,
 body.pace-active header h1,
 body.pace-active header #stat-pills-row,
 body.pace-active header #spectator-pill,
-body.tally-active header .burger-deco,
-body.tally-active header h1,
-body.tally-active header #stat-pills-row,
-body.tally-active header #spectator-pill,
 body.leaderboard-active header .burger-deco,
 body.leaderboard-active header h1,
 body.leaderboard-active header #stat-pills-row,
@@ -603,12 +584,10 @@ body.leaderboard-active header #spectator-pill,
 body.feed-active header,
 body.map-active header,
 body.pace-active header,
-body.tally-active header,
 body.leaderboard-active header{padding:6px 0 0!important;gap:0!important}
 body.feed-active .tabs,
 body.map-active .tabs,
 body.pace-active .tabs,
-body.tally-active .tabs,
 body.leaderboard-active .tabs{
   position:sticky;top:0;z-index:20;
   background:rgba(168,212,237,0.85);
@@ -2558,6 +2537,74 @@ body.july4-bg::before {
 }
 
 
+
+/* ═══════════════════════════════════════════════
+   🍔 DINER ORDER TICKET — Log Burger Modal
+   ═══════════════════════════════════════════════ */
+#log-modal-sheet{background:#FFF8ED;border-top:2px solid rgba(139,104,60,0.22)}
+#log-modal-drag{background:rgba(139,104,60,0.22)}
+#log-modal-spiral{display:flex;justify-content:space-between;align-items:center;padding:5px 14px 2px}
+.lm-spiral-hole{width:12px;height:12px;border-radius:50%;border:1.5px solid rgba(139,104,60,0.28);background:rgba(240,220,190,0.5);flex-shrink:0}
+#log-modal-header{border-bottom:1px solid rgba(139,104,60,0.18);padding:6px 20px 12px;background:#FFF8ED}
+#log-modal-title{font-family:'Outfit',sans-serif;font-size:13px;flex-direction:column;align-items:flex-start;gap:2px}
+#log-modal-title-sub{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#8B7355;font-weight:700;font-family:'Courier New',monospace;display:block}
+#log-modal-title-main{font-family:'Russo One',sans-serif;font-size:20px;color:#2C1810;letter-spacing:0.02em;display:block}
+#log-modal-close{background:rgba(255,244,220,0.8);border-color:rgba(139,104,60,0.25);color:#7C5C3E}
+#log-modal-close:hover{background:rgba(194,123,32,0.15);color:#2C1810}
+#log-modal-mini{background:rgba(139,104,60,0.06);border-bottom:1px solid rgba(139,104,60,0.14);padding:0}
+#log-modal-ring-area{display:flex;align-items:center;gap:14px;padding:12px 20px;width:100%;box-sizing:border-box}
+#log-modal-bar-track{background:rgba(139,104,60,0.12)}
+#log-modal-bar-fill{background:#C27B20;box-shadow:none}
+#log-modal-scroll{background:#FFF8ED}
+/* Restaurant section */
+.restaurant-step{padding:14px 16px 10px;background:#FFF8ED;border-bottom:1px solid rgba(139,104,60,0.10)}
+.restaurant-section-label{font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:#8B7355;font-weight:700;font-family:'Courier New',monospace;display:block;margin-bottom:8px}
+.restaurant-step input[type=text]{background:transparent;border:none;border-bottom:1.5px solid #C27B20;border-radius:0;font-size:15px;font-weight:600;color:#2C1810;padding:4px 0;width:100%;box-sizing:border-box;font-family:'Outfit',sans-serif}
+.restaurant-step input[type=text]:focus{border-bottom-color:#7C3A1E;box-shadow:none}
+.restaurant-step input[type=text]::placeholder{color:rgba(139,104,60,0.45);font-weight:400}
+.restaurant-locked-row{background:rgba(194,123,32,0.10);border:1.5px solid rgba(194,123,32,0.35);border-radius:8px}
+.restaurant-locked-name{color:#2C1810}
+.restaurant-change-btn{color:#8B7355}
+.restaurant-change-btn:hover{color:#2C1810}
+.restaurant-suggestion{background:#FFF3DC;border-color:rgba(139,104,60,0.20)}
+.restaurant-suggestion:hover{background:rgba(194,123,32,0.15);border-color:rgba(194,123,32,0.45)}
+.restaurant-suggestion-badge{background:rgba(124,58,30,0.12);color:#7C3A1E}
+/* Menu picker */
+.menu-picker{background:#FFF8ED;border-top-color:rgba(139,104,60,0.14)}
+.menu-picker-label{color:#8B7355}
+.menu-card{background:#FFF3DC;border-color:rgba(139,104,60,0.22)}
+.menu-card:hover{background:rgba(194,123,32,0.12);border-color:rgba(139,104,60,0.45)}
+.menu-card.selected{border-color:#7C3A1E;background:rgba(124,58,30,0.10);box-shadow:none}
+.menu-card-name{color:#2C1810}
+.menu-card-badge{background:rgba(124,58,30,0.12);color:#7C3A1E}
+.build-own-btn{color:#8B7355}
+.build-own-btn:hover{color:#2C1810}
+/* Patty builder */
+.patty-builder{background:#FFF8ED}
+.pb-btn{background:rgba(255,244,220,0.85);border:1.5px solid rgba(139,104,60,0.25);color:#5C4033}
+.pb-btn:hover{background:rgba(194,123,32,0.12);color:#2C1810;border-color:rgba(139,104,60,0.45)}
+.pb-btn.selected{background:#7C3A1E;border-color:#7C3A1E;color:#FFF8ED;box-shadow:none}
+.pb-label{color:#8B7355}
+/* Detail section */
+.burger-detail{background:#FFF8ED;border-top:1px solid rgba(139,104,60,0.14)}
+.burger-detail label{color:#8B7355;font-size:9px;letter-spacing:0.14em;font-family:'Courier New',monospace;width:68px}
+.burger-detail input[type=text]{background:transparent;border:none;border-bottom:1.5px solid rgba(194,123,32,0.40);border-radius:0;color:#2C1810;padding:4px 0;font-size:14px}
+.burger-detail input[type=text]:focus{border-bottom-color:#7C3A1E;box-shadow:none}
+.rating-score{color:#2C1810;font-family:'Russo One',sans-serif}
+.star-icon{color:rgba(139,104,60,0.22)}
+.star-icon.full{color:#C27B20}
+.topping-btn{background:#FFF3DC;border-color:rgba(139,104,60,0.25);color:#5C4033}
+.topping-btn.topping-active{background:#7C3A1E;border-color:#7C3A1E;color:#FFF8ED}
+#toppings-toggle{background:rgba(255,244,220,0.8);border-color:rgba(194,123,32,0.22)}
+#toppings-toggle-label{color:#8B7355}
+#toppings-chevron{color:#8B7355}
+#custom-burger-name{background:transparent !important;border:none !important;border-bottom:1.5px solid rgba(194,123,32,0.40) !important;border-radius:0 !important;color:#2C1810 !important;padding:4px 0 !important;font-size:15px}
+#custom-burger-name:focus{border-bottom-color:#7C3A1E !important;box-shadow:none !important}
+.burger-photo-btn{background:rgba(255,244,220,0.8);border-color:rgba(139,104,60,0.25);color:#5C4033}
+.burger-photo-btn:hover{border-color:#C27B20;color:#7C3A1E}
+.detail-confirm-btn{background:#7C3A1E;border:3px double #5C2A0E;border-radius:10px;font-family:'Courier New',monospace;font-size:13px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#FFF8ED;padding:13px;margin-top:8px}
+.detail-confirm-btn:hover{opacity:0.88}
+.complete-strip{background:rgba(45,106,79,0.12);border-top:1px solid rgba(45,106,79,0.20);color:#1B4332}
 </style>
 </head>
 <body>
@@ -2663,11 +2710,6 @@ body.july4-bg::before {
       <div id="ranks-restaurants-panel" style="display:none">
         <div class="resto-lb-wrap" id="resto-lb-wrap"></div>
       </div>
-    </div>
-
-    <!-- TALLY TAB -->
-    <div class="tab-panel" id="tab-tally">
-      <div id="my-tally-area"></div>
     </div>
 
     <!-- ORDER RECEIPT — lives outside any re-rendered container so Firestore snapshots can't wipe it -->
@@ -2798,28 +2840,43 @@ body.july4-bg::before {
 <div id="log-modal-overlay" onclick="onLogOverlayClick(event)">
   <div id="log-modal-sheet" onclick="event.stopPropagation()">
     <div id="log-modal-drag"></div>
+    <div id="log-modal-spiral">
+      <div class="lm-spiral-hole"></div><div class="lm-spiral-hole"></div><div class="lm-spiral-hole"></div>
+      <div class="lm-spiral-hole"></div><div class="lm-spiral-hole"></div><div class="lm-spiral-hole"></div>
+      <div class="lm-spiral-hole"></div><div class="lm-spiral-hole"></div><div class="lm-spiral-hole"></div>
+      <div class="lm-spiral-hole"></div><div class="lm-spiral-hole"></div><div class="lm-spiral-hole"></div>
+    </div>
     <div id="log-modal-header">
-      <div id="log-modal-title">🍔 Log a Burger</div>
+      <div id="log-modal-title">
+        <span id="log-modal-title-sub">Order Ticket</span>
+        <span id="log-modal-title-main">🍔 Log a Burger</span>
+      </div>
       <button id="log-modal-close" onclick="closeLogModal()">✕</button>
     </div>
-    <!-- Mini progress bar -->
+    <!-- Progress ring -->
     <div id="log-modal-mini">
-      <div id="log-modal-mini-avatar" style="flex-shrink:0"></div>
-      <div id="log-modal-bar-wrap">
-        <div id="log-modal-bar-track"><div id="log-modal-bar-fill" style="width:0%"></div></div>
-        <div id="log-modal-bar-burger">🍔</div>
+      <div id="log-modal-ring-area">
+        <div id="log-modal-ring-svg" style="flex-shrink:0"></div>
+        <div style="flex:1;min-width:0">
+          <div id="log-modal-player-name" style="font-weight:700;font-size:15px;color:#2C1810"></div>
+          <div id="log-modal-player-sub" style="font-size:11px;color:#8B7355;margin-top:3px"></div>
+          <div id="log-modal-player-pace" style="font-size:11px;margin-top:3px;font-weight:600"></div>
+        </div>
       </div>
-      <div style="display:flex;align-items:baseline;gap:3px;flex-shrink:0">
-        <span id="log-modal-mini-count" style="font-family:'Russo One',sans-serif;font-size:14px;color:var(--amber)">0</span>
-        <span style="font-size:11px;color:var(--muted);font-family:'Outfit',sans-serif">/ 100</span>
+      <!-- Hidden compat stubs for any code still referencing these IDs -->
+      <div style="display:none">
+        <div id="log-modal-mini-avatar"></div>
+        <div id="log-modal-bar-wrap"><div id="log-modal-bar-track"><div id="log-modal-bar-fill" style="width:0%"></div></div><div id="log-modal-bar-burger"></div></div>
+        <span id="log-modal-mini-count">0</span>
       </div>
     </div>
     <!-- Scrollable form content -->
     <div id="log-modal-scroll">
       <!-- Step 1: Restaurant search -->
       <div class="restaurant-step" id="restaurant-step">
+        <span class="restaurant-section-label">📍 Restaurant</span>
         <div id="restaurant-input-row">
-          <input type="text" id="detail-restaurant" placeholder="🔍 Where are you eating?" maxlength="80" autocomplete="off" oninput="onRestaurantInput(this.value)"/>
+          <input type="text" id="detail-restaurant" placeholder="Where are you eating?" maxlength="80" autocomplete="off" oninput="onRestaurantInput(this.value)"/>
         </div>
         <div class="restaurant-locked-row" id="restaurant-locked-row" style="display:none">
           <span class="restaurant-locked-name" id="restaurant-locked-name"></span>
@@ -2921,7 +2978,7 @@ body.july4-bg::before {
         <!-- Avatar photo inputs (global, live here for DOM simplicity) -->
         <input type="file" id="avatar-input-camera" accept="image/*" capture="user" style="display:none" onchange="onAvatarPhotoSelected(this)"/>
         <input type="file" id="avatar-input-upload" accept="image/*" style="display:none" onchange="onAvatarPhotoSelected(this)"/>
-        <button class="detail-confirm-btn" id="confirm-btn" onclick="confirmBurger()">✓ Log Burger</button>
+        <button class="detail-confirm-btn" id="confirm-btn" onclick="confirmBurger()">✓ Place Order</button>
       </div>
       <!-- Completion strip -->
       <div class="complete-strip" id="log-modal-complete-strip" style="display:none">🎉 You crushed 100 burgers! You're a legend!</div>
@@ -3689,16 +3746,41 @@ window.openFABLog = function() {
   if (!overlay) return;
   // Update mini progress strip
   const me = players.find(p => p.id === myPlayerId);
+  if (!_logModalInitialized) initLogModal();
   if (me) {
-    const countEl = document.getElementById('log-modal-mini-count');
-    const av = document.getElementById('log-modal-mini-avatar');
-    const barFill = document.getElementById('log-modal-bar-fill');
-    const barBurger = document.getElementById('log-modal-bar-burger');
+    const color = RING_COLORS[me.colorIdx % RING_COLORS.length];
+    const isDone = me.count >= 100;
+    const R = 36, circ = +(2 * Math.PI * R).toFixed(1);
     const pct = Math.min(100, me.count);
-    if (countEl) { countEl.textContent = me.count; countEl.style.color = RING_COLORS[me.colorIdx % RING_COLORS.length]; }
-    if (av) av.innerHTML = ringAvatarHTML(me, 30);
-    if (barFill) barFill.style.width = pct + '%';
-    if (barBurger) barBurger.style.left = pct + '%';
+    const dashOff = isDone ? 0 : +((1 - pct / 100) * circ).toFixed(1);
+    const paceD = getPaceDelta(me.count);
+    const paceColor = paceD >= 0 ? '#22c55e' : '#ef4444';
+    const paceStr = (paceD >= 0 ? '+' : '') + paceD + ' vs pace';
+    // Build progress ring
+    const ringSvgEl = document.getElementById('log-modal-ring-svg');
+    if (ringSvgEl) ringSvgEl.innerHTML = `<svg viewBox="0 0 88 88" width="80" height="80" style="overflow:visible">
+      <circle cx="44" cy="44" r="${R}" fill="none" stroke="rgba(139,104,60,0.14)" stroke-width="7"/>
+      <circle cx="44" cy="44" r="${R}" fill="none" stroke="${color}" stroke-width="7" stroke-linecap="round"
+        stroke-dasharray="${circ}" stroke-dashoffset="${dashOff}"
+        transform="rotate(-90 44 44)" style="transition:stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)"/>
+      <text x="44" y="40" text-anchor="middle" font-family="Russo One,sans-serif" font-size="18" fill="${color}" font-weight="900">${me.count}</text>
+      <text x="44" y="53" text-anchor="middle" font-family="Outfit,sans-serif" font-size="9" fill="rgba(44,24,16,0.45)">${isDone ? '🏆 done' : 'of 100'}</text>
+    </svg>`;
+    // Player info
+    const nameEl2 = document.getElementById('log-modal-player-name');
+    const subEl2 = document.getElementById('log-modal-player-sub');
+    const paceEl = document.getElementById('log-modal-player-pace');
+    if (nameEl2) nameEl2.textContent = me.name;
+    if (subEl2) subEl2.textContent = me.count + ' burgers · ' + Math.max(0, 100 - me.count) + ' to go';
+    if (paceEl) { paceEl.textContent = paceStr; paceEl.style.color = paceColor; }
+    // Ticket header
+    const subEl = document.getElementById('log-modal-title-sub');
+    const mainEl = document.getElementById('log-modal-title-main');
+    if (subEl) subEl.textContent = 'Order Ticket · Burger #' + (me.count + 1);
+    if (mainEl) mainEl.textContent = '🍔 ' + (me.name || 'Log a Burger');
+    // Complete strip
+    const cs = document.getElementById('log-modal-complete-strip');
+    if (cs) cs.style.display = isDone ? 'block' : 'none';
   }
   // Show default suggestions if not mid-entry
   if (!restaurantLocked && !document.getElementById('detail-restaurant')?.value.trim()) {
@@ -4002,7 +4084,6 @@ function render(){
   countUp('stat-days', daysUntilLaborDay(), 500);
   countUp('stat-finished', players.reduce((sum,p)=>sum+(p.count||0),0), 500);
   renderLeaderboard(sorted);
-  renderMyTally();
   renderHeaderTally();
   renderPlayersList();
   renderDailyCard(players);
@@ -4358,55 +4439,6 @@ function renderHeaderTally() {
   if (burgerEl) burgerEl.style.left = pct + '%';
 }
 
-function renderMyTally(){
-  const area=document.getElementById('my-tally-area');
-  const me=players.find(p=>p.id===myPlayerId);
-  if(!me){area.innerHTML='<div class="empty"><div class="e-icon">🔍</div><p>Player not found. Try rejoining.</p></div>';return;}
-  const cc=colorClass(me.colorIdx);
-  const color=RING_COLORS[me.colorIdx%RING_COLORS.length];
-  const pct=Math.min(100,me.count), isDone=me.count>=100;
-  const R=58, circ=+(2*Math.PI*R).toFixed(1);
-  const dashOff=isDone?0:+((1-pct/100)*circ).toFixed(1);
-  const paceD=getPaceDelta(me.count);
-  const paceStr=(paceD>=0?'+':'')+paceD;
-  const paceColor=paceD>=0?'#22c55e':'#ef4444';
-  area.innerHTML=`<div class="my-tally-card ${cc} ${isDone?'complete':''}">
-    <div class="tally-bun-top"></div>
-    <div class="tally-top">
-      ${ringAvatarHTML(me,48)}
-      <div class="tally-info">
-        <div class="tally-name">${escHtml(me.name)}</div>
-        <div class="tally-sub">${me.count} of 100 burgers eaten</div>
-      </div>
-    </div>
-    <div class="tally-ring-wrap">
-      <svg viewBox="0 0 140 140" width="150" height="150" style="overflow:visible;filter:drop-shadow(0 4px 16px ${color}44)">
-        <circle cx="70" cy="70" r="${R}" fill="none" stroke="rgba(0,0,0,0.08)" stroke-width="11"/>
-        <circle cx="70" cy="70" r="${R}" fill="none" stroke="${color}" stroke-width="11" stroke-linecap="round"
-          stroke-dasharray="${circ}" stroke-dashoffset="${dashOff}"
-          transform="rotate(-90 70 70)" style="transition:stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1)"/>
-        <text x="70" y="60" text-anchor="middle" font-family="Russo One,sans-serif" font-size="30" fill="${color}" font-weight="900" id="my-count">${me.count}</text>
-        <text x="70" y="77" text-anchor="middle" font-family="Outfit,sans-serif" font-size="12" fill="rgba(0,0,0,0.40)" font-weight="600">of 100</text>
-        ${isDone
-          ?`<text x="70" y="97" text-anchor="middle" font-size="20">🏆</text>`
-          :`<text x="70" y="96" text-anchor="middle" font-family="Outfit,sans-serif" font-size="10" fill="rgba(0,0,0,0.28)">${100-me.count} to go</text>`
-        }
-      </svg>
-      <div class="tally-ring-stats">
-        <div class="trs-item"><div class="trs-val">${pct}%</div><div class="trs-lbl">Complete</div></div>
-        <div class="trs-item"><div class="trs-val" style="color:${paceColor}">${paceStr}</div><div class="trs-lbl">Pace</div></div>
-        <div class="trs-item"><div class="trs-val">${Math.max(0,100-me.count)}</div><div class="trs-lbl">Remaining</div></div>
-      </div>
-    </div>
-    <div class="tally-bun-bottom"></div>
-    ${isDone?'<div class="complete-strip">🎉 You crushed 100 burgers! You\'re a legend!</div>':''}
-  </div>`;
-  // Initialize the modal log form on first load
-  if (!_logModalInitialized) initLogModal();
-  // Keep modal complete strip in sync
-  const cs = document.getElementById('log-modal-complete-strip');
-  if (cs) cs.style.display = isDone ? 'block' : 'none';
-}
 
 
 function renderPlayersList(){
@@ -8150,7 +8182,6 @@ window.switchTab=function(name,btn){
   document.body.classList.toggle('feed-active',        name==='feed');
   document.body.classList.toggle('map-active',         name==='map');
   document.body.classList.toggle('pace-active',         name==='pace');
-  document.body.classList.toggle('tally-active',       name==='tally');
   document.body.classList.toggle('leaderboard-active', name==='leaderboard');
   // Hide personal progress card on Ranks tab — it lives on other tabs
   const _strip = document.getElementById('header-tally-strip');
