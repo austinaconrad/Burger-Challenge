@@ -6815,6 +6815,12 @@ function renderBentoList() {
     const numStr = String(p.count);
     const numSize = numStr.length >= 3 ? 17 : numStr.length === 2 ? 23 : 30;
     const borderStyle = '';
+    // Hanger metal finish by rank
+    const hangerColor = dr === 1 ? '#F5C518' : dr === 2 ? '#C8CDD4' : dr === 3 ? '#CD8B4A' : '#a0aeb8';
+    const hangerGlow  = dr === 1
+      ? `<line x1="60" y1="0" x2="60" y2="-15" stroke="rgba(245,180,0,0.38)" stroke-width="7" stroke-linecap="round"/>
+         <path d="M60,-15 Q60,-26 70,-26 Q80,-26 80,-15" fill="none" stroke="rgba(245,180,0,0.38)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>`
+      : '';
     // Avatar content inside chest circle
     const chestContent = p.avatar
       ? `<image href="${escHtml(p.avatar)}" x="42" y="30" width="36" height="36" clip-path="url(#jwcp-${escHtml(p.id)})" preserveAspectRatio="xMidYMid slice"/>
@@ -6834,10 +6840,11 @@ function renderBentoList() {
           </pattern>
         </defs>
 
-        <!-- Hanger hook — rises above card into the closet rod -->
-        <line x1="60" y1="0" x2="60" y2="-15" stroke="#a0aeb8" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- Hanger hook — gold/silver/bronze/grey by rank, gold gets ambient glow -->
+        ${hangerGlow}
+        <line x1="60" y1="0" x2="60" y2="-15" stroke="${hangerColor}" stroke-width="2.5" stroke-linecap="round"/>
         <path d="M60,-15 Q60,-26 70,-26 Q80,-26 80,-15"
-          fill="none" stroke="#a0aeb8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          fill="none" stroke="${hangerColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
 
         <!-- Jersey body base fill -->
         <path d="M20,22 L0,36 L0,62 L26,54 L22,130 L98,130 L94,54 L120,62 L120,36 L100,22 L80,10 L65,30 L60,36 L55,30 L40,10 Z" fill="${c}"/>
