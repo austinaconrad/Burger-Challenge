@@ -1560,16 +1560,6 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
   position:relative; overflow:visible;
 }
 .jersey-card:active { transform:scale(0.97); transition-duration:0.12s; }
-@keyframes jerseyWiggle {
-  0%   { transform:rotate(0deg); }
-  18%  { transform:rotate(-2.0deg); }
-  38%  { transform:rotate(2.2deg); }
-  56%  { transform:rotate(-1.2deg); }
-  74%  { transform:rotate(0.8deg); }
-  88%  { transform:rotate(-0.4deg); }
-  100% { transform:rotate(0deg); }
-}
-.jersey-card.wiggling { animation:jerseyWiggle 0.65s cubic-bezier(0.34,1.56,0.64,1) both; }
 .jersey-hero { padding-bottom:14px; }
 .jersey-mid  { padding-bottom:10px; }
 .jersey-small{ padding-bottom:8px; }
@@ -6914,40 +6904,6 @@ function renderBentoList() {
     });
   });
 }
-
-// ── Jersey wall scroll wiggle ────────────────────────────────
-(function() {
-  let _cooldown = false;
-  let _lastY    = 0;
-
-  function wiggleAll() {
-    const panel = document.getElementById('ranks-players-panel');
-    if (!panel || panel.offsetParent === null) return;     // tab not visible
-    const cards = document.querySelectorAll('#bento-list .jersey-card');
-    if (!cards.length) return;
-    cards.forEach((card, i) => {
-      card.style.animationDelay = (i * 0.04) + 's';
-      card.classList.remove('wiggling');
-      void card.offsetWidth;                               // force reflow
-      card.classList.add('wiggling');
-      card.addEventListener('animationend', () => {
-        card.classList.remove('wiggling');
-        card.style.animationDelay = '';
-      }, { once: true });
-    });
-  }
-
-  document.addEventListener('scroll', function(e) {
-    const el  = e.target;
-    const cur = el.scrollTop !== undefined ? el.scrollTop : window.scrollY;
-    const scrollingDown = cur > _lastY;
-    _lastY = cur;
-    if (!scrollingDown || _cooldown) return;
-    _cooldown = true;
-    setTimeout(() => { _cooldown = false; }, 750);
-    wiggleAll();
-  }, { passive: true, capture: true });
-})();
 
 // Tap the card: front → flip to back; back → flip back (unless history pill tapped)
 window.handlePodiumTap=function(pid,e){
