@@ -460,7 +460,12 @@ button{transition:transform 0.2s ease}
 .receipt-plus-unit{font-family:monospace;font-size:8px;text-transform:uppercase;letter-spacing:0.1em;color:#888;line-height:1.3;padding-bottom:4px}
 .receipt-meta-col{text-align:right;font-family:monospace;font-size:9px;color:#999;text-transform:uppercase;letter-spacing:0.08em;line-height:1.9}
 /* footer */
-.receipt-foot{text-align:center;padding:9px 24px 5px;font-family:monospace;font-size:9px;color:#AAA;text-transform:uppercase;letter-spacing:0.12em;line-height:1.9}
+.receipt-foot{text-align:center;padding:6px 24px 4px;font-family:'Courier New',monospace;font-size:9px;color:#AAA;text-transform:uppercase;letter-spacing:0.12em;line-height:1.9}
+.receipt-order-num{font-family:'Courier New',monospace;font-size:10px;color:#B0A090;letter-spacing:0.16em;text-transform:uppercase;margin-top:3px}
+.receipt-foot-rule{border:none;border-top:2px dashed #D4CABF;margin:6px 20px 0}
+.receipt-foot-thank{text-align:center;font-family:'Courier New',monospace;font-size:12px;font-weight:700;color:#7A6E60;letter-spacing:0.12em;text-transform:uppercase;padding:10px 24px 2px}
+.receipt-barcode{display:flex;justify-content:center;gap:1.5px;padding:8px 24px 12px;opacity:0.25}
+.receipt-barcode span{display:inline-block;width:2px;background:#333;border-radius:0}
 .my-tally-card.complete{border-color:rgba(34,197,94,0.30);box-shadow:0 0 0 1.5px rgba(34,197,94,0.20),0 4px 24px rgba(30,100,160,0.14)}
 .tally-bun-top{height:3px;background:linear-gradient(90deg,transparent,var(--amber-dark),#F59E0B,rgba(255,255,255,0.6),#F59E0B,var(--amber-dark),transparent);opacity:0.9}
 .tally-top{display:flex;align-items:center;gap:14px;padding:16px 16px 12px}
@@ -469,6 +474,12 @@ button{transition:transform 0.2s ease}
 .tally-sub{font-size:12px;color:var(--muted2);margin-top:2px;font-weight:400}
 .tally-count{font-family:'Russo One',sans-serif;font-size:42px;font-weight:400;line-height:1;letter-spacing:0;transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1)}
 .tally-count.pop{transform:scale(1.3)}
+/* Tally progress ring */
+.tally-ring-wrap{display:flex;flex-direction:column;align-items:center;padding:12px 0 16px;gap:12px}
+.tally-ring-stats{display:flex;gap:28px;justify-content:center}
+.trs-item{display:flex;flex-direction:column;align-items:center;gap:2px}
+.trs-val{font-family:'Russo One',sans-serif;font-size:17px;font-weight:900;color:var(--text);line-height:1}
+.trs-lbl{font-size:9px;color:var(--muted2);font-weight:700;text-transform:uppercase;letter-spacing:0.06em}
 .progress-track{height:16px;background:rgba(30,100,160,0.10);margin:0 16px;border-radius:999px;overflow:visible;position:relative;box-shadow:inset 0 2px 4px rgba(30,100,160,0.15)}
 .progress-fill{height:100%;border-radius:999px;transition:width 0.5s cubic-bezier(0.34,1.56,0.64,1);position:relative;overflow:hidden;box-shadow:0 0 12px rgba(234,88,12,0.40),0 2px 6px rgba(0,0,0,0.30),inset 0 1px 0 rgba(255,255,255,0.18)}
 .progress-fill::before{content:'';position:absolute;top:0;bottom:0;width:40%;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.28) 50%,transparent 100%);animation:barShimmer 1.4s ease-in-out infinite}
@@ -539,6 +550,27 @@ button{transition:transform 0.2s ease}
 .feed-row-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:999px;border:.5px solid;white-space:nowrap;flex-shrink:0;margin-left:auto;align-self:flex-start}
 .feed-row-photo{margin-top:7px;border-radius:10px;overflow:hidden;cursor:zoom-in}
 .feed-row-photo img{width:100%;max-height:220px;object-fit:cover;display:block}
+/* ── Photo-forward burger card ── */
+.feed-photo-card{border-bottom:1px solid rgba(30,100,160,0.14);animation:slideIn 0.25s ease both;position:relative}
+.fpc-hero{position:relative;width:100%;overflow:hidden;border-radius:14px 14px 0 0;min-height:190px;max-height:240px;cursor:zoom-in}
+.fpc-hero img{width:100%;height:100%;min-height:190px;max-height:240px;object-fit:cover;display:block}
+.fpc-grad{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0.38) 0%,transparent 42%,transparent 50%,rgba(0,0,0,0.54) 100%);pointer-events:none}
+.fpc-top-row{position:absolute;top:10px;left:10px;right:10px;display:flex;align-items:center;justify-content:space-between;pointer-events:none}
+.fpc-player-chip{display:flex;align-items:center;gap:7px}
+.fpc-avatar{width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,0.85);overflow:hidden;flex-shrink:0;background:#333}
+.fpc-avatar img{width:100%;height:100%;object-fit:cover}
+.fpc-player-name{font-size:12px;font-weight:700;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,0.7)}
+.fpc-time-badge{font-size:10px;color:rgba(255,255,255,0.80);background:rgba(0,0,0,0.38);border-radius:999px;padding:2px 8px;border:1px solid rgba(255,255,255,0.20);text-shadow:none;white-space:nowrap}
+.fpc-bottom-row{position:absolute;bottom:0;left:0;right:0;padding:10px 12px;display:flex;align-items:flex-end;justify-content:space-between;pointer-events:none}
+.fpc-restaurant{font-size:15px;font-weight:800;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,0.8);letter-spacing:-0.01em;line-height:1.2}
+.fpc-burger-badge{font-size:10px;font-weight:700;color:#fff;background:rgba(0,0,0,0.45);border-radius:999px;padding:3px 10px;border:1px solid rgba(255,255,255,0.28);flex-shrink:0}
+.fpc-body{padding:9px 14px 6px;display:flex;flex-direction:column;gap:0}
+/* No-photo warm gradient header */
+.feed-no-photo-header{display:flex;align-items:center;gap:11px;padding:11px 14px 10px;background:linear-gradient(135deg,rgba(180,83,9,0.07),rgba(245,158,11,0.13));border-bottom:1px solid rgba(245,158,11,0.16);border-radius:14px 14px 0 0;margin-bottom:2px}
+.fnph-icon{font-size:26px;line-height:1;flex-shrink:0}
+.fnph-info{flex:1;min-width:0}
+.fnph-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.02em;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fnph-sub{font-size:10px;color:var(--muted2);margin-top:1px}
 /* keep legacy class names for backward compat */
 .msg-card{animation:slideIn 0.25s ease both}
 .msg-header{display:flex;align-items:center;gap:8px;margin-bottom:5px}
@@ -1876,6 +1908,7 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
   white-space: normal; word-break: break-word;
 }
 .sticker-label.locked { color: var(--muted); }
+.sticker-unlock-tip{font-size:7.5px;color:var(--muted);text-align:center;max-width:72px;line-height:1.35;margin-top:2px;font-style:italic;opacity:0.75;word-break:break-word}
 
 /* ══════════════════════════════════════════════
    📈 PACE TAB
@@ -4198,9 +4231,10 @@ function renderStickerPage(p) {
     window._badgePopupData[k] = {label: a.label, tip: a.tip, earned: isEarned, color, progStat};
 
     if (isEarned) {
+      const glowStyle = `box-shadow:inset 0 1px 0 rgba(255,255,255,0.90),inset 0 0 0 1px rgba(30,110,170,0.14),0 3px 10px rgba(30,100,160,0.16),0 0 0 2.5px ${a.color},0 0 20px ${a.glow};background:rgba(255,255,255,0.88)`;
       return `<div class="sticker-cell" onclick="showBadgePopup('${k}')" style="cursor:pointer">
         <div class="badge-sticker unlocked" style="--skew:${skew}deg">
-          <div class="sticker-emoji" style="${emojiSize}display:flex;align-items:center;justify-content:center;flex-wrap:nowrap">${a.emoji}</div>
+          <div class="sticker-emoji" style="${emojiSize}display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;${glowStyle}">${a.emoji}</div>
         </div>
         <div class="sticker-label">${a.label}</div>
       </div>`;
@@ -4208,12 +4242,17 @@ function renderStickerPage(p) {
       const prog = progress[k];
       const pct = prog ? Math.min(prog.current / prog.max, 1) : 0;
       const ring = (prog && pct > 0) ? progressRingSvg(pct, a.color) : '';
+      const lockedBorderColor = a.color.replace(/[\d.]+\)$/, '0.35)');
+      const lockedInnerStyle = `${emojiSize}display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;opacity:0.22;filter:grayscale(1)`;
       return `<div class="sticker-cell" onclick="showBadgePopup('${k}')" style="cursor:pointer">
         <div style="position:relative;display:inline-flex;align-items:center;justify-content:center">
           ${ring}
-          <div class="badge-sticker locked">?</div>
+          <div class="badge-sticker locked" style="border:2px dashed ${lockedBorderColor};background:rgba(30,100,160,0.04);border-radius:50%;width:64px;height:64px;display:flex;align-items:center;justify-content:center">
+            <div style="${lockedInnerStyle}">${a.emoji}</div>
+          </div>
         </div>
         <div class="sticker-label locked">${a.label}</div>
+        <div class="sticker-unlock-tip">${a.tip}</div>
       </div>`;
     }
   }).join('');
@@ -4324,18 +4363,41 @@ function renderMyTally(){
   const me=players.find(p=>p.id===myPlayerId);
   if(!me){area.innerHTML='<div class="empty"><div class="e-icon">🔍</div><p>Player not found. Try rejoining.</p></div>';return;}
   const cc=colorClass(me.colorIdx);
+  const color=RING_COLORS[me.colorIdx%RING_COLORS.length];
   const pct=Math.min(100,me.count), isDone=me.count>=100;
+  const R=58, circ=+(2*Math.PI*R).toFixed(1);
+  const dashOff=isDone?0:+((1-pct/100)*circ).toFixed(1);
+  const paceD=getPaceDelta(me.count);
+  const paceStr=(paceD>=0?'+':'')+paceD;
+  const paceColor=paceD>=0?'#22c55e':'#ef4444';
   area.innerHTML=`<div class="my-tally-card ${cc} ${isDone?'complete':''}">
     <div class="tally-bun-top"></div>
     <div class="tally-top">
-      ${ringAvatarHTML(me,58)}
+      ${ringAvatarHTML(me,48)}
       <div class="tally-info">
         <div class="tally-name">${escHtml(me.name)}</div>
         <div class="tally-sub">${me.count} of 100 burgers eaten</div>
       </div>
-      <div class="tally-count ${cc}" id="my-count">${me.count}</div>
     </div>
-    <div class="progress-track"><div class="progress-fill ${cc}" id="my-bar" style="width:${pct}%"></div><div class="progress-burger${pct>0?' visible':''}" id="my-burger" style="left:${pct}%">🍔</div></div>
+    <div class="tally-ring-wrap">
+      <svg viewBox="0 0 140 140" width="150" height="150" style="overflow:visible;filter:drop-shadow(0 4px 16px ${color}44)">
+        <circle cx="70" cy="70" r="${R}" fill="none" stroke="rgba(0,0,0,0.08)" stroke-width="11"/>
+        <circle cx="70" cy="70" r="${R}" fill="none" stroke="${color}" stroke-width="11" stroke-linecap="round"
+          stroke-dasharray="${circ}" stroke-dashoffset="${dashOff}"
+          transform="rotate(-90 70 70)" style="transition:stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1)"/>
+        <text x="70" y="60" text-anchor="middle" font-family="Russo One,sans-serif" font-size="30" fill="${color}" font-weight="900" id="my-count">${me.count}</text>
+        <text x="70" y="77" text-anchor="middle" font-family="Outfit,sans-serif" font-size="12" fill="rgba(0,0,0,0.40)" font-weight="600">of 100</text>
+        ${isDone
+          ?`<text x="70" y="97" text-anchor="middle" font-size="20">🏆</text>`
+          :`<text x="70" y="96" text-anchor="middle" font-family="Outfit,sans-serif" font-size="10" fill="rgba(0,0,0,0.28)">${100-me.count} to go</text>`
+        }
+      </svg>
+      <div class="tally-ring-stats">
+        <div class="trs-item"><div class="trs-val">${pct}%</div><div class="trs-lbl">Complete</div></div>
+        <div class="trs-item"><div class="trs-val" style="color:${paceColor}">${paceStr}</div><div class="trs-lbl">Pace</div></div>
+        <div class="trs-item"><div class="trs-val">${Math.max(0,100-me.count)}</div><div class="trs-lbl">Remaining</div></div>
+      </div>
+    </div>
     <div class="tally-bun-bottom"></div>
     ${isDone?'<div class="complete-strip">🎉 You crushed 100 burgers! You\'re a legend!</div>':''}
   </div>`;
@@ -4673,38 +4735,69 @@ function renderUnifiedFeed() {
             ${burgerComments.length > 1 ? `<div class="fcp-viewall">View all ${burgerComments.length} comments</div>` : ''}
           </div>`
         : '';
-      return `<div class="feed-row" data-player-id="${escHtml(item.player.id)}" data-burger-id="${escHtml(targetId)}" style="animation-delay:${_feedInitialRenderDone?'0s':Math.min(idx*0.04,0.6)+'s'}">
-        <div class="${colorClass(item.player.colorIdx)}" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--av-bg);color:var(--av-text);flex-shrink:0;overflow:hidden;font-family:'Outfit',sans-serif">${item.player.avatar?`<img src="${item.player.avatar}" style="width:100%;height:100%;object-fit:cover" alt="avatar"/>`:`${ini}`}</div>
-        <div class="feed-row-body">
-          <div class="feed-row-header">
-            <span class="feed-row-name">${escHtml(item.player.name)}${isMe?' <span class="feed-row-you">(you)</span>':''}</span>
-            ${bannerMeta ? `<span class="feed-row-meta">${bannerMeta}</span>` : ''}
-            <span class="feed-row-badge" style="color:var(--text);border-color:rgba(11,53,80,0.30);background:rgba(11,53,80,0.07)">🍔 #${burgerNum>0?burgerNum:'?'}</span>
-          </div>
-          ${item.photo ? `
-          <div class="feed-row-photo" onclick="openLightboxSrc(this.querySelector('img').src)" style="position:relative">
-            <img src="${item.photo}" alt="burger photo"/>
-            <div style="position:absolute;bottom:9px;left:9px;right:9px;pointer-events:none">
-              <div style="display:inline-flex;align-items:center;gap:4px;background:rgba(168,212,237,0.88);border:1px solid rgba(255,255,255,0.60);border-radius:999px;padding:4px 11px 4px 8px;max-width:100%;overflow:hidden">
-                <span style="font-size:12px;line-height:1;flex-shrink:0">📍</span>
-                <span style="font-size:12px;font-weight:700;color:#0b3550;letter-spacing:0.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(item.restaurant)}</span>
+      const avatarInner = item.player.avatar
+        ? `<img src="${item.player.avatar}" alt="avatar" style="width:100%;height:100%;object-fit:cover"/>`
+        : `<div class="${colorClass(item.player.colorIdx)}" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:var(--av-bg);color:var(--av-text);font-family:'Outfit',sans-serif">${ini}</div>`;
+
+      if (item.photo) {
+        // ── PHOTO-FORWARD CARD ──
+        return `<div class="feed-photo-card" data-player-id="${escHtml(item.player.id)}" data-burger-id="${escHtml(targetId)}" style="animation-delay:${_feedInitialRenderDone?'0s':Math.min(idx*0.04,0.6)+'s'}">
+          <div class="fpc-hero" onclick="openLightboxSrc(this.querySelector('img').src)">
+            <img src="${item.photo}" alt="burger photo" loading="lazy"/>
+            <div class="fpc-grad"></div>
+            <div class="fpc-top-row">
+              <div class="fpc-player-chip">
+                <div class="fpc-avatar">${avatarInner}</div>
+                <span class="fpc-player-name">${escHtml(item.player.name)}${isMe?' (you)':''}</span>
               </div>
+              <span class="fpc-time-badge">${bannerMeta}</span>
             </div>
-          </div>` : `<div style="font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.02em;margin:4px 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📍 ${escHtml(item.restaurant)}</div>`}
-          ${item.rating > 0 ? `<div class="grill-rating-row" style="margin-top:6px">${ratingStars}</div>` : ''}
-          <div class="grill-pill-row" style="margin-top:6px">
-            <span class="grill-pill ${stampCls==='stamp-triple'?'grill-pill-triple':''}">${stampText}</span>
-            ${locPill}${weatherPill}
+            <div class="fpc-bottom-row">
+              <div class="fpc-restaurant">📍 ${escHtml(item.restaurant)}</div>
+              <div class="fpc-burger-badge">🍔 #${burgerNum>0?burgerNum:'?'}</div>
+            </div>
           </div>
-          <div class="msg-reactions" data-burger-id="${targetId}">${pillsHtml}</div>
-          <div class="feed-card-actions">
-            <button class="feed-react-btn" data-target-id="${targetId}" data-target-type="burger" title="Add reaction">${_REACT_SVG}</button>
-            <button class="feed-comment-btn" data-target-id="${targetId}" onclick="toggleComments('${targetId}')">${commentLabel}</button>
+          <div class="fpc-body">
+            ${item.rating > 0 ? `<div class="grill-rating-row" style="margin-top:0;margin-bottom:6px">${ratingStars}</div>` : ''}
+            <div class="grill-pill-row" style="margin-top:0">
+              <span class="grill-pill ${stampCls==='stamp-triple'?'grill-pill-triple':''}">${stampText}</span>
+              ${locPill}${weatherPill}
+            </div>
+            <div class="msg-reactions" data-burger-id="${targetId}">${pillsHtml}</div>
+            <div class="feed-card-actions">
+              <button class="feed-react-btn" data-target-id="${targetId}" data-target-type="burger" title="Add reaction">${_REACT_SVG}</button>
+              <button class="feed-comment-btn" data-target-id="${targetId}" onclick="toggleComments('${targetId}')">${commentLabel}</button>
+            </div>
+            ${inlineCommentHtml}
+            ${buildCommentHtml(targetId, 'burger', burgerComments)}
           </div>
-          ${inlineCommentHtml}
-          ${buildCommentHtml(targetId, 'burger', burgerComments)}
-        </div>
-      </div>`.trim();
+        </div>`.trim();
+      } else {
+        // ── NO-PHOTO CARD: warm gradient header ──
+        return `<div class="feed-row" data-player-id="${escHtml(item.player.id)}" data-burger-id="${escHtml(targetId)}" style="flex-direction:column;padding:0;gap:0;animation-delay:${_feedInitialRenderDone?'0s':Math.min(idx*0.04,0.6)+'s'}">
+          <div class="feed-no-photo-header">
+            <div class="fnph-icon">🍔</div>
+            <div class="fnph-info">
+              <div class="fnph-title">📍 ${escHtml(item.restaurant)}</div>
+              <div class="fnph-sub">${escHtml(item.player.name)}${isMe?' (you)':''} &nbsp;·&nbsp; ${bannerMeta} &nbsp;·&nbsp; 🍔 #${burgerNum>0?burgerNum:'?'}</div>
+            </div>
+          </div>
+          <div class="feed-row-body" style="padding:8px 0 0">
+            ${item.rating > 0 ? `<div class="grill-rating-row" style="margin-top:0;margin-bottom:6px">${ratingStars}</div>` : ''}
+            <div class="grill-pill-row" style="margin-top:0">
+              <span class="grill-pill ${stampCls==='stamp-triple'?'grill-pill-triple':''}">${stampText}</span>
+              ${locPill}${weatherPill}
+            </div>
+            <div class="msg-reactions" data-burger-id="${targetId}">${pillsHtml}</div>
+            <div class="feed-card-actions">
+              <button class="feed-react-btn" data-target-id="${targetId}" data-target-type="burger" title="Add reaction">${_REACT_SVG}</button>
+              <button class="feed-comment-btn" data-target-id="${targetId}" onclick="toggleComments('${targetId}')">${commentLabel}</button>
+            </div>
+            ${inlineCommentHtml}
+            ${buildCommentHtml(targetId, 'burger', burgerComments)}
+          </div>
+        </div>`.trim();
+      }
     }
   }).join('\n');
 
@@ -5134,18 +5227,23 @@ function openFeedReceipt(item) {
     for (let i = 1; i <= 5; i++) s += item.rating >= i ? '⭐' : '<span style="opacity:0.22">⭐</span>';
     return s;
   })();
+  const orderNum = d ? ('ORD-' + (d.getTime() % 100000).toString().padStart(5,'0')) : 'ORD-00000';
+  // Generate pseudo-barcode bars (varied heights for authentic look)
+  const barHeights = [18,24,18,30,20,14,28,18,22,14,26,20,18,24,30,14,18,26,20,24,14,30,18,22,20];
+  const barcodeHtml = barHeights.map(h => `<span style="height:${h}px"></span>`).join('');
   receipt.innerHTML = `
     <div class="receipt-card" onclick="event.stopPropagation()">
       <div class="receipt-top-bar"></div>
       <div class="receipt-hero-section">
         <span class="receipt-burger-icon">🍔</span>
         <div class="receipt-challenge-title">100 Burger Challenge</div>
-        <div class="receipt-challenge-sub">The Summer Grind &middot; Room ${escHtml(roomId)}</div>
+        <div class="receipt-challenge-sub">THE SUMMER GRIND &middot; ROOM ${escHtml(roomId)}</div>
+        <div class="receipt-order-num">${orderNum}</div>
       </div>
       <hr class="receipt-perf"/>
       <div class="receipt-main-section">
         <div class="receipt-logged-tag">✓ Logged</div>
-        <div class="receipt-restaurant-name">${escHtml(item.restaurant || '?')}</div>
+        <div class="receipt-restaurant-name">${escHtml((item.restaurant || '?').toUpperCase())}</div>
         <div class="receipt-menu-pill">${burgerLabel}</div>
         ${item.rating ? `<div class="receipt-fire-row">${fireDisplay}</div><div class="receipt-rating-txt">${item.rating} / 5</div>` : ''}
       </div>
@@ -5156,7 +5254,10 @@ function openFeedReceipt(item) {
         </div>
         <div class="receipt-meta-col">${dateStr}<br>${timeStr}<br>${escHtml(item.player?.name || '?')}</div>
       </div>
-      <div class="receipt-foot">Keep grinding! 💪<br>Room: ${escHtml(roomId)}</div>
+      <div class="receipt-foot">${dateStr} &nbsp;·&nbsp; ${timeStr}<br>Player: ${escHtml(item.player?.name || '?')} &nbsp;·&nbsp; Room: ${escHtml(roomId)}</div>
+      <hr class="receipt-foot-rule"/>
+      <div class="receipt-foot-thank">Keep Grinding! 💪</div>
+      <div class="receipt-barcode">${barcodeHtml}</div>
       <button class="receipt-done-btn" onclick="closeReceipt()">Close</button>
     </div>
   `;
