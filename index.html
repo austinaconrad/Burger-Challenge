@@ -6060,6 +6060,8 @@ window.onRestaurantSuggestionClick = function(name) {
 function lockRestaurant(name, emoji) {
   restaurantLocked = true;
   pendingMenuKey = '';
+  const inp = document.getElementById('detail-restaurant');
+  if (inp) inp.value = name;
   document.getElementById('restaurant-input-row').style.display = 'none';
   const lockedRow = document.getElementById('restaurant-locked-row');
   const lockedName = document.getElementById('restaurant-locked-name');
