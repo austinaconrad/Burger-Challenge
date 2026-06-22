@@ -3885,7 +3885,6 @@ function subscribeToRoom(){
       render();
       backfillWeatherStamps();
       backfillLocationNames();
-      runLogSyncRepair();
     },
     ()=>{cs.className='offline-dot'; cs.textContent='Reconnecting…'}
   );
@@ -6533,67 +6532,6 @@ async function backfillWeatherStamps() {
   }
 }
 
-// ── Log sync repair — runs once after first snapshot ─────────────────────────
-// Detects two classes of problem:
-//  1. Log entries whose ts field is a Firestore Timestamp or number (not a string) —
-//     logTs() would return the object itself, which breaks feed/calendar ts parsing.
-//     We extract a proper ISO string via safeTs() and write the fix back.
-//  2. Players where p.count > number of parseable log entries — this means entries
-//     were clobbered by the geocode/weather race condition (now fixed).
-//     Lost data can't be recovered but we surface it clearly.
-let _logSyncRepairDone = false;
-async function runLogSyncRepair() {
-  if (_logSyncRepairDone) return;
-  _logSyncRepairDone = true;
-
-  const fixed = [];
-  const gaps  = [];
-
-  for (const p of players) {
-    const rawLogs = p.logs || [];
-    let changed = false;
-
-    // Pass 1: ensure every entry's ts is a plain ISO string
-    const repairedLogs = rawLogs.map(e => {
-      if (!e || typeof e === 'string') return e;
-      if (typeof e !== 'object') return e;
-      const proper = safeTs(e);
-      if (proper && e.ts !== proper) {
-        changed = true;
-        return { ...e, ts: proper };
-      }
-      return e;
-    });
-
-    if (changed) {
-      try {
-        await updateDoc(doc(db, 'rooms', roomId, 'players', p.id), { logs: repairedLogs });
-        fixed.push(p.name);
-      } catch (_) { /* silently skip — will retry on next load */ }
-    }
-
-    // Pass 2: count/log gap check
-    const basis = changed ? repairedLogs : rawLogs;
-    const validLogCount = basis.filter(e => !!(logTs(e) || safeTs(e))).length;
-    if (p.count > validLogCount) {
-      gaps.push({ name: p.name, count: p.count, found: validLogCount });
-    }
-  }
-
-  if (fixed.length) {
-    console.log('[LogSync] Repaired log timestamp format for:', fixed.join(', '));
-    showToast(`🔧 Log format repaired for ${fixed.join(', ')}`);
-  }
-  if (gaps.length) {
-    const detail = gaps.map(g => `${g.name}: count=${g.count} but only ${g.found} log entries found (${g.count - g.found} missing)`).join(' | ');
-    console.warn('[LogSync] Count/log gaps — entries are unrecoverable:', detail);
-    showToast('⚠️ ' + gaps.map(g => `${g.name} is missing ${g.count - g.found} log entr${g.count - g.found === 1 ? 'y' : 'ies'}`).join(', ') + ' — check console for details');
-  }
-  if (!fixed.length && !gaps.length) {
-    console.log('[LogSync] All player logs look clean ✓');
-  }
-}
-
 async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null, patties=1, toppings=[], menuItem='', menuEmoji='', photo='') {
   const me=players.find(p=>p.id===myPlayerId);
   if(!me) return;
@@ -6615,24 +6553,20 @@ async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null
     if(gps) {
       entry.lat = gps.lat;
       entry.lng = gps.lng;
-      // Reverse-geocode to City, State — fire-and-forget.
-      // IMPORTANT: use newLogs (closure) as the base if the entry isn't in players yet,
-      // to avoid the race where this callback fires before the main updateDoc resolves
-      // and overwrites logs with a version that's missing the new entry.
+      // Reverse-geocode to City, State — fire-and-forget with 5s cap
       reverseGeocode(gps.lat, gps.lng).then(loc => {
         if (!loc) return;
+        // Patch the saved log entry in Firestore with the resolved location string
         const me2 = players.find(p => p.id === myPlayerId);
         if (!me2) return;
-        const latestLogs = me2.logs || [];
-        const base = latestLogs.some(e => typeof e === 'object' && e.ts === entry.ts)
-          ? latestLogs : newLogs;
-        const updatedLogs = base.map(e =>
-          (typeof e === 'object' && e.ts === entry.ts && !e.locationCityState)
-            ? { ...e, locationCityState: loc } : e
-        );
+        const updatedLogs = (me2.logs || []).map(e => {
+          if (typeof e === 'object' && e.ts === entry.ts && !e.locationCityState)
+            return { ...e, locationCityState: loc };
+          return e;
+        });
         updateDoc(doc(db,'rooms',roomId,'players',myPlayerId), {logs: updatedLogs}).catch(()=>{});
       });
-      // Weather stamp — same race-condition guard as above
+      // Weather stamp — fire-and-forget, silently fails if offline
       fetch(`https://api.open-meteo.com/v1/forecast?latitude=${gps.lat}&longitude=${gps.lng}&current_weather=true`)
         .then(res => res.json())
         .then(data => {
@@ -6642,13 +6576,11 @@ async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null
           const weatherStamp = weatherStampFromCode(weatherCode, tempF);
           const me3 = players.find(p => p.id === myPlayerId);
           if (!me3) return;
-          const latestLogs3 = me3.logs || [];
-          const base3 = latestLogs3.some(e => typeof e === 'object' && e.ts === entry.ts)
-            ? latestLogs3 : newLogs;
-          const updatedLogs = base3.map(e =>
-            (typeof e === 'object' && e.ts === entry.ts && !e.weatherStamp)
-              ? { ...e, weatherStamp } : e
-          );
+          const updatedLogs = (me3.logs || []).map(e => {
+            if (typeof e === 'object' && e.ts === entry.ts && !e.weatherStamp)
+              return { ...e, weatherStamp };
+            return e;
+          });
           updateDoc(doc(db,'rooms',roomId,'players',myPlayerId), {logs: updatedLogs}).catch(()=>{});
         }).catch(() => {});
     }
@@ -7103,13 +7035,9 @@ function renderBentoList() {
     const nameFontSize = nameLen <= 4 ? 12 : nameLen <= 6 ? 10.5 : nameLen <= 8 ? 9 : nameLen <= 11 ? 8 : nameLen <= 14 ? 7 : nameLen <= 17 ? 6.5 : 6;
     const nameLetterSpacing = nameLen <= 4 ? 3.5 : nameLen <= 6 ? 2.5 : nameLen <= 8 ? 1.5 : nameLen <= 11 ? 0.5 : 0;
     const borderStyle = '';
-    // Avatar strip above the jersey — sits in normal flow so it doesn't overlap the SVG
-    const avatarHeader = p.avatar
-      ? `<div style="width:100%;display:flex;align-items:flex-end;padding:6px 6px 4px">
-           <div style="width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,0.7);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.18);flex-shrink:0">
-             <img src="${escHtml(p.avatar)}" style="width:100%;height:100%;object-fit:cover;object-position:center top"/>
-           </div>
-         </div>`
+    // Avatar overlay in top-left corner of card
+    const avatarOverlay = p.avatar
+      ? `<div style="position:absolute;top:10px;left:10px;width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,0.85);overflow:hidden;z-index:2;box-shadow:0 1px 3px rgba(0,0,0,0.22)"><img src="${escHtml(p.avatar)}" style="width:100%;height:100%;object-fit:cover;object-position:center top"/></div>`
       : '';
     const meBadge  = isMe ? `<span class="jw-me-badge">You</span>` : '';
     const tieBadge = isTied ? `<span class="jw-tie-badge">TIE</span>` : '';
@@ -7118,7 +7046,7 @@ function renderBentoList() {
     return `<div class="jersey-card jersey-${size}" data-pid="${escHtml(p.id)}"
         style="animation-delay:${Math.min(i*0.05,0.4)}s"
         onclick="openCalModal('${escHtml(p.id)}')" title="View ${escHtml(p.name)}'s burger history">
-      ${avatarHeader}
+      ${avatarOverlay}
       <svg viewBox="0 8 120 124" class="jersey-svg" aria-hidden="true">
         <defs>
           <pattern id="jw-mesh" x="0" y="0" width="4" height="4" patternUnits="userSpaceOnUse">
