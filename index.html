@@ -3885,6 +3885,7 @@ function subscribeToRoom(){
       render();
       backfillWeatherStamps();
       backfillLocationNames();
+      runLogSyncRepair();
     },
     ()=>{cs.className='offline-dot'; cs.textContent='Reconnecting…'}
   );
@@ -6532,6 +6533,67 @@ async function backfillWeatherStamps() {
   }
 }
 
+// ── Log sync repair — runs once after first snapshot ─────────────────────────
+// Detects two classes of problem:
+//  1. Log entries whose ts field is a Firestore Timestamp or number (not a string) —
+//     logTs() would return the object itself, which breaks feed/calendar ts parsing.
+//     We extract a proper ISO string via safeTs() and write the fix back.
+//  2. Players where p.count > number of parseable log entries — this means entries
+//     were clobbered by the geocode/weather race condition (now fixed).
+//     Lost data can't be recovered but we surface it clearly.
+let _logSyncRepairDone = false;
+async function runLogSyncRepair() {
+  if (_logSyncRepairDone) return;
+  _logSyncRepairDone = true;
+
+  const fixed = [];
+  const gaps  = [];
+
+  for (const p of players) {
+    const rawLogs = p.logs || [];
+    let changed = false;
+
+    // Pass 1: ensure every entry's ts is a plain ISO string
+    const repairedLogs = rawLogs.map(e => {
+      if (!e || typeof e === 'string') return e;
+      if (typeof e !== 'object') return e;
+      const proper = safeTs(e);
+      if (proper && e.ts !== proper) {
+        changed = true;
+        return { ...e, ts: proper };
+      }
+      return e;
+    });
+
+    if (changed) {
+      try {
+        await updateDoc(doc(db, 'rooms', roomId, 'players', p.id), { logs: repairedLogs });
+        fixed.push(p.name);
+      } catch (_) { /* silently skip — will retry on next load */ }
+    }
+
+    // Pass 2: count/log gap check
+    const basis = changed ? repairedLogs : rawLogs;
+    const validLogCount = basis.filter(e => !!(logTs(e) || safeTs(e))).length;
+    if (p.count > validLogCount) {
+      gaps.push({ name: p.name, count: p.count, found: validLogCount });
+    }
+  }
+
+  if (fixed.length) {
+    console.log('[LogSync] Repaired log timestamp format for:', fixed.join(', '));
+    showToast(`🔧 Log format repaired for ${fixed.join(', ')}`);
+  }
+  if (gaps.length) {
+    const detail = gaps.map(g => `${g.name}: count=${g.count} but only ${g.found} log entries found (${g.count - g.found} missing)`).join(' | ');
+    console.warn('[LogSync] Count/log gaps — entries are unrecoverable:', detail);
+    showToast('⚠️ ' + gaps.map(g => `${g.name} is missing ${g.count - g.found} log entr${g.count - g.found === 1 ? 'y' : 'ies'}`).join(', ') + ' — check console for details');
+  }
+  if (!fixed.length && !gaps.length) {
+    console.log('[LogSync] All player logs look clean ✓');
+  }
+}
+
 async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null, patties=1, toppings=[], menuItem='', menuEmoji='', photo='') {
   const me=players.find(p=>p.id===myPlayerId);
   if(!me) return;
@@ -6553,20 +6615,24 @@ async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null
     if(gps) {
       entry.lat = gps.lat;
       entry.lng = gps.lng;
-      // Reverse-geocode to City, State — fire-and-forget with 5s cap
+      // Reverse-geocode to City, State — fire-and-forget.
+      // IMPORTANT: use newLogs (closure) as the base if the entry isn't in players yet,
+      // to avoid the race where this callback fires before the main updateDoc resolves
+      // and overwrites logs with a version that's missing the new entry.
       reverseGeocode(gps.lat, gps.lng).then(loc => {
         if (!loc) return;
-        // Patch the saved log entry in Firestore with the resolved location string
         const me2 = players.find(p => p.id === myPlayerId);
         if (!me2) return;
-        const updatedLogs = (me2.logs || []).map(e => {
-          if (typeof e === 'object' && e.ts === entry.ts && !e.locationCityState)
-            return { ...e, locationCityState: loc };
-          return e;
-        });
+        const latestLogs = me2.logs || [];
+        const base = latestLogs.some(e => typeof e === 'object' && e.ts === entry.ts)
+          ? latestLogs : newLogs;
+        const updatedLogs = base.map(e =>
+          (typeof e === 'object' && e.ts === entry.ts && !e.locationCityState)
+            ? { ...e, locationCityState: loc } : e
+        );
         updateDoc(doc(db,'rooms',roomId,'players',myPlayerId), {logs: updatedLogs}).catch(()=>{});
       });
-      // Weather stamp — fire-and-forget, silently fails if offline
+      // Weather stamp — same race-condition guard as above
       fetch(`https://api.open-meteo.com/v1/forecast?latitude=${gps.lat}&longitude=${gps.lng}&current_weather=true`)
         .then(res => res.json())
         .then(data => {
@@ -6576,11 +6642,13 @@ async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null
           const weatherStamp = weatherStampFromCode(weatherCode, tempF);
           const me3 = players.find(p => p.id === myPlayerId);
           if (!me3) return;
-          const updatedLogs = (me3.logs || []).map(e => {
-            if (typeof e === 'object' && e.ts === entry.ts && !e.weatherStamp)
-              return { ...e, weatherStamp };
-            return e;
-          });
+          const latestLogs3 = me3.logs || [];
+          const base3 = latestLogs3.some(e => typeof e === 'object' && e.ts === entry.ts)
+            ? latestLogs3 : newLogs;
+          const updatedLogs = base3.map(e =>
+            (typeof e === 'object' && e.ts === entry.ts && !e.weatherStamp)
+              ? { ...e, weatherStamp } : e
+          );
           updateDoc(doc(db,'rooms',roomId,'players',myPlayerId), {logs: updatedLogs}).catch(()=>{});
         }).catch(() => {});
     }
