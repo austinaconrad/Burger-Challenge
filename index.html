@@ -2985,6 +2985,19 @@ body.july4-bg::before {
         <!-- Avatar photo inputs (global, live here for DOM simplicity) -->
         <input type="file" id="avatar-input-camera" accept="image/*" capture="user" style="display:none" onchange="onAvatarPhotoSelected(this)"/>
         <input type="file" id="avatar-input-upload" accept="image/*" style="display:none" onchange="onAvatarPhotoSelected(this)"/>
+        <!-- Backdate option -->
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <button id="backdate-toggle" onclick="toggleBackdatePanel()" style="display:flex;align-items:center;justify-content:space-between;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:'Outfit',sans-serif;width:100%;transition:background 0.15s,border-color 0.15s">
+            <span id="backdate-toggle-label" style="font-size:12px;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em">📅 Log for a different time</span>
+            <span id="backdate-chevron" style="font-size:12px;color:var(--muted2);transition:transform 0.2s">▾</span>
+          </button>
+          <div id="backdate-wrap" style="display:none;animation:slideIn 0.15s ease both;padding:2px 0 4px">
+            <input type="datetime-local" id="backdate-input"
+                   style="width:100%;box-sizing:border-box;background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-xs);color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border-color 0.2s"
+                   onfocus="this.style.borderColor='var(--amber)'" onblur="this.style.borderColor=''"/>
+            <div style="font-size:11px;color:var(--muted2);margin-top:5px;padding-left:2px">Leave blank to log at the current time.</div>
+          </div>
+        </div>
         <button class="detail-confirm-btn" id="confirm-btn" onclick="confirmBurger()">✓ Place Order</button>
       </div>
       <!-- Completion strip -->
@@ -3504,10 +3517,15 @@ function computeAchievements(p, allPlayers) {
   if (Object.values(byDay).some(v => v >= 2)) earned.push('double_down');
   if (Object.values(byDay).some(v => v >= 3)) earned.push('iron_stomach');
 
-  const dayKeys = Object.keys(byDay).sort();
-  let streak = 1, best = 1;
+  // Sort numerically by actual date value — string sort breaks for months 10/11
+  // (e.g. "2024-10-1" sorts before "2024-2-1" lexicographically but November > February)
+  const dayKeys = Object.keys(byDay).sort((a, b) => {
+    const [ya, ma, da] = a.split('-').map(Number);
+    const [yb, mb, db] = b.split('-').map(Number);
+    return new Date(ya, ma, da) - new Date(yb, mb, db);
+  });
+  let streak = 1, best = dayKeys.length > 0 ? 1 : 0;
   for (let i = 1; i < dayKeys.length; i++) {
-    // Parse key parts and use Date(year, month, day) — month is 0-indexed, matching getMonth()
     const [y1, m1, d1] = dayKeys[i-1].split('-').map(Number);
     const [y2, m2, d2] = dayKeys[i].split('-').map(Number);
     const prev = new Date(y1, m1, d1).getTime();
@@ -4253,8 +4271,13 @@ function computeBadgeProgress(p) {
     const key = tsToDateKey(e.ts);
     if (key) byDay[key] = (byDay[key] || 0) + 1;
   });
-  const dayKeys = Object.keys(byDay).sort();
-  let streak = 1, best = 1;
+  // Sort numerically by actual date value — string sort breaks for months 10/11
+  const dayKeys = Object.keys(byDay).sort((a, b) => {
+    const [ya, ma, da] = a.split('-').map(Number);
+    const [yb, mb, db] = b.split('-').map(Number);
+    return new Date(ya, ma, da) - new Date(yb, mb, db);
+  });
+  let streak = 1, best = dayKeys.length > 0 ? 1 : 0;
   for (let i = 1; i < dayKeys.length; i++) {
     const [y1,m1,d1] = dayKeys[i-1].split('-').map(Number);
     const [y2,m2,d2] = dayKeys[i].split('-').map(Number);
@@ -5867,6 +5890,27 @@ window.toggleToppingsPanel = function() {
   updateToppingsToggleLabel();
 };
 
+window.toggleBackdatePanel = function() {
+  const wrap = document.getElementById('backdate-wrap');
+  const chevron = document.getElementById('backdate-chevron');
+  const btn = document.getElementById('backdate-toggle');
+  const inp = document.getElementById('backdate-input');
+  if (!wrap) return;
+  const open = wrap.style.display !== 'none';
+  wrap.style.display = open ? 'none' : 'block';
+  if (chevron) chevron.style.transform = open ? '' : 'rotate(180deg)';
+  if (btn) btn.style.borderColor = open ? 'rgba(245,158,11,0.15)' : 'rgba(245,158,11,0.35)';
+  // On open: set default to now and cap max at now so future dates can't be selected
+  if (!open && inp) {
+    const now = new Date();
+    // datetime-local value format: "YYYY-MM-DDTHH:mm"
+    const pad = n => String(n).padStart(2, '0');
+    const localNow = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    inp.max = localNow;
+    if (!inp.value) inp.value = localNow;
+  }
+};
+
 function updateToppingsToggleLabel() {
   const lbl = document.getElementById('toppings-toggle-label');
   if (!lbl) return;
@@ -6302,12 +6346,19 @@ window.confirmBurger = async function() {
   const snapshotMenuItemName  = pendingMenuItemName;
   const snapshotPhoto         = pendingPhoto;      // base64 preview — used for receipt UI only
   const snapshotPhotoFile     = pendingPhotoFile;  // original File — uploaded to Storage
+  // Backdate: if panel is open and a value was entered, use it; otherwise log as now
+  const backdateInp = document.getElementById('backdate-input');
+  const backdateWrap = document.getElementById('backdate-wrap');
+  const backdateOpen = backdateWrap && backdateWrap.style.display !== 'none';
+  const snapshotCustomTs = (backdateOpen && backdateInp && backdateInp.value)
+    ? new Date(backdateInp.value).toISOString()
+    : null;
 
   // ── 1. Show receipt immediately (before the async Firestore write)
   //       so snapshot re-renders can't race against it
   const receipt = document.getElementById('order-receipt');
   if (receipt) {
-    const now = new Date();
+    const now = snapshotCustomTs ? new Date(snapshotCustomTs) : new Date();
     const dateStr = (now.getMonth()+1).toString().padStart(2,'0') + '/' + now.getDate().toString().padStart(2,'0') + '/' + now.getFullYear();
     const timeStr = now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', hour12:true});
     // Capture share data while all snapshot vars are in scope
@@ -6382,6 +6433,15 @@ window.confirmBurger = async function() {
   if (lbl) lbl.textContent = 'How many patties?';
   pendingPattyCount = 0;
   pendingToppings = [];
+  // Reset backdate panel
+  const bdWrap = document.getElementById('backdate-wrap');
+  const bdChevron = document.getElementById('backdate-chevron');
+  const bdBtn = document.getElementById('backdate-toggle');
+  const bdInp = document.getElementById('backdate-input');
+  if (bdWrap) bdWrap.style.display = 'none';
+  if (bdChevron) bdChevron.style.transform = '';
+  if (bdBtn) bdBtn.style.borderColor = 'rgba(245,158,11,0.15)';
+  if (bdInp) bdInp.value = '';
   pendingMenuEmoji = '';
   pendingMenuItemName = '';
   const customNameInp = document.getElementById('custom-burger-name');
@@ -6432,7 +6492,7 @@ window.confirmBurger = async function() {
       photoToSave = snapshotPhoto;
     }
   }
-  await changeMyCountWithDetails(1, restaurant, snapshotRating, snapshotGPS, snapshotCount, snapshotToppings, snapshotMenuItemName, snapshotMenuEmoji, photoToSave);
+  await changeMyCountWithDetails(1, restaurant, snapshotRating, snapshotGPS, snapshotCount, snapshotToppings, snapshotMenuItemName, snapshotMenuEmoji, photoToSave, snapshotCustomTs);
 };
 
 // ── Shared weather code → emoji + label ──────────────────────────────────────
@@ -6468,7 +6528,9 @@ async function backfillLocationNames() {
   );
   if (!needsCity.length) return;
 
-  let updatedLogs = [...(me.logs || [])];
+  // Collect patches as a map { [ts]: locationCityState } instead of mutating a snapshot of logs.
+  // This prevents overwriting burgers logged while we're waiting on geocode API calls.
+  const patches = {};
   let changed = false;
 
   for (const entry of needsCity) {
@@ -6478,16 +6540,23 @@ async function backfillLocationNames() {
       const geoKey = `${entry.lat.toFixed(5)},${entry.lng.toFixed(5)}`;
       GEO_CACHE[geoKey] = loc; // seed in-memory cache so feed updates instantly
       _saveGeoCache();
-      updatedLogs = updatedLogs.map(e =>
-        (typeof e === 'object' && e.ts === entry.ts) ? { ...e, locationCityState: loc } : e
-      );
+      patches[entry.ts] = loc;
       changed = true;
     } catch (_) { /* silently skip */ }
     await new Promise(r => setTimeout(r, 300)); // respect Nominatim rate limit
   }
 
   if (changed) {
-    updateDoc(doc(db, 'rooms', roomId, 'players', myPlayerId), { logs: updatedLogs }).catch(() => {});
+    // Re-read the LATEST logs from players so we don't overwrite any burgers logged
+    // during the async geocode loop above.
+    const latestMe = players.find(p => p.id === myPlayerId);
+    if (!latestMe) return;
+    const freshLogs = (latestMe.logs || []).map(e =>
+      (typeof e === 'object' && e.ts && patches[e.ts] && !e.locationCityState?.includes(','))
+        ? { ...e, locationCityState: patches[e.ts] }
+        : e
+    );
+    updateDoc(doc(db, 'rooms', roomId, 'players', myPlayerId), { logs: freshLogs }).catch(() => {});
   }
 }
 
@@ -6503,7 +6572,9 @@ async function backfillWeatherStamps() {
   );
   if (!needsStamp.length) return;
 
-  let updatedLogs = [...(me.logs || [])];
+  // Collect patches as a map { [ts]: weatherStamp } instead of mutating a snapshot of logs.
+  // This prevents overwriting burgers logged while we're waiting on weather API calls.
+  const patches = {};
   let changed = false;
 
   for (const entry of needsStamp) {
@@ -6518,21 +6589,63 @@ async function backfillWeatherStamps() {
       const tempC = data.hourly?.temperature_2m?.[hour];
       if (weatherCode == null || tempC == null) continue;
       const tempF = Math.round((tempC * 9 / 5) + 32);
-      const stamp = weatherStampFromCode(weatherCode, tempF);
-      updatedLogs = updatedLogs.map(e =>
-        (typeof e === 'object' && e.ts === entry.ts) ? { ...e, weatherStamp: stamp } : e
-      );
+      patches[entry.ts] = weatherStampFromCode(weatherCode, tempF);
       changed = true;
     } catch (_) { /* silently skip */ }
     await new Promise(r => setTimeout(r, 300)); // respect rate limit
   }
 
   if (changed) {
-    updateDoc(doc(db, 'rooms', roomId, 'players', myPlayerId), { logs: updatedLogs }).catch(() => {});
+    // Re-read the LATEST logs from players so we don't overwrite any burgers logged
+    // during the async weather-fetch loop above.
+    const latestMe = players.find(p => p.id === myPlayerId);
+    if (!latestMe) return;
+    const freshLogs = (latestMe.logs || []).map(e =>
+      (typeof e === 'object' && e.ts && patches[e.ts] && !e.weatherStamp)
+        ? { ...e, weatherStamp: patches[e.ts] }
+        : e
+    );
+    updateDoc(doc(db, 'rooms', roomId, 'players', myPlayerId), { logs: freshLogs }).catch(() => {});
   }
 }
 
-async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null, patties=1, toppings=[], menuItem='', menuEmoji='', photo='') {
+// ── Repair: fill in placeholder log entries for any count gap ────────────────
+// If p.count > p.logs.length, some log entries were lost (e.g. due to the backfill
+// race condition). This creates placeholder entries so the feed and calendar show them.
+window.repairMissingLogs = async function() {
+  const me = players.find(p => p.id === myPlayerId);
+  if (!me) return;
+  const logCount = (me.logs || []).filter(e => logTs(e)).length;
+  const total = me.count || 0;
+  const missing = total - logCount;
+  if (missing <= 0) {
+    showToast('✅ No missing logs — everything looks good!');
+    return;
+  }
+  if (!confirm(`Found ${missing} burger${missing > 1 ? 's' : ''} counted but not in your log history.\n\nAdd ${missing} placeholder entr${missing > 1 ? 'ies' : 'y'} so they show in the feed and calendar?`)) return;
+  const placeholders = [];
+  for (let i = 0; i < missing; i++) {
+    // Space them 1ms apart so each gets a unique timestamp
+    placeholders.push({
+      ts: new Date(Date.now() - (missing - i) * 1).toISOString(),
+      restaurant: 'Unknown Spot',
+      rating: 0,
+      patties: 1,
+      toppings: [],
+      _placeholder: true,
+    });
+  }
+  const newLogs = [...(me.logs || []), ...placeholders];
+  try {
+    await updateDoc(doc(db, 'rooms', roomId, 'players', myPlayerId), { logs: newLogs });
+    showToast(`🍔 Added ${missing} placeholder log${missing > 1 ? 's' : ''} — they'll now show in the feed!`);
+  } catch(e) {
+    console.error('[repairMissingLogs]', e);
+    showToast('⚠️ Could not save — check connection');
+  }
+};
+
+async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null, patties=1, toppings=[], menuItem='', menuEmoji='', photo='', customTs=null) {
   const me=players.find(p=>p.id===myPlayerId);
   if(!me) return;
   const newCount=Math.max(0,Math.min(999,me.count+delta));
@@ -6546,7 +6659,7 @@ async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null
   const currentLogs = me.logs || [];
   let newLogs = [...currentLogs];
   if(delta > 0){
-    const entry = {ts: new Date().toISOString(), restaurant, rating: rating||0, patties: patties||1, toppings: toppings||[]};
+    const entry = {ts: customTs || new Date().toISOString(), restaurant, rating: rating||0, patties: patties||1, toppings: toppings||[]};
     if (menuItem)  entry.menuItem  = menuItem;
     if (menuEmoji) entry.menuEmoji = menuEmoji;
     if (photo)     entry.photo     = photo;
@@ -6556,15 +6669,29 @@ async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null
       // Reverse-geocode to City, State — fire-and-forget with 5s cap
       reverseGeocode(gps.lat, gps.lng).then(loc => {
         if (!loc) return;
-        // Patch the saved log entry in Firestore with the resolved location string
-        const me2 = players.find(p => p.id === myPlayerId);
-        if (!me2) return;
-        const updatedLogs = (me2.logs || []).map(e => {
-          if (typeof e === 'object' && e.ts === entry.ts && !e.locationCityState)
-            return { ...e, locationCityState: loc };
-          return e;
-        });
-        updateDoc(doc(db,'rooms',roomId,'players',myPlayerId), {logs: updatedLogs}).catch(()=>{});
+        // Helper: try to patch the location onto the entry. Returns true if patched.
+        function _patchLocation(attempt) {
+          const me2 = players.find(p => p.id === myPlayerId);
+          if (!me2) return false;
+          let patched = false;
+          const updatedLogs = (me2.logs || []).map(e => {
+            if (typeof e === 'object' && e.ts === entry.ts && !e.locationCityState) {
+              patched = true;
+              return { ...e, locationCityState: loc };
+            }
+            return e;
+          });
+          // Only write if the entry was actually found. If not found, the Firestore
+          // snapshot hasn't arrived yet — writing stale logs would erase the new entry.
+          if (patched) {
+            updateDoc(doc(db,'rooms',roomId,'players',myPlayerId), {logs: updatedLogs}).catch(()=>{});
+          } else if (attempt === 1) {
+            // Retry once after 3s so the snapshot has time to land
+            setTimeout(() => _patchLocation(2), 3000);
+          }
+          // If still not found on attempt 2, backfillLocationNames will handle it next session
+        }
+        _patchLocation(1);
       });
       // Weather stamp — fire-and-forget, silently fails if offline
       fetch(`https://api.open-meteo.com/v1/forecast?latitude=${gps.lat}&longitude=${gps.lng}&current_weather=true`)
@@ -6574,14 +6701,24 @@ async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null
           const tempF = Math.round((tempC * 9/5) + 32);
           const weatherCode = data.current_weather.weathercode;
           const weatherStamp = weatherStampFromCode(weatherCode, tempF);
-          const me3 = players.find(p => p.id === myPlayerId);
-          if (!me3) return;
-          const updatedLogs = (me3.logs || []).map(e => {
-            if (typeof e === 'object' && e.ts === entry.ts && !e.weatherStamp)
-              return { ...e, weatherStamp };
-            return e;
-          });
-          updateDoc(doc(db,'rooms',roomId,'players',myPlayerId), {logs: updatedLogs}).catch(()=>{});
+          function _patchWeather(attempt) {
+            const me3 = players.find(p => p.id === myPlayerId);
+            if (!me3) return;
+            let patched = false;
+            const updatedLogs = (me3.logs || []).map(e => {
+              if (typeof e === 'object' && e.ts === entry.ts && !e.weatherStamp) {
+                patched = true;
+                return { ...e, weatherStamp };
+              }
+              return e;
+            });
+            if (patched) {
+              updateDoc(doc(db,'rooms',roomId,'players',myPlayerId), {logs: updatedLogs}).catch(()=>{});
+            } else if (attempt === 1) {
+              setTimeout(() => _patchWeather(2), 3000);
+            }
+          }
+          _patchWeather(1);
         }).catch(() => {});
     }
     newLogs.push(entry);
