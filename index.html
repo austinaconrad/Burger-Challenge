@@ -1196,6 +1196,9 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 .pb-bacon { width:124px; height:8px; background:repeating-linear-gradient(90deg,#C2410C 0px,#C2410C 7px,#9A3412 7px,#9A3412 9px,#EA580C 9px,#EA580C 15px,#7C2D12 15px,#7C2D12 17px,#C2410C 17px); border-radius:3px; margin:1px auto; box-shadow:0 2px 5px rgba(0,0,0,0.45); animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
 .pb-blue-cheese { width:120px; height:6px; background:radial-gradient(circle 2px at 12% 50%,#818CF8 0%,transparent 100%),radial-gradient(circle 2px at 38% 30%,#6366F1 0%,transparent 100%),radial-gradient(circle 2px at 62% 70%,#818CF8 0%,transparent 100%),radial-gradient(circle 2px at 85% 40%,#6366F1 0%,transparent 100%),linear-gradient(180deg,#F8FAFC 0%,#E2E8F0 100%); border-radius:3px; margin:1px auto; box-shadow:0 1px 3px rgba(0,0,0,0.2); animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
 .pb-special-sauce { width:120px; height:4px; background:linear-gradient(180deg,#FB923C 0%,#C2410C 100%); border-radius:3px; margin:1px auto; box-shadow:0 1px 4px rgba(194,65,12,0.4); animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+.pb-bbq-sauce { width:120px; height:5px; background:linear-gradient(180deg,#7C2D12 0%,#451A03 100%); border-radius:3px; margin:1px auto; box-shadow:0 1px 4px rgba(69,26,3,0.5); animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+.pb-egg { width:60px; height:10px; background:radial-gradient(circle 7px at 50% 50%,#FBBF24 0%,#F59E0B 100%),linear-gradient(180deg,#FFFBEB,#FEF3C7); border-radius:50%; margin:1px auto; box-shadow:0 2px 4px rgba(0,0,0,0.3); animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+.pb-onion-rings { width:124px; height:10px; background:repeating-linear-gradient(90deg,#D97706 0,#D97706 9px,#92400E 9px,#92400E 11px,transparent 11px,transparent 13px); border-radius:5px; margin:1px auto; box-shadow:0 2px 4px rgba(0,0,0,0.35); animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
 
 /* Prevent iOS Safari zoom-on-focus by forcing 16px min on touch devices */
 @media (hover:none) and (pointer:coarse) {
@@ -2884,6 +2887,9 @@ body.july4-bg::before {
         <div id="pb-top-Bacon"         class="pb-bacon"                 style="display:none"></div>
         <div id="pb-top-Cheese"        class="pb-cheese"                style="display:none"></div>
         <div id="pb-top-Blue-Cheese"   class="pb-blue-cheese"           style="display:none"></div>
+        <div id="pb-top-BBQ-Sauce"     class="pb-bbq-sauce"             style="display:none"></div>
+        <div id="pb-top-Egg"           class="pb-egg"                   style="display:none"></div>
+        <div id="pb-top-Onion-Rings"   class="pb-onion-rings"           style="display:none"></div>
         <div class="pb-stack" id="pb-stack"></div>
         <div class="pb-bun-bottom"></div>
         <div class="pb-selector">
@@ -5824,7 +5830,7 @@ window.shareReceipt = async function() {
   }
 };
 
-const ALL_TOPPINGS = ['Ketchup','Mustard','Mayo','Cheese','Blue Cheese','Lettuce','Pickles','Tomatoes','Onions','Bacon','Mushrooms','Green Peppers','Special Sauce'];
+const ALL_TOPPINGS = ['Ketchup','Mustard','Mayo','Cheese','Blue Cheese','Lettuce','Pickles','Tomatoes','Onions','Bacon','Mushrooms','Green Peppers','Special Sauce','BBQ Sauce','Egg','Onion Rings'];
 
 // Compress a burger-log photo to fit within Firestore's 1 MB document limit.
 // We target ≤ 65 KB as a base64 string (≈ 48 KB binary) per photo, which
