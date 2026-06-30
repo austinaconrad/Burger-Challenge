@@ -95,6 +95,24 @@ body::after{
 .btn-secondary:hover{border-color:var(--border3);color:var(--text)}
 .divider{display:flex;align-items:center;gap:12px;margin:28px 0;color:var(--muted2);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border2)}
+/* ── Receipt tab ── */
+.rcpt-toggle{display:flex;gap:6px;margin:4px 0 14px}
+.rcpt-toggle-btn{flex:1;text-align:center;font-size:13px;font-weight:600;font-family:'Outfit',sans-serif;background:var(--surface3);color:var(--text);border:1px solid var(--border2);border-radius:999px;padding:9px 0;cursor:pointer;transition:background 0.15s,color 0.15s,border-color 0.15s}
+.rcpt-toggle-btn.active{background:var(--sky);color:#fff;border-color:var(--sky);font-weight:700}
+.rcpt-card{background:#F7F2E8;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(30,100,160,0.18)}
+.rcpt-line-section{padding:12px 24px 4px}
+.rcpt-line-label{font-family:monospace;font-size:8px;color:#B0A090;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px}
+.rcpt-line-table{width:100%;font-family:monospace;font-size:11px;color:#5C4A3A;border-collapse:collapse}
+.rcpt-line-table td{padding:4px 0}
+.rcpt-line-table td:last-child{text-align:right}
+.rcpt-line-table .rcpt-strong td{font-weight:700;color:#1A1A1A}
+.rcpt-cal-table{width:100%;font-family:monospace;font-size:10px;color:#5C4A3A;border-collapse:collapse}
+.rcpt-cal-table td{padding:3px 0}
+.rcpt-cal-table td:last-child{text-align:right}
+.rcpt-cal-more td{color:#B0A090}
+.rcpt-tally-row{padding:10px 24px;font-family:monospace;font-size:10px;color:#5C4A3A}
+.rcpt-tally-line{display:flex;justify-content:space-between;padding:3px 0}
+.rcpt-tally-total{display:flex;justify-content:space-between;padding:8px 0 2px;font-weight:700;color:#1A1A1A;border-top:1px solid #D4CABF;margin-top:6px;font-size:13px}
 /* ── Leaderboard skeleton loading state ── */
 .lb-skel-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-sm);margin-bottom:8px}
 .lb-skel-avatar{width:40px;height:40px;border-radius:50%;flex-shrink:0;background:linear-gradient(90deg,rgba(30,110,170,0.08) 25%,rgba(30,110,170,0.16) 37%,rgba(30,110,170,0.08) 63%);background-size:400% 100%;animation:lbShimmer 1.4s ease infinite}
@@ -2664,7 +2682,7 @@ body.july4-bg::before {
       <button class="tab-btn" onclick="switchTab('map',this)"><span class="tab-emoji">🗺</span><span class="tab-label">Map</span></button>
       <button class="tab-btn" onclick="switchTab('leaderboard',this)"><span class="tab-emoji">🏅</span><span class="tab-label">Badges</span></button>
       <button class="tab-btn" onclick="switchTab('pace',this)"><span class="tab-emoji">📈</span><span class="tab-label">Pace</span></button>
-      <button class="tab-btn" onclick="switchTab('game',this)"><span class="tab-emoji">🍔</span><span class="tab-label">Stackz</span></button>
+      <button class="tab-btn" onclick="switchTab('receipt',this)"><span class="tab-emoji">🧾</span><span class="tab-label">Receipt</span></button>
     </div>
 
     <!-- LEADERBOARD TAB -->
@@ -2755,34 +2773,13 @@ body.july4-bg::before {
       <div id="map-feed" class="map-feed-wrap"></div>
     </div>
 
-    <!-- GAME TAB -->
-    <div class="tab-panel" id="tab-game">
-      <div class="bs-wrap">
-        <div class="bs-scoreboard">
-          <div class="bs-scoreboard-left">
-            <span class="bs-scoreboard-label">ROOM RECORD</span>
-            <span class="bs-top-score" id="bs-top-score">—</span>
-          </div>
-          <span class="bs-trophy">🏆</span>
-        </div>
-        <div class="bs-canvas-wrap">
-          <canvas id="burger-stack-canvas"></canvas>
-          <div class="bs-overlay" id="bs-overlay">
-            <div class="bs-overlay-inner">
-              <div class="bs-title">🍔<br>BURGER STACK</div>
-              <div class="bs-subtitle">Tap to drop each ingredient.<br>Don't miss or the burger falls!</div>
-              <div class="bs-result" id="bs-result" style="display:none">
-                <div class="bs-result-label">YOUR SCORE</div>
-                <div class="bs-result-score" id="bs-result-score">0</div>
-                <div class="bs-result-msg" id="bs-result-msg"></div>
-              </div>
-              <button class="bs-btn" id="bs-play-btn">▶&nbsp; PLAY</button>
-              <button class="bs-btn bs-btn-again" id="bs-again-btn" style="display:none">↺&nbsp; PLAY AGAIN</button>
-            </div>
-          </div>
-        </div>
-        <div class="bs-hint">Tap · Click · Space to drop</div>
+    <!-- RECEIPT TAB -->
+    <div class="tab-panel" id="tab-receipt">
+      <div class="rcpt-toggle">
+        <button class="rcpt-toggle-btn active" id="rcpt-toggle-me" onclick="switchReceiptMode('me')">Me</button>
+        <button class="rcpt-toggle-btn" id="rcpt-toggle-squad" onclick="switchReceiptMode('squad')">Squad</button>
       </div>
+      <div id="rcpt-wrap"></div>
     </div>
 
   </div>
@@ -7407,6 +7404,152 @@ function renderPaceTab() {
   root.innerHTML=summaryHtml+`<div class="section-label" style="margin-top:4px">Player projections</div>`+cardsHtml;
 }
 
+// ── Receipt tab ────────────────────────────────────────────────────────────
+let receiptMode = 'me';
+
+const CALORIE_MAP = {
+  patty: 250, bun: 150,
+  'Ketchup': 15, 'Mustard': 5, 'Mayo': 90, 'Cheese': 100, 'Blue Cheese': 100,
+  'Lettuce': 5, 'Pickles': 5, 'Tomatoes': 10, 'Onions': 10, 'Bacon': 45,
+  'Mushrooms': 15, 'Green Peppers': 5, 'Special Sauce': 60, 'BBQ Sauce': 30,
+  'Egg': 70, 'Onion Rings': 60,
+};
+
+function computeReceiptStats(targetPlayers) {
+  let totalBurgers = 0, ratingSum = 0, ratingCount = 0;
+  const restaurantCounts = {}, toppingCounts = {}, calByItem = {};
+  const dayKeys = new Set();
+
+  targetPlayers.forEach(p => {
+    const logs = normalizeLogs(p.logs || []);
+    logs.forEach(e => {
+      totalBurgers++;
+      const patties = (e._raw && typeof e._raw.patties === 'number') ? e._raw.patties : 1;
+      if (e.restaurant) restaurantCounts[e.restaurant] = (restaurantCounts[e.restaurant] || 0) + 1;
+      if (typeof e.rating === 'number' && e.rating > 0) { ratingSum += e.rating; ratingCount++; }
+      calByItem['Patties'] = (calByItem['Patties'] || 0) + patties * CALORIE_MAP.patty;
+      calByItem['Buns'] = (calByItem['Buns'] || 0) + CALORIE_MAP.bun;
+      (e.toppings || []).forEach(t => {
+        toppingCounts[t] = (toppingCounts[t] || 0) + 1;
+        calByItem[t] = (calByItem[t] || 0) + (CALORIE_MAP[t] != null ? CALORIE_MAP[t] : 20);
+      });
+      const d = safeDate(e.ts);
+      if (d) dayKeys.add(d.toISOString().slice(0, 10));
+    });
+  });
+
+  const topRestaurant = Object.entries(restaurantCounts).sort((a, b) => b[1] - a[1])[0] || null;
+  const topTopping = Object.entries(toppingCounts).sort((a, b) => b[1] - a[1])[0] || null;
+  const avgRating = ratingCount ? (ratingSum / ratingCount) : null;
+  const totalCalories = Object.values(calByItem).reduce((s, v) => s + v, 0);
+
+  // Current streak — consecutive days (ending today or yesterday) with at least one log
+  const sortedDays = [...dayKeys].sort();
+  let streak = 0;
+  if (sortedDays.length) {
+    let cursor = new Date(); cursor.setHours(0, 0, 0, 0);
+    const todayKey = cursor.toISOString().slice(0, 10);
+    if (!dayKeys.has(todayKey)) cursor.setDate(cursor.getDate() - 1);
+    while (dayKeys.has(cursor.toISOString().slice(0, 10))) {
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+  }
+
+  const calItems = Object.entries(calByItem).sort((a, b) => b[1] - a[1]);
+
+  return {
+    totalBurgers,
+    restaurantCount: Object.keys(restaurantCounts).length,
+    topRestaurant,
+    topTopping,
+    avgRating,
+    streak,
+    calItems,
+    totalCalories,
+  };
+}
+
+window.switchReceiptMode = function(mode) {
+  receiptMode = mode;
+  document.getElementById('rcpt-toggle-me')?.classList.toggle('active', mode === 'me');
+  document.getElementById('rcpt-toggle-squad')?.classList.toggle('active', mode === 'squad');
+  renderReceiptTab();
+};
+
+function renderReceiptTab() {
+  const wrap = document.getElementById('rcpt-wrap');
+  if (!wrap) return;
+
+  const me = players.find(p => p.id === myPlayerId);
+  const targets = receiptMode === 'me' ? (me ? [me] : []) : players;
+  const stats = computeReceiptStats(targets);
+
+  const goalCount = receiptMode === 'me' ? 100 : players.length * 100;
+  const currentCount = receiptMode === 'me' ? (me ? me.count : 0) : players.reduce((s, p) => s + (p.count || 0), 0);
+  const togo = Math.max(0, goalCount - currentCount);
+  const subtitle = receiptMode === 'me' ? 'YOUR FULL TAB' : 'SQUAD FULL TAB';
+
+  const calRows = stats.calItems.slice(0, 5).map(([name, cal]) =>
+    `<tr><td>${escHtml(name)}</td><td>${Math.round(cal).toLocaleString()} cal</td></tr>`
+  ).join('');
+  const remaining = stats.calItems.slice(5);
+  const moreRow = remaining.length
+    ? `<tr class="rcpt-cal-more"><td>+ ${remaining.length} more item${remaining.length > 1 ? 's' : ''}</td><td>${Math.round(remaining.reduce((s, [, c]) => s + c, 0)).toLocaleString()} cal</td></tr>`
+    : '';
+
+  if (!stats.totalBurgers) {
+    wrap.innerHTML = `
+      <div class="rcpt-card">
+        <div class="receipt-top-bar"></div>
+        <div class="receipt-hero-section">
+          <span class="receipt-burger-icon">🍔</span>
+          <div class="receipt-challenge-title">100 Burger Challenge</div>
+          <div class="receipt-challenge-sub">${escHtml(subtitle)} &middot; ROOM ${escHtml(roomId)}</div>
+        </div>
+        <div class="rcpt-tally-row" style="text-align:center;padding:18px 24px">No burgers logged yet — get grinding!</div>
+      </div>`;
+    return;
+  }
+
+  wrap.innerHTML = `
+    <div class="rcpt-card">
+      <div class="receipt-top-bar"></div>
+      <div class="receipt-hero-section">
+        <span class="receipt-burger-icon">🍔</span>
+        <div class="receipt-challenge-title">100 Burger Challenge</div>
+        <div class="receipt-challenge-sub">${escHtml(subtitle)} &middot; ROOM ${escHtml(roomId)}</div>
+      </div>
+      <hr class="receipt-perf"/>
+      <div class="rcpt-line-section">
+        <div class="rcpt-line-label">Order summary</div>
+        <table class="rcpt-line-table">
+          <tr class="rcpt-strong"><td>Burgers logged</td><td>${stats.totalBurgers}</td></tr>
+          <tr><td>Restaurants visited</td><td>${stats.restaurantCount}</td></tr>
+          <tr><td>Top spot</td><td>${stats.topRestaurant ? `${escHtml(stats.topRestaurant[0])} (${stats.topRestaurant[1]}x)` : '—'}</td></tr>
+          <tr><td>Favorite topping</td><td>${stats.topTopping ? `${escHtml(stats.topTopping[0])} (${stats.topTopping[1]}x)` : '—'}</td></tr>
+          <tr><td>Avg rating given</td><td>${stats.avgRating != null ? stats.avgRating.toFixed(1) + ' ★' : '—'}</td></tr>
+          <tr><td>Current streak</td><td>${stats.streak} day${stats.streak === 1 ? '' : 's'}${stats.streak >= 3 ? ' 🔥' : ''}</td></tr>
+        </table>
+      </div>
+      <hr class="receipt-perf" style="margin-top:8px"/>
+      <div class="rcpt-line-section">
+        <div class="rcpt-line-label">Calorie breakdown</div>
+        <table class="rcpt-cal-table">
+          ${calRows}
+          ${moreRow}
+        </table>
+      </div>
+      <hr class="receipt-perf" style="margin-top:4px"/>
+      <div class="rcpt-tally-row">
+        <div class="rcpt-tally-line"><span>Calorie total</span><span>${Math.round(stats.totalCalories).toLocaleString()} cal</span></div>
+        <div class="rcpt-tally-line"><span>Tip</span><span>${togo} burger${togo === 1 ? '' : 's'} to go</span></div>
+        <div class="rcpt-tally-total"><span>${receiptMode === 'me' ? 'Your tab' : 'Squad tab'}</span><span>${currentCount} / ${goalCount}</span></div>
+      </div>
+      <div class="receipt-foot-thank">Thanks for grinding</div>
+    </div>`;
+}
+
 // ── Restaurant Leaderboard ────────────────────────────────────────────────────
 window.switchRanksTab = function(tab, btn) {
   document.querySelectorAll('.ranks-sub-tab').forEach(b => b.classList.remove('active'));
@@ -8384,9 +8527,7 @@ window.switchTab=function(name,btn){
   }
   if(name==='leaderboard') { _openAlbumId = null; const s=[...players].sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name)); renderLeaderboard(s); }
   if(name==='pace') renderPaceTab();
-  if(name==='game') { if(typeof initBurgerStack==='function') initBurgerStack(); }
-  // Pause game when leaving game tab
-  if(name!=='game' && typeof pauseBurgerStack==='function') pauseBurgerStack();
+  if(name==='receipt') renderReceiptTab();
 
   // Staggered card reveal on every tab switch
   requestAnimationFrame(() => {
