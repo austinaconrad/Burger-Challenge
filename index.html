@@ -25,6 +25,7 @@
   --border:rgba(255,255,255,0.78); --border2:rgba(30,110,170,0.20); --border3:rgba(30,110,170,0.36);
   --text:#0b3550; --muted:rgba(11,53,80,0.38); --muted2:rgba(11,53,80,0.58);
   --green:#16a34a; --red:#dc2626;
+  --streak:#22c55e; --streak-dark:#15803d; --streak-glow:rgba(34,197,94,0.22);
   --sky:#1a70aa; --sky-light:#3baae2;
   --cheese:#F59E0B; --bun-top:#D97706; --bun-mid:#F59E0B; --sesame:#EAB308;
   --radius:16px; --radius-sm:12px; --radius-xs:8px;
@@ -92,8 +93,16 @@ body::after{
 .btn-primary:disabled{opacity:0.35;cursor:not-allowed;transform:none}
 .btn-secondary{flex:1;background:var(--surface2);color:var(--muted2);border:1px solid var(--border2);border-radius:var(--radius-xs);font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;padding:12px 20px;cursor:pointer;transition:border-color 0.15s,color 0.15s}
 .btn-secondary:hover{border-color:var(--border3);color:var(--text)}
-.divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted);font-size:12px}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.divider{display:flex;align-items:center;gap:12px;margin:28px 0;color:var(--muted2);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border2)}
+/* ── Leaderboard skeleton loading state ── */
+.lb-skel-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-sm);margin-bottom:8px}
+.lb-skel-avatar{width:40px;height:40px;border-radius:50%;flex-shrink:0;background:linear-gradient(90deg,rgba(30,110,170,0.08) 25%,rgba(30,110,170,0.16) 37%,rgba(30,110,170,0.08) 63%);background-size:400% 100%;animation:lbShimmer 1.4s ease infinite}
+.lb-skel-lines{flex:1;display:flex;flex-direction:column;gap:6px}
+.lb-skel-line{height:10px;border-radius:6px;background:linear-gradient(90deg,rgba(30,110,170,0.08) 25%,rgba(30,110,170,0.16) 37%,rgba(30,110,170,0.08) 63%);background-size:400% 100%;animation:lbShimmer 1.4s ease infinite}
+.lb-skel-line-name{width:42%}
+.lb-skel-line-sub{width:65%;height:8px}
+@keyframes lbShimmer{0%{background-position:100% 0}100%{background-position:0 0}}
 #config-banner{background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.2);border-radius:var(--radius-sm);padding:14px 18px;font-size:13px;color:#DC2626;line-height:1.7;margin-bottom:20px;display:none;max-width:440px;width:100%;text-align:left}
 #config-banner strong{color:var(--amber)}
 #config-banner code{background:rgba(255,255,255,0.08);border-radius:4px;padding:1px 6px;font-size:12px;font-family:monospace}
@@ -325,6 +334,7 @@ h1{font-family:'Russo One',sans-serif;font-size:clamp(20px,5.5vw,36px);font-weig
 .lb-card:active{transform:scale(0.98);transition:transform 0.1s ease}
 /* ── Universal spring physics ── */
 button{transition:transform 0.2s ease}
+button:active{transform:scale(0.97)}
 .tab-btn{transition:all 0.2s ease,transform 0.2s ease}
 .tab-btn:active{transform:scale(0.96)}
 .btn-primary:active,.btn-secondary:active,.detail-confirm-btn:active,.add-form button:active{transform:scale(0.96);transition:transform 0.2s ease}
@@ -378,7 +388,7 @@ button{transition:transform 0.2s ease}
 .mini-bar-wrap{height:3px;background:rgba(30,110,170,0.10);border-radius:999px;margin-top:6px;overflow:hidden;width:100%}
 .mini-bar-fill{height:100%;border-radius:999px;transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1)}
 .pace-indicator{font-size:10px;font-weight:700;margin-top:5px;letter-spacing:0.03em;white-space:nowrap;font-family:'Outfit',sans-serif}
-.pace-indicator.ahead{color:var(--text);text-shadow:none}
+.pace-indicator.ahead{color:var(--streak-dark);text-shadow:none}
 .pace-indicator.behind{color:#F87171;text-shadow:0 0 8px rgba(248,113,113,0.25)}
 .pace-indicator.on-track{color:var(--muted2)}
 .badge-col{flex:1;display:flex;align-items:center;justify-content:center;min-width:0;padding:0 4px}
@@ -1197,7 +1207,7 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 .pb-blue-cheese { width:120px; height:6px; background:radial-gradient(circle 2px at 12% 50%,#818CF8 0%,transparent 100%),radial-gradient(circle 2px at 38% 30%,#6366F1 0%,transparent 100%),radial-gradient(circle 2px at 62% 70%,#818CF8 0%,transparent 100%),radial-gradient(circle 2px at 85% 40%,#6366F1 0%,transparent 100%),linear-gradient(180deg,#F8FAFC 0%,#E2E8F0 100%); border-radius:3px; margin:1px auto; box-shadow:0 1px 3px rgba(0,0,0,0.2); animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
 .pb-special-sauce { width:120px; height:4px; background:linear-gradient(180deg,#FB923C 0%,#C2410C 100%); border-radius:3px; margin:1px auto; box-shadow:0 1px 4px rgba(194,65,12,0.4); animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
 .pb-bbq-sauce { width:120px; height:5px; background:linear-gradient(180deg,#7C2D12 0%,#451A03 100%); border-radius:3px; margin:1px auto; box-shadow:0 1px 4px rgba(69,26,3,0.5); animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
-.pb-egg { width:60px; height:10px; background:radial-gradient(circle 7px at 50% 50%,#FBBF24 0%,#F59E0B 100%),linear-gradient(180deg,#FFFBEB,#FEF3C7); border-radius:50%; margin:1px auto; box-shadow:0 2px 4px rgba(0,0,0,0.3); animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+.pb-egg { width:70px; height:14px; background:radial-gradient(circle 6px at 50% 50%,#FBBF24 0%,#F59E0B 55%,#F59E0B 56%,transparent 57%),radial-gradient(ellipse 70px 14px at 50% 50%,#FFFDF5 0%,#FFFBEB 70%,#FEF3C7 100%); border-radius:50%; margin:1px auto; box-shadow:0 2px 4px rgba(0,0,0,0.25); animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
 .pb-onion-rings { width:124px; height:10px; background:repeating-linear-gradient(90deg,#D97706 0,#D97706 9px,#92400E 9px,#92400E 11px,transparent 11px,transparent 13px); border-radius:5px; margin:1px auto; box-shadow:0 2px 4px rgba(0,0,0,0.35); animation:pattyDrop 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
 
 /* Prevent iOS Safari zoom-on-focus by forcing 16px min on touch devices */
@@ -1839,6 +1849,7 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.90),
     inset 0 0 0 1px rgba(30,110,170,0.14),
+    0 0 0 3px var(--streak-glow),
     0 3px 10px rgba(30,100,160,0.16);
   flex-shrink: 0;
   padding: 8px;
@@ -3885,6 +3896,7 @@ function startApp(){
   document.getElementById('app-screen').style.display='block';
   document.getElementById('room-display').textContent=roomId;
   document.getElementById('stat-days').textContent=daysUntilLaborDay();
+  showLeaderboardSkeleton();
   _startSteam();
   initSummerBanner();
   renderDailyCard(players);
@@ -4409,6 +4421,21 @@ function renderStickerPage(p) {
     </div>
     <div class="sticker-album-page">${badgesHtml}</div>
   </div>`;
+}
+
+function showLeaderboardSkeleton(){
+  const lb=document.getElementById('leaderboard');
+  const empty=document.getElementById('lb-empty');
+  if(!lb || lb.children.length) return; // already has real content, don't clobber
+  empty.style.display='none';
+  lb.innerHTML = Array.from({length:3}, () => `
+    <div class="lb-skel-row">
+      <div class="lb-skel-avatar"></div>
+      <div class="lb-skel-lines">
+        <div class="lb-skel-line lb-skel-line-name"></div>
+        <div class="lb-skel-line lb-skel-line-sub"></div>
+      </div>
+    </div>`).join('');
 }
 
 function renderLeaderboard(sorted){
