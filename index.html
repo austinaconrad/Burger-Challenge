@@ -7410,7 +7410,7 @@ function renderPaceTab() {
 let receiptMode = 'me';
 
 const CALORIE_MAP = {
-  patty: 250, bun: 150,
+  patty: 250, bunHalf: 75,
   'Ketchup': 15, 'Mustard': 5, 'Mayo': 90, 'Cheese': 100, 'Blue Cheese': 100,
   'Lettuce': 5, 'Pickles': 5, 'Tomatoes': 10, 'Onions': 10, 'Bacon': 45,
   'Mushrooms': 15, 'Green Peppers': 5, 'Special Sauce': 60, 'BBQ Sauce': 30,
@@ -7431,8 +7431,8 @@ function computeReceiptStats(targetPlayers) {
       if (typeof e.rating === 'number' && e.rating > 0) { ratingSum += e.rating; ratingCount++; }
       calByItem['Patties'] = (calByItem['Patties'] || 0) + patties * CALORIE_MAP.patty;
       qtyByItem['Patties'] = (qtyByItem['Patties'] || 0) + patties;
-      calByItem['Buns'] = (calByItem['Buns'] || 0) + CALORIE_MAP.bun;
-      qtyByItem['Buns'] = (qtyByItem['Buns'] || 0) + 1;
+      calByItem['Buns'] = (calByItem['Buns'] || 0) + 2 * CALORIE_MAP.bunHalf;
+      qtyByItem['Buns'] = (qtyByItem['Buns'] || 0) + 2;
       (e.toppings || []).forEach(t => {
         toppingCounts[t] = (toppingCounts[t] || 0) + 1;
         calByItem[t] = (calByItem[t] || 0) + (CALORIE_MAP[t] != null ? CALORIE_MAP[t] : 20);
