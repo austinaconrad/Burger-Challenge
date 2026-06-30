@@ -110,6 +110,8 @@ body::after{
 .rcpt-cal-table td{padding:3px 0}
 .rcpt-cal-table td:last-child{text-align:right}
 .rcpt-cal-more td{color:#B0A090}
+.rcpt-cal-more{cursor:pointer}
+.rcpt-cal-hidden-row{display:none}
 .rcpt-tally-row{padding:10px 24px;font-family:monospace;font-size:10px;color:#5C4A3A}
 .rcpt-tally-line{display:flex;justify-content:space-between;padding:3px 0}
 .rcpt-tally-total{display:flex;justify-content:space-between;padding:8px 0 2px;font-weight:700;color:#1A1A1A;border-top:1px solid #D4CABF;margin-top:6px;font-size:13px}
@@ -7417,7 +7419,7 @@ const CALORIE_MAP = {
 
 function computeReceiptStats(targetPlayers) {
   let totalBurgers = 0, ratingSum = 0, ratingCount = 0;
-  const restaurantCounts = {}, toppingCounts = {}, calByItem = {};
+  const restaurantCounts = {}, toppingCounts = {}, calByItem = {}, qtyByItem = {};
   const dayKeys = new Set();
 
   targetPlayers.forEach(p => {
@@ -7428,10 +7430,13 @@ function computeReceiptStats(targetPlayers) {
       if (e.restaurant) restaurantCounts[e.restaurant] = (restaurantCounts[e.restaurant] || 0) + 1;
       if (typeof e.rating === 'number' && e.rating > 0) { ratingSum += e.rating; ratingCount++; }
       calByItem['Patties'] = (calByItem['Patties'] || 0) + patties * CALORIE_MAP.patty;
+      qtyByItem['Patties'] = (qtyByItem['Patties'] || 0) + patties;
       calByItem['Buns'] = (calByItem['Buns'] || 0) + CALORIE_MAP.bun;
+      qtyByItem['Buns'] = (qtyByItem['Buns'] || 0) + 1;
       (e.toppings || []).forEach(t => {
         toppingCounts[t] = (toppingCounts[t] || 0) + 1;
         calByItem[t] = (calByItem[t] || 0) + (CALORIE_MAP[t] != null ? CALORIE_MAP[t] : 20);
+        qtyByItem[t] = (qtyByItem[t] || 0) + 1;
       });
       const d = safeDate(e.ts);
       if (d) dayKeys.add(d.toISOString().slice(0, 10));
@@ -7456,7 +7461,7 @@ function computeReceiptStats(targetPlayers) {
     }
   }
 
-  const calItems = Object.entries(calByItem).sort((a, b) => b[1] - a[1]);
+  const calItems = Object.entries(calByItem).sort((a, b) => b[1] - a[1]).map(([name, cal]) => [name, cal, qtyByItem[name] || 0]);
 
   return {
     totalBurgers,
@@ -7469,6 +7474,17 @@ function computeReceiptStats(targetPlayers) {
     totalCalories,
   };
 }
+
+window.toggleReceiptCalMore = function(rowEl) {
+  const expanded = rowEl.classList.toggle('expanded');
+  let sib = rowEl.nextElementSibling;
+  while (sib && sib.classList.contains('rcpt-cal-hidden-row')) {
+    sib.style.display = expanded ? 'table-row' : 'none';
+    sib = sib.nextElementSibling;
+  }
+  const label = expanded ? rowEl.dataset.expandedLabel : rowEl.dataset.collapsedLabel;
+  rowEl.firstElementChild.textContent = label;
+};
 
 window.switchReceiptMode = function(mode) {
   receiptMode = mode;
@@ -7490,12 +7506,18 @@ function renderReceiptTab() {
   const togo = Math.max(0, goalCount - currentCount);
   const subtitle = receiptMode === 'me' ? 'YOUR FULL TAB' : 'SQUAD FULL TAB';
 
-  const calRows = stats.calItems.slice(0, 5).map(([name, cal]) =>
-    `<tr><td>${escHtml(name)}</td><td>${Math.round(cal).toLocaleString()} cal</td></tr>`
+  const calRows = stats.calItems.slice(0, 5).map(([name, cal, qty]) =>
+    `<tr><td>${escHtml(name)} (${qty}x)</td><td>${Math.round(cal).toLocaleString()} cal</td></tr>`
   ).join('');
   const remaining = stats.calItems.slice(5);
+  const remainingQty = remaining.reduce((s, [, , q]) => s + q, 0);
+  const remainingCal = remaining.reduce((s, [, c]) => s + c, 0);
+  const hiddenRows = remaining.map(([name, cal, qty]) =>
+    `<tr class="rcpt-cal-hidden-row"><td>${escHtml(name)} (${qty}x)</td><td>${Math.round(cal).toLocaleString()} cal</td></tr>`
+  ).join('');
   const moreRow = remaining.length
-    ? `<tr class="rcpt-cal-more"><td>+ ${remaining.length} more item${remaining.length > 1 ? 's' : ''}</td><td>${Math.round(remaining.reduce((s, [, c]) => s + c, 0)).toLocaleString()} cal</td></tr>`
+    ? `<tr class="rcpt-cal-more" onclick="toggleReceiptCalMore(this)" data-collapsed-label="+ ${remaining.length} more item${remaining.length > 1 ? 's' : ''} (${remainingQty}x) ▾" data-expanded-label="Show less ▲">
+         <td>+ ${remaining.length} more item${remaining.length > 1 ? 's' : ''} (${remainingQty}x) ▾</td><td>${Math.round(remainingCal).toLocaleString()} cal</td></tr>${hiddenRows}`
     : '';
 
   if (!stats.totalBurgers) {
