@@ -9251,14 +9251,15 @@ function initJuly4Stars() {
   document.body.prepend(canvas);
   const ctx = canvas.getContext('2d');
 
-  // Warm daytime embers — amber, cheese-yellow, hot grill orange, white cloud accent
+  // Patriotic night sky sparks — red, white, blue, gold
   const COLORS = [
-    [245, 158,  11],  // amber
-    [217, 119,   6],  // amber-dark / deep ember
-    [234, 179,   8],  // sesame / cheese-yellow
-    [245, 158,  11],  // amber (weighted heavier)
-    [255, 200,  50],  // bright sun flare
-    [255, 255, 255],  // white cloud accent
+    [220,  38,  38],  // red
+    [185,  28,  28],  // deep red
+    [255, 255, 255],  // white (weighted heavier for star feel)
+    [255, 255, 255],  // white
+    [ 37,  99, 235],  // blue
+    [ 29,  78, 216],  // deep blue
+    [255, 215,  50],  // gold burst
   ];
 
   let embers = [];
