@@ -8730,6 +8730,115 @@ if(IS_CONFIGURED && loadSession()){initFirebase();startApp();}
   });
 })();
 
+// ── JULY 4TH: Flag emojis + eagle fly-across ─────────────────────
+(function() {
+  const isJuly4 = () => { const d = new Date(); return d.getMonth() === 6 && d.getDate() === 4; };
+  if (!isJuly4()) return;
+
+  // Inject flag wobble CSS
+  const style = document.createElement('style');
+  style.textContent = `
+    .july4-flag {
+      font-size: 64px;
+      line-height: 1;
+      display: inline-block;
+      animation: wobble 1.6s ease-in-out infinite;
+      cursor: pointer;
+      user-select: none;
+      filter: drop-shadow(0 4px 16px rgba(178,34,52,0.40));
+    }
+    .july4-flag:nth-child(1) { animation-delay: -0.4s; }
+    .july4-flag:nth-child(3) { animation-delay: -0.8s; }
+    .july4-flag:active { transform: scale(0.88); }
+    .july4-flag-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+    }
+    @keyframes eagleFly {
+      0%   { transform: translateX(0) scaleX(1) translateY(0px); opacity: 0; }
+      5%   { opacity: 1; }
+      45%  { transform: translateX(48vw) scaleX(1) translateY(-18px); opacity: 1; }
+      50%  { transform: translateX(52vw) scaleX(-1) translateY(-18px); opacity: 1; }
+      95%  { transform: translateX(2vw) scaleX(-1) translateY(8px); opacity: 1; }
+      100% { transform: translateX(-4vw) scaleX(-1) translateY(8px); opacity: 0; }
+    }
+    .eagle-flyer {
+      position: fixed;
+      font-size: 36px;
+      pointer-events: none;
+      z-index: 9998;
+      animation: eagleFly var(--dur, 2.4s) ease-in-out forwards;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+      line-height: 1;
+      will-change: transform;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Replace burger-deco with flag + burger + flag row in app header
+  function injectFlags() {
+    document.querySelectorAll('#app-screen header .burger-deco, #setup-screen .burger-deco').forEach(deco => {
+      if (deco.parentNode.classList.contains('july4-flag-row')) return; // already done
+      const row = document.createElement('div');
+      row.className = 'july4-flag-row';
+
+      const flagL = document.createElement('span');
+      flagL.className = 'july4-flag';
+      flagL.textContent = '🇺🇸';
+      flagL.setAttribute('role', 'img');
+      flagL.setAttribute('aria-label', 'USA flag');
+
+      const flagR = document.createElement('span');
+      flagR.className = 'july4-flag';
+      flagR.textContent = '🇺🇸';
+      flagR.setAttribute('role', 'img');
+      flagR.setAttribute('aria-label', 'USA flag');
+
+      deco.parentNode.insertBefore(row, deco);
+      row.appendChild(flagL);
+      row.appendChild(deco);
+      row.appendChild(flagR);
+
+      [flagL, flagR].forEach(flag => flag.addEventListener('click', launchEagles));
+    });
+  }
+
+  function launchEagles() {
+    const count = 5 + Math.floor(Math.random() * 4); // 5-8 eagles
+    for (let i = 0; i < count; i++) {
+      setTimeout(() => {
+        const eagle = document.createElement('span');
+        eagle.className = 'eagle-flyer';
+        eagle.textContent = '🦅';
+        const fromRight = Math.random() > 0.5;
+        const yPos = 10 + Math.random() * 70; // random vertical position (vh)
+        const dur = 1.8 + Math.random() * 1.4;
+        eagle.style.setProperty('--dur', dur + 's');
+        eagle.style.top = yPos + 'vh';
+        if (fromRight) {
+          eagle.style.right = '0';
+          eagle.style.transform = 'scaleX(-1)';
+          eagle.style.animation = `eagleFly ${dur}s ease-in-out forwards`;
+          eagle.style.animationDirection = 'reverse';
+        } else {
+          eagle.style.left = '0';
+        }
+        document.body.appendChild(eagle);
+        setTimeout(() => eagle.remove(), dur * 1000 + 200);
+      }, i * 120);
+    }
+  }
+
+  // Run after DOM is ready, and again after app screen shows
+  injectFlags();
+  const observer = new MutationObserver(() => injectFlags());
+  observer.observe(document.body, { childList: true, subtree: true });
+  // Stop observing after 10s to avoid overhead
+  setTimeout(() => observer.disconnect(), 10000);
+})();
+
 
 
 // ── AMERICAN SMOKEHOUSE FEED ──────────────────────────────────────
