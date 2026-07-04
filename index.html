@@ -2023,6 +2023,87 @@ body.july4-bg .tab-btn { color: rgba(232,244,253,0.55) !important; }
 body.july4-bg .tab-btn.active { background: rgba(178,34,52,0.75) !important; color: #fff !important; }
 body.july4-bg .room-pill { background: rgba(255,255,255,0.08) !important; border-color: rgba(255,255,255,0.14) !important; color: #e8f4fd !important; }
 body.july4-bg .live-dot-wrap { background: rgba(255,255,255,0.08) !important; border-color: rgba(255,255,255,0.14) !important; color: #e8f4fd !important; }
+/* Player leaderboard rows — match restaurant dark treatment */
+body.july4-bg .rank-list { background: rgba(10,22,40,0.72) !important; border-color: rgba(255,255,255,0.10) !important; box-shadow: 0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06) !important; }
+body.july4-bg .rank-row { background: transparent !important; }
+body.july4-bg .rank-row:not(:last-child) { border-bottom-color: rgba(255,255,255,0.07) !important; }
+body.july4-bg .rank-row:active { background: rgba(255,255,255,0.06) !important; }
+body.july4-bg .rank-name { color: #e8f4fd !important; }
+body.july4-bg .rank-num { color: rgba(232,244,253,0.35) !important; }
+/* Restaurant cards */
+body.july4-bg .resto-card { background: rgba(10,22,40,0.72) !important; border-color: rgba(255,255,255,0.10) !important; }
+body.july4-bg .ranks-sub-tab { background: rgba(255,255,255,0.07) !important; border-color: rgba(255,255,255,0.10) !important; color: rgba(232,244,253,0.55) !important; }
+body.july4-bg .ranks-sub-tab.active { background: rgba(178,34,52,0.25) !important; border-color: rgba(220,38,38,0.5) !important; color: #fff !important; }
+/* Feed cards */
+body.july4-bg .feed-card { background: rgba(10,22,40,0.72) !important; border-color: rgba(255,255,255,0.10) !important; }
+body.july4-bg .feed-card .msg-text, body.july4-bg .feed-card .msg-name { color: #e8f4fd !important; }
+/* Setup card */
+body.july4-bg .setup-card { background: rgba(10,22,40,0.82) !important; border-color: rgba(255,255,255,0.12) !important; }
+body.july4-bg .setup-card input { background: rgba(255,255,255,0.07) !important; border-color: rgba(255,255,255,0.15) !important; color: #e8f4fd !important; }
+body.july4-bg .setup-card input::placeholder { color: rgba(232,244,253,0.35) !important; }
+body.july4-bg .setup-card p, body.july4-bg .setup-card label { color: rgba(232,244,253,0.58) !important; }
+/* Log modal */
+body.july4-bg #log-modal-sheet { background: #0d1f3c !important; border-top-color: rgba(178,34,52,0.4) !important; }
+body.july4-bg #log-modal-header { background: #0d1f3c !important; border-bottom-color: rgba(255,255,255,0.08) !important; }
+body.july4-bg #log-modal-drag { background: rgba(255,255,255,0.15) !important; }
+body.july4-bg #log-modal-spiral { display: none !important; }
+/* Pace cards */
+body.july4-bg .pace-card { background: rgba(10,22,40,0.72) !important; border-color: rgba(255,255,255,0.10) !important; }
+body.july4-bg .pace-summary-card { background: rgba(10,22,40,0.72) !important; border-color: rgba(255,255,255,0.10) !important; }
+/* Receipt card */
+body.july4-bg .rcpt-card { background: rgba(5,15,35,0.90) !important; }
+body.july4-bg .rcpt-card hr { border-top-color: rgba(255,255,255,0.10) !important; }
+body.july4-bg .rcpt-line-table, body.july4-bg .rcpt-cal-table, body.july4-bg .rcpt-tally-row { color: rgba(232,244,253,0.75) !important; }
+body.july4-bg .rcpt-line-table .rcpt-strong td { color: #fff !important; }
+body.july4-bg .rcpt-tally-total { color: #fff !important; border-top-color: rgba(255,255,255,0.12) !important; }
+body.july4-bg .receipt-challenge-title, body.july4-bg .receipt-foot-thank { color: #fff !important; }
+body.july4-bg .receipt-hero-section { background: transparent !important; }
+body.july4-bg .rcpt-toggle-btn { background: rgba(255,255,255,0.07) !important; border-color: rgba(255,255,255,0.12) !important; color: #e8f4fd !important; }
+body.july4-bg .rcpt-toggle-btn.active { background: rgba(178,34,52,0.7) !important; border-color: rgba(220,38,38,0.6) !important; }
+/* Badge stickers */
+body.july4-bg .badge-sticker.locked { background: rgba(255,255,255,0.04) !important; border-color: rgba(255,255,255,0.08) !important; }
+body.july4-bg .badge-sticker.unlocked { box-shadow: inset 0 1px 0 rgba(255,255,255,0.20), inset 0 0 0 1px rgba(255,255,255,0.08), 0 0 0 3px var(--streak-glow), 0 3px 10px rgba(0,0,0,0.4) !important; }
+/* Header tally strip */
+body.july4-bg #header-tally-strip { background: rgba(10,22,40,0.72) !important; border-color: rgba(255,255,255,0.10) !important; }
+/* Misc pills / players pill */
+body.july4-bg .players-pill { background: rgba(255,255,255,0.07) !important; border-color: rgba(255,255,255,0.12) !important; color: rgba(232,244,253,0.65) !important; }
+body.july4-bg .leave-btn { color: rgba(232,244,253,0.5) !important; border-color: rgba(255,255,255,0.12) !important; }
+/* Section labels */
+body.july4-bg .section-label { color: rgba(232,244,253,0.45) !important; }
+/* ── July 4th "Happy 4th" header badge CSS ── */
+.july4-header-msg {
+  display: none;
+  font-family: 'Russo One', sans-serif;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  background: linear-gradient(90deg, #DC2626 0%, #DC2626 33%, #ffffff 50%, #2563EB 67%, #2563EB 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: center;
+  padding: 4px 0 2px;
+  filter: drop-shadow(0 1px 6px rgba(220,38,38,0.35));
+  animation: july4HeaderPulse 2.5s ease-in-out infinite;
+}
+@keyframes july4HeaderPulse {
+  0%,100% { opacity: 1; filter: drop-shadow(0 1px 6px rgba(220,38,38,0.35)); }
+  50% { opacity: 0.88; filter: drop-shadow(0 1px 12px rgba(37,99,235,0.5)); }
+}
+body.july4-bg .july4-header-msg { display: block; }
+/* ── Enhanced July 4th starfield CSS — red/white/blue burst particles ── */
+.july4-burst {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 50%;
+  animation: burstFade var(--bd, 3s) ease-out forwards;
+  width: var(--bs, 3px);
+  height: var(--bs, 3px);
+}
+@keyframes burstFade {
+  0%   { opacity: 0.9; transform: translate(0,0) scale(1); }
+  100% { opacity: 0;   transform: translate(var(--bx,0px), var(--by,0px)) scale(0.3); }
+}
 
 /* Overrides the amber glow with a deep navy glow on July 4th */
 body.july4-bg::before {
@@ -2675,6 +2756,7 @@ body.july4-bg::before {
       </div>
       <div class="burger-deco">🍔</div>
       <h1>100 Burger Challenge</h1>
+      <div class="july4-header-msg">🎆 Happy 4th of July! 🎆</div>
       <div id="stat-pills-row">
         <div class="stat-pill">🗓 <span id="stat-days" class="stat-num">--</span><span class="stat-label">days left</span></div>
         <div class="stat-pill">🍔 <span id="stat-finished" class="stat-num">0</span><span class="stat-label">total</span></div>
@@ -8862,6 +8944,36 @@ if(IS_CONFIGURED && loadSession()){initFirebase();startApp();}
   observer.observe(document.body, { childList: true, subtree: true });
   // Stop observing after 10s to avoid overhead
   setTimeout(() => observer.disconnect(), 10000);
+
+  // ── Enhanced burst particles (red/white/blue) ──
+  const BURST_COLORS = ['#DC2626','#DC2626','#ffffff','#ffffff','#2563EB','#2563EB','#FFD700'];
+  function spawnBurst() {
+    const el = document.createElement('div');
+    el.className = 'july4-burst';
+    const color = BURST_COLORS[Math.floor(Math.random() * BURST_COLORS.length)];
+    const size = 2 + Math.random() * 4;
+    const startX = Math.random() * 100;
+    const startY = 20 + Math.random() * 70;
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 40 + Math.random() * 80;
+    el.style.cssText = `
+      left:${startX}vw; top:${startY}vh;
+      background:${color};
+      box-shadow: 0 0 ${size*2}px ${color};
+      --bs:${size}px;
+      --bd:${1.5 + Math.random() * 2.5}s;
+      --bx:${Math.cos(angle)*dist}px;
+      --by:${Math.sin(angle)*dist}px;
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  }
+  // Stagger initial burst, then repeat
+  for (let i = 0; i < 8; i++) setTimeout(spawnBurst, i * 200);
+  setInterval(() => {
+    const count = 2 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < count; i++) setTimeout(spawnBurst, i * 150);
+  }, 1200);
 })();
 
 
