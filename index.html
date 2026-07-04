@@ -818,8 +818,10 @@ body.feed-active .social-input-area.comment-focus-hide{opacity:0;transform:trans
 }
 #log-fab:active{transform:scale(0.93)}
 #log-fab-icon{font-size:22px;line-height:1;transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1)}
-#log-fab-plus{font-size:10px;font-weight:800;color:var(--text);letter-spacing:0.02em;line-height:1;font-family:'Outfit',sans-serif;margin-top:1px}
+#log-fab-plus{font-size:10px;font-weight:800;color:#0b3550;letter-spacing:0.02em;line-height:1;font-family:'Outfit',sans-serif;margin-top:1px}
 #log-fab:hover #log-fab-icon{transform:rotate(-10deg) scale(1.1)}
+body.july4-bg #log-fab{background:#fff;border-color:#0b3550;box-shadow:0 4px 20px rgba(178,34,52,0.25),0 0 0 2px rgba(37,99,235,0.15)}
+body.july4-bg #log-fab-plus{color:#0b3550}
 @keyframes fabPulse{
   0%,100%{box-shadow:0 4px 20px rgba(30,100,160,0.20),0 0 0 3px rgba(11,53,80,0.15)}
   50%{box-shadow:0 4px 24px rgba(30,100,160,0.35),0 0 0 5px rgba(11,53,80,0.25)}
@@ -2070,7 +2072,75 @@ body.july4-bg .players-pill { background: rgba(255,255,255,0.07) !important; bor
 body.july4-bg .leave-btn { color: rgba(232,244,253,0.5) !important; border-color: rgba(255,255,255,0.12) !important; }
 /* Section labels */
 body.july4-bg .section-label { color: rgba(232,244,253,0.45) !important; }
-/* ── July 4th "Happy 4th" header badge CSS ── */
+/* ── JULY 4TH: Log modal full dark override ── */
+body.july4-bg #log-modal-sheet { background: #0a1628 !important; border-top: 2px solid rgba(178,34,52,0.5) !important; }
+body.july4-bg #log-modal-header { background: #0a1628 !important; border-bottom: 1px solid rgba(255,255,255,0.08) !important; }
+body.july4-bg #log-modal-title { color: #e8f4fd !important; }
+body.july4-bg #log-modal-drag { background: rgba(255,255,255,0.18) !important; }
+body.july4-bg #log-modal-close { background: rgba(255,255,255,0.08) !important; border-color: rgba(255,255,255,0.12) !important; color: rgba(232,244,253,0.6) !important; }
+body.july4-bg #log-modal-mini { background: rgba(255,255,255,0.04) !important; border-bottom: 1px solid rgba(255,255,255,0.07) !important; }
+body.july4-bg #log-modal-scroll { background: #0d1f3c !important; }
+body.july4-bg #log-modal-spiral { display: none !important; }
+/* Restaurant section */
+body.july4-bg .restaurant-step { background: #0d1f3c !important; border-bottom-color: rgba(255,255,255,0.07) !important; }
+body.july4-bg .restaurant-section-label { color: rgba(232,244,253,0.45) !important; }
+body.july4-bg .restaurant-step input[type=text] { color: #e8f4fd !important; border-bottom-color: rgba(37,99,235,0.6) !important; }
+body.july4-bg .restaurant-step input[type=text]::placeholder { color: rgba(232,244,253,0.3) !important; }
+body.july4-bg .restaurant-locked-row { background: rgba(37,99,235,0.12) !important; border-color: rgba(37,99,235,0.35) !important; }
+body.july4-bg .restaurant-locked-name { color: #e8f4fd !important; }
+body.july4-bg .restaurant-change-btn { color: rgba(232,244,253,0.5) !important; }
+body.july4-bg .restaurant-suggestion { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.10) !important; color: #e8f4fd !important; }
+body.july4-bg .restaurant-suggestion:hover { background: rgba(37,99,235,0.12) !important; }
+body.july4-bg .restaurant-suggestion-badge { background: rgba(37,99,235,0.18) !important; color: #93c5fd !important; }
+/* Menu picker */
+body.july4-bg .menu-picker { background: #0d1f3c !important; border-top-color: rgba(255,255,255,0.07) !important; }
+body.july4-bg .menu-picker-label { color: rgba(232,244,253,0.45) !important; }
+body.july4-bg .menu-card { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.10) !important; color: #e8f4fd !important; }
+body.july4-bg .menu-card:hover { background: rgba(37,99,235,0.12) !important; }
+body.july4-bg .menu-card.selected { background: rgba(178,34,52,0.20) !important; border-color: rgba(220,38,38,0.6) !important; }
+body.july4-bg .menu-card-name { color: #e8f4fd !important; }
+body.july4-bg .menu-card-badge { background: rgba(37,99,235,0.18) !important; color: #93c5fd !important; }
+body.july4-bg .build-own-btn { color: rgba(232,244,253,0.5) !important; }
+/* Patty builder */
+body.july4-bg .patty-builder { background: #0d1f3c !important; }
+body.july4-bg .pb-btn { background: rgba(255,255,255,0.06) !important; border-color: rgba(255,255,255,0.12) !important; color: #e8f4fd !important; }
+body.july4-bg .pb-btn:hover { background: rgba(37,99,235,0.12) !important; }
+body.july4-bg .pb-btn.selected { background: rgba(178,34,52,0.75) !important; border-color: rgba(220,38,38,0.7) !important; color: #fff !important; }
+body.july4-bg .pb-label { color: rgba(232,244,253,0.45) !important; }
+/* Detail section */
+body.july4-bg .burger-detail { background: #0d1f3c !important; border-top-color: rgba(255,255,255,0.07) !important; }
+body.july4-bg .burger-detail label { color: rgba(232,244,253,0.45) !important; }
+body.july4-bg .burger-detail input[type=text] { color: #e8f4fd !important; border-bottom-color: rgba(37,99,235,0.5) !important; }
+body.july4-bg .rating-score { color: #e8f4fd !important; }
+body.july4-bg .star-icon { color: rgba(232,244,253,0.15) !important; }
+body.july4-bg .star-icon.full { color: #FFD700 !important; }
+/* Toppings */
+body.july4-bg .topping-btn { background: rgba(255,255,255,0.06) !important; border-color: rgba(255,255,255,0.12) !important; color: #e8f4fd !important; }
+body.july4-bg .topping-btn.topping-active { background: rgba(178,34,52,0.75) !important; border-color: rgba(220,38,38,0.7) !important; color: #fff !important; }
+body.july4-bg #toppings-toggle { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.10) !important; }
+body.july4-bg #toppings-toggle-label, body.july4-bg #toppings-chevron { color: rgba(232,244,253,0.5) !important; }
+/* Burger name + photo + submit */
+body.july4-bg #custom-burger-name { color: #e8f4fd !important; border-bottom-color: rgba(37,99,235,0.5) !important; }
+body.july4-bg .burger-photo-btn { background: rgba(255,255,255,0.06) !important; border-color: rgba(255,255,255,0.12) !important; color: #e8f4fd !important; }
+body.july4-bg .detail-confirm-btn { background: linear-gradient(135deg,#B22234,#8B0000) !important; border-color: #DC2626 !important; color: #fff !important; }
+body.july4-bg .complete-strip { background: rgba(34,197,94,0.10) !important; border-top-color: rgba(34,197,94,0.20) !important; color: #86efac !important; }
+/* Repeat last burger row */
+body.july4-bg #repeat-last-burger-btn { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.12) !important; color: #e8f4fd !important; }
+/* ── JULY 4TH: Badge tab dark override ── */
+body.july4-bg .sticker-book-open { background: rgba(10,22,40,0.82) !important; border-color: rgba(255,255,255,0.10) !important; box-shadow: 0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06) !important; }
+body.july4-bg .sticker-book-header { background: rgba(10,22,40,0.90) !important; border-color: rgba(255,255,255,0.08) !important; }
+body.july4-bg .sticker-book-count { color: rgba(232,244,253,0.45) !important; }
+body.july4-bg .sticker-album-page { background: rgba(10,22,40,0.72) !important; border-color: rgba(255,255,255,0.08) !important; border-top-color: rgba(255,255,255,0.06) !important; }
+body.july4-bg .sticker-emoji { background: rgba(255,255,255,0.08) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 0 0 3px var(--streak-glow), 0 3px 10px rgba(0,0,0,0.4) !important; }
+body.july4-bg .badge-sticker.locked { background: rgba(255,255,255,0.04) !important; border-color: rgba(255,255,255,0.10) !important; color: rgba(255,255,255,0.15) !important; }
+body.july4-bg .sticker-label { color: rgba(232,244,253,0.55) !important; }
+body.july4-bg .sticker-label.locked { color: rgba(232,244,253,0.25) !important; }
+body.july4-bg .sticker-unlock-tip { color: rgba(232,244,253,0.3) !important; }
+/* Badge album covers */
+body.july4-bg .badge-album-cover { background: rgba(10,22,40,0.72) !important; border-color: rgba(255,255,255,0.10) !important; }
+body.july4-bg .album-name { color: #e8f4fd !important; }
+body.july4-bg .album-spine { background: rgba(255,255,255,0.05) !important; }
+body.july4-bg .album-spine-dot { background: rgba(255,255,255,0.10) !important; }
 .july4-header-msg {
   display: none;
   font-family: 'Russo One', sans-serif;
