@@ -11,6 +11,7 @@
 <meta http-equiv="Expires" content="0">
 <title>🍔 100 Burger Challenge</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Russo+One&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css"/>
@@ -2983,9 +2984,9 @@ body.july4-bg::before {
         </div>
       </div>
       <div id="stat-pills-row">
-        <div class="stat-pill">🗓 <span id="stat-days" class="stat-num">--</span><span class="stat-label">days left</span></div>
-        <div class="stat-pill">🍔 <span id="stat-finished" class="stat-num">0</span><span class="stat-label">total</span></div>
-        <div class="stat-pill" id="daily-pill">🔥 <span id="daily-count" class="stat-num">0</span><span class="stat-label">today</span></div>
+        <div class="stat-pill"><i class="ti ti-calendar-event" style="font-size:14px;color:var(--sky)"></i> <span id="stat-days" class="stat-num">--</span><span class="stat-label">days left</span></div>
+        <div class="stat-pill"><i class="ti ti-stack-2" style="font-size:14px;color:var(--amber)"></i> <span id="stat-finished" class="stat-num">0</span><span class="stat-label">total</span></div>
+        <div class="stat-pill" id="daily-pill"><i class="ti ti-flame" style="font-size:14px;color:var(--red)"></i> <span id="daily-count" class="stat-num">0</span><span class="stat-label">today</span></div>
       </div>
       <!-- Compact personal progress strip -->
       <div id="header-tally-strip" style="display:none;width:100%;max-width:480px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 14px;box-sizing:border-box;box-shadow:var(--shadow-card)">
@@ -3011,12 +3012,12 @@ body.july4-bg::before {
 
     <div class="tabs">
       <div class="tab-pill-indicator" id="tab-pill-indicator"></div>
-      <button class="tab-btn active" onclick="switchTab('list',this)"><span class="tab-emoji">🏆</span><span class="tab-label">Ranks</span></button>
-      <button class="tab-btn" onclick="switchTab('feed',this)"><span class="tab-emoji">🔥</span><span class="tab-label">Feed</span><span class="tab-unread" id="social-unread-dot"></span></button>
-      <button class="tab-btn" onclick="switchTab('map',this)"><span class="tab-emoji">🗺</span><span class="tab-label">Map</span></button>
-      <button class="tab-btn" onclick="switchTab('leaderboard',this)"><span class="tab-emoji">🏅</span><span class="tab-label">Badges</span></button>
-      <button class="tab-btn" onclick="switchTab('pace',this)"><span class="tab-emoji">📈</span><span class="tab-label">Pace</span></button>
-      <button class="tab-btn" onclick="switchTab('receipt',this)"><span class="tab-emoji">🧾</span><span class="tab-label">Receipt</span></button>
+      <button class="tab-btn active" onclick="switchTab('list',this)"><span class="tab-emoji"><i class="ti ti-trophy"></i></span><span class="tab-label">Ranks</span></button>
+      <button class="tab-btn" onclick="switchTab('feed',this)"><span class="tab-emoji"><i class="ti ti-bolt"></i></span><span class="tab-label">Feed</span><span class="tab-unread" id="social-unread-dot"></span></button>
+      <button class="tab-btn" onclick="switchTab('map',this)"><span class="tab-emoji"><i class="ti ti-map-pin"></i></span><span class="tab-label">Map</span></button>
+      <button class="tab-btn" onclick="switchTab('leaderboard',this)"><span class="tab-emoji"><i class="ti ti-award"></i></span><span class="tab-label">Badges</span></button>
+      <button class="tab-btn" onclick="switchTab('pace',this)"><span class="tab-emoji"><i class="ti ti-chart-line"></i></span><span class="tab-label">Pace</span></button>
+      <button class="tab-btn" onclick="switchTab('receipt',this)"><span class="tab-emoji"><i class="ti ti-receipt"></i></span><span class="tab-label">Receipt</span></button>
     </div>
 
     <!-- LEADERBOARD TAB -->
