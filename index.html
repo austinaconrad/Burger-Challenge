@@ -586,6 +586,8 @@ button:active{transform:scale(0.97)}
 /* No-photo warm gradient header */
 .feed-no-photo-header{display:flex;align-items:center;gap:11px;padding:14px 16px 12px;background:linear-gradient(135deg,rgba(180,83,9,0.07),rgba(245,158,11,0.13));border-bottom:1px solid rgba(245,158,11,0.16)}
 .fnph-icon{font-size:26px;line-height:1;flex-shrink:0}
+.fnph-logo{width:30px;height:30px;border-radius:8px;object-fit:contain;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.15);flex-shrink:0}
+.fpc-restaurant-logo{width:18px;height:18px;border-radius:5px;object-fit:contain;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.3);vertical-align:-4px;margin-right:4px}
 .fnph-info{flex:1;min-width:0}
 .fnph-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.02em;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fnph-sub{font-size:10px;color:var(--muted2);margin-top:1px}
@@ -5195,6 +5197,14 @@ function renderUnifiedFeed() {
       const avatarInner = item.player.avatar
         ? `<img src="${item.player.avatar}" alt="avatar" style="width:100%;height:100%;object-fit:cover"/>`
         : `<div class="${colorClass(item.player.colorIdx)}" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:var(--av-bg);color:var(--av-text);font-family:'Outfit',sans-serif">${ini}</div>`;
+      const feedRestoEmoji = restoEmoji(item.restaurant);
+      const feedRestoLogoUrl = restoLogoUrl(item.restaurant, 64);
+      const fnphIconHtml = feedRestoLogoUrl
+        ? `<img src="${feedRestoLogoUrl}" alt="" class="fnph-logo" data-fallback-class="fnph-icon" data-fallback-emoji="${escHtml(feedRestoEmoji)}" onerror="handleLogoErr(this)">`
+        : `<div class="fnph-icon">${feedRestoEmoji}</div>`;
+      const fpcRestoIconHtml = feedRestoLogoUrl
+        ? `<img src="${feedRestoLogoUrl}" alt="" class="fpc-restaurant-logo" data-fallback-emoji="📍" onerror="handleLogoErr(this)">`
+        : '📍 ';
 
       if (item.photo) {
         // ── PHOTO-FORWARD CARD ──
@@ -5210,7 +5220,7 @@ function renderUnifiedFeed() {
               <span class="fpc-time-badge">${bannerMeta}</span>
             </div>
             <div class="fpc-bottom-row">
-              <div class="fpc-restaurant">📍 ${escHtml(item.restaurant)}</div>
+              <div class="fpc-restaurant">${fpcRestoIconHtml}${escHtml(item.restaurant)}</div>
               <div class="fpc-burger-badge">🍔 #${burgerNum>0?burgerNum:'?'}</div>
             </div>
           </div>
@@ -5233,7 +5243,7 @@ function renderUnifiedFeed() {
         // ── NO-PHOTO CARD: warm gradient header ──
         return `<div class="feed-row" data-player-id="${escHtml(item.player.id)}" data-burger-id="${escHtml(targetId)}" style="flex-direction:column;padding:0;gap:0;border-bottom:none;border-radius:16px;overflow:hidden;margin:0 0 10px;background:var(--surface);box-shadow:var(--shadow-card);animation-delay:${_feedInitialRenderDone?'0s':Math.min(idx*0.04,0.6)+'s'}">
           <div class="feed-no-photo-header">
-            <div class="fnph-icon">🍔</div>
+            ${fnphIconHtml}
             <div class="fnph-info">
               <div class="fnph-title">📍 ${escHtml(item.restaurant)}</div>
               <div class="fnph-sub">${escHtml(item.player.name)}${isMe?' (you)':''} &nbsp;·&nbsp; ${bannerMeta} &nbsp;·&nbsp; 🍔 #${burgerNum>0?burgerNum:'?'}</div>
