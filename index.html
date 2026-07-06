@@ -306,31 +306,36 @@ h1{font-family:'Russo One',sans-serif;font-size:clamp(20px,5.5vw,36px);font-weig
   transition: box-shadow 0.3s ease;
 }
 
-/* ── 3. Bottom nav active glow dot ─────────────────────────────────────────
-   A radial amber orb sits behind the active tab emoji, giving the tab bar
-   an iOS 18-style ambient glow treatment on the selected button.              */
-.tab-btn.active::before {
+/* ── 3. Per-tab color identity ──────────────────────────────────────────────
+   Each nav tab keeps its own icon/label color whether active or not.          */
+.tab-btn.tab-ranks   { color: #dc2626 !important; }
+.tab-btn.tab-feed    { color: #2563eb !important; }
+.tab-btn.tab-map     { color: #16a34a !important; }
+.tab-btn.tab-badges  { color: #f97316 !important; }
+.tab-btn.tab-pace    { color: #16a34a !important; }
+.tab-btn.tab-receipt { color: #111111 !important; }
+
+/* ── 4. Bottom nav "you are here" dot ───────────────────────────────────────
+   A small blinking green dot sits below whichever tab is currently active,
+   replacing the old amber glow-behind-the-icon treatment.                    */
+.tab-btn.active::after {
   content: '';
   position: absolute;
-  top: 2px;
+  bottom: -6px;
   left: 50%;
   transform: translateX(-50%);
-  width: 38px;
-  height: 26px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  background: radial-gradient(ellipse at 50% 40%,
-    rgba(245,158,11,0.38) 0%,
-    rgba(245,158,11,0.18) 40%,
-    transparent 72%
-  );
-  filter: blur(5px);
-  z-index: 0;
+  background: #22c55e;
+  box-shadow: 0 0 6px rgba(34,197,94,0.65);
+  z-index: 2;
   pointer-events: none;
-  animation: tabGlowPulse 3s ease-in-out infinite;
+  animation: tabDotBlink 1.4s ease-in-out infinite;
 }
-@keyframes tabGlowPulse {
-  0%,100% { opacity: 0.85; transform: translateX(-50%) scaleX(1); }
-  50%      { opacity: 1;    transform: translateX(-50%) scaleX(1.12); }
+@keyframes tabDotBlink {
+  0%,100% { opacity: 1; }
+  50%     { opacity: 0.15; }
 }
 /* Ensure emoji and label sit above the glow orb */
 .tab-btn .tab-emoji,
@@ -587,7 +592,7 @@ button:active{transform:scale(0.97)}
 .feed-no-photo-header{display:flex;align-items:center;gap:11px;padding:14px 16px 12px;background:linear-gradient(135deg,rgba(180,83,9,0.07),rgba(245,158,11,0.13));border-bottom:1px solid rgba(245,158,11,0.16)}
 .fnph-icon{font-size:26px;line-height:1;flex-shrink:0}
 .fnph-logo{width:30px;height:30px;border-radius:8px;object-fit:contain;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.15);flex-shrink:0}
-.fpc-restaurant-logo{width:18px;height:18px;border-radius:5px;object-fit:contain;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.3);vertical-align:-4px;margin-right:4px}
+.fpc-restaurant-logo{width:13px;height:13px;border-radius:4px;object-fit:contain;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.3);vertical-align:-2px;margin-right:3px}
 .fnph-info{flex:1;min-width:0}
 .fnph-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.02em;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fnph-sub{font-size:10px;color:var(--muted2);margin-top:1px}
@@ -3016,12 +3021,12 @@ body.july4-bg::before {
 
     <div class="tabs">
       <div class="tab-pill-indicator" id="tab-pill-indicator"></div>
-      <button class="tab-btn active" onclick="switchTab('list',this)"><span class="tab-emoji"><i class="ti ti-trophy"></i></span><span class="tab-label">Ranks</span></button>
-      <button class="tab-btn" onclick="switchTab('feed',this)"><span class="tab-emoji"><i class="ti ti-bolt"></i></span><span class="tab-label">Feed</span><span class="tab-unread" id="social-unread-dot"></span></button>
-      <button class="tab-btn" onclick="switchTab('map',this)"><span class="tab-emoji"><i class="ti ti-map-pin"></i></span><span class="tab-label">Map</span></button>
-      <button class="tab-btn" onclick="switchTab('leaderboard',this)"><span class="tab-emoji"><i class="ti ti-award"></i></span><span class="tab-label">Badges</span></button>
-      <button class="tab-btn" onclick="switchTab('pace',this)"><span class="tab-emoji"><i class="ti ti-chart-line"></i></span><span class="tab-label">Pace</span></button>
-      <button class="tab-btn" onclick="switchTab('receipt',this)"><span class="tab-emoji"><i class="ti ti-receipt"></i></span><span class="tab-label">Receipt</span></button>
+      <button class="tab-btn tab-ranks active" onclick="switchTab('list',this)"><span class="tab-emoji"><i class="ti ti-trophy"></i></span><span class="tab-label">Ranks</span></button>
+      <button class="tab-btn tab-feed" onclick="switchTab('feed',this)"><span class="tab-emoji"><i class="ti ti-bolt"></i></span><span class="tab-label">Feed</span><span class="tab-unread" id="social-unread-dot"></span></button>
+      <button class="tab-btn tab-map" onclick="switchTab('map',this)"><span class="tab-emoji"><i class="ti ti-map-pin"></i></span><span class="tab-label">Map</span></button>
+      <button class="tab-btn tab-badges" onclick="switchTab('leaderboard',this)"><span class="tab-emoji"><i class="ti ti-award"></i></span><span class="tab-label">Badges</span></button>
+      <button class="tab-btn tab-pace" onclick="switchTab('pace',this)"><span class="tab-emoji"><i class="ti ti-chart-line"></i></span><span class="tab-label">Pace</span></button>
+      <button class="tab-btn tab-receipt" onclick="switchTab('receipt',this)"><span class="tab-emoji"><i class="ti ti-receipt"></i></span><span class="tab-label">Receipt</span></button>
     </div>
 
     <!-- LEADERBOARD TAB -->
