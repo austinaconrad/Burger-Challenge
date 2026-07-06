@@ -150,8 +150,6 @@ h1{font-family:'Russo One',sans-serif;font-size:clamp(20px,5.5vw,36px);font-weig
 .tab-unread{position:absolute;top:4px;right:6px;width:8px;height:8px;border-radius:50%;background:#22C55E;border:1.5px solid var(--bg);display:none;animation:pulse 1.5s ease-in-out infinite}
 .tab-unread.visible{display:block}
 .tab-btn.active{background:linear-gradient(145deg,rgba(30,110,170,0.14),rgba(26,112,170,0.07));color:var(--sky);border:1px solid rgba(30,110,170,0.30);box-shadow:0 1px 8px rgba(30,100,160,0.14),inset 0 1px 0 rgba(255,255,255,0.80);font-weight:600}
-.tab-panel{display:none}
-.tab-panel.active{display:block}
 .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
 .stat-card{background:var(--surface);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 14px 12px;text-align:left;position:relative;overflow:hidden;box-shadow:var(--shadow-card)}
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--sky),var(--sky-light));opacity:0.8}
@@ -2477,50 +2475,6 @@ body.july4-bg::before {
 .resto-score{font-family:'Russo One',sans-serif;font-size:13px;font-weight:800;color:var(--amber)}
 .resto-unrated{font-size:11px;color:var(--muted);font-weight:500}
 
-/* ── Burger Stack Game ── */
-.bs-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;padding:14px 12px 24px;max-width:360px;margin:0 auto}
-.bs-scoreboard{
-  width:100%;
-  display:flex;align-items:center;justify-content:space-between;
-  background:var(--surface2);
-  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
-  border:1px solid var(--border2);
-  border-radius:14px;
-  padding:12px 16px;
-  box-shadow:var(--shadow-card);
-}
-.bs-scoreboard-left{display:flex;flex-direction:column;gap:3px}
-.bs-scoreboard-label{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--muted2);letter-spacing:0.08em}
-.bs-top-score{font-family:'Russo One',sans-serif;font-size:18px;color:var(--sky);letter-spacing:-0.3px}
-.bs-trophy{font-size:28px;line-height:1;filter:drop-shadow(0 2px 6px rgba(245,158,11,0.4))}
-.bs-canvas-wrap{position:relative;border-radius:18px;overflow:hidden;box-shadow:0 8px 32px rgba(11,53,80,0.25);border:2px solid rgba(255,255,255,0.6)}
-#burger-stack-canvas{display:block}
-.bs-overlay{
-  position:absolute;inset:0;
-  background:rgba(8,28,46,0.82);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  display:flex;align-items:center;justify-content:center;
-}
-.bs-overlay-inner{display:flex;flex-direction:column;align-items:center;gap:16px;padding:24px;text-align:center}
-.bs-title{font-family:'Russo One',sans-serif;font-size:28px;color:#fff;line-height:1.15;text-shadow:0 0 24px rgba(168,212,237,0.5)}
-.bs-subtitle{font-size:13px;color:rgba(255,255,255,0.65);font-family:'Outfit',sans-serif;line-height:1.5;max-width:220px}
-.bs-result{display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:14px 28px}
-.bs-result-label{font-family:'Press Start 2P',monospace;font-size:7px;color:rgba(255,255,255,0.5);letter-spacing:0.1em}
-.bs-result-score{font-family:'Russo One',sans-serif;font-size:52px;color:#fff;line-height:1;text-shadow:0 0 20px rgba(168,212,237,0.6)}
-.bs-result-msg{font-size:12px;color:rgba(255,255,255,0.7);font-family:'Outfit',sans-serif;margin-top:2px}
-.bs-btn{
-  font-family:'Russo One',sans-serif;font-size:15px;letter-spacing:0.05em;
-  color:#fff;background:var(--sky);
-  border:none;border-radius:12px;
-  padding:13px 40px;cursor:pointer;
-  box-shadow:0 4px 16px rgba(26,112,170,0.45);
-  transition:transform 0.1s,box-shadow 0.1s;
-}
-.bs-btn:active{transform:scale(0.96);box-shadow:0 2px 8px rgba(26,112,170,0.3)}
-.bs-btn-again{background:rgba(255,255,255,0.12);box-shadow:none;border:1px solid rgba(255,255,255,0.2)}
-.bs-btn-again:active{transform:scale(0.96)}
-.bs-hint{font-size:11px;color:var(--muted);font-family:'Outfit',sans-serif;opacity:0.7}
-
 /* ── Milestone Feed Card ── */
 .milestone-card{
   background:var(--surface2);
@@ -2614,124 +2568,8 @@ body.july4-bg::before {
   user-select: none;
   filter: drop-shadow(0 0 10px rgba(255,215,0,0.6));
 }
-.burger-stack-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
 /* Triple card — no special border, inherits standard card style */
 .grill-feed-card.triple-card {}
-
-/* .grill-card-inner — no longer needed in feed row layout */
-.grill-card-inner { position: relative; }
-
-/* Left accent strip — player color injected via inline style */
-.grill-left-accent {
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 3px;
-  z-index: 1;
-  border-radius: 0;
-}
-
-/* ── Banner row — same visual weight as .msg-header ── */
-.grill-card-banner {
-  padding: 10px 13px 10px 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-}
-.grill-banner-left { display: flex; align-items: center; gap: 10px; }
-.grill-banner-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 800;
-  flex-shrink: 0;
-  font-family: 'Inter', sans-serif;
-}
-.grill-banner-name {
-  font-family: 'Poppins', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  color: #F3F4F6;
-  letter-spacing: 0.01em;
-  line-height: 1.2;
-}
-.grill-banner-meta {
-  font-size: 11px;
-  color: rgba(255,255,255,0.45);
-  font-weight: 500;
-  margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 220px;
-  line-height: 1;
-}
-.grill-banner-you {
-  font-size: 9px;
-  font-weight: 500;
-  color: #6B7280;
-}
-.grill-banner-badge {
-  font-size: 11px;
-  font-weight: 700;
-  border: 1.5px solid transparent;
-  padding: 3px 10px;
-  border-radius: 999px;
-  white-space: nowrap;
-  flex-shrink: 0;
-  font-family: 'Inter', sans-serif;
-  letter-spacing: 0.03em;
-}
-
-/* ── Patty stamp ── */
-.grill-patty-stamp {
-  font-family: 'Inter', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  color: #6B7280;
-  background: rgba(0,0,0,0.2);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  padding: 7px 14px 7px 18px;
-  letter-spacing: 0.02em;
-  line-height: 1.6;
-}
-.grill-patty-stamp.stamp-triple {
-  background: rgba(245,158,11,0.05);
-  border-bottom-color: rgba(245,158,11,0.15);
-  color: var(--amber, #F59E0B);
-}
-/* single and double share the same neutral style */
-.grill-patty-stamp.stamp-double,
-.grill-patty-stamp.stamp-single { /* inherits base styles */ }
-
-/* ── Card body — plain content block, no side graphic ── */
-.grill-card-body {
-  padding: 8px 14px 12px 18px;
-}
-
-/* Restaurant name */
-.grill-restaurant-name {
-  font-family: 'Poppins', sans-serif;
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: #F59E0B;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 
 /* Mini burger stack — tight sandwich, no gaps */
 .feed-card-burger-tally {
@@ -3064,8 +2902,8 @@ body.july4-bg::before {
     <!-- FEED TAB (unified: burger cards + messages) -->
     <div class="tab-panel" id="tab-feed">
       <div class="feed-sub-tabs" id="feed-sub-tabs">
-        <button class="feed-sub-tab active" onclick="switchFeedTab('feed',this)">🔥 Feed</button>
-        <button class="feed-sub-tab" onclick="switchFeedTab('rated',this)">⭐ Top Rated</button>
+        <button class="feed-sub-tab active" onclick="switchFeedTab('feed',this)"><i class="ti ti-bolt"></i> Feed</button>
+        <button class="feed-sub-tab" onclick="switchFeedTab('rated',this)"><i class="ti ti-star-filled"></i> Top Rated</button>
       </div>
       <!-- Unified feed panel -->
       <div id="unified-feed-panel">
@@ -3572,6 +3410,12 @@ function initials(name) {
 }
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+// Shared star-rating glyph — filled (amber) vs empty (dim outline), replacing the old ⭐ emoji rows.
+function starIcon(filled, dimOpacity) {
+  return filled
+    ? '<i class="ti ti-star-filled" style="color:#FBBF24"></i>'
+    : `<i class="ti ti-star" style="color:rgba(120,120,120,${dimOpacity != null ? dimOpacity : 0.3})"></i>`;
 }
 const colorClass = idx => COLORS[idx % COLORS.length];
 
@@ -4371,8 +4215,10 @@ function patchCommentCounts() {
     const btnUpdates = [];
     feed.querySelectorAll('.feed-comment-btn[data-target-id]').forEach(btn => {
       const count = (byTarget[btn.dataset.targetId] || []).length;
-      const text = count ? `💬 ${count}` : '💬';
-      if (btn.textContent !== text) btnUpdates.push({ el: btn, text });
+      const countSpan = btn.querySelector('.comment-count');
+      const currentText = countSpan ? countSpan.textContent : '';
+      const nextText = count ? String(count) : '';
+      if (currentText !== nextText) btnUpdates.push({ el: btn, count });
     });
     const threadUpdates = [];
     feed.querySelectorAll('.feed-comment-thread[id]').forEach(thread => {
@@ -4400,7 +4246,19 @@ function patchCommentCounts() {
     });
 
     // Write phase — all mutations batched
-    btnUpdates.forEach(({ el, text }) => { el.textContent = text; });
+    btnUpdates.forEach(({ el, count }) => {
+      let countSpan = el.querySelector('.comment-count');
+      if (count) {
+        if (!countSpan) {
+          countSpan = document.createElement('span');
+          countSpan.className = 'comment-count';
+          el.appendChild(countSpan);
+        }
+        countSpan.textContent = count;
+      } else if (countSpan) {
+        countSpan.remove();
+      }
+    });
     threadUpdates.forEach(({ list, thread, html }) => {
       list.innerHTML = html;
       thread.style.maxHeight = thread.scrollHeight + 'px';
@@ -5118,7 +4976,7 @@ function renderUnifiedFeed() {
       const pillsHtml = buildReactionPills(m.reactions, targetId, 'message');
       const reactionsHtml = `<div class="msg-reactions" data-msg-id="${targetId}">${pillsHtml}</div>`;
       const msgComments = comments.filter(c => c.targetId === targetId);
-      const commentLabel = msgComments.length ? `💬 ${msgComments.length}` : '💬';
+      const commentLabel = `<i class="ti ti-message-circle"></i>${msgComments.length ? `<span class="comment-count">${msgComments.length}</span>` : ''}`;
       const msgLatestComment = msgComments.length > 0 ? msgComments[msgComments.length - 1] : null;
       const msgInlineComment = msgLatestComment
         ? `<div class="feed-comment-preview" onclick="toggleComments('${targetId}')">
@@ -5179,7 +5037,7 @@ function renderUnifiedFeed() {
       const ratingStars = (() => {
         if (!item.rating || item.rating <= 0) return '<span style="color:var(--muted);font-size:12px">— unrated</span>';
         let s = '';
-        for (let i = 1; i <= 5; i++) s += item.rating >= i ? '⭐' : '<span style="opacity:0.2">⭐</span>';
+        for (let i = 1; i <= 5; i++) s += starIcon(item.rating >= i, 0.2);
         return `${s} <span class="grill-rating-num">${item.rating}/5</span>`;
       })();
       const color = RING_COLORS[item.player.colorIdx % RING_COLORS.length];
@@ -5191,7 +5049,7 @@ function renderUnifiedFeed() {
       const rxns = burgerReactions[targetId] || {};
       const pillsHtml = buildReactionPills(rxns, targetId, 'burger');
       const burgerComments = comments.filter(c => c.targetId === targetId);
-      const commentLabel = burgerComments.length ? `💬 ${burgerComments.length}` : '💬';
+      const commentLabel = `<i class="ti ti-message-circle"></i>${burgerComments.length ? `<span class="comment-count">${burgerComments.length}</span>` : ''}`;
       const cardDate = safeDate(item.ts);
       const cardTimeAgo = dateAgo(cardDate);
       const bannerMeta = cardTimeAgo || '';
@@ -5747,7 +5605,7 @@ function openFeedReceipt(item) {
   const fireDisplay = (() => {
     if (!item.rating) return '';
     let s = '';
-    for (let i = 1; i <= 5; i++) s += item.rating >= i ? '⭐' : '<span style="opacity:0.22">⭐</span>';
+    for (let i = 1; i <= 5; i++) s += starIcon(item.rating >= i, 0.22);
     return s;
   })();
   const orderNum = d ? ('ORD-' + (d.getTime() % 100000).toString().padStart(5,'0')) : 'ORD-00000';
@@ -6839,7 +6697,7 @@ window.confirmBurger = async function() {
       const full = Math.floor(snapshotRating);
       const half = snapshotRating % 1 >= 0.5;
       const dim = 5 - full - (half ? 1 : 0);
-      return '⭐'.repeat(full) + (half ? '⭐' : '') + '<span style="opacity:0.22">' + '⭐'.repeat(dim) + '</span>';
+      return starIcon(true).repeat(full) + (half ? starIcon(true) : '') + starIcon(false, 0.22).repeat(dim);
     })();
     const burgerLabel = snapshotMenuItemName
       ? `${snapshotMenuEmoji || '🍔'} ${escHtml(snapshotMenuItemName)}`
@@ -7522,7 +7380,7 @@ window.openDayDetail = function(year, month, day) {
 
     let stars = '';
     if (rating > 0) {
-      for (let i = 1; i <= 5; i++) stars += rating >= i ? '⭐' : '<span style="opacity:0.2">⭐</span>';
+      for (let i = 1; i <= 5; i++) stars += starIcon(rating >= i, 0.2);
       stars += ` <span style="font-size:11px;color:#9CA3AF">${rating}/5</span>`;
     }
 
@@ -8052,853 +7910,6 @@ function renderRestaurantLB() {
 
   wrap.innerHTML = cardsHtml + loadMoreRestoHtml;
 }
-
-// ═══════════════════════════════════════════════════════════════════════════
-// 🍔  STACKZ — Premium Burger Stack Game
-// ═══════════════════════════════════════════════════════════════════════════
-(function() {
-  const PIECE_H = 30;
-
-  // Fixed buns — not part of the drop cycle
-  const BUN_BOT = { type:'bun_bot', label:'Bottom Bun', fill:'#D4956A', stroke:'#A06030' };
-  const BUN_TOP = { type:'bun_top', label:'Top Bun',    fill:'#D4A56A', stroke:'#A06030' };
-
-  // Toppings only — what the player actually stacks
-  const TOPPINGS = [
-    { type:'patty',   label:'Patty',   fill:'#5C2E0A', stroke:'#3D1A04' },
-    { type:'cheese',  label:'Cheese',  fill:'#F5C518', stroke:'#C49A00' },
-    { type:'lettuce', label:'Lettuce', fill:'#22C55E', stroke:'#15803D' },
-    { type:'tomato',  label:'Tomato',  fill:'#EF4444', stroke:'#B91C1C' },
-    { type:'bacon',   label:'Bacon',   fill:'#C2410C', stroke:'#9A3412' },
-    { type:'onion',   label:'Onion',   fill:'#C084FC', stroke:'#9333EA' },
-    { type:'pickle',  label:'Pickle',  fill:'#4ADE80', stroke:'#16A34A' },
-  ];
-
-  const W = 320, H = 500;
-  let canvas, ctx, DPR;
-  let raf     = null;
-  let state   = 'idle';   // idle | playing | over
-  let score   = 0;
-  let speed   = 2.5;
-  let stack   = [];
-  let cur     = null;
-  let falling = [];
-  let cameraY = 0;        // positive = world shifts DOWN (tower grows up)
-  let layerIdx = 0;
-  let bsTopScore = 0, bsTopName = '';
-  let spaceDown = false;
-  let endBun = null;      // animated top bun that falls on game over
-  let perfectStreak = 0;  // consecutive perfect drops
-  let flashMsg = null;    // { text, alpha, worldY } — floats up on perfect
-  let particles = [];     // burst sparks on perfect drop
-  let scoreScale = 1.0;   // spring-pops when score increases
-  let idleRaf = null;     // rAF handle for idle animation loop
-  let idleT = 0;          // idle animation clock (frames)
-
-  function $id(id){ return document.getElementById(id); }
-
-  // ── Firebase top-score ────────────────────────────────────
-  function loadBsTop() {
-    if (!db || !roomId) return;
-    getDoc(doc(db, 'rooms', roomId)).then(snap => {
-      if (!snap.exists()) return;
-      const t = snap.data().burgerStackTop;
-      if (t) { bsTopScore = t.score || 0; bsTopName = t.name || ''; refreshScoreBoard(); }
-    }).catch(() => {});
-  }
-  function saveBsTop(name, sc) {
-    if (!db || !roomId) return;
-    updateDoc(doc(db, 'rooms', roomId), { burgerStackTop: { name, score: sc, ts: Date.now() } })
-      .then(() => { bsTopScore = sc; bsTopName = name; refreshScoreBoard(); })
-      .catch(() => {});
-  }
-  function refreshScoreBoard() {
-    const el = $id('bs-top-score');
-    if (el) el.textContent = bsTopScore > 0 ? bsTopName + '  ' + bsTopScore : '—';
-  }
-
-  // ── Canvas setup ──────────────────────────────────────────
-  function setupCanvas() {
-    canvas = $id('burger-stack-canvas');
-    if (!canvas) return false;
-    DPR = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width  = W * DPR;
-    canvas.height = H * DPR;
-    canvas.style.width  = W + 'px';
-    canvas.style.height = H + 'px';
-    ctx = canvas.getContext('2d');
-    ctx.scale(DPR, DPR);
-    return true;
-  }
-
-  // ── Game lifecycle ────────────────────────────────────────
-  function resetGame() {
-    score = 0; speed = 2.5; layerIdx = 0; cameraY = 0; falling = []; endBun = null; perfectStreak = 0; flashMsg = null;
-    particles = []; scoreScale = 1.0;
-    const startW = 190, startX = (W - startW) / 2;
-    stack = [{ x: startX, w: startW, y: H - PIECE_H - 8, ...BUN_BOT }];
-    spawnCurrent();
-  }
-
-  function spawnCurrent() {
-    const top = stack[stack.length - 1];
-    const layer = TOPPINGS[layerIdx % TOPPINGS.length];
-    cur = { x: 0, w: top.w, dir: 1, ...layer };
-    layerIdx++;
-  }
-
-  function drop() {
-    if (state !== 'playing' || !cur) return;
-    const top   = stack[stack.length - 1];
-    const left  = Math.max(cur.x, top.x);
-    const right = Math.min(cur.x + cur.w, top.x + top.w);
-    const overlap = right - left;
-    if (overlap <= 2) { endGame(); return; }
-
-    const isPerfect = Math.abs(cur.x - top.x) <= 3;
-    const newX = isPerfect ? top.x : left;
-    const newW = isPerfect ? top.w : overlap;
-    const { type, label, fill, stroke } = cur;
-    const fragY = top.y - PIECE_H - 2;
-
-    if (!isPerfect) {
-      if (cur.x < top.x)
-        falling.push({ x: cur.x,        y: fragY, w: top.x - cur.x,                        h: PIECE_H, vy: -0.5, type, label:'', fill, stroke });
-      if (cur.x + cur.w > top.x + top.w)
-        falling.push({ x: top.x + top.w, y: fragY, w: (cur.x + cur.w) - (top.x + top.w), h: PIECE_H, vy: -0.5, type, label:'', fill, stroke });
-    }
-
-    stack.push({ x: newX, w: newW, y: fragY, type, label, fill, stroke });
-
-    if (isPerfect) {
-      perfectStreak++;
-      // Bonus points scale with streak: +1 extra on 1st, +2 on 2nd, +3 on 3rd+
-      const bonus = Math.min(perfectStreak, 3);
-      score += 1 + bonus;
-      const streakEmoji = perfectStreak >= 3 ? '🔥' : perfectStreak === 2 ? '⚡' : '✨';
-      const streakLabel = perfectStreak >= 3 ? ' HOT STREAK!' : perfectStreak === 2 ? ' DOUBLE!' : '';
-      flashMsg = {
-        text: `${streakEmoji} PERFECT! +${1 + bonus}${streakLabel}`,
-        alpha: 1.0,
-        worldY: fragY - 20,  // float up from just above the landed piece
-      };
-      if (navigator.vibrate) navigator.vibrate([12, 40, 24]);
-      // Particle burst — spawn 14 sparks at landing centre
-      const cx = newX + newW / 2;
-      for (let i = 0; i < 14; i++) {
-        const angle = (Math.PI * 2 * i) / 14 + Math.random() * 0.3;
-        const spd   = 1.8 + Math.random() * 2.6;
-        particles.push({
-          x: cx, y: fragY + PIECE_H / 2,
-          vx: Math.cos(angle) * spd,
-          vy: Math.sin(angle) * spd - 1.2,
-          alpha: 1.0,
-          r: 3 + Math.random() * 2,
-          color: [fill, stroke, '#FFD700', '#fff'][Math.floor(Math.random() * 4)],
-        });
-      }
-    } else {
-      perfectStreak = 0;
-      score++;
-      if (navigator.vibrate) navigator.vibrate(18);
-    }
-    scoreScale = 1.38;  // pop the score display
-
-    speed = Math.min(10, 2.5 + Math.floor(score / 4) * 0.35);
-    spawnCurrent();
-  }
-
-  function endGame() {
-    state = 'over';
-    if (raf) { cancelAnimationFrame(raf); raf = null; }
-
-    // Drop a top bun from above the visible canvas onto the finished tower
-    const top = stack[stack.length - 1];
-    const bunW  = Math.min(top.w + 10, 190); // slightly wider than top piece
-    const bunX  = top.x + (top.w - bunW) / 2;
-    const landY = top.y - PIECE_H - 2;       // just above the top piece
-    endBun = {
-      x: bunX, w: bunW,
-      y: -cameraY - PIECE_H * 3,             // start above visible canvas top
-      vy: 0, landY, bounces: 0,
-    };
-    animateEndBun();
-  }
-
-  function animateEndBun() {
-    if (!endBun) return;
-    endBun.vy += 1.1;           // gravity
-    endBun.y  += endBun.vy;
-
-    if (endBun.y >= endBun.landY) {
-      endBun.y   = endBun.landY;
-      endBun.vy *= -0.38;       // bounce with energy loss
-      endBun.bounces++;
-      if (Math.abs(endBun.vy) < 1.5 || endBun.bounces >= 4) {
-        // Settled — draw final frame then reveal overlay after short pause
-        endBun.y  = endBun.landY;
-        endBun.vy = 0;
-        drawFrame();
-        setTimeout(() => showOverlay(true), 520);
-        return;
-      }
-    }
-    drawFrame();
-    requestAnimationFrame(animateEndBun);
-  }
-
-  // ── Game loop ─────────────────────────────────────────────
-  function loop() {
-    if (state !== 'playing') return;
-    update();
-    drawFrame();
-    raf = requestAnimationFrame(loop);
-  }
-
-  function update() {
-    if (!cur) return;
-    cur.x += cur.dir * speed;
-    if (cur.x <= 0)          { cur.x = 0;         cur.dir =  1; }
-    if (cur.x + cur.w >= W)  { cur.x = W - cur.w; cur.dir = -1; }
-
-    falling.forEach(f => { f.vy += 0.55; f.y += f.vy; });
-    falling = falling.filter(f => f.y < H + 120);
-
-    // Fade & float the perfect-drop flash message
-    if (flashMsg) {
-      flashMsg.alpha  -= 0.030;
-      flashMsg.worldY -= 0.9;
-      if (flashMsg.alpha <= 0) flashMsg = null;
-    }
-
-    // Tick particles (in world space, gravity applied)
-    particles.forEach(p => {
-      p.vy   += 0.18;
-      p.x    += p.vx;
-      p.y    += p.vy;
-      p.alpha -= 0.038;
-    });
-    particles = particles.filter(p => p.alpha > 0);
-
-    // Lerp score scale back to 1.0
-    scoreScale += (1.0 - scoreScale) * 0.20;
-
-    // Dynamic viewport camera: once the tower top rises past 40% of canvas,
-    // smoothly translate the world downward to keep the landing zone visible.
-    const topPiece = stack[stack.length - 1];
-    const targetCamY = Math.max(0, H * 0.40 - topPiece.y);
-    cameraY += (targetCamY - cameraY) * 0.12;
-  }
-
-  // ─────────────────────────────────────────────────────────
-  // VECTOR DRAW LIBRARY — one premium function per ingredient
-  // ─────────────────────────────────────────────────────────
-
-  // Shared rounded-rect path helper (no fill/stroke — caller decides)
-  function bsRR(x, y, w, h, r) {
-    r = Math.max(0, Math.min(r, w / 2, h / 2));
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
-  }
-
-  // Shared label renderer — white bold text at reduced opacity
-  function drawLabel(x, y, w, h, text) {
-    if (!text || w < 44) return;
-    ctx.save();
-    ctx.globalAlpha = 0.70;
-    ctx.fillStyle = '#fff';
-    ctx.shadowColor = 'rgba(0,0,0,0.60)'; ctx.shadowBlur = 4;
-    const fs = Math.max(7, Math.min(10, w / 17));
-    ctx.font = `700 ${fs}px 'Outfit', sans-serif`;
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(text, x + w / 2, y + h * 0.60);
-    ctx.restore();
-  }
-
-  // ── TOP BUN — warm golden dome with sesame seeds ──────────
-  function drawBunTop(x, y, w, h) {
-    const cx = x + w / 2;
-    const domeH = h * 1.05; // crown height above y
-
-    // Dome body
-    ctx.save();
-    ctx.shadowColor = 'rgba(100,40,0,0.38)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 4;
-    ctx.beginPath();
-    ctx.moveTo(x + 4, y + h);
-    ctx.lineTo(x + 4, y + h * 0.60);
-    ctx.quadraticCurveTo(x, y + h * 0.55, x + w * 0.08, y - domeH * 0.48);
-    ctx.quadraticCurveTo(cx, y - domeH, cx, y - domeH);
-    ctx.quadraticCurveTo(x + w * 0.92, y - domeH * 0.48, x + w - 4, y + h * 0.55);
-    ctx.lineTo(x + w - 4, y + h);
-    ctx.closePath();
-    const grd = ctx.createLinearGradient(0, y - domeH, 0, y + h);
-    grd.addColorStop(0, '#EDAF5A');
-    grd.addColorStop(0.50, '#D4956A');
-    grd.addColorStop(1,   '#B8753A');
-    ctx.fillStyle = grd; ctx.fill();
-    ctx.restore();
-
-    // Outline
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(x + 4, y + h);
-    ctx.lineTo(x + 4, y + h * 0.60);
-    ctx.quadraticCurveTo(x, y + h * 0.55, x + w * 0.08, y - domeH * 0.48);
-    ctx.quadraticCurveTo(cx, y - domeH, cx, y - domeH);
-    ctx.quadraticCurveTo(x + w * 0.92, y - domeH * 0.48, x + w - 4, y + h * 0.55);
-    ctx.lineTo(x + w - 4, y + h);
-    ctx.strokeStyle = '#9A5520'; ctx.lineWidth = 1.5; ctx.stroke();
-    ctx.restore();
-
-    // Sesame seeds — fixed positions for render stability
-    const seeds = [[0.22,0.32],[0.50,0.12],[0.78,0.32],[0.36,0.57],[0.64,0.55]];
-    seeds.forEach(([sx, sy]) => {
-      const seedX = x + w * sx;
-      const seedY = (y - domeH) + (h + domeH) * sy;
-      ctx.save();
-      ctx.fillStyle = '#F5E5C5';
-      ctx.shadowColor = 'rgba(80,30,0,0.18)'; ctx.shadowBlur = 2;
-      ctx.beginPath();
-      ctx.ellipse(seedX, seedY, 5, 2.8, 0.18, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    });
-
-    // Specular sheen
-    ctx.save();
-    ctx.globalAlpha = 0.22;
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.ellipse(cx - w * 0.10, y - domeH * 0.60, w * 0.17, domeH * 0.18, -0.3, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-
-  // ── BOTTOM BUN — flat golden platform, rounded bottom corners ─
-  function drawBunBottom(x, y, w, h) {
-    const r = Math.min(6, h * 0.35);
-    ctx.save();
-    ctx.shadowColor = 'rgba(100,40,0,0.30)'; ctx.shadowBlur = 7; ctx.shadowOffsetY = 3;
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x + w, y);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.closePath();
-    const grd = ctx.createLinearGradient(0, y, 0, y + h);
-    grd.addColorStop(0, '#E8A84C'); grd.addColorStop(0.5, '#D4956A'); grd.addColorStop(1, '#A86030');
-    ctx.fillStyle = grd; ctx.fill();
-    ctx.restore();
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x + w, y);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.strokeStyle = '#9A5520'; ctx.lineWidth = 1.5; ctx.stroke();
-    ctx.restore();
-    // Top-edge highlight
-    ctx.save(); ctx.globalAlpha = 0.28; ctx.fillStyle = '#fff';
-    ctx.fillRect(x + 2, y, w - 4, 3);
-    ctx.restore();
-  }
-
-  // ── PATTY — thick dark slab with sin-wave craggy edge + grill marks ──
-  function drawPatty(x, y, w, h) {
-    const segs = 14;
-    const jag  = h * 0.22;
-    ctx.save();
-    ctx.shadowColor = 'rgba(0,0,0,0.50)'; ctx.shadowBlur = 9; ctx.shadowOffsetY = 5;
-    ctx.beginPath();
-    // Craggy top edge — sin-based for frame-stability (no Math.random)
-    for (let i = 0; i <= segs; i++) {
-      const px = x + (w / segs) * i;
-      const py = y + jag * (Math.sin(i * 1.9) * 0.5 + 0.12);
-      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-    }
-    ctx.lineTo(x + w, y + h);
-    ctx.lineTo(x, y + h);
-    ctx.closePath();
-    const grd = ctx.createLinearGradient(0, y, 0, y + h);
-    grd.addColorStop(0, '#7A3A10'); grd.addColorStop(0.35, '#5C2E0A'); grd.addColorStop(1, '#3D1A04');
-    ctx.fillStyle = grd; ctx.fill();
-    ctx.restore();
-    // Grill marks — lighter horizontal streaks
-    ctx.save(); ctx.globalAlpha = 0.22; ctx.fillStyle = '#A06040';
-    for (let i = 0; i < 3; i++)
-      ctx.fillRect(x + w * 0.08, y + jag + h * 0.10 + i * h * 0.26, w * 0.84, 2.5);
-    ctx.restore();
-    // Edge stroke
-    ctx.save(); ctx.strokeStyle = '#3D1A04'; ctx.lineWidth = 1.5;
-    bsRR(x, y + jag * 0.4, w, h - jag * 0.4, 4); ctx.stroke();
-    ctx.restore();
-  }
-
-  // ── CHEESE — bright yellow layer with dripping corner triangles ──
-  function drawCheese(x, y, w, h) {
-    ctx.save();
-    ctx.shadowColor = 'rgba(180,140,0,0.42)'; ctx.shadowBlur = 5; ctx.shadowOffsetY = 2;
-    bsRR(x, y, w, h, 3);
-    const grd = ctx.createLinearGradient(0, y, 0, y + h);
-    grd.addColorStop(0, '#FFD84A'); grd.addColorStop(1, '#F5C518');
-    ctx.fillStyle = grd; ctx.fill();
-    ctx.restore();
-    // Dripping cheese triangles at two points
-    [[x + w * 0.18, -3], [x + w * 0.78, 3]].forEach(([dx, tilt]) => {
-      ctx.save();
-      ctx.fillStyle = '#F5C518';
-      ctx.shadowColor = 'rgba(180,140,0,0.32)'; ctx.shadowBlur = 4; ctx.shadowOffsetY = 3;
-      ctx.beginPath();
-      ctx.moveTo(dx - 8, y + h);
-      ctx.lineTo(dx + 8, y + h);
-      ctx.lineTo(dx + tilt, y + h + 11);
-      ctx.closePath(); ctx.fill();
-      ctx.restore();
-    });
-    ctx.save(); ctx.strokeStyle = '#C49A00'; ctx.lineWidth = 1;
-    bsRR(x, y, w, h, 3); ctx.stroke();
-    ctx.restore();
-  }
-
-  // ── LETTUCE — organic wavy green zigzag ribbon ────────────
-  function drawLettuce(x, y, w, h) {
-    const waves = 7;
-    const waveW = w / waves;
-    const amp   = h * 0.55;
-    ctx.save();
-    ctx.shadowColor = 'rgba(0,80,20,0.22)'; ctx.shadowBlur = 5; ctx.shadowOffsetY = 2;
-    ctx.beginPath();
-    ctx.moveTo(x, y + h * 0.68);
-    for (let i = 0; i < waves; i++) {
-      const cpX = x + waveW * i + waveW * 0.5;
-      const cpY = i % 2 === 0 ? y : y + amp;
-      const eX  = x + waveW * (i + 1);
-      ctx.quadraticCurveTo(cpX, cpY, eX, y + h * 0.68);
-    }
-    ctx.lineTo(x + w, y + h);
-    ctx.lineTo(x, y + h);
-    ctx.closePath();
-    const grd = ctx.createLinearGradient(0, y, 0, y + h);
-    grd.addColorStop(0, '#4ADE80'); grd.addColorStop(1, '#22C55E');
-    ctx.fillStyle = grd; ctx.fill();
-    ctx.restore();
-    // Wave top-edge outline
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(x, y + h * 0.68);
-    for (let i = 0; i < waves; i++) {
-      const cpX = x + waveW * i + waveW * 0.5;
-      const cpY = i % 2 === 0 ? y : y + amp;
-      const eX  = x + waveW * (i + 1);
-      ctx.quadraticCurveTo(cpX, cpY, eX, y + h * 0.68);
-    }
-    ctx.strokeStyle = '#15803D'; ctx.lineWidth = 1.5; ctx.stroke();
-    ctx.restore();
-  }
-
-  // ── TOMATO — shiny red slab with specular gleam ───────────
-  function drawTomato(x, y, w, h) {
-    ctx.save();
-    ctx.shadowColor = 'rgba(120,0,0,0.38)'; ctx.shadowBlur = 7; ctx.shadowOffsetY = 3;
-    bsRR(x + 2, y, w - 4, h, 5);
-    const grd = ctx.createLinearGradient(0, y, 0, y + h);
-    grd.addColorStop(0, '#F87171'); grd.addColorStop(0.5, '#EF4444'); grd.addColorStop(1, '#B91C1C');
-    ctx.fillStyle = grd; ctx.fill();
-    ctx.restore();
-    // Specular ellipse gleam
-    ctx.save(); ctx.globalAlpha = 0.40; ctx.fillStyle = '#FFD0D0';
-    ctx.beginPath();
-    ctx.ellipse(x + w * 0.25, y + h * 0.28, w * 0.14, h * 0.18, -0.4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-    // Bright top-edge highlight line
-    ctx.save(); ctx.globalAlpha = 0.52; ctx.strokeStyle = '#FFB0B0'; ctx.lineWidth = 1.8;
-    ctx.beginPath();
-    ctx.moveTo(x + w * 0.12, y + 2.5); ctx.lineTo(x + w * 0.88, y + 2.5); ctx.stroke();
-    ctx.restore();
-    ctx.save(); ctx.strokeStyle = '#B91C1C'; ctx.lineWidth = 1;
-    bsRR(x + 2, y, w - 4, h, 5); ctx.stroke();
-    ctx.restore();
-  }
-
-  // ── BACON — wavy alternating crimson + pink strips ────────
-  function drawBacon(x, y, w, h) {
-    const strips = 4;
-    const stripH = h / strips;
-    ctx.save();
-    ctx.shadowColor = 'rgba(80,0,0,0.38)'; ctx.shadowBlur = 6; ctx.shadowOffsetY = 3;
-    // Clip to piece bounds so waves stay contained
-    bsRR(x, y, w, h, 4); ctx.clip();
-    for (let s = 0; s < strips; s++) {
-      const sy   = y + s * stripH;
-      const dark = s % 2 === 0;
-      const segs = 6;
-      const segW = w / segs;
-      ctx.beginPath();
-      ctx.moveTo(x, sy);
-      for (let i = 0; i < segs; i++) {
-        const mx = x + segW * i + segW * 0.5;
-        const my = sy + (i % 2 === 0 ? -stripH * 0.28 : stripH * 0.28);
-        ctx.quadraticCurveTo(mx, my, x + segW * (i + 1), sy);
-      }
-      ctx.lineTo(x + w, sy + stripH);
-      ctx.lineTo(x, sy + stripH);
-      ctx.closePath();
-      const grd = ctx.createLinearGradient(0, sy, 0, sy + stripH);
-      if (dark) { grd.addColorStop(0,'#9A2510'); grd.addColorStop(1,'#7A1A08'); }
-      else       { grd.addColorStop(0,'#F4A0A0'); grd.addColorStop(1,'#E08080'); }
-      ctx.fillStyle = grd; ctx.fill();
-    }
-    ctx.restore();
-    ctx.save(); ctx.strokeStyle = '#7A1A08'; ctx.lineWidth = 1.5;
-    bsRR(x, y, w, h, 4); ctx.stroke();
-    ctx.restore();
-  }
-
-  // ── ONION — purple rings layer ────────────────────────────
-  function drawOnion(x, y, w, h) {
-    ctx.save();
-    ctx.shadowColor = 'rgba(100,0,150,0.28)'; ctx.shadowBlur = 5; ctx.shadowOffsetY = 2;
-    bsRR(x + 1, y, w - 2, h, 5);
-    const grd = ctx.createLinearGradient(0, y, 0, y + h);
-    grd.addColorStop(0, '#E0AAFF'); grd.addColorStop(1, '#C084FC');
-    ctx.fillStyle = grd; ctx.fill();
-    ctx.restore();
-    // Semi-transparent ring ovals
-    ctx.save(); ctx.globalAlpha = 0.22; ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5;
-    const ringW = w * 0.22, ringH = h * 0.70, offsets = [0.18, 0.42, 0.66];
-    offsets.forEach(ox => {
-      ctx.beginPath();
-      ctx.ellipse(x + w * ox + ringW / 2, y + h * 0.5, ringW * 0.5, ringH * 0.5, 0, 0, Math.PI * 2);
-      ctx.stroke();
-    });
-    ctx.restore();
-    ctx.save(); ctx.strokeStyle = '#9333EA'; ctx.lineWidth = 1;
-    bsRR(x + 1, y, w - 2, h, 5); ctx.stroke();
-    ctx.restore();
-  }
-
-  // ── PICKLE — green slab with characteristic bumps ─────────
-  function drawPickle(x, y, w, h) {
-    ctx.save();
-    ctx.shadowColor = 'rgba(0,100,40,0.28)'; ctx.shadowBlur = 5; ctx.shadowOffsetY = 2;
-    bsRR(x + 2, y, w - 4, h, 5);
-    const grd = ctx.createLinearGradient(0, y, 0, y + h);
-    grd.addColorStop(0, '#6EE79C'); grd.addColorStop(1, '#4ADE80');
-    ctx.fillStyle = grd; ctx.fill();
-    ctx.restore();
-    // Pickle bump dots
-    ctx.save(); ctx.fillStyle = '#15803D'; ctx.globalAlpha = 0.48;
-    const bumpCount = Math.max(2, Math.floor(w / 22));
-    for (let i = 0; i < bumpCount; i++) {
-      ctx.beginPath();
-      ctx.arc(x + 12 + i * ((w - 16) / Math.max(1, bumpCount - 1)), y + h * 0.50, 3.2, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.restore();
-    ctx.save(); ctx.strokeStyle = '#16A34A'; ctx.lineWidth = 1;
-    bsRR(x + 2, y, w - 4, h, 5); ctx.stroke();
-    ctx.restore();
-  }
-
-  // ── Dispatcher: routes to the correct vector function ─────
-  function drawIngredient(piece) {
-    const { x, y, w, type, label, fill, stroke } = piece;
-    const h = piece.h != null ? piece.h : PIECE_H;
-    if (w < 1) return;
-    switch (type) {
-      case 'bun_top': drawBunTop(x, y, w, h);    break;
-      case 'bun_bot': drawBunBottom(x, y, w, h); break;
-      case 'patty':   drawPatty(x, y, w, h);     break;
-      case 'cheese':  drawCheese(x, y, w, h);    break;
-      case 'lettuce': drawLettuce(x, y, w, h);   break;
-      case 'tomato':  drawTomato(x, y, w, h);    break;
-      case 'bacon':   drawBacon(x, y, w, h);     break;
-      case 'onion':   drawOnion(x, y, w, h);     break;
-      case 'pickle':  drawPickle(x, y, w, h);    break;
-      default:
-        // Fallback generic pill
-        ctx.save();
-        ctx.shadowColor = 'rgba(11,53,80,0.22)'; ctx.shadowBlur = 7; ctx.shadowOffsetY = 3;
-        bsRR(x, y, w, h, Math.min(8, h / 2, w / 2));
-        ctx.fillStyle = fill || '#888'; ctx.fill();
-        ctx.restore();
-        ctx.strokeStyle = stroke || '#555'; ctx.lineWidth = 1.5;
-        bsRR(x, y, w, h, Math.min(8, h / 2, w / 2)); ctx.stroke();
-    }
-    drawLabel(x, y, w, h, label);
-  }
-
-  // ── Frame drawing ─────────────────────────────────────────
-  function drawFrame() {
-    ctx.clearRect(0, 0, W, H);
-
-    // Sky gradient background
-    const bg = ctx.createLinearGradient(0, 0, 0, H);
-    bg.addColorStop(0, '#7ec4e6'); bg.addColorStop(1, '#c4e3f5');
-    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-
-    // Subtle depth grid
-    ctx.strokeStyle = 'rgba(255,255,255,0.10)'; ctx.lineWidth = 1;
-    for (let gx = 0; gx < W; gx += 40) {
-      ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke();
-    }
-
-    // ── Camera transform — everything inside scrolls with the tower ──
-    ctx.save();
-    ctx.translate(0, cameraY);
-
-    stack.forEach(p => drawIngredient(p));
-
-    falling.forEach(f => {
-      ctx.save(); ctx.globalAlpha = 0.58;
-      drawIngredient({ ...f, label: '' });
-      ctx.restore();
-    });
-
-    if (cur && state === 'playing') {
-      const top  = stack[stack.length - 1];
-      const curY = top.y - PIECE_H - 18;
-      // Landing shadow — shows where piece will land at its current X
-      ctx.save();
-      ctx.globalAlpha = 0.22;
-      ctx.fillStyle = cur.fill;
-      bsRR(cur.x, top.y - PIECE_H - 2, cur.w, PIECE_H, 5); ctx.fill();
-      ctx.restore();
-
-      drawIngredient({ ...cur, y: curY, h: PIECE_H });
-
-      // Ghost guide line
-      ctx.save();
-      ctx.setLineDash([3, 5]);
-      ctx.strokeStyle = 'rgba(255,255,255,0.22)'; ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(cur.x + cur.w / 2, curY + PIECE_H);
-      ctx.lineTo(cur.x + cur.w / 2, top.y);
-      ctx.stroke();
-      ctx.setLineDash([]); ctx.restore();
-    }
-
-    // Animated top bun — falls in on game over
-    if (endBun) {
-      drawIngredient({ x: endBun.x, y: endBun.y, w: endBun.w, h: PIECE_H, ...BUN_TOP });
-    }
-
-    // Perfect-drop flash message — floats up from the stack
-    if (flashMsg && flashMsg.alpha > 0) {
-      ctx.save();
-      ctx.globalAlpha = Math.min(1, flashMsg.alpha);
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.font = "700 13px 'Russo One', sans-serif";
-      ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 6;
-      ctx.fillStyle = '#FFD700';
-      ctx.fillText(flashMsg.text, W / 2, flashMsg.worldY);
-      ctx.restore();
-    }
-
-    // Particle burst sparks (world-space, inside camera transform)
-    particles.forEach(p => {
-      ctx.save();
-      ctx.globalAlpha = Math.max(0, p.alpha);
-      ctx.fillStyle = p.color;
-      ctx.shadowColor = p.color; ctx.shadowBlur = 6;
-      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
-    });
-
-    ctx.restore(); // ── end camera ──
-
-    // ── HUD — fixed over canvas, unaffected by camera ─────────
-    ctx.save();
-
-    // Score pill — scales when score pops
-    const pillCX = 67, pillCY = 27;
-    ctx.save();
-    ctx.translate(pillCX, pillCY);
-    ctx.scale(scoreScale, scoreScale);
-    ctx.translate(-pillCX, -pillCY);
-    ctx.fillStyle = 'rgba(11,53,80,0.55)';
-    bsRR(10, 10, 115, 34, 10); ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.font = "700 18px 'Russo One', sans-serif";
-    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-    ctx.shadowColor = 'rgba(0,0,0,0.4)'; ctx.shadowBlur = 3;
-    ctx.fillText('🍔  ' + score, 20, 33);
-    ctx.shadowBlur = 0;
-    ctx.restore();
-
-    // Speed label
-    ctx.fillStyle = 'rgba(255,255,255,0.55)';
-    ctx.font = "600 8px 'Outfit', sans-serif";
-    ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
-    ctx.fillText('SPEED', W - 10, 16);
-
-    // Speed dots — green (0-3), yellow (4-6), red (7-9)
-    const dots = Math.min(Math.floor((speed - 2.5) / 0.35) + 1, 10);
-    for (let i = 0; i < 10; i++) {
-      let litColor;
-      if (i <= 3)      litColor = '#22c55e';
-      else if (i <= 6) litColor = '#fbbf24';
-      else             litColor = '#ef4444';
-      ctx.fillStyle = i < dots ? litColor : 'rgba(255,255,255,0.18)';
-      ctx.beginPath(); ctx.arc(W - 14 - (9 - i) * 13, 27, 4.5, 0, Math.PI * 2); ctx.fill();
-    }
-
-    // Next piece preview (only during play)
-    if (state === 'playing' && cur) {
-      const nextLayer = TOPPINGS[layerIdx % TOPPINGS.length];
-      ctx.fillStyle = 'rgba(11,53,80,0.50)';
-      bsRR(10, 52, 100, 28, 8); ctx.fill();
-      ctx.fillStyle = 'rgba(255,255,255,0.48)';
-      ctx.font = "600 7px 'Outfit', sans-serif";
-      ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-      ctx.fillText('NEXT', 16, 63);
-      // colour swatch
-      ctx.fillStyle = nextLayer.fill;
-      bsRR(48, 57, 56, 17, 4); ctx.fill();
-      ctx.strokeStyle = nextLayer.stroke; ctx.lineWidth = 1;
-      bsRR(48, 57, 56, 17, 4); ctx.stroke();
-      ctx.fillStyle = '#fff';
-      ctx.font = "700 8px 'Outfit', sans-serif";
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 2;
-      ctx.fillText(nextLayer.label, 76, 65.5);
-      ctx.shadowBlur = 0;
-    }
-
-    // Streak counter badge — visible when perfectStreak >= 2
-    if (perfectStreak >= 2) {
-      const sEmoji = perfectStreak >= 5 ? '🔥' : perfectStreak >= 3 ? '⚡' : '✨';
-      ctx.fillStyle = perfectStreak >= 3 ? 'rgba(200,80,0,0.72)' : 'rgba(80,130,210,0.68)';
-      bsRR(10, 88, 100, 20, 8); ctx.fill();
-      ctx.fillStyle = '#fff';
-      ctx.font = "700 9px 'Russo One', sans-serif";
-      ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-      ctx.shadowColor = 'rgba(0,0,0,0.50)'; ctx.shadowBlur = 3;
-      ctx.fillText(`${sEmoji} ×${perfectStreak} STREAK`, 17, 98);
-      ctx.shadowBlur = 0;
-    }
-
-    ctx.restore();
-  }
-
-  // ── Idle title screen ─────────────────────────────────────
-  function drawIdle(bobOffset) {
-    if (!ctx) return;
-    const bob = bobOffset || 0;
-    ctx.clearRect(0, 0, W, H);
-    const bg = ctx.createLinearGradient(0, 0, 0, H);
-    bg.addColorStop(0, '#7ec4e6'); bg.addColorStop(1, '#c4e3f5');
-    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-
-    const demoStack = [
-      { type:'bun_bot', label:'Bottom Bun', fill:'#D4956A', stroke:'#A06030' },
-      { type:'patty',   label:'Patty',      fill:'#5C2E0A', stroke:'#3D1A04' },
-      { type:'cheese',  label:'Cheese',     fill:'#F5C518', stroke:'#C49A00' },
-      { type:'lettuce', label:'Lettuce',    fill:'#22C55E', stroke:'#15803D' },
-      { type:'tomato',  label:'Tomato',     fill:'#EF4444', stroke:'#B91C1C' },
-    ];
-    const cx = W / 2;
-    demoStack.forEach((layer, i) => {
-      const bw = 164 - i * 4;
-      const by = H * 0.76 - i * (PIECE_H + 3);
-      drawIngredient({ x: cx - bw / 2, y: by, w: bw, h: PIECE_H, ...layer });
-    });
-    // Top bun bobs gently up and down
-    const topIdx = demoStack.length;
-    const bw = 164 - topIdx * 4;
-    const baseY = H * 0.76 - topIdx * (PIECE_H + 3);
-    drawIngredient({ x: cx - bw / 2, y: baseY + bob, w: bw, h: PIECE_H, ...BUN_TOP });
-  }
-
-  function idleLoop() {
-    if (state !== 'idle') { idleRaf = null; return; }
-    idleT++;
-    const bob = Math.sin(idleT * 0.045) * 5;
-    drawIdle(bob);
-    idleRaf = requestAnimationFrame(idleLoop);
-  }
-
-  // ── Overlay ───────────────────────────────────────────────
-  function showOverlay(isGameOver) {
-    const ov      = $id('bs-overlay');
-    const res     = $id('bs-result');
-    const playBtn = $id('bs-play-btn');
-    const againBtn= $id('bs-again-btn');
-    const scoreEl = $id('bs-result-score');
-    const msgEl   = $id('bs-result-msg');
-    if (!ov) return;
-    ov.style.display = 'flex';
-    if (isGameOver) {
-      if (res)     res.style.display    = 'flex';
-      if (scoreEl) scoreEl.textContent  = score;
-      if (playBtn) playBtn.style.display = 'none';
-      if (againBtn)againBtn.style.display= '';
-      if (msgEl) {
-        if (score > bsTopScore)                   { msgEl.textContent = '🏆 NEW ROOM RECORD!'; saveBsTop(myName || 'Player', score); }
-        else if (score === bsTopScore && score > 0){ msgEl.textContent = '🤝 Tied the record!'; }
-        else if (bsTopScore > 0)                   { msgEl.textContent = 'Room record: ' + bsTopName + ' — ' + bsTopScore; }
-        else                                        { msgEl.textContent = 'Nice try! Keep stacking.'; }
-      }
-    } else {
-      if (res)     res.style.display    = 'none';
-      if (playBtn) playBtn.style.display = '';
-      if (againBtn)againBtn.style.display= 'none';
-    }
-  }
-
-  function hideOverlay() {
-    const ov = $id('bs-overlay'); if (ov) ov.style.display = 'none';
-  }
-
-  function startGame() {
-    hideOverlay();
-    if (idleRaf) { cancelAnimationFrame(idleRaf); idleRaf = null; }
-    state = 'playing'; resetGame();
-    if (raf) cancelAnimationFrame(raf);
-    raf = requestAnimationFrame(loop);
-  }
-
-  // ── Input ─────────────────────────────────────────────────
-  function onCanvasTap(e) { e.preventDefault(); if (state === 'playing') drop(); }
-  function onSpaceKey(e)  {
-    if (e.code === 'Space' && !spaceDown) { e.preventDefault(); spaceDown = true; if (state === 'playing') drop(); }
-  }
-  function onSpaceUp(e) { if (e.code === 'Space') spaceDown = false; }
-
-  // ── Public API ────────────────────────────────────────────
-  window.initBurgerStack = function() {
-    if (!canvas) {
-      if (!setupCanvas()) return;
-      $id('bs-play-btn')?.addEventListener('click', startGame);
-      $id('bs-again-btn')?.addEventListener('click', startGame);
-      canvas.addEventListener('pointerdown', onCanvasTap);
-      document.addEventListener('keydown', onSpaceKey);
-      document.addEventListener('keyup',   onSpaceUp);
-    }
-    loadBsTop();
-    if (state !== 'playing') {
-      state = 'idle'; idleT = 0;
-      drawIdle(0); showOverlay(false);
-      if (!idleRaf) idleRaf = requestAnimationFrame(idleLoop);
-    }
-  };
-
-  window.pauseBurgerStack = function() {
-    if (raf) { cancelAnimationFrame(raf); raf = null; }
-    if (idleRaf) { cancelAnimationFrame(idleRaf); idleRaf = null; }
-    if (state === 'playing') state = 'paused';
-  };
-})();
 
 
 
@@ -9479,7 +8490,7 @@ function renderTopRated() {
   });
 
   if (!entries.length) {
-    el.innerHTML = `<div class="grill-feed-empty"><span class="gfe-icon">⭐</span><div class="gfe-title">NO RATINGS YET</div>Log a burger and rate it to see rankings!</div>`;
+    el.innerHTML = `<div class="grill-feed-empty"><span class="gfe-icon"><i class="ti ti-star"></i></span><div class="gfe-title">NO RATINGS YET</div>Log a burger and rate it to see rankings!</div>`;
     return;
   }
 
@@ -9495,9 +8506,9 @@ function renderTopRated() {
     const dateStr = d ? `${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)}` : '';
     let stars = '';
     for (let s = 1; s <= 5; s++) {
-      if (item.rating >= s)          stars += '⭐';
-      else if (item.rating >= s-0.5) stars += '<span style="font-size:13px">✨</span>';
-      else                           stars += '<span style="opacity:0.15;font-size:13px">⭐</span>';
+      if (item.rating >= s)          stars += starIcon(true);
+      else if (item.rating >= s-0.5) stars += starIcon(true);
+      else                           stars += starIcon(false, 0.15);
     }
     return `<div class="tr-item">
       <div class="tr-card" style="animation-delay:${Math.min(i*0.04,0.5)}s" onclick="toggleTrDrawer(${i})">
