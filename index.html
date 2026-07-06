@@ -141,7 +141,7 @@ header{padding:calc(22px + env(safe-area-inset-top)) 0 16px;display:flex;flex-di
 h1{font-family:'Russo One',sans-serif;font-size:clamp(20px,5.5vw,36px);font-weight:900;letter-spacing:0;line-height:1;color:var(--text)}
 .room-pill{font-size:11px;font-weight:500;color:var(--muted2);background:rgba(30,110,170,0.08);border:1px solid var(--border);padding:4px 14px;border-radius:999px;letter-spacing:0.04em}
 .room-pill span{color:var(--text);font-weight:700}
-.tabs{display:flex;gap:2px;background:rgba(255,255,255,0.58);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid rgba(255,255,255,0.82);border-radius:var(--radius);padding:4px;margin-bottom:20px;box-shadow:0 2px 16px rgba(30,100,160,0.14),inset 0 1px 0 rgba(255,255,255,0.90)}
+.tabs{display:flex;gap:2px;background:rgba(255,255,255,0.58);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid rgba(255,255,255,0.82);border-radius:var(--radius);padding:4px 4px 11px;margin-bottom:20px;box-shadow:0 2px 16px rgba(30,100,160,0.14),inset 0 1px 0 rgba(255,255,255,0.90)}
 .tab-btn{flex:1;padding:7px 4px;border:none;background:transparent;color:var(--muted2);font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;border-radius:calc(var(--radius) - 5px);cursor:pointer;transition:all 0.2s;letter-spacing:0.01em;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
 .tab-emoji{font-size:18px;line-height:1}
 .tab-label{font-size:10px;font-weight:500;line-height:1}
@@ -312,7 +312,7 @@ h1{font-family:'Russo One',sans-serif;font-size:clamp(20px,5.5vw,36px);font-weig
 .tab-btn.tab-feed    { color: #2563eb !important; }
 .tab-btn.tab-map     { color: #16a34a !important; }
 .tab-btn.tab-badges  { color: #f97316 !important; }
-.tab-btn.tab-pace    { color: #16a34a !important; }
+.tab-btn.tab-pace    { color: #eab308 !important; }
 .tab-btn.tab-receipt { color: #111111 !important; }
 
 /* ── 4. Bottom nav "you are here" dot ───────────────────────────────────────
@@ -321,7 +321,7 @@ h1{font-family:'Russo One',sans-serif;font-size:clamp(20px,5.5vw,36px);font-weig
 .tab-btn.active::after {
   content: '';
   position: absolute;
-  bottom: -6px;
+  bottom: -9px;
   left: 50%;
   transform: translateX(-50%);
   width: 5px;
@@ -592,7 +592,7 @@ button:active{transform:scale(0.97)}
 .feed-no-photo-header{display:flex;align-items:center;gap:11px;padding:14px 16px 12px;background:linear-gradient(135deg,rgba(180,83,9,0.07),rgba(245,158,11,0.13));border-bottom:1px solid rgba(245,158,11,0.16)}
 .fnph-icon{font-size:26px;line-height:1;flex-shrink:0}
 .fnph-logo{width:30px;height:30px;border-radius:8px;object-fit:contain;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.15);flex-shrink:0}
-.fpc-restaurant-logo{width:13px;height:13px;border-radius:4px;object-fit:contain;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.3);vertical-align:-2px;margin-right:3px}
+.fpc-restaurant-logo{width:10px;height:10px;border-radius:3px;object-fit:contain;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,0.3);vertical-align:-1px;margin-right:2px}
 .fnph-info{flex:1;min-width:0}
 .fnph-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.02em;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fnph-sub{font-size:10px;color:var(--muted2);margin-top:1px}
