@@ -208,23 +208,6 @@ h1{font-family:'Bungee',sans-serif;font-size:clamp(20px,5.5vw,36px);font-weight:
 .tr-card{transition:transform 0.18s ease,box-shadow 0.18s ease}
 .tr-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-card),0 6px 20px rgba(0,0,0,0.25)}
 
-/* ── Live activity pulse ──────────────────────────────────────────────── */
-@keyframes burgerPulse{
-  0%{box-shadow:var(--shadow-card)}
-  30%{box-shadow:var(--shadow-card),0 0 0 3px rgba(245,158,11,0.35),0 0 18px rgba(245,158,11,0.22)}
-  100%{box-shadow:var(--shadow-card)}
-}
-.pl-row.just-logged{animation:burgerPulse 1.1s ease forwards}
-
-/* ── Rank number flip ─────────────────────────────────────────────────── */
-@keyframes rankFlip{
-  0%{opacity:1;transform:translateY(0) rotateX(0deg)}
-  40%{opacity:0;transform:translateY(-8px) rotateX(60deg)}
-  60%{opacity:0;transform:translateY(8px) rotateX(-60deg)}
-  100%{opacity:1;transform:translateY(0) rotateX(0deg)}
-}
-.pl-rank.rank-changed{animation:rankFlip 0.45s ease both;perspective:200px}
-
 /* ── Empty states ─────────────────────────────────────────────────────── */
 .empty-state{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -1546,58 +1529,37 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
    🏆 PLAYER RANKS — Rich List
    ══════════════════════════════════════════════ */
 .pl-list { display: flex; flex-direction: column; gap: 8px; padding: 4px 0 24px; }
-.pl-row {
-  display: flex; align-items: center; gap: 10px;
-  background: var(--surface);
-  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 12px 14px;
-  box-shadow: var(--shadow-card);
-  transition: border-color 0.2s, transform 0.15s;
-  position: relative; overflow: hidden;
-}
-.pl-row::before { content:''; position:absolute; top:0; left:0; right:0; height:1.5px; background:linear-gradient(90deg,transparent,rgba(245,158,11,0.15),transparent); }
-.pl-row:active { transform: scale(0.99); }
-.pl-row.pl-gold { border-color: rgba(245,158,11,0.45); background: rgba(245,158,11,0.05); }
-.pl-row.pl-gold::before { background: linear-gradient(90deg,transparent,rgba(245,158,11,0.5),transparent); }
-.pl-row.pl-silver { border-color: rgba(192,192,192,0.3); }
-.pl-row.pl-bronze { border-color: rgba(180,83,9,0.3); }
-.pl-rank { font-family:'Bungee',sans-serif; font-size:14px; font-weight:900; color:var(--text); width:28px; text-align:center; flex-shrink:0; line-height:1; }
-.pl-avatar { width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; font-family:'Poppins',sans-serif; flex-shrink:0; }
-.pl-info { flex:1; min-width:0; }
-.pl-name { font-size:15px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:6px; }
-.pl-pills { display:flex; gap:5px; margin-top:4px; flex-wrap:nowrap; overflow:hidden; }
-.pl-pill { font-size:10px; color:var(--muted2); background:rgba(30,110,170,0.07); border:1px solid rgba(30,110,170,0.10); border-radius:5px; padding:1px 6px; white-space:nowrap; flex-shrink:0; }
-.pl-bar-track { height:3px; background:rgba(30,110,170,0.10); border-radius:99px; overflow:hidden; margin-top:5px; }
-.pl-bar-fill { height:3px; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); }
-.pl-count { font-family:'Bungee',sans-serif; font-size:24px; font-weight:400; line-height:1; letter-spacing:0; flex-shrink:0; }
-.pl-count-lbl { font-size:8px; color:var(--muted2); text-transform:uppercase; letter-spacing:0.08em; font-weight:600; text-align:right; margin-top:2px; }
-
 /* ══════════════════════════════════════════════
    📋 RANKS LIST — Clean player leaderboard
    ══════════════════════════════════════════════ */
 
 .rank-list {
+  display:flex; flex-direction:column; gap:8px;
+}
+.rank-row {
+  display:flex; align-items:center; gap:12px;
+  padding:12px 16px;
+  cursor:pointer;
   background:rgba(255,255,255,0.55);
   backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
   border:1px solid var(--border);
-  border-radius:var(--radius);
+  border-radius:14px;
   box-shadow:var(--shadow-card);
-  overflow:hidden;
+  transition:background 0.15s, transform 0.15s, border-color 0.2s;
 }
-.rank-row {
-  display:flex; align-items:center; gap:14px;
-  padding:13px 18px;
-  cursor:pointer;
-  transition:background 0.15s;
-}
-.rank-row:not(:last-child) { border-bottom:1px solid rgba(255,255,255,0.55); }
-.rank-row:active { background:rgba(255,255,255,0.35); }
+.rank-row:active { transform:scale(0.99); background:rgba(255,255,255,0.35); }
+.rank-row.rank-gold { border-color:rgba(245,158,11,0.45); background:rgba(245,158,11,0.06); }
+.rank-row.rank-silver { border-color:rgba(148,163,184,0.5); background:rgba(148,163,184,0.08); }
+.rank-row.rank-bronze { border-color:rgba(180,83,9,0.4); background:rgba(180,83,9,0.06); }
 .rank-num {
-  font-family:'Poppins',sans-serif; font-size:13px; font-weight:500;
-  color:var(--muted); width:24px; text-align:center; flex-shrink:0;
+  font-family:'Bungee',sans-serif; font-size:12px; font-weight:400;
+  color:var(--muted); width:24px; height:24px; text-align:center; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:50%; line-height:1;
 }
+.rank-row.rank-gold .rank-num { background:#F59E0B; color:#fff; }
+.rank-row.rank-silver .rank-num { background:#94A3B8; color:#fff; }
+.rank-row.rank-bronze .rank-num { background:#B45309; color:#fff; }
 .rank-avatar {
   width:40px; height:40px; border-radius:50%;
   display:flex; align-items:center; justify-content:center;
@@ -1605,12 +1567,22 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
   color:white; flex-shrink:0; overflow:hidden;
 }
 .rank-avatar img { width:100%; height:100%; object-fit:cover; object-position:center top; }
+.rank-info { flex:1; min-width:0; }
 .rank-name {
-  flex:1; font-family:'Poppins',sans-serif; font-size:15px; font-weight:500;
+  font-family:'Poppins',sans-serif; font-size:15px; font-weight:500;
   color:var(--text); min-width:0;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  display:flex; align-items:center; gap:6px;
 }
+.rank-gauge-track {
+  position:relative; height:3px; border-radius:99px; overflow:hidden; margin-top:6px;
+  background:linear-gradient(90deg,#ef4444 0%,#f59e0b 40%,#eab308 55%,#22c55e 100%);
+}
+.rank-gauge-mask {
+  position:absolute; top:0; bottom:0; left:0%; right:0;
+  background:rgba(226,232,240,0.95);
+  transition:left 0.6s cubic-bezier(0.34,1.56,0.64,1);
+}
+.rank-badges { display:flex; gap:5px; margin-top:5px; flex-wrap:nowrap; overflow:hidden; }
 .rank-count {
   font-family:'Bungee',sans-serif; font-size:26px;
   flex-shrink:0; line-height:1;
@@ -2034,12 +2006,11 @@ body.july4-bg .tab-btn.active { background: rgba(178,34,52,0.75) !important; col
 body.july4-bg .room-pill { background: rgba(255,255,255,0.08) !important; border-color: rgba(255,255,255,0.14) !important; color: #e8f4fd !important; }
 body.july4-bg .live-dot-wrap { background: rgba(255,255,255,0.08) !important; border-color: rgba(255,255,255,0.14) !important; color: #e8f4fd !important; }
 /* Player leaderboard rows — match restaurant dark treatment */
-body.july4-bg .rank-list { background: rgba(10,22,40,0.72) !important; border-color: rgba(255,255,255,0.10) !important; box-shadow: 0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06) !important; }
-body.july4-bg .rank-row { background: transparent !important; }
-body.july4-bg .rank-row:not(:last-child) { border-bottom-color: rgba(255,255,255,0.07) !important; }
+body.july4-bg .rank-row { background: rgba(10,22,40,0.72) !important; border-color: rgba(255,255,255,0.10) !important; box-shadow: 0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06) !important; }
 body.july4-bg .rank-row:active { background: rgba(255,255,255,0.06) !important; }
 body.july4-bg .rank-name { color: #e8f4fd !important; }
 body.july4-bg .rank-num { color: rgba(232,244,253,0.35) !important; }
+body.july4-bg .rank-gauge-mask { background: rgba(10,22,40,0.85) !important; }
 /* Restaurant cards */
 body.july4-bg .resto-card { background: rgba(10,22,40,0.72) !important; border-color: rgba(255,255,255,0.10) !important; }
 body.july4-bg .ranks-sub-tab { background: rgba(255,255,255,0.07) !important; border-color: rgba(255,255,255,0.10) !important; color: rgba(232,244,253,0.55) !important; }
@@ -7475,17 +7446,24 @@ function renderBentoList() {
     const isMe = p.id === myPlayerId;
     const done = p.count >= 100;
     const isTied = countFreq[p.count] > 1;
-    const rankLabel = dr === 1 ? '🥇' : dr === 2 ? '🥈' : dr === 3 ? '🥉' : dr;
+    const medalClass = dr === 1 ? ' rank-gold' : dr === 2 ? ' rank-silver' : dr === 3 ? ' rank-bronze' : '';
+    const pct = Math.min(100, p.count);
     const meBadge = isMe ? `<span class="jw-me-badge">You</span>` : '';
-    const doneBadge = done ? `<span class="done-badge">✓</span>` : '';
+    const doneBadge = done ? `<span class="done-badge">✓ Done</span>` : '';
     const tieBadge = isTied ? `<span class="jw-tie-badge">TIE</span>` : '';
+    const badgesHtml = (meBadge || doneBadge || tieBadge)
+      ? `<div class="rank-badges">${meBadge}${doneBadge}${tieBadge}</div>` : '';
     const avatarInner = p.avatar
       ? `<img src="${escHtml(p.avatar)}" alt="${escHtml(p.name)}">`
       : escHtml((p.name || '?').slice(0, 2).toUpperCase());
-    return `<div class="rank-row" data-pid="${escHtml(p.id)}" onclick="openCalModal('${escHtml(p.id)}')" title="View ${escHtml(p.name)}'s burger history">
-      <div class="rank-num">${rankLabel}</div>
+    return `<div class="rank-row${medalClass}" data-pid="${escHtml(p.id)}" onclick="openCalModal('${escHtml(p.id)}')" title="View ${escHtml(p.name)}'s burger history">
+      <div class="rank-num">${dr}</div>
       <div class="rank-avatar" style="background:${c};">${avatarInner}</div>
-      <div class="rank-name">${escHtml(p.name)}${meBadge}${doneBadge}${tieBadge}</div>
+      <div class="rank-info">
+        <div class="rank-name">${escHtml(p.name)}</div>
+        <div class="rank-gauge-track"><div class="rank-gauge-mask" style="left:${pct}%"></div></div>
+        ${badgesHtml}
+      </div>
       <div class="rank-count" style="color:${c};">${p.count}</div>
     </div>`;
   }).join('');
