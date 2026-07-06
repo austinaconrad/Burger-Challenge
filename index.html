@@ -10,7 +10,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>🍔 100 Burger Challenge</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Russo+One&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Bungee&family=Press+Start+2P&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -49,7 +49,7 @@
 [class*="tally-name"],[class*="bg-name"],[class*="hl-name"],[class*="lb-count"],
 .grill-banner-name,.setup-card h2{letter-spacing:-0.03em}
 html{background:#7ec3e8}
-body{background:linear-gradient(175deg,#7ec3e8 0%,#a8d4ed 30%,#c2e3f4 65%,#d8eefd 100%);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden}
+body{background:linear-gradient(175deg,#7ec3e8 0%,#a8d4ed 30%,#c2e3f4 65%,#d8eefd 100%);color:var(--text);font-family:'Poppins',sans-serif;min-height:100vh;overflow-x:hidden}
 /* ── Cloud blobs — soft white radial glows float in the sky ── */
 body::before{content:'';position:fixed;top:calc(-1 * env(safe-area-inset-top, 0px));left:0;right:0;bottom:0;z-index:0;background:
   radial-gradient(ellipse 40% 16% at 12% 12%, rgba(255,255,255,0.70) 0%,transparent 70%),
@@ -77,28 +77,28 @@ body::after{
 @keyframes burgerPop{0%{transform:scale(1)}30%{transform:scale(1.35) rotate(8deg)}55%{transform:scale(0.88) rotate(-5deg)}75%{transform:scale(1.12) rotate(3deg)}100%{transform:scale(1) rotate(0deg)}}
 .burger-deco.egg-pop{animation:burgerPop 0.35s cubic-bezier(0.34,1.56,0.64,1) both!important}
 #setup-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px;text-align:center;gap:0;position:relative;z-index:1}
-#setup-screen h1{font-family:'Russo One',sans-serif;font-size:clamp(24px,7vw,44px);font-weight:900;letter-spacing:0;line-height:1;color:var(--text);margin-bottom:8px}
+#setup-screen h1{font-family:'Bungee',sans-serif;font-size:clamp(24px,7vw,44px);font-weight:900;letter-spacing:0;line-height:1;color:var(--text);margin-bottom:8px}
 #setup-screen .subtitle{font-size:14px;color:var(--muted2);margin-bottom:32px;font-weight:400}
 .setup-card{background:var(--surface);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius);padding:28px;width:100%;max-width:440px;text-align:left;box-shadow:var(--shadow-card)}
-.setup-card h2{font-family:'Russo One',sans-serif;font-size:14px;color:var(--amber);margin-bottom:6px;font-weight:700}
+.setup-card h2{font-family:'Bungee',sans-serif;font-size:14px;color:var(--amber);margin-bottom:6px;font-weight:700}
 .setup-card p{font-size:13px;color:var(--muted2);margin-bottom:20px;line-height:1.6}
 .setup-card label{font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:6px;margin-top:16px;font-weight:500}
 .setup-card label:first-of-type{margin-top:0}
-.setup-card input{width:100%;background:rgba(255,255,255,0.45);border:1px solid rgba(30,110,170,0.15);border-radius:var(--radius-xs);color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;padding:11px 14px;outline:none;transition:border-color 0.2s,box-shadow 0.2s}
+.setup-card input{width:100%;background:rgba(255,255,255,0.45);border:1px solid rgba(30,110,170,0.15);border-radius:var(--radius-xs);color:var(--text);font-family:'Poppins',sans-serif;font-size:15px;padding:11px 14px;outline:none;transition:border-color 0.2s,box-shadow 0.2s}
 .setup-card input:focus{border-color:var(--sky-light);box-shadow:0 0 0 3px rgba(59,170,226,0.15)}
 .setup-card input::placeholder{color:var(--muted)}
 .setup-card .btn-row{display:flex;gap:8px;margin-top:20px}
-.btn-primary{flex:1;background:linear-gradient(135deg,var(--amber) 0%,var(--amber-dark) 100%);color:#fff;border:none;border-radius:var(--radius-xs);font-family:'Russo One',sans-serif;font-size:15px;font-weight:700;padding:12px 20px;cursor:pointer;transition:opacity 0.15s,transform 0.1s;box-shadow:0 4px 12px rgba(217,119,6,0.3)}
+.btn-primary{flex:1;background:linear-gradient(135deg,var(--amber) 0%,var(--amber-dark) 100%);color:#fff;border:none;border-radius:var(--radius-xs);font-family:'Bungee',sans-serif;font-size:15px;font-weight:700;padding:12px 20px;cursor:pointer;transition:opacity 0.15s,transform 0.1s;box-shadow:0 4px 12px rgba(217,119,6,0.3)}
 .btn-primary:hover{opacity:0.92;transform:translateY(-1px)}
 .btn-primary:active{transform:scale(0.97)}
 .btn-primary:disabled{opacity:0.35;cursor:not-allowed;transform:none}
-.btn-secondary{flex:1;background:var(--surface2);color:var(--muted2);border:1px solid var(--border2);border-radius:var(--radius-xs);font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;padding:12px 20px;cursor:pointer;transition:border-color 0.15s,color 0.15s}
+.btn-secondary{flex:1;background:var(--surface2);color:var(--muted2);border:1px solid var(--border2);border-radius:var(--radius-xs);font-family:'Poppins',sans-serif;font-size:14px;font-weight:500;padding:12px 20px;cursor:pointer;transition:border-color 0.15s,color 0.15s}
 .btn-secondary:hover{border-color:var(--border3);color:var(--text)}
 .divider{display:flex;align-items:center;gap:12px;margin:28px 0;color:var(--muted2);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border2)}
 /* ── Receipt tab ── */
 .rcpt-toggle{display:flex;gap:6px;margin:4px 0 14px}
-.rcpt-toggle-btn{flex:1;text-align:center;font-size:13px;font-weight:600;font-family:'Outfit',sans-serif;background:var(--surface3);color:var(--text);border:1px solid var(--border2);border-radius:999px;padding:9px 0;cursor:pointer;transition:background 0.15s,color 0.15s,border-color 0.15s}
+.rcpt-toggle-btn{flex:1;text-align:center;font-size:13px;font-weight:600;font-family:'Poppins',sans-serif;background:var(--surface3);color:var(--text);border:1px solid var(--border2);border-radius:999px;padding:9px 0;cursor:pointer;transition:background 0.15s,color 0.15s,border-color 0.15s}
 .rcpt-toggle-btn.active{background:var(--sky);color:#fff;border-color:var(--sky);font-weight:700}
 .rcpt-card{background:#F7F2E8;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(30,100,160,0.18)}
 .rcpt-line-section{padding:12px 24px 4px}
@@ -136,13 +136,13 @@ body::after{
 .offline-dot{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--muted2);background:rgba(255,255,255,0.03);border:1px solid var(--border);padding:3px 10px;border-radius:999px}
 header{padding:calc(22px + env(safe-area-inset-top)) 0 16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
 .header-top{display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:4px}
-.leave-btn{background:none;border:1px solid var(--border);color:var(--muted2);font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;padding:5px 12px;border-radius:999px;cursor:pointer;transition:border-color 0.2s,color 0.2s}
+.leave-btn{background:none;border:1px solid var(--border);color:var(--muted2);font-family:'Poppins',sans-serif;font-size:11px;font-weight:500;padding:5px 12px;border-radius:999px;cursor:pointer;transition:border-color 0.2s,color 0.2s}
 .leave-btn:hover{border-color:var(--border3);color:var(--text)}
-h1{font-family:'Russo One',sans-serif;font-size:clamp(20px,5.5vw,36px);font-weight:900;letter-spacing:0;line-height:1;color:var(--text)}
+h1{font-family:'Bungee',sans-serif;font-size:clamp(20px,5.5vw,36px);font-weight:900;letter-spacing:0;line-height:1;color:var(--text)}
 .room-pill{font-size:11px;font-weight:500;color:var(--muted2);background:rgba(30,110,170,0.08);border:1px solid var(--border);padding:4px 14px;border-radius:999px;letter-spacing:0.04em}
 .room-pill span{color:var(--text);font-weight:700}
 .tabs{display:flex;gap:2px;background:rgba(255,255,255,0.58);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid rgba(255,255,255,0.82);border-radius:var(--radius);padding:4px 4px 11px;margin-bottom:20px;box-shadow:0 2px 16px rgba(30,100,160,0.14),inset 0 1px 0 rgba(255,255,255,0.90)}
-.tab-btn{flex:1;padding:7px 4px;border:none;background:transparent;color:var(--muted2);font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;border-radius:calc(var(--radius) - 5px);cursor:pointer;transition:all 0.2s;letter-spacing:0.01em;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.tab-btn{flex:1;padding:7px 4px;border:none;background:transparent;color:var(--muted2);font-family:'Poppins',sans-serif;font-size:11px;font-weight:500;border-radius:calc(var(--radius) - 5px);cursor:pointer;transition:all 0.2s;letter-spacing:0.01em;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
 .tab-emoji{font-size:18px;line-height:1}
 .tab-label{font-size:10px;font-weight:500;line-height:1}
 .tab-btn:active{transform:scale(0.95)}
@@ -154,7 +154,7 @@ h1{font-family:'Russo One',sans-serif;font-size:clamp(20px,5.5vw,36px);font-weig
 .stat-card{background:var(--surface);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 14px 12px;text-align:left;position:relative;overflow:hidden;box-shadow:var(--shadow-card)}
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--sky),var(--sky-light));opacity:0.8}
 .stat-icon{position:absolute;top:10px;right:11px;font-size:18px;opacity:1;line-height:1}
-.stat-val{font-family:'Russo One',sans-serif;font-size:22px;font-weight:800;line-height:1;color:var(--amber);letter-spacing:0}
+.stat-val{font-family:'Bungee',sans-serif;font-size:22px;font-weight:800;line-height:1;color:var(--amber);letter-spacing:0}
 .stat-lbl{font-size:10px;color:var(--muted2);margin-top:4px;text-transform:uppercase;letter-spacing:0.07em;font-weight:600}
 .stat-sub{font-size:10px;color:var(--muted);margin-top:4px;font-weight:400}
 /* daily-card sub-message */
@@ -231,7 +231,7 @@ h1{font-family:'Russo One',sans-serif;font-size:clamp(20px,5.5vw,36px);font-weig
   padding:48px 24px;gap:12px;text-align:center;
 }
 .empty-state-icon{font-size:48px;line-height:1;filter:drop-shadow(0 0 12px rgba(245,158,11,0.25))}
-.empty-state-title{font-family:'Russo One',sans-serif;font-size:16px;letter-spacing:0;color:var(--text);opacity:0.7}
+.empty-state-title{font-family:'Bungee',sans-serif;font-size:16px;letter-spacing:0;color:var(--text);opacity:0.7}
 .empty-state-sub{font-size:13px;color:var(--muted2);line-height:1.5;max-width:220px}
 
 /* Scroll-linked header compression removed — caused layout-shift feedback loop on ranks tab */
@@ -394,10 +394,10 @@ button:active{transform:scale(0.97)}
 .ring-avatar svg{position:absolute;top:0;left:0;width:100%;height:100%;transform:rotate(-90deg)}
 .ring-track{fill:none;stroke:rgba(245,158,11,0.10);stroke-width:3}
 .ring-fill{fill:none;stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset 0.7s cubic-bezier(0.34,1.56,0.64,1);filter:drop-shadow(0 0 3px currentColor)}
-.ring-inner{position:absolute;top:5px;left:5px;right:5px;bottom:5px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:none;font-family:'Outfit',sans-serif}
+.ring-inner{position:absolute;top:5px;left:5px;right:5px;bottom:5px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:none;font-family:'Poppins',sans-serif}
 .rank-badge{font-size:20px;width:28px;text-align:center;flex-shrink:0;line-height:1}
 .player-info{flex:0 0 110px;width:110px;min-width:0;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
-.player-name{font-size:16px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;font-family:'Outfit',sans-serif}
+.player-name{font-size:16px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;font-family:'Poppins',sans-serif}
 .player-last-spot{font-size:10px;color:var(--muted2);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:color 0.15s;line-height:1.3;font-weight:400}
 .player-last-spot:hover{color:var(--amber)}
 /* ── MICRO GRID ── */
@@ -411,33 +411,33 @@ button:active{transform:scale(0.97)}
 .done-badge{font-size:9px;font-weight:700;background:rgba(34,197,94,0.12);color:var(--green);border:1px solid rgba(34,197,94,0.30);padding:2px 7px;border-radius:999px;text-transform:uppercase;white-space:nowrap;letter-spacing:0.04em}
 .mini-bar-wrap{height:3px;background:rgba(30,110,170,0.10);border-radius:999px;margin-top:6px;overflow:hidden;width:100%}
 .mini-bar-fill{height:100%;border-radius:999px;transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1)}
-.pace-indicator{font-size:10px;font-weight:700;margin-top:5px;letter-spacing:0.03em;white-space:nowrap;font-family:'Outfit',sans-serif}
+.pace-indicator{font-size:10px;font-weight:700;margin-top:5px;letter-spacing:0.03em;white-space:nowrap;font-family:'Poppins',sans-serif}
 .pace-indicator.ahead{color:var(--streak-dark);text-shadow:none}
 .pace-indicator.behind{color:#F87171;text-shadow:0 0 8px rgba(248,113,113,0.25)}
 .pace-indicator.on-track{color:var(--muted2)}
 .badge-col{flex:1;display:flex;align-items:center;justify-content:center;min-width:0;padding:0 4px}
 .badge-row{display:grid;grid-template-columns:repeat(6,28px);gap:6px;justify-content:center}
 .lb-score{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;flex-shrink:0;text-align:right;gap:0}
-.lb-count{font-family:'Russo One',sans-serif;font-size:32px;font-weight:400;line-height:1;letter-spacing:0;color:var(--text);text-shadow:0 0 24px rgba(30,110,170,0.18)}
+.lb-count{font-family:'Bungee',sans-serif;font-size:32px;font-weight:400;line-height:1;letter-spacing:0;color:var(--text);text-shadow:0 0 24px rgba(30,110,170,0.18)}
 .lb-of{font-size:9px;color:var(--muted2);font-weight:500;text-transform:uppercase;letter-spacing:0.09em;white-space:nowrap;margin-top:3px}
 .lb-of-label{font-size:8px;color:var(--muted);font-weight:400;text-transform:uppercase;letter-spacing:0.07em;white-space:nowrap}
 .ach-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.07);border:1.5px solid var(--bdg-color,rgba(217,119,6,0.55));box-shadow:0 1px 4px rgba(0,0,0,0.10),0 0 5px var(--bdg-glow,rgba(217,119,6,0.10));cursor:pointer;position:relative;transition:transform 0.15s,box-shadow 0.2s,filter 0.2s,opacity 0.2s;flex-shrink:0;}
 .ach-badge:hover{transform:scale(1.12);box-shadow:0 2px 8px rgba(0,0,0,0.15),0 0 12px var(--bdg-glow,rgba(217,119,6,0.25))}
 .ach-badge.locked{filter:grayscale(1) brightness(0.8);opacity:0.35;border-color:rgba(30,100,160,0.12);box-shadow:none;background:rgba(30,100,160,0.04)}
 .ach-badge.locked:hover,.ach-badge.locked.tip-open{filter:none;opacity:1;transform:scale(1.1);background:rgba(255,255,255,0.08);border-color:var(--bdg-color,rgba(217,119,6,0.55));box-shadow:0 2px 8px rgba(0,0,0,0.15),0 0 12px var(--bdg-glow,rgba(217,119,6,0.25))}
-#bdg-tip{position:fixed;z-index:9999;pointer-events:none;background:#1A1A1A;border:1px solid rgba(255,255,255,0.15);color:var(--text);font-size:11px;font-family:'Outfit',sans-serif;font-weight:500;padding:5px 10px;border-radius:7px;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,0.25);opacity:0;transition:opacity 0.15s;}
+#bdg-tip{position:fixed;z-index:9999;pointer-events:none;background:#1A1A1A;border:1px solid rgba(255,255,255,0.15);color:var(--text);font-size:11px;font-family:'Poppins',sans-serif;font-weight:500;padding:5px 10px;border-radius:7px;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,0.25);opacity:0;transition:opacity 0.15s;}
 #bdg-tip.visible{opacity:1}
 .ach-badge.new-badge{animation:badgePop 0.5s cubic-bezier(0.34,1.56,0.64,1)}
 @keyframes badgePop{0%{transform:scale(0) rotate(-30deg)}80%{transform:scale(1.2) rotate(5deg)}100%{transform:scale(1) rotate(0)}}
-.winner-banner{background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(217,119,6,0.08));border:1px solid rgba(217,119,6,0.25);border-radius:var(--radius-sm);padding:12px 16px;text-align:center;font-size:14px;font-weight:700;font-family:'Russo One',sans-serif;color:var(--amber);margin-bottom:14px;display:none}
+.winner-banner{background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(217,119,6,0.08));border:1px solid rgba(217,119,6,0.25);border-radius:var(--radius-sm);padding:12px 16px;text-align:center;font-size:14px;font-weight:700;font-family:'Bungee',sans-serif;color:var(--amber);margin-bottom:14px;display:none}
 .heavy-lifting-card{display:none;background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(109,40,217,0.08));border:1px solid rgba(139,92,246,0.35);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;align-items:center;gap:14px;box-shadow:0 0 24px rgba(139,92,246,0.12),inset 0 1px 0 rgba(255,255,255,0.05)}
 .heavy-lifting-card.visible{display:flex}
 .hl-emoji{font-size:38px;flex-shrink:0;line-height:1}
 .hl-info{flex:1;min-width:0}
 .hl-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--sky);margin-bottom:3px}
-.hl-name{font-family:'Russo One',sans-serif;font-size:14px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hl-name{font-family:'Bungee',sans-serif;font-size:14px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hl-sub{font-size:11px;color:var(--muted2);margin-top:2px;font-weight:400}
-.hl-count{font-family:'Russo One',sans-serif;font-size:24px;font-weight:900;color:var(--sky);line-height:1;flex-shrink:0;text-align:right}
+.hl-count{font-family:'Bungee',sans-serif;font-size:24px;font-weight:900;color:var(--sky);line-height:1;flex-shrink:0;text-align:right}
 .hl-count-lbl{font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;text-align:right}
 .my-tally-card{background:var(--surface);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-card);position:relative}
 /* ── ORDER RECEIPT ── */
@@ -466,33 +466,33 @@ button:active{transform:scale(0.97)}
 }
 .order-receipt.show .receipt-card{transform:scale(1) translateY(0)}
 /* Done / close button */
-.receipt-done-btn{display:block;width:calc(100% - 48px);margin:10px auto 16px;padding:11px;background:linear-gradient(135deg,#B45309,#F59E0B);color:#fff;border:none;border-radius:999px;font-family:'Russo One',sans-serif;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:0.02em;transition:opacity 0.15s,transform 0.1s}
+.receipt-done-btn{display:block;width:calc(100% - 48px);margin:10px auto 16px;padding:11px;background:linear-gradient(135deg,#B45309,#F59E0B);color:#fff;border:none;border-radius:999px;font-family:'Bungee',sans-serif;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:0.02em;transition:opacity 0.15s,transform 0.1s}
 .receipt-done-btn:active{transform:scale(0.97);opacity:0.9}
-.receipt-share-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:calc(100% - 48px);margin:0 auto 14px;padding:10px;background:rgba(30,100,160,0.07);border:1.5px solid rgba(30,100,160,0.20);border-radius:999px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:#1a70aa;cursor:pointer;transition:background 0.15s,transform 0.18s cubic-bezier(0.34,1.56,0.64,1)}
+.receipt-share-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:calc(100% - 48px);margin:0 auto 14px;padding:10px;background:rgba(30,100,160,0.07);border:1.5px solid rgba(30,100,160,0.20);border-radius:999px;font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;color:#1a70aa;cursor:pointer;transition:background 0.15s,transform 0.18s cubic-bezier(0.34,1.56,0.64,1)}
 .receipt-share-btn:hover{background:rgba(30,100,160,0.12)}
 .receipt-share-btn:active{transform:scale(0.93)}
-#share-toast{position:fixed;top:calc(env(safe-area-inset-top,0px) + 16px);left:50%;transform:translateX(-50%) translateY(-90px);background:rgba(255,255,255,0.94);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,0.75);color:var(--text);font-size:13px;font-weight:600;padding:12px 22px;border-radius:999px;opacity:0;z-index:2000;white-space:normal;max-width:calc(100vw - 40px);text-align:center;box-shadow:0 4px 24px rgba(11,53,80,0.16),0 1px 4px rgba(11,53,80,0.08);font-family:'Outfit',sans-serif;transition:transform 0.38s cubic-bezier(0.34,1.56,0.64,1),opacity 0.3s;pointer-events:none}
+#share-toast{position:fixed;top:calc(env(safe-area-inset-top,0px) + 16px);left:50%;transform:translateX(-50%) translateY(-90px);background:rgba(255,255,255,0.94);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,0.75);color:var(--text);font-size:13px;font-weight:600;padding:12px 22px;border-radius:999px;opacity:0;z-index:2000;white-space:normal;max-width:calc(100vw - 40px);text-align:center;box-shadow:0 4px 24px rgba(11,53,80,0.16),0 1px 4px rgba(11,53,80,0.08);font-family:'Poppins',sans-serif;transition:transform 0.38s cubic-bezier(0.34,1.56,0.64,1),opacity 0.3s;pointer-events:none}
 #share-toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 /* amber gradient stripe at very top */
 .receipt-top-bar{height:5px;background:linear-gradient(90deg,#92400E,#F59E0B,#D97706,#F59E0B,#92400E)}
 /* hero / header */
 .receipt-hero-section{text-align:center;padding:16px 24px 13px;background:#F7F2E8}
 .receipt-burger-icon{font-size:38px;line-height:1;display:block;margin-bottom:7px;filter:drop-shadow(0 2px 8px rgba(217,119,6,0.4))}
-.receipt-challenge-title{font-family:'Russo One',sans-serif;font-size:13px;font-weight:900;color:#1A1A1A;letter-spacing:0.03em;text-transform:uppercase}
+.receipt-challenge-title{font-family:'Bungee',sans-serif;font-size:13px;font-weight:900;color:#1A1A1A;letter-spacing:0.03em;text-transform:uppercase}
 .receipt-challenge-sub{font-family:monospace;font-size:9px;color:#999;letter-spacing:0.10em;text-transform:uppercase;margin-top:3px;line-height:1.6}
 /* perforation divider */
 .receipt-perf{border:none;border-top:2px dashed #D4CABF;margin:0 20px}
 /* main logged section */
 .receipt-main-section{text-align:center;padding:14px 24px 12px;background:#F7F2E8}
 .receipt-logged-tag{display:inline-block;font-family:monospace;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.18em;color:#B45309;border:1.5px solid #E8C89A;border-radius:4px;padding:2px 8px;margin-bottom:9px}
-.receipt-restaurant-name{font-family:'Russo One',sans-serif;font-size:18px;font-weight:900;color:#1A1A1A;letter-spacing:0;line-height:1.1;margin-bottom:5px}
-.receipt-menu-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(0,0,0,0.07);border-radius:999px;padding:3px 12px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:#444;margin-bottom:10px}
+.receipt-restaurant-name{font-family:'Bungee',sans-serif;font-size:18px;font-weight:900;color:#1A1A1A;letter-spacing:0;line-height:1.1;margin-bottom:5px}
+.receipt-menu-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(0,0,0,0.07);border-radius:999px;padding:3px 12px;font-family:'Poppins',sans-serif;font-size:12px;font-weight:600;color:#444;margin-bottom:10px}
 .receipt-fire-row{font-size:20px;letter-spacing:3px;line-height:1;margin-bottom:3px}
 .receipt-rating-txt{font-family:monospace;font-size:10px;color:#888;letter-spacing:0.06em}
 /* count + meta row */
 .receipt-count-section{display:flex;align-items:center;justify-content:space-between;padding:11px 24px 11px;background:rgba(0,0,0,0.04);border-top:2px dashed #D4CABF;border-bottom:2px dashed #D4CABF}
 .receipt-plus-block{display:flex;align-items:baseline;gap:4px}
-.receipt-plus-num{font-family:'Russo One',sans-serif;font-size:34px;font-weight:400;color:#B45309;line-height:1;letter-spacing:0}
+.receipt-plus-num{font-family:'Bungee',sans-serif;font-size:34px;font-weight:400;color:#B45309;line-height:1;letter-spacing:0}
 .receipt-plus-unit{font-family:monospace;font-size:8px;text-transform:uppercase;letter-spacing:0.1em;color:#888;line-height:1.3;padding-bottom:4px}
 .receipt-meta-col{text-align:right;font-family:monospace;font-size:9px;color:#999;text-transform:uppercase;letter-spacing:0.08em;line-height:1.9}
 /* footer */
@@ -513,7 +513,7 @@ button:active{transform:scale(0.97)}
 .ctrl-btn{background:none;border:none;color:var(--muted2);font-size:24px;cursor:pointer;padding:14px;transition:color 0.15s,background 0.15s;display:flex;align-items:center;justify-content:center}
 .ctrl-btn:hover{background:rgba(255,255,255,0.06);color:var(--text)}
 .ctrl-btn:active{transform:scale(0.9)}
-.ate-btn{background:none;border:none;border-left:1px solid var(--border);border-right:1px solid var(--border);font-family:'Russo One',sans-serif;font-size:16px;font-weight:700;cursor:pointer;padding:14px;display:flex;align-items:center;justify-content:center;gap:8px;transition:background 0.15s}
+.ate-btn{background:none;border:none;border-left:1px solid var(--border);border-right:1px solid var(--border);font-family:'Bungee',sans-serif;font-size:16px;font-weight:700;cursor:pointer;padding:14px;display:flex;align-items:center;justify-content:center;gap:8px;transition:background 0.15s}
 .ate-btn:hover{background:rgba(245,158,11,0.08)}
 .ate-btn:active{background:rgba(245,158,11,0.15);transform:scale(0.97)}
 .ate-btn .bicon{font-size:18px;transition:transform 0.2s}
@@ -528,29 +528,29 @@ button:active{transform:scale(0.97)}
 .delete-btn{background:none;border:none;color:var(--muted);font-size:15px;cursor:pointer;padding:4px 8px;border-radius:6px;transition:color 0.15s,background 0.15s}
 .delete-btn:hover{color:var(--red);background:rgba(220,38,38,0.07)}
 .add-form{display:flex;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
-.add-form input{flex:1;background:rgba(255,255,255,0.45);border:1px solid rgba(30,110,170,0.15);border-radius:var(--radius-xs);color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;padding:10px 14px;outline:none;transition:border-color 0.2s,box-shadow 0.2s}
+.add-form input{flex:1;background:rgba(255,255,255,0.45);border:1px solid rgba(30,110,170,0.15);border-radius:var(--radius-xs);color:var(--text);font-family:'Poppins',sans-serif;font-size:14px;padding:10px 14px;outline:none;transition:border-color 0.2s,box-shadow 0.2s}
 .add-form input:focus{border-color:var(--sky-light);box-shadow:0 0 0 3px rgba(59,170,226,0.15);outline:none}
 .add-form input:focus{border-color:var(--amber)}
 .add-form input::placeholder{color:var(--muted)}
-.add-form button{background:linear-gradient(135deg,var(--amber),var(--amber-dark));color:#fff;border:none;border-radius:var(--radius-xs);font-family:'Russo One',sans-serif;font-size:14px;font-weight:700;padding:10px 18px;cursor:pointer;transition:opacity 0.15s;white-space:nowrap}
+.add-form button{background:linear-gradient(135deg,var(--amber),var(--amber-dark));color:#fff;border:none;border-radius:var(--radius-xs);font-family:'Bungee',sans-serif;font-size:14px;font-weight:700;padding:10px 18px;cursor:pointer;transition:opacity 0.15s;white-space:nowrap}
 .add-form button:hover{opacity:0.9}
 .add-form button:active{transform:scale(0.97)}
 .bg-player-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px 10px;margin-bottom:8px;box-shadow:var(--shadow-card);position:relative;overflow:hidden}
 .bg-player-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--amber-dark),#F59E0B,var(--amber-dark));opacity:0.7}
 .bg-player-card.complete::before{background:linear-gradient(90deg,var(--green),#4ADE80,var(--green));opacity:0.8}
 .bg-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.bg-name{font-family:'Russo One',sans-serif;font-size:14px;color:var(--text);font-weight:700;flex:1;letter-spacing:0}
-.bg-count-pill{font-family:'Russo One',sans-serif;font-size:13px;font-weight:700;background:var(--surface2);border:1px solid var(--border2);padding:3px 10px;border-radius:999px;color:var(--av-text);flex-shrink:0}
+.bg-name{font-family:'Bungee',sans-serif;font-size:14px;color:var(--text);font-weight:700;flex:1;letter-spacing:0}
+.bg-count-pill{font-family:'Bungee',sans-serif;font-size:13px;font-weight:700;background:var(--surface2);border:1px solid var(--border2);padding:3px 10px;border-radius:999px;color:var(--av-text);flex-shrink:0}
 .bg-grid{display:grid;grid-template-columns:repeat(20,1fr);gap:2px}
 .bg-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:3px;font-size:clamp(7px,1.8vw,11px);line-height:1;cursor:default;position:relative;transition:filter 0.3s,opacity 0.3s}
 .bg-cell.eaten{filter:none;opacity:1;animation:popIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both}
 @keyframes popIn{from{transform:scale(0.4) rotate(-20deg);opacity:0}to{transform:scale(1) rotate(0deg);opacity:1}}
 .bg-cell.empty-burger{filter:grayscale(1) brightness(0.15);opacity:0.35}
-.bg-cell[data-num]:hover::after{content:attr(data-num);position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:#1A1A1A;border:1px solid rgba(255,255,255,0.12);color:var(--text);font-size:10px;font-family:'Outfit',sans-serif;padding:2px 6px;border-radius:4px;white-space:nowrap;pointer-events:none;z-index:10}
+.bg-cell[data-num]:hover::after{content:attr(data-num);position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:#1A1A1A;border:1px solid rgba(255,255,255,0.12);color:var(--text);font-size:10px;font-family:'Poppins',sans-serif;padding:2px 6px;border-radius:4px;white-space:nowrap;pointer-events:none;z-index:10}
 .bg-progress-row{display:flex;align-items:center;gap:10px;margin-top:10px}
 .bg-progress-track{flex:1;height:5px;background:rgba(30,100,160,0.10);border-radius:999px;overflow:hidden}
 .bg-progress-fill{height:100%;border-radius:999px;transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1)}
-.bg-pct{font-family:'Russo One',sans-serif;font-size:13px;font-weight:700;color:var(--av-text);flex-shrink:0;min-width:40px;text-align:right}
+.bg-pct{font-family:'Bungee',sans-serif;font-size:13px;font-weight:700;color:var(--av-text);flex-shrink:0;min-width:40px;text-align:right}
 .social-wrap{display:flex;flex-direction:column;height:calc(100dvh - 310px);min-height:360px}
 .social-feed{flex:1;overflow-y:auto;display:flex;flex-direction:column-reverse;gap:0;padding:6px 2px 14px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
 .social-feed::-webkit-scrollbar{width:4px}
@@ -590,7 +590,7 @@ button:active{transform:scale(0.97)}
 /* No-photo warm gradient header */
 .feed-no-photo-header{display:flex;align-items:center;gap:11px;padding:14px 16px 12px;background:linear-gradient(135deg,rgba(180,83,9,0.07),rgba(245,158,11,0.13));border-bottom:1px solid rgba(245,158,11,0.16)}
 .fnph-icon{font-size:26px;line-height:1;flex-shrink:0}
-.fnph-logo{width:30px;height:30px;border-radius:8px;object-fit:contain;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.15);flex-shrink:0}
+.fnph-logo{width:36px;height:36px;border-radius:9px;object-fit:contain;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.15);flex-shrink:0}
 .fpc-restaurant-logo{width:20px!important;height:20px!important;border-radius:6px;object-fit:contain!important;display:inline-block!important;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.35);vertical-align:-5px;margin-right:5px}
 .fnph-info{flex:1;min-width:0}
 .fnph-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.02em;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -674,7 +674,7 @@ body.feed-active .social-input-area{
 .feed-react-btn{background:none;border:none;padding:7px 10px;border-radius:999px;cursor:pointer;flex-shrink:0;color:var(--muted);display:flex;align-items:center;justify-content:center;transition:color 0.2s ease,transform 0.2s ease,background 0.2s ease;line-height:0}
 .feed-react-btn:hover,.feed-react-btn:focus-visible{color:var(--text);transform:scale(1.15);background:rgba(30,100,160,0.07);outline:none}
 .feed-react-btn:active{transform:scale(0.92)}
-.feed-comment-btn{background:none;border:none;color:var(--muted2);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;transition:background 0.15s,color 0.15s;font-family:'Outfit',sans-serif}
+.feed-comment-btn{background:none;border:none;color:var(--muted2);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;transition:background 0.15s,color 0.15s;font-family:'Poppins',sans-serif}
 .feed-comment-btn:hover{background:rgba(30,100,160,0.07);color:var(--text)}
 .feed-comment-btn.active{background:rgba(30,110,170,0.10);color:var(--sky)}
 .feed-comment-btn .comment-count{font-size:11px;color:var(--muted2)}
@@ -691,7 +691,7 @@ body.feed-active .social-input-area{
 .comment-time{font-size:9px;color:var(--muted);font-weight:400}
 .comment-text{font-size:13px;color:var(--text);word-break:break-word;line-height:1.45}
 .comment-input-row{display:flex;gap:6px;align-items:center}
-.comment-input-row input{flex:1;background:rgba(255,255,255,0.60);border:1px solid rgba(30,110,170,0.20);border-radius:20px;padding:6px 13px;color:var(--text);font-size:13px;outline:none;font-family:'Outfit',sans-serif;transition:border-color 0.2s}
+.comment-input-row input{flex:1;background:rgba(255,255,255,0.60);border:1px solid rgba(30,110,170,0.20);border-radius:20px;padding:6px 13px;color:var(--text);font-size:13px;outline:none;font-family:'Poppins',sans-serif;transition:border-color 0.2s}
 .comment-input-row input:focus{border-color:rgba(30,110,170,0.45)}
 .comment-input-row input::placeholder{color:var(--muted)}
 .comment-send-btn{background:linear-gradient(135deg,var(--sky),var(--sky-light));color:#fff;border:none;width:30px;height:30px;border-radius:50%;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity 0.15s,transform 0.1s}
@@ -793,7 +793,7 @@ body.feed-active .social-input-area.comment-focus-hide{opacity:0;transform:trans
 .social-capsule-cam{background:none;border:none;color:var(--muted2);font-size:18px;cursor:pointer;padding:0 8px 0 0;flex-shrink:0;line-height:1;display:flex;align-items:center;justify-content:center;transition:color 0.15s}
 .social-capsule-cam:hover{color:var(--amber)}
 .social-capsule-cam.has-image{color:var(--amber)}
-.social-capsule textarea{flex:1;background:transparent;border:none;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;resize:none;min-height:24px;max-height:110px;line-height:1.5;overflow-y:auto;padding:3px 0;align-self:center}
+.social-capsule textarea{flex:1;background:transparent;border:none;color:var(--text);font-family:'Poppins',sans-serif;font-size:14px;outline:none;resize:none;min-height:24px;max-height:110px;line-height:1.5;overflow-y:auto;padding:3px 0;align-self:center}
 .social-capsule textarea::placeholder{color:var(--muted)}
 .send-btn{background:linear-gradient(135deg,var(--sky),var(--sky-light));color:#fff;border:none;width:38px;height:38px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity 0.15s,transform 0.1s;box-shadow:0 2px 8px rgba(30,100,160,0.30)}
 .send-btn:hover{opacity:0.9;transform:scale(1.05)}
@@ -825,7 +825,7 @@ body.feed-active .social-input-area.comment-focus-hide{opacity:0;transform:trans
 }
 #log-fab:active{transform:scale(0.93)}
 #log-fab-icon{font-size:22px;line-height:1;transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1)}
-#log-fab-plus{font-size:10px;font-weight:800;color:#0b3550;letter-spacing:0.02em;line-height:1;font-family:'Outfit',sans-serif;margin-top:1px}
+#log-fab-plus{font-size:10px;font-weight:800;color:#0b3550;letter-spacing:0.02em;line-height:1;font-family:'Poppins',sans-serif;margin-top:1px}
 #log-fab:hover #log-fab-icon{transform:rotate(-10deg) scale(1.1)}
 body.july4-bg #log-fab{background:#fff;border-color:#0b3550;box-shadow:0 4px 20px rgba(178,34,52,0.25),0 0 0 2px rgba(37,99,235,0.15)}
 body.july4-bg #log-fab-plus{color:#0b3550}
@@ -875,7 +875,7 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
   border-bottom:1px solid var(--border);
 }
 #log-modal-title{
-  font-family:'Russo One',sans-serif;
+  font-family:'Bungee',sans-serif;
   font-size:22px;letter-spacing:0.05em;
   color:var(--text);
   display:flex;align-items:center;gap:8px;
@@ -924,7 +924,7 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
   /* safe area for devices with home bar */
   padding-bottom:env(safe-area-inset-bottom,0px);
 }
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-size:13px;font-weight:500;padding:10px 20px;border-radius:999px;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1),opacity 0.3s;opacity:0;z-index:999;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.25);font-family:'Outfit',sans-serif}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-size:13px;font-weight:500;padding:10px 20px;border-radius:999px;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1),opacity 0.3s;opacity:0;z-index:999;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.25);font-family:'Poppins',sans-serif}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 
 /* ── Minecraft "Advancement Unlocked" toast ── */
@@ -1025,13 +1025,13 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
   padding:6px 16px;
   font-size:11px;
   color:var(--muted2);
-  font-family:'Outfit',sans-serif;
+  font-family:'Poppins',sans-serif;
   letter-spacing:0.01em;
   box-shadow:0 2px 8px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.08);
   white-space:nowrap;
 }
 .stat-num{
-  font-family:'Russo One',sans-serif;
+  font-family:'Bungee',sans-serif;
   font-size:16px;
   font-weight:900;
   color:var(--text);
@@ -1117,7 +1117,7 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 }
 @keyframes pattyDrop{0%{opacity:0;transform:translateY(-14px) scaleX(0.75)}100%{opacity:1;transform:translateY(0) scaleX(1)}}
 .pb-selector{display:flex;gap:8px;margin-top:16px;margin-bottom:4px;width:100%}
-.pb-btn{flex:1;background:rgba(255,255,255,0.45);border:1px solid rgba(30,110,170,0.15);border-radius:var(--radius-sm);color:var(--muted2);font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;padding:10px 12px;cursor:pointer;transition:all 0.15s,transform 0.1s ease;letter-spacing:0.01em}
+.pb-btn{flex:1;background:rgba(255,255,255,0.45);border:1px solid rgba(30,110,170,0.15);border-radius:var(--radius-sm);color:var(--muted2);font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;padding:10px 12px;cursor:pointer;transition:all 0.15s,transform 0.1s ease;letter-spacing:0.01em}
 .pb-btn:hover{background:rgba(30,100,160,0.07);color:var(--text);border-color:rgba(30,110,170,0.25)}
 .pb-btn:active{transform:scale(0.95)}
 .pb-btn.selected{background:rgba(30,110,170,0.12);border-color:rgba(30,110,170,0.50);color:var(--sky);box-shadow:0 0 12px rgba(30,110,170,0.12)}
@@ -1126,7 +1126,7 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 .burger-detail.open{display:flex}
 .burger-detail-row{display:flex;align-items:center;gap:10px}
 .burger-detail label{font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em;font-weight:600;flex-shrink:0;width:76px}
-.burger-detail input[type=text]{flex:1;background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-xs);color:var(--text);font-family:'Outfit',sans-serif;font-size:13px;padding:8px 12px;outline:none;transition:border-color 0.2s}
+.burger-detail input[type=text]{flex:1;background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-xs);color:var(--text);font-family:'Poppins',sans-serif;font-size:13px;padding:8px 12px;outline:none;transition:border-color 0.2s}
 .burger-detail input[type=text]:focus{border-color:var(--sky-light);box-shadow:0 0 0 3px rgba(59,170,226,0.15)}
 .burger-detail input[type=text]::placeholder{color:var(--muted)}
 /* ── Half-star rating widget ── */
@@ -1144,7 +1144,7 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 */
 .rating-widget{display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:16px;flex:1}
 .rating-score{
-  font-family:'Russo One',sans-serif;
+  font-family:'Bungee',sans-serif;
   font-size:1.35rem;
   font-weight:800;
   min-width:52px;
@@ -1244,22 +1244,22 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
   input[type="text"],input[type="number"],input[type="email"],input[type="password"],input[type="search"],textarea,select { font-size:16px !important; }
 }
 .topping-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
-.topping-btn{background:var(--surface3);border:1px solid var(--border2);border-radius:999px;color:var(--muted2);font-size:11px;font-weight:500;padding:5px 11px;cursor:pointer;transition:all 0.15s;font-family:'Outfit',sans-serif}
+.topping-btn{background:var(--surface3);border:1px solid var(--border2);border-radius:999px;color:var(--muted2);font-size:11px;font-weight:500;padding:5px 11px;cursor:pointer;transition:all 0.15s;font-family:'Poppins',sans-serif}
 @media(hover:hover)and(pointer:fine){.topping-btn:hover{border-color:var(--sky-light);color:var(--sky)}}
 .topping-btn.topping-active{background:rgba(30,110,170,0.12);border-color:var(--sky-light);color:var(--sky);font-weight:700}
 .quick-spot{background:var(--surface3);border:1px solid var(--border2);border-radius:999px;color:var(--muted2);font-size:11px;font-weight:500;padding:4px 10px;cursor:pointer;transition:border-color 0.15s,color 0.15s,background 0.15s}
 .quick-spot:hover{border-color:var(--sky-light);color:var(--sky);background:rgba(30,110,170,0.07)}
 /* ── Restaurant-first step ── */
 .restaurant-step{padding:12px 16px 6px}
-.restaurant-step input[type=text]{width:100%;box-sizing:border-box;background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:'Outfit',sans-serif;font-size:13px;padding:10px 14px;outline:none;transition:border-color 0.2s}
+.restaurant-step input[type=text]{width:100%;box-sizing:border-box;background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:'Poppins',sans-serif;font-size:13px;padding:10px 14px;outline:none;transition:border-color 0.2s}
 .restaurant-step input[type=text]:focus{border-color:var(--sky-light);box-shadow:0 0 0 3px rgba(59,170,226,0.15)}
 .restaurant-step input[type=text]::placeholder{color:var(--muted)}
 .restaurant-locked-row{display:flex;align-items:center;justify-content:space-between;background:rgba(30,110,170,0.07);border:1px solid rgba(30,110,170,0.22);border-radius:var(--radius-sm);padding:10px 14px;gap:8px}
 .restaurant-locked-name{font-size:14px;font-weight:700;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.restaurant-change-btn{font-size:11px;color:var(--muted2);background:none;border:none;cursor:pointer;padding:2px 6px;font-family:'Outfit',sans-serif;font-weight:500;white-space:nowrap;transition:color 0.15s;flex-shrink:0}
+.restaurant-change-btn{font-size:11px;color:var(--muted2);background:none;border:none;cursor:pointer;padding:2px 6px;font-family:'Poppins',sans-serif;font-weight:500;white-space:nowrap;transition:color 0.15s;flex-shrink:0}
 .restaurant-change-btn:hover{color:var(--text)}
 .restaurant-suggestions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
-.restaurant-suggestion{background:var(--surface3);border:1px solid var(--border2);border-radius:12px;padding:10px 8px;font-size:12px;color:var(--text);cursor:pointer;transition:background 0.15s,border-color 0.15s,transform 0.12s;text-align:center;font-family:'Outfit',sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-sizing:border-box;font-weight:600;width:100%}
+.restaurant-suggestion{background:var(--surface3);border:1px solid var(--border2);border-radius:12px;padding:10px 8px;font-size:12px;color:var(--text);cursor:pointer;transition:background 0.15s,border-color 0.15s,transform 0.12s;text-align:center;font-family:'Poppins',sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-sizing:border-box;font-weight:600;width:100%}
 .restaurant-suggestion:active{transform:scale(0.95)}
 .restaurant-suggestion:hover{background:rgba(30,110,170,0.08);border-color:rgba(30,110,170,0.35)}
 .restaurant-suggestion-emoji{font-size:22px;line-height:1}
@@ -1279,21 +1279,21 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 .menu-card-name{font-size:11px;font-weight:700;color:var(--text);text-align:center;line-height:1.25;min-height:26px;display:flex;align-items:center;justify-content:center}
 .menu-card-badge{font-size:9px;font-weight:700;color:var(--sky);background:rgba(30,110,170,0.10);border-radius:999px;padding:2px 8px;text-transform:uppercase;letter-spacing:0.04em}
 .menu-card-toppings{font-size:8px;color:var(--muted2);text-align:center;line-height:1.3;min-height:9px}
-.build-own-btn{background:none;border:none;color:var(--muted2);font-size:11px;font-family:'Outfit',sans-serif;cursor:pointer;padding:8px 0 4px;width:100%;text-align:center;transition:color 0.15s}
+.build-own-btn{background:none;border:none;color:var(--muted2);font-size:11px;font-family:'Poppins',sans-serif;cursor:pointer;padding:8px 0 4px;width:100%;text-align:center;transition:color 0.15s}
 .build-own-btn:hover{color:var(--text)}
 /* ── Feed: menu item line ── */
 .grill-menu-item-line{font-size:11px;color:var(--muted2);margin-top:2px;font-weight:500}
 /* ── Critic score nudge ── */
 .critic-nudge{background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.22);border-radius:var(--radius-xs);padding:8px 12px;font-size:12px;color:var(--muted2);line-height:1.4;animation:slideIn 0.2s ease both}
 .critic-nudge strong{color:var(--amber);font-weight:700}
-.detail-confirm-btn{background:linear-gradient(135deg,var(--amber),var(--amber-dark));color:#fff;border:none;border-radius:var(--radius-xs);font-family:'Russo One',sans-serif;font-size:14px;font-weight:700;padding:10px;cursor:pointer;width:100%;margin-top:4px;transition:opacity 0.15s}
+.detail-confirm-btn{background:linear-gradient(135deg,var(--amber),var(--amber-dark));color:#fff;border:none;border-radius:var(--radius-xs);font-family:'Bungee',sans-serif;font-size:14px;font-weight:700;padding:10px;cursor:pointer;width:100%;margin-top:4px;transition:opacity 0.15s}
 .detail-confirm-btn:hover{opacity:0.9}
 .detail-confirm-btn:active{transform:scale(0.97)}
 .map-wrap{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border2);box-shadow:var(--shadow-card);margin:0 2px}
 .leaflet-tile-container{filter:contrast(0.95) saturate(0.9)}
 /* Cluster icon overrides — sky blue theme */
 .marker-cluster-small,.marker-cluster-medium,.marker-cluster-large{background:rgba(26,112,170,0.22)!important}
-.marker-cluster-small div,.marker-cluster-medium div,.marker-cluster-large div{background:rgba(26,112,170,0.72)!important;color:#fff!important;font-weight:700!important;font-family:'Outfit',sans-serif!important;font-size:13px!important}
+.marker-cluster-small div,.marker-cluster-medium div,.marker-cluster-large div{background:rgba(26,112,170,0.72)!important;color:#fff!important;font-weight:700!important;font-family:'Poppins',sans-serif!important;font-size:13px!important}
 .marker-cluster{box-shadow:0 2px 12px rgba(26,112,170,0.35)!important;border:2px solid rgba(255,255,255,0.8)!important}
 #burger-map{width:100%;height:520px}
 .leaflet-popup-content-wrapper{background:var(--surface2)!important;border:1px solid var(--border2)!important;border-radius:12px!important;box-shadow:0 4px 24px rgba(30,100,160,0.18)!important;color:var(--text)!important;padding:0!important}
@@ -1302,7 +1302,7 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 .leaflet-popup-close-button{color:var(--muted2)!important;top:8px!important;right:10px!important;font-size:18px!important}
 .map-popup{padding:14px 16px;min-width:200px}
 .map-popup-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.map-popup-name{font-family:'Russo One',sans-serif;font-size:13px;font-weight:700;color:var(--text)}
+.map-popup-name{font-family:'Bungee',sans-serif;font-size:13px;font-weight:700;color:var(--text)}
 .map-popup-restaurant{font-size:13px;color:var(--muted2);margin-bottom:6px;display:flex;align-items:center;gap:5px}
 .map-popup-stars{font-size:15px;margin-bottom:6px}
 .map-popup-time{font-size:11px;color:var(--muted);font-weight:400}
@@ -1310,13 +1310,13 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 /* ── Player stats drawer cells ── */
 .ps-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .ps-cell{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:7px 10px;text-align:center}
-.ps-cell .ps-val{font-family:'Russo One',sans-serif;font-size:14px;font-weight:800;color:var(--text);line-height:1}
+.ps-cell .ps-val{font-family:'Bungee',sans-serif;font-size:14px;font-weight:800;color:var(--text);line-height:1}
 .ps-cell .ps-lbl{font-size:8px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-top:3px}
 .ps-row{display:flex;align-items:baseline;gap:6px;padding:5px 8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:7px;min-width:0}
 .ps-tag{font-size:8px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap;flex-shrink:0}
 .ps-val-sm{font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 /* ── Burger photo in tally + feed ── */
-.burger-photo-btn{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--muted2);font-size:13px;font-weight:600;padding:7px 12px;cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.15s;display:flex;align-items:center;gap:5px}
+.burger-photo-btn{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--muted2);font-size:13px;font-weight:600;padding:7px 12px;cursor:pointer;font-family:'Poppins',sans-serif;transition:all 0.15s;display:flex;align-items:center;gap:5px}
 .burger-photo-btn:hover{border-color:var(--amber);color:var(--amber)}
 .burger-photo-btn.has-photo{border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,0.08)}
 .burger-photo-preview{width:44px;height:44px;border-radius:8px;object-fit:cover;border:1.5px solid rgba(245,158,11,0.4);flex-shrink:0}
@@ -1328,7 +1328,7 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 /* top-to-bottom dark fade so text at bottom is always readable */
 .grill-photo-scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.48) 36%,rgba(0,0,0,0.10) 64%,transparent 100%);pointer-events:none}
 /* frosted-glass stamp badge top-left */
-.grill-photo-stamp-pill{position:absolute;top:10px;left:14px;background:rgba(0,0,0,0.50);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.13);border-radius:999px;padding:3px 10px;font-size:9px;font-weight:700;color:rgba(255,255,255,0.78);text-transform:uppercase;letter-spacing:0.08em;font-family:'Outfit',sans-serif;z-index:1}
+.grill-photo-stamp-pill{position:absolute;top:10px;left:14px;background:rgba(0,0,0,0.50);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.13);border-radius:999px;padding:3px 10px;font-size:9px;font-weight:700;color:rgba(255,255,255,0.78);text-transform:uppercase;letter-spacing:0.08em;font-family:'Poppins',sans-serif;z-index:1}
 /* mini burger stack top-right corner */
 .grill-photo-burger-corner{position:absolute;top:8px;right:10px;z-index:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6))}
 /* restaurant name + rating overlaid at photo bottom */
@@ -1563,15 +1563,15 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 .pl-row.pl-gold::before { background: linear-gradient(90deg,transparent,rgba(245,158,11,0.5),transparent); }
 .pl-row.pl-silver { border-color: rgba(192,192,192,0.3); }
 .pl-row.pl-bronze { border-color: rgba(180,83,9,0.3); }
-.pl-rank { font-family:'Russo One',sans-serif; font-size:14px; font-weight:900; color:var(--text); width:28px; text-align:center; flex-shrink:0; line-height:1; }
-.pl-avatar { width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; font-family:'Outfit',sans-serif; flex-shrink:0; }
+.pl-rank { font-family:'Bungee',sans-serif; font-size:14px; font-weight:900; color:var(--text); width:28px; text-align:center; flex-shrink:0; line-height:1; }
+.pl-avatar { width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; font-family:'Poppins',sans-serif; flex-shrink:0; }
 .pl-info { flex:1; min-width:0; }
 .pl-name { font-size:15px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:6px; }
 .pl-pills { display:flex; gap:5px; margin-top:4px; flex-wrap:nowrap; overflow:hidden; }
 .pl-pill { font-size:10px; color:var(--muted2); background:rgba(30,110,170,0.07); border:1px solid rgba(30,110,170,0.10); border-radius:5px; padding:1px 6px; white-space:nowrap; flex-shrink:0; }
 .pl-bar-track { height:3px; background:rgba(30,110,170,0.10); border-radius:99px; overflow:hidden; margin-top:5px; }
 .pl-bar-fill { height:3px; border-radius:99px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); }
-.pl-count { font-family:'Russo One',sans-serif; font-size:24px; font-weight:400; line-height:1; letter-spacing:0; flex-shrink:0; }
+.pl-count { font-family:'Bungee',sans-serif; font-size:24px; font-weight:400; line-height:1; letter-spacing:0; flex-shrink:0; }
 .pl-count-lbl { font-size:8px; color:var(--muted2); text-transform:uppercase; letter-spacing:0.08em; font-weight:600; text-align:right; margin-top:2px; }
 
 /* ══════════════════════════════════════════════
@@ -1595,24 +1595,24 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 .rank-row:not(:last-child) { border-bottom:1px solid rgba(255,255,255,0.55); }
 .rank-row:active { background:rgba(255,255,255,0.35); }
 .rank-num {
-  font-family:'Outfit',sans-serif; font-size:13px; font-weight:500;
+  font-family:'Poppins',sans-serif; font-size:13px; font-weight:500;
   color:var(--muted); width:24px; text-align:center; flex-shrink:0;
 }
 .rank-avatar {
   width:40px; height:40px; border-radius:50%;
   display:flex; align-items:center; justify-content:center;
-  font-family:'Outfit',sans-serif; font-size:14px; font-weight:600;
+  font-family:'Poppins',sans-serif; font-size:14px; font-weight:600;
   color:white; flex-shrink:0; overflow:hidden;
 }
 .rank-avatar img { width:100%; height:100%; object-fit:cover; object-position:center top; }
 .rank-name {
-  flex:1; font-family:'Outfit',sans-serif; font-size:15px; font-weight:500;
+  flex:1; font-family:'Poppins',sans-serif; font-size:15px; font-weight:500;
   color:var(--text); min-width:0;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   display:flex; align-items:center; gap:6px;
 }
 .rank-count {
-  font-family:'Russo One',sans-serif; font-size:26px;
+  font-family:'Bungee',sans-serif; font-size:26px;
   flex-shrink:0; line-height:1;
 }
 .jw-me-badge {
@@ -1920,7 +1920,7 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
   box-shadow: var(--shadow-card);
 }
 .pace-summary-val {
-  font-family: 'Russo One',sans-serif;
+  font-family: 'Bungee',sans-serif;
   font-size: 21px;
   line-height: 1;
   color: var(--sky);
@@ -1952,7 +1952,7 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 .pace-avatar {
   width: 36px; height: 36px; border-radius: 9px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 800; font-family: 'Outfit',sans-serif;
+  font-size: 13px; font-weight: 800; font-family: 'Poppins',sans-serif;
   flex-shrink: 0;
 }
 .pace-name { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1; }
@@ -2229,7 +2229,7 @@ body.july4-bg .album-spine-dot.earned { background: var(--album-color, var(--amb
   100% { left: 130%; }
 }
 .july4-header-msg-text {
-  font-family: 'Russo One', sans-serif;
+  font-family: 'Bungee', sans-serif;
   font-size: 14px;
   letter-spacing: 0.06em;
   background: linear-gradient(90deg,
@@ -2380,7 +2380,7 @@ body.july4-bg::before {
   display: block;
 }
 .july4-title {
-  font-family: 'Russo One',sans-serif;
+  font-family: 'Bungee',sans-serif;
   font-size: 16px;
   letter-spacing: 0.02em;
   background: linear-gradient(90deg, #DC2626, #fff 40%, #2563EB);
@@ -2415,7 +2415,7 @@ body.july4-bg::before {
 }
 .map-feed-card:hover{background:var(--surface2);border-color:rgba(30,110,170,0.25)}
 .map-feed-card:active{transform:scale(0.98)}
-.map-feed-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;font-family:'Outfit',sans-serif}
+.map-feed-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;font-family:'Poppins',sans-serif}
 .map-feed-body{flex:1;min-width:0}
 .map-feed-name{font-size:12px;font-weight:700;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .map-feed-restaurant{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -2436,7 +2436,7 @@ body.july4-bg::before {
   padding:3px 10px;border-radius:999px;
   cursor:pointer;
   transition:border-color 0.2s,color 0.2s,background 0.2s;
-  font-family:'Outfit',sans-serif;
+  font-family:'Poppins',sans-serif;
   letter-spacing:0.03em;
 }
 .players-pill:hover{border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,0.07)}
@@ -2446,19 +2446,19 @@ body.july4-bg::before {
    ══════════════════════════════════════════════ */
 
 .feed-sub-tabs{display:flex;gap:6px;margin-bottom:14px}
-.feed-sub-tab{flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--muted2);font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:8px 12px;cursor:pointer;transition:all 0.2s;letter-spacing:0.01em}
+.feed-sub-tab{flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--muted2);font-family:'Poppins',sans-serif;font-size:12px;font-weight:600;padding:8px 12px;cursor:pointer;transition:all 0.2s;letter-spacing:0.01em}
 .feed-sub-tab.active{background:rgba(245,158,11,0.10);border-color:rgba(245,158,11,0.40);color:var(--amber)}
 .feed-sub-tab:active{transform:scale(0.96)}
 
 /* ── Restaurant Leaderboard ── */
 .ranks-sub-tabs{display:flex;gap:6px;margin-bottom:14px}
-.ranks-sub-tab{flex:1;background:rgba(255,255,255,0.40);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--muted2);font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:8px 12px;cursor:pointer;transition:all 0.2s;letter-spacing:0.01em}
+.ranks-sub-tab{flex:1;background:rgba(255,255,255,0.40);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--muted2);font-family:'Poppins',sans-serif;font-size:12px;font-weight:600;padding:8px 12px;cursor:pointer;transition:all 0.2s;letter-spacing:0.01em}
 .ranks-sub-tab.active{background:rgba(30,110,170,0.12);border-color:rgba(30,110,170,0.38);color:var(--sky)}
 .ranks-sub-tab:active{transform:scale(0.96)}
 .resto-lb-wrap{display:flex;flex-direction:column;gap:8px;padding:4px 0 24px}
 .resto-card{background:var(--surface);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-card);animation:slideIn 0.25s ease both;position:relative;overflow:hidden}
 .resto-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.12),transparent)}
-.resto-rank{font-family:'Russo One',sans-serif;font-size:17px;font-weight:900;min-width:32px;text-align:center;flex-shrink:0}
+.resto-rank{font-family:'Bungee',sans-serif;font-size:17px;font-weight:900;min-width:32px;text-align:center;flex-shrink:0}
 .resto-rank.r1{color:#F59E0B;text-shadow:0 0 12px rgba(245,158,11,0.45)}
 .resto-rank.r2{color:#C0C0C0}
 .resto-rank.r3{color:#CD7F32}
@@ -2472,7 +2472,7 @@ body.july4-bg::before {
 .resto-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
 .resto-right-logo{width:32px;height:32px;border-radius:8px;object-fit:contain;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);flex-shrink:0}
 .resto-stars{font-size:14px;line-height:1}
-.resto-score{font-family:'Russo One',sans-serif;font-size:13px;font-weight:800;color:var(--amber)}
+.resto-score{font-family:'Bungee',sans-serif;font-size:13px;font-weight:800;color:var(--amber)}
 .resto-unrated{font-size:11px;color:var(--muted);font-weight:500}
 
 /* ── Milestone Feed Card ── */
@@ -2492,18 +2492,18 @@ body.july4-bg::before {
 .mc-player-name{font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mc-timestamp{font-size:10px;color:var(--muted2);margin-top:1px}
 .mc-hero{text-align:center;padding:4px 16px 14px}
-.mc-milestone-num{font-family:'Russo One',sans-serif;font-size:46px;font-weight:400;line-height:1;letter-spacing:0;color:var(--sky);text-shadow:0 0 30px rgba(30,100,160,0.25),0 0 60px rgba(30,100,160,0.10)}
-.mc-milestone-label{font-family:'Russo One',sans-serif;font-size:11px;font-weight:800;letter-spacing:0.10em;text-transform:uppercase;color:var(--muted2);margin-top:-4px}
+.mc-milestone-num{font-family:'Bungee',sans-serif;font-size:46px;font-weight:400;line-height:1;letter-spacing:0;color:var(--sky);text-shadow:0 0 30px rgba(30,100,160,0.25),0 0 60px rgba(30,100,160,0.10)}
+.mc-milestone-label{font-family:'Bungee',sans-serif;font-size:11px;font-weight:800;letter-spacing:0.10em;text-transform:uppercase;color:var(--muted2);margin-top:-4px}
 .mc-tagline{font-size:13px;color:var(--muted2);margin-top:8px;font-weight:500;line-height:1.4}
 .mc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(30,110,170,0.08);border-top:1px solid rgba(30,110,170,0.12);border-bottom:1px solid rgba(30,110,170,0.12)}
 .mc-stat{background:rgba(255,255,255,0.45);padding:10px 8px;text-align:center}
-.mc-stat-val{font-family:'Russo One',sans-serif;font-size:13px;font-weight:900;color:var(--text);line-height:1}
+.mc-stat-val{font-family:'Bungee',sans-serif;font-size:13px;font-weight:900;color:var(--text);line-height:1}
 .mc-stat-lbl{font-size:8px;color:var(--muted2);font-weight:600;text-transform:uppercase;letter-spacing:0.07em;margin-top:3px}
 .mc-spots{padding:10px 16px 12px;font-size:11px;color:var(--muted2);display:flex;gap:14px;flex-wrap:wrap}
 .mc-spots span{display:flex;align-items:center;gap:4px}
 .top-rated-wrap{display:flex;flex-direction:column;gap:8px;padding:4px 0 24px}
 .tr-card{background:var(--surface);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-card);animation:slideIn 0.25s ease both}
-.tr-rank{font-family:'Russo One',sans-serif;font-size:14px;font-weight:900;color:var(--text);min-width:28px;text-align:center;flex-shrink:0}
+.tr-rank{font-family:'Bungee',sans-serif;font-size:14px;font-weight:900;color:var(--text);min-width:28px;text-align:center;flex-shrink:0}
 .tr-rank.gold{color:#F59E0B;text-shadow:0 0 10px rgba(245,158,11,0.4)}
 .tr-rank.silver{color:#C0C0C0}
 .tr-rank.bronze{color:#CD7F32}
@@ -2514,7 +2514,7 @@ body.july4-bg::before {
 .tr-date{font-size:9px;color:var(--muted2);font-weight:400}
 .tr-patty{font-size:9px;color:var(--muted2);font-weight:500}
 .tr-stars{font-size:15px;line-height:1;flex-shrink:0;text-align:right}
-.tr-score{font-family:'Russo One',sans-serif;font-size:11px;font-weight:700;color:#9CA3AF;text-align:right;margin-top:2px}
+.tr-score{font-family:'Bungee',sans-serif;font-size:11px;font-weight:700;color:#9CA3AF;text-align:right;margin-top:2px}
 .tr-right{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;gap:2px}
 .tr-item{display:flex;flex-direction:column}
 .tr-card{cursor:pointer;user-select:none}
@@ -2699,7 +2699,7 @@ body.july4-bg::before {
 .grill-rating-row { display: flex; align-items: center; gap: 7px; }
 .grill-flames { font-size: 13px; line-height: 1; letter-spacing: 0.5px; }
 .grill-rating-num {
-  font-family: 'Outfit',sans-serif;
+  font-family: 'Poppins',sans-serif;
   font-size: 13px;
   font-weight: 700;
   color: var(--text);
@@ -2722,9 +2722,9 @@ body.july4-bg::before {
 #log-modal-spiral{display:flex;justify-content:space-between;align-items:center;padding:5px 14px 2px}
 .lm-spiral-hole{width:12px;height:12px;border-radius:50%;border:1.5px solid rgba(139,104,60,0.28);background:rgba(240,220,190,0.5);flex-shrink:0}
 #log-modal-header{border-bottom:1px solid rgba(139,104,60,0.18);padding:6px 20px 12px;background:#FFF8ED}
-#log-modal-title{font-family:'Outfit',sans-serif;font-size:13px;flex-direction:column;align-items:flex-start;gap:2px}
+#log-modal-title{font-family:'Poppins',sans-serif;font-size:13px;flex-direction:column;align-items:flex-start;gap:2px}
 #log-modal-title-sub{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#8B7355;font-weight:700;font-family:'Courier New',monospace;display:block}
-#log-modal-title-main{font-family:'Russo One',sans-serif;font-size:20px;color:#2C1810;letter-spacing:0.02em;display:block}
+#log-modal-title-main{font-family:'Bungee',sans-serif;font-size:20px;color:#2C1810;letter-spacing:0.02em;display:block}
 #log-modal-close{background:rgba(255,244,220,0.8);border-color:rgba(139,104,60,0.25);color:#7C5C3E}
 #log-modal-close:hover{background:rgba(194,123,32,0.15);color:#2C1810}
 #log-modal-mini{background:rgba(139,104,60,0.06);border-bottom:1px solid rgba(139,104,60,0.14);padding:0}
@@ -2735,7 +2735,7 @@ body.july4-bg::before {
 /* Restaurant section */
 .restaurant-step{padding:14px 16px 10px;background:#FFF8ED;border-bottom:1px solid rgba(139,104,60,0.10)}
 .restaurant-section-label{font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:#8B7355;font-weight:700;font-family:'Courier New',monospace;display:block;margin-bottom:8px}
-.restaurant-step input[type=text]{background:transparent;border:none;border-bottom:1.5px solid #C27B20;border-radius:0;font-size:15px;font-weight:600;color:#2C1810;padding:4px 0;width:100%;box-sizing:border-box;font-family:'Outfit',sans-serif}
+.restaurant-step input[type=text]{background:transparent;border:none;border-bottom:1.5px solid #C27B20;border-radius:0;font-size:15px;font-weight:600;color:#2C1810;padding:4px 0;width:100%;box-sizing:border-box;font-family:'Poppins',sans-serif}
 .restaurant-step input[type=text]:focus{border-bottom-color:#7C3A1E;box-shadow:none}
 .restaurant-step input[type=text]::placeholder{color:rgba(139,104,60,0.45);font-weight:400}
 .restaurant-locked-row{background:rgba(194,123,32,0.10);border:1.5px solid rgba(194,123,32,0.35);border-radius:8px}
@@ -2766,7 +2766,7 @@ body.july4-bg::before {
 .burger-detail label{color:#8B7355;font-size:9px;letter-spacing:0.14em;font-family:'Courier New',monospace;width:68px}
 .burger-detail input[type=text]{background:transparent;border:none;border-bottom:1.5px solid rgba(194,123,32,0.40);border-radius:0;color:#2C1810;padding:4px 0;font-size:14px}
 .burger-detail input[type=text]:focus{border-bottom-color:#7C3A1E;box-shadow:none}
-.rating-score{color:#2C1810;font-family:'Russo One',sans-serif}
+.rating-score{color:#2C1810;font-family:'Bungee',sans-serif}
 .star-icon{color:rgba(139,104,60,0.22)}
 .star-icon.full{color:#C27B20}
 .topping-btn{background:#FFF3DC;border-color:rgba(139,104,60,0.25);color:#5C4033}
@@ -2842,9 +2842,9 @@ body.july4-bg::before {
           <div id="header-ring-avatar" style="flex-shrink:0"></div>
           <div style="flex:1;min-width:0">
             <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:5px">
-              <span id="header-tally-name" style="font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px"></span>
-              <span id="header-tally-count" style="font-family:'Russo One',sans-serif;font-size:17px;letter-spacing:0;line-height:1"></span>
-              <span style="font-size:11px;color:var(--muted);font-family:'Outfit',sans-serif">/ 100</span>
+              <span id="header-tally-name" style="font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px"></span>
+              <span id="header-tally-count" style="font-family:'Bungee',sans-serif;font-size:17px;letter-spacing:0;line-height:1"></span>
+              <span style="font-size:11px;color:var(--muted);font-family:'Poppins',sans-serif">/ 100</span>
             </div>
             <div style="position:relative;height:14px;display:flex;align-items:center">
               <div style="position:absolute;inset:4px 0;background:linear-gradient(90deg,#ef4444 0%,#f59e0b 40%,#eab308 55%,#22c55e 100%);border-radius:999px;box-shadow:inset 0 1px 3px rgba(0,0,0,0.3)">
@@ -2903,7 +2903,7 @@ body.july4-bg::before {
     <div class="tab-panel" id="tab-feed">
       <div class="feed-sub-tabs" id="feed-sub-tabs">
         <button class="feed-sub-tab active" onclick="switchFeedTab('feed',this)"><i class="ti ti-bolt"></i> Feed</button>
-        <button class="feed-sub-tab" onclick="switchFeedTab('rated',this)"><i class="ti ti-star-filled"></i> Top Rated</button>
+        <button class="feed-sub-tab" onclick="switchFeedTab('rated',this)"><i class="ti ti-star"></i> Top Rated</button>
       </div>
       <!-- Unified feed panel -->
       <div id="unified-feed-panel">
@@ -3036,7 +3036,7 @@ body.july4-bg::before {
     <div id="log-modal-scroll">
       <!-- Repeat last burger shortcut -->
       <div id="repeat-last-burger-strip" style="display:none;padding:10px 16px 0">
-        <button id="repeat-last-burger-btn" onclick="repeatLastBurger()" style="width:100%;display:flex;align-items:center;gap:10px;background:rgba(194,123,32,0.10);border:1.5px dashed rgba(194,123,32,0.40);border-radius:10px;padding:10px 14px;cursor:pointer;font-family:'Outfit',sans-serif;text-align:left;transition:background 0.15s">
+        <button id="repeat-last-burger-btn" onclick="repeatLastBurger()" style="width:100%;display:flex;align-items:center;gap:10px;background:rgba(194,123,32,0.10);border:1.5px dashed rgba(194,123,32,0.40);border-radius:10px;padding:10px 14px;cursor:pointer;font-family:'Poppins',sans-serif;text-align:left;transition:background 0.15s">
           <span style="font-size:18px;flex-shrink:0">🔁</span>
           <div style="min-width:0;flex:1">
             <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted2);font-weight:700;font-family:'Courier New',monospace;margin-bottom:2px">Repeat last order</div>
@@ -3121,12 +3121,12 @@ body.july4-bg::before {
           <label style="font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em;font-weight:600;width:auto">Burger name</label>
           <input type="text" id="custom-burger-name" maxlength="60" autocomplete="off"
                  placeholder="Name your creation…"
-                 style="width:100%;box-sizing:border-box;background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-xs);padding:11px 14px;font-size:15px;color:var(--text);font-family:'Outfit',sans-serif;outline:none;transition:border-color 0.2s,box-shadow 0.2s"
+                 style="width:100%;box-sizing:border-box;background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-xs);padding:11px 14px;font-size:15px;color:var(--text);font-family:'Poppins',sans-serif;outline:none;transition:border-color 0.2s,box-shadow 0.2s"
                  onfocus="this.style.borderColor='var(--amber)';this.style.boxShadow='0 0 0 3px rgba(217,119,6,0.12)'"
                  onblur="this.style.borderColor='';this.style.boxShadow=''"/>
         </div>
         <div style="display:flex;flex-direction:column;gap:6px">
-          <button id="toppings-toggle" onclick="toggleToppingsPanel()" style="display:flex;align-items:center;justify-content:space-between;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:'Outfit',sans-serif;width:100%;transition:background 0.15s,border-color 0.15s">
+          <button id="toppings-toggle" onclick="toggleToppingsPanel()" style="display:flex;align-items:center;justify-content:space-between;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:'Poppins',sans-serif;width:100%;transition:background 0.15s,border-color 0.15s">
             <span id="toppings-toggle-label" style="font-size:12px;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em">+ Add Toppings</span>
             <span id="toppings-chevron" style="font-size:12px;color:var(--muted2);transition:transform 0.2s">▾</span>
           </button>
@@ -3156,13 +3156,13 @@ body.july4-bg::before {
         <input type="file" id="avatar-input-upload" accept="image/*" style="display:none" onchange="onAvatarPhotoSelected(this)"/>
         <!-- Backdate option -->
         <div style="display:flex;flex-direction:column;gap:6px">
-          <button id="backdate-toggle" onclick="toggleBackdatePanel()" style="display:flex;align-items:center;justify-content:space-between;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:'Outfit',sans-serif;width:100%;transition:background 0.15s,border-color 0.15s">
+          <button id="backdate-toggle" onclick="toggleBackdatePanel()" style="display:flex;align-items:center;justify-content:space-between;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:'Poppins',sans-serif;width:100%;transition:background 0.15s,border-color 0.15s">
             <span id="backdate-toggle-label" style="font-size:12px;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em">📅 Log for a different time</span>
             <span id="backdate-chevron" style="font-size:12px;color:var(--muted2);transition:transform 0.2s">▾</span>
           </button>
           <div id="backdate-wrap" style="display:none;animation:slideIn 0.15s ease both;padding:2px 0 4px">
             <input type="datetime-local" id="backdate-input"
-                   style="width:100%;box-sizing:border-box;background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-xs);color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border-color 0.2s"
+                   style="width:100%;box-sizing:border-box;background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-xs);color:var(--text);font-family:'Poppins',sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border-color 0.2s"
                    onfocus="this.style.borderColor='var(--amber)'" onblur="this.style.borderColor=''"/>
             <div style="font-size:11px;color:var(--muted2);margin-top:5px;padding-left:2px">Leave blank to log at the current time.</div>
           </div>
@@ -3185,30 +3185,30 @@ body.july4-bg::before {
     <div style="text-align:center;margin-bottom:16px">
       <div style="width:40px;height:4px;background:var(--border);border-radius:999px;margin:0 auto 14px"></div>
       <div id="avatar-picker-preview" style="width:72px;height:72px;border-radius:50%;margin:0 auto 10px;overflow:hidden;background:var(--surface3);border:2px solid var(--border)"></div>
-      <div style="font-family:'Russo One',sans-serif;font-size:17px;letter-spacing:0;color:var(--text)">CHANGE AVATAR</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:2px;font-family:'Outfit',sans-serif">Pick a photo for your profile</div>
+      <div style="font-family:'Bungee',sans-serif;font-size:17px;letter-spacing:0;color:var(--text)">CHANGE AVATAR</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px;font-family:'Poppins',sans-serif">Pick a photo for your profile</div>
     </div>
     <div style="display:flex;flex-direction:column;gap:10px">
       <button onclick="document.getElementById('avatar-input-camera').click()" style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;width:100%;text-align:left;transition:background 0.15s">
         <span style="font-size:22px">📸</span>
         <div>
-          <div style="font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;color:var(--text)">Take a Selfie</div>
-          <div style="font-family:'Outfit',sans-serif;font-size:11px;color:var(--muted);margin-top:1px">Open camera and take a photo</div>
+          <div style="font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;color:var(--text)">Take a Selfie</div>
+          <div style="font-family:'Poppins',sans-serif;font-size:11px;color:var(--muted);margin-top:1px">Open camera and take a photo</div>
         </div>
       </button>
       <button onclick="document.getElementById('avatar-input-upload').click()" style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;width:100%;text-align:left;transition:background 0.15s">
         <span style="font-size:22px">🖼️</span>
         <div>
-          <div style="font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;color:var(--text)">Choose from Library</div>
-          <div style="font-family:'Outfit',sans-serif;font-size:11px;color:var(--muted);margin-top:1px">Upload an existing photo</div>
+          <div style="font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;color:var(--text)">Choose from Library</div>
+          <div style="font-family:'Poppins',sans-serif;font-size:11px;color:var(--muted);margin-top:1px">Upload an existing photo</div>
         </div>
       </button>
       <div id="avatar-remove-row" style="display:none">
         <button onclick="removeAvatar()" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;width:100%;text-align:left;transition:background 0.15s">
           <span style="font-size:22px">🗑️</span>
           <div>
-            <div style="font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;color:var(--red)">Remove Photo</div>
-            <div style="font-family:'Outfit',sans-serif;font-size:11px;color:var(--muted);margin-top:1px">Go back to initials avatar</div>
+            <div style="font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;color:var(--red)">Remove Photo</div>
+            <div style="font-family:'Poppins',sans-serif;font-size:11px;color:var(--muted);margin-top:1px">Go back to initials avatar</div>
           </div>
         </button>
       </div>
@@ -3220,15 +3220,15 @@ body.july4-bg::before {
 <div id="avatar-crop-overlay" style="display:none;position:fixed;inset:0;z-index:9100;background:rgba(0,0,0,0.96);flex-direction:column;align-items:center;justify-content:center;padding:16px;box-sizing:border-box">
   <div style="width:100%;max-width:440px;display:flex;flex-direction:column;align-items:center;gap:16px">
     <div style="text-align:center">
-      <div style="font-family:'Russo One',sans-serif;font-size:18px;letter-spacing:0;color:#fff">CROP YOUR PHOTO</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.45);font-family:'Outfit',sans-serif;margin-top:3px">Pinch or scroll to zoom · Drag to reposition</div>
+      <div style="font-family:'Bungee',sans-serif;font-size:18px;letter-spacing:0;color:#fff">CROP YOUR PHOTO</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.45);font-family:'Poppins',sans-serif;margin-top:3px">Pinch or scroll to zoom · Drag to reposition</div>
     </div>
     <div id="avatar-crop-container" style="width:100%;max-width:320px;height:320px;border-radius:16px;overflow:hidden;background:#111;position:relative">
       <img id="avatar-crop-img" style="max-width:100%;display:block" alt="crop"/>
     </div>
     <div style="display:flex;gap:10px;width:100%;max-width:320px">
-      <button onclick="cancelAvatarCrop()" style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:13px;color:#fff;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer">Cancel</button>
-      <button onclick="confirmAvatarCrop()" style="flex:2;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.5);border-radius:12px;padding:13px;color:var(--amber);font-family:'Russo One',sans-serif;font-size:14px;letter-spacing:0;cursor:pointer">SAVE AVATAR</button>
+      <button onclick="cancelAvatarCrop()" style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:13px;color:#fff;font-family:'Poppins',sans-serif;font-size:14px;font-weight:600;cursor:pointer">Cancel</button>
+      <button onclick="confirmAvatarCrop()" style="flex:2;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.5);border-radius:12px;padding:13px;color:var(--amber);font-family:'Bungee',sans-serif;font-size:14px;letter-spacing:0;cursor:pointer">SAVE AVATAR</button>
     </div>
   </div>
 </div>
@@ -3411,10 +3411,12 @@ function initials(name) {
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-// Shared star-rating glyph — filled (amber) vs empty (dim outline), replacing the old ⭐ emoji rows.
+// Shared star-rating glyph — filled (yellow) vs empty (dim outline), replacing the old ⭐ emoji rows.
+// Filled state uses an inline SVG (not the icon font) since this webfont build has no "-filled" glyphs.
+const _FILLED_STAR_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="#FACC15" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:-2px" aria-hidden="true"><path d="M12 1l3.09 6.26L22 8.27l-5 4.87 1.18 6.88L12 16.77l-6.18 3.25L7 13.14 2 8.27l6.91-1.01L12 1z"/></svg>';
 function starIcon(filled, dimOpacity) {
   return filled
-    ? '<i class="ti ti-star-filled" style="color:#FACC15"></i>'
+    ? _FILLED_STAR_SVG
     : `<i class="ti ti-star" style="color:rgba(120,120,120,${dimOpacity != null ? dimOpacity : 0.3})"></i>`;
 }
 const colorClass = idx => COLORS[idx % COLORS.length];
@@ -3600,7 +3602,7 @@ function avatarHTML(p, size) {
   if (p.avatar) {
     return `<div class="${cc}" style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="${p.avatar}" style="width:100%;height:100%;object-fit:cover" alt="${escHtml(p.name)}"/></div>`;
   }
-  return `<div class="${cc}" style="width:${size}px;height:${size}px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.33)}px;font-weight:700;background:var(--av-bg);color:var(--av-text);flex-shrink:0;font-family:'Outfit',sans-serif">${initials(p.name)}</div>`;
+  return `<div class="${cc}" style="width:${size}px;height:${size}px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.33)}px;font-weight:700;background:var(--av-bg);color:var(--av-text);flex-shrink:0;font-family:'Poppins',sans-serif">${initials(p.name)}</div>`;
 }
 
 function miniAvatarHTML(name, colorIdx, size, avatar='') {
@@ -3608,7 +3610,7 @@ function miniAvatarHTML(name, colorIdx, size, avatar='') {
   if (avatar) {
     return `<div class="${cc}" style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="${avatar}" style="width:100%;height:100%;object-fit:cover" alt="${escHtml(name)}"/></div>`;
   }
-  return `<div class="${cc}" style="width:${size}px;height:${size}px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.36)}px;font-weight:700;background:var(--av-bg);color:var(--av-text);flex-shrink:0;font-family:'Outfit',sans-serif">${initials(name)}</div>`;
+  return `<div class="${cc}" style="width:${size}px;height:${size}px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.36)}px;font-weight:700;background:var(--av-bg);color:var(--av-text);flex-shrink:0;font-family:'Poppins',sans-serif">${initials(name)}</div>`;
 }
 
 function logTs(entry) { return typeof entry === 'string' ? entry : (entry && entry.ts) || ''; }
@@ -3962,8 +3964,8 @@ window.openFABLog = function() {
       <circle cx="44" cy="44" r="${R}" fill="none" stroke="${color}" stroke-width="7" stroke-linecap="round"
         stroke-dasharray="${circ}" stroke-dashoffset="${dashOff}"
         transform="rotate(-90 44 44)" style="transition:stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)"/>
-      <text x="44" y="40" text-anchor="middle" font-family="Russo One,sans-serif" font-size="18" fill="${color}" font-weight="900">${me.count}</text>
-      <text x="44" y="53" text-anchor="middle" font-family="Outfit,sans-serif" font-size="9" fill="rgba(44,24,16,0.45)">${isDone ? '🏆 done' : 'of 100'}</text>
+      <text x="44" y="40" text-anchor="middle" font-family="Bungee,sans-serif" font-size="18" fill="${color}" font-weight="900">${me.count}</text>
+      <text x="44" y="53" text-anchor="middle" font-family="Poppins,sans-serif" font-size="9" fill="rgba(44,24,16,0.45)">${isDone ? '🏆 done' : 'of 100'}</text>
     </svg>`;
     // Player info
     const nameEl2 = document.getElementById('log-modal-player-name');
@@ -4887,7 +4889,7 @@ function renderUnifiedFeed() {
 
   const loadMoreHtml = hasMore
     ? `<div style="display:flex;justify-content:center;padding:16px 0 8px;flex-shrink:0">
-         <button onclick="loadMoreFeed()" style="background:rgba(245,158,11,0.12);border:1px solid var(--border2);color:var(--amber);font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;padding:8px 22px;border-radius:999px;cursor:pointer;letter-spacing:0.02em">
+         <button onclick="loadMoreFeed()" style="background:rgba(245,158,11,0.12);border:1px solid var(--border2);color:var(--amber);font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;padding:8px 22px;border-radius:999px;cursor:pointer;letter-spacing:0.02em">
            ↑ Load ${Math.min(30, totalItems - _feedItemLimit)} older burgers
          </button>
        </div>`
@@ -5063,7 +5065,7 @@ function renderUnifiedFeed() {
         : '';
       const avatarInner = item.player.avatar
         ? `<img src="${item.player.avatar}" alt="avatar" style="width:100%;height:100%;object-fit:cover"/>`
-        : `<div class="${colorClass(item.player.colorIdx)}" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:var(--av-bg);color:var(--av-text);font-family:'Outfit',sans-serif">${ini}</div>`;
+        : `<div class="${colorClass(item.player.colorIdx)}" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:var(--av-bg);color:var(--av-text);font-family:'Poppins',sans-serif">${ini}</div>`;
       const feedRestoEmoji = restoEmoji(item.restaurant);
       const feedRestoLogoUrl = restoLogoUrl(item.restaurant, 64);
       const fnphIconHtml = feedRestoLogoUrl
@@ -5790,10 +5792,10 @@ async function generateReceiptCanvas(d) {
   const titleY    = HDR_Y + Math.round(HDR_H * 0.48); // ≈ 89
   const subtitleY = titleY + 28;
   ctx.textAlign = 'center';
-  ctx.font = "700 38px 'Outfit', sans-serif";
+  ctx.font = "700 38px 'Poppins', sans-serif";
   ctx.fillStyle = '#ffffff';
   ctx.fillText('🍔  100 BURGER CHALLENGE', W / 2, titleY);
-  ctx.font = "500 14px 'Outfit', sans-serif";
+  ctx.font = "500 14px 'Poppins', sans-serif";
   ctx.fillStyle = 'rgba(255,255,255,0.58)';
   ctx.fillText('THE SUMMER GRIND  ·  ROOM ' + (roomId || '—'), W / 2, subtitleY);
 
@@ -5818,10 +5820,10 @@ async function generateReceiptCanvas(d) {
 
   // Player name — leftX aligned, navy, vertically centered in PCRD_H
   let nameFs = 46;
-  ctx.font = `700 ${nameFs}px 'Russo One', sans-serif`;
+  ctx.font = `700 ${nameFs}px 'Bungee', sans-serif`;
   while (ctx.measureText(d.name).width > rightX - leftX - 160 && nameFs > 20) {
     nameFs--;
-    ctx.font = `700 ${nameFs}px 'Russo One', sans-serif`;
+    ctx.font = `700 ${nameFs}px 'Bungee', sans-serif`;
   }
   // Center vertically: baseline = y + (PCRD_H + capHeight) / 2
   const nameCap = Math.round(nameFs * 0.72);
@@ -5837,10 +5839,10 @@ async function generateReceiptCanvas(d) {
   const rL2Y = y + 57;   // "date 📅  ·  time 🕐" baseline
 
   ctx.textAlign = 'right';
-  ctx.font = "700 22px 'Outfit', sans-serif";
+  ctx.font = "700 22px 'Poppins', sans-serif";
   ctx.fillStyle = 'rgba(11,53,80,0.7)';
   ctx.fillText(d.count + '/100 🍔', rightX, rL1Y);
-  ctx.font = "400 12px 'Outfit', sans-serif";
+  ctx.font = "400 12px 'Poppins', sans-serif";
   ctx.fillStyle = 'rgba(11,53,80,0.45)';
   ctx.fillText(d.dateStr + ' 📅  ·  ' + d.timeStr + ' 🕐', rightX, rL2Y);
 
@@ -5925,7 +5927,7 @@ async function generateReceiptCanvas(d) {
 
   // Restaurant + build — leftX / rightX aligned
   ctx.textAlign = 'left';
-  ctx.font = "700 21px 'Outfit', sans-serif";
+  ctx.font = "700 21px 'Poppins', sans-serif";
   ctx.fillStyle = '#0b3550';
   ctx.fillText('📍 ' + (d.restaurant || 'Unknown Spot'), leftX, y + 24);
 
@@ -5933,7 +5935,7 @@ async function generateReceiptCanvas(d) {
     ? `${d.menuEmoji || '🍔'} ${d.menuItem}`
     : `${d.pattyLabel}-Patty Smash`;
   ctx.textAlign = 'right';
-  ctx.font = "500 15px 'Outfit', sans-serif";
+  ctx.font = "500 15px 'Poppins', sans-serif";
   ctx.fillStyle = 'rgba(11,53,80,0.55)';
   ctx.fillText(buildLabel, rightX, y + 24);
   y += 46;
@@ -5959,7 +5961,7 @@ async function generateReceiptCanvas(d) {
       stx += SR * 2 + SG;
     }
     ctx.globalAlpha = 1;
-    ctx.font = "700 20px 'Outfit', sans-serif";
+    ctx.font = "700 20px 'Poppins', sans-serif";
     ctx.textAlign = 'left';
     ctx.fillStyle = '#F59E0B';
     ctx.fillText(d.rating + ' / 5 Stars', stx + 10, y + SR + 6);
@@ -5974,7 +5976,7 @@ async function generateReceiptCanvas(d) {
     ctx.fillText('TOPPINGS', leftX, y);
     y += 14;
 
-    ctx.font = "500 15px 'Outfit', sans-serif";
+    ctx.font = "500 15px 'Poppins', sans-serif";
     const PH = 34, PPX = 13, PGX = 7, PGY = 8;
     let tx = leftX, ty = y;
     for (const top of d.toppings) {
@@ -5995,7 +5997,7 @@ async function generateReceiptCanvas(d) {
     }
     y = ty + PH + 12;
   } else {
-    ctx.font = "500 15px 'Outfit', sans-serif";
+    ctx.font = "500 15px 'Poppins', sans-serif";
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(11,53,80,0.3)';
     ctx.fillText('Classic build', leftX, y + 17);
@@ -6053,7 +6055,7 @@ function showReceiptPreview(canvas) {
 
   const hint = document.createElement('p');
   hint.textContent = '📲 Press & hold (mobile) · Right-click → Save Image (desktop)';
-  hint.style.cssText = 'color:rgba(255,255,255,0.38);font-size:13px;margin:18px 0 0;font-family:Outfit,sans-serif;text-align:center;';
+  hint.style.cssText = 'color:rgba(255,255,255,0.38);font-size:13px;margin:18px 0 0;font-family:Poppins,sans-serif;text-align:center;';
 
   const closeBtn = document.createElement('button');
   closeBtn.textContent = 'Close';
@@ -6061,7 +6063,7 @@ function showReceiptPreview(canvas) {
     'margin-top:18px;padding:11px 36px',
     'background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.16)',
     'border-radius:999px;color:#fff;font-size:14px;font-weight:600',
-    'cursor:pointer;font-family:Outfit,sans-serif;transition:background 0.15s',
+    'cursor:pointer;font-family:Poppins,sans-serif;transition:background 0.15s',
   ].join(';');
   closeBtn.onmouseenter = () => { closeBtn.style.background = 'rgba(255,255,255,0.14)'; };
   closeBtn.onmouseleave = () => { closeBtn.style.background = 'rgba(255,255,255,0.08)'; };
@@ -7141,7 +7143,7 @@ window.openAvatarPicker = function() {
     removeRow.style.display = 'block';
   } else {
     const c = RING_COLORS[me.colorIdx % RING_COLORS.length];
-    preview.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;font-family:'Outfit',sans-serif;color:${c};background:${c}22">${initials(me.name)}</div>`;
+    preview.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;font-family:'Poppins',sans-serif;color:${c};background:${c}22">${initials(me.name)}</div>`;
     removeRow.style.display = 'none';
   }
   overlay.style.display = 'flex';
@@ -7388,7 +7390,7 @@ window.openDayDetail = function(year, month, day) {
       <div style="background:var(--surface);border:1px solid ${color}22;border-left:3px solid ${color};border-radius:12px;padding:12px 14px">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:${stars||weather||location?'8px':'0'}">
           <div>
-            <div style="font-family:'Russo One',sans-serif;font-size:15px;font-weight:800;color:${color};letter-spacing:-0.02em;line-height:1.2">
+            <div style="font-family:'Bungee',sans-serif;font-size:15px;font-weight:800;color:${color};letter-spacing:-0.02em;line-height:1.2">
               ${restaurant ? escHtml(restaurant) : `Burger #${idx + 1}`}
             </div>
             <div style="font-size:11px;color:#6B7280;font-weight:600;margin-top:3px">${pattyEmoji} ${pattyLabel}</div>
@@ -7902,7 +7904,7 @@ function renderRestaurantLB() {
 
   const loadMoreRestoHtml = hasMoreResto
     ? `<div style="display:flex;justify-content:center;padding:12px 0 4px">
-         <button onclick="loadMoreRestoLB()" style="background:rgba(245,158,11,0.12);border:1px solid var(--border2);color:var(--amber);font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;padding:8px 22px;border-radius:999px;cursor:pointer;letter-spacing:0.02em">
+         <button onclick="loadMoreRestoLB()" style="background:rgba(245,158,11,0.12);border:1px solid var(--border2);color:var(--amber);font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;padding:8px 22px;border-radius:999px;cursor:pointer;letter-spacing:0.02em">
            Show ${Math.min(10, sorted.length - _lbRestoLimit)} more spots
          </button>
        </div>`
