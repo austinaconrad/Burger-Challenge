@@ -1257,6 +1257,7 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 .restaurant-suggestion:active{transform:scale(0.95)}
 .restaurant-suggestion:hover{background:rgba(30,110,170,0.08);border-color:rgba(30,110,170,0.35)}
 .restaurant-suggestion-emoji{font-size:22px;line-height:1}
+.restaurant-suggestion-logo{width:26px;height:26px;border-radius:7px;object-fit:contain;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.15)}
 .restaurant-suggestion-name{display:block;white-space:normal;overflow-wrap:break-word;word-break:break-word;width:100%;line-height:1.3;text-align:center}
 .restaurant-suggestion-badge{font-size:9px;background:rgba(30,110,170,0.12);color:var(--sky);border-radius:999px;padding:1px 6px;font-weight:600;margin-top:1px}
 /* ── Menu picker ── */
@@ -2463,6 +2464,7 @@ body.july4-bg::before {
 .resto-bar-wrap{height:3px;background:rgba(255,255,255,0.07);border-radius:999px;margin-top:6px;overflow:hidden}
 .resto-bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--amber-dark),var(--amber));transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1)}
 .resto-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
+.resto-right-logo{width:32px;height:32px;border-radius:8px;object-fit:contain;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);flex-shrink:0}
 .resto-stars{font-size:14px;line-height:1}
 .resto-score{font-family:'Russo One',sans-serif;font-size:13px;font-weight:800;color:var(--amber)}
 .resto-unrated{font-size:11px;color:var(--muted);font-weight:500}
@@ -5579,6 +5581,53 @@ function restoEmoji(name) {
   return '🍔';
 }
 
+// ── Restaurant logos (Logo.dev) ──────────────────────────────────
+// Free-tier publishable token — safe to expose client-side (like a Stripe publishable key).
+const LOGO_DEV_TOKEN = 'pk_NxXa9SCRRPG5aSn2Tqsqhw';
+
+// Known chain name → real domain, so we can pull a real logo instead of an emoji.
+// Anything not matched here (local spots, inside jokes, generic categories) keeps its emoji.
+const CHAIN_DOMAINS = [
+  { kw: ['mcdonald', 'micky d'],                    domain: 'mcdonalds.com' },
+  { kw: ['wendy'],                                   domain: 'wendys.com' },
+  { kw: ['burger king', 'bk'],                       domain: 'bk.com' },
+  { kw: ['five guys'],                               domain: 'fiveguys.com' },
+  { kw: ['shake shack'],                             domain: 'shakeshack.com' },
+  { kw: ['whataburger'],                             domain: 'whataburger.com' },
+  { kw: ['in-n-out', 'in n out'],                    domain: 'in-n-out.com' },
+  { kw: ['sonic'],                                   domain: 'sonicdrivein.com' },
+  { kw: ['culver'],                                  domain: 'culvers.com' },
+  { kw: ["steak n shake", "steak 'n shake"],         domain: 'steaknshake.com' },
+  { kw: ['dairy queen', 'dq'],                        domain: 'dairyqueen.com' },
+  { kw: ['hardee'],                                   domain: 'hardees.com' },
+  { kw: ['carl'],                                     domain: 'carlsjr.com' },
+  { kw: ['jack in the box'],                          domain: 'jackinthebox.com' },
+  { kw: ['white castle'],                             domain: 'whitecastle.com' },
+  { kw: ['smashburger'],                              domain: 'smashburger.com' },
+  { kw: ['fatburger'],                                domain: 'fatburger.com' },
+  { kw: ['red robin'],                                domain: 'redrobin.com' },
+  { kw: ['applebee'],                                 domain: 'applebees.com' },
+  { kw: ['swenson'],                                  domain: 'swensons.com' },
+  { kw: ['buffalo wild wings', 'bdubs'],              domain: 'buffalowildwings.com' },
+];
+
+function restoLogoUrl(name, size) {
+  if (!name || !LOGO_DEV_TOKEN) return null;
+  const n = name.toLowerCase();
+  const hit = CHAIN_DOMAINS.find(entry => entry.kw.some(k => n.includes(k)));
+  if (!hit) return null;
+  return `https://img.logo.dev/${hit.domain}?token=${LOGO_DEV_TOKEN}&size=${size || 64}&format=png`;
+}
+
+// Swaps a broken/missing logo image back to its emoji fallback (keeps layout stable).
+function handleLogoErr(img) {
+  const span = document.createElement('span');
+  span.className = img.dataset.fallbackClass || '';
+  if (img.dataset.fallbackSize) span.style.fontSize = img.dataset.fallbackSize;
+  span.textContent = img.dataset.fallbackEmoji || '🍔';
+  img.replaceWith(span);
+}
+
 // Google Places API key — paste yours here to enable live autocomplete for any restaurant.
 // Get one free at console.cloud.google.com → enable "Places API".
 // Without a key the picker still works for the spots listed in BURGER_MENUS.
@@ -6451,9 +6500,13 @@ function renderRestaurantSuggestions(list) {
     const hasMenu = !!BURGER_MENUS[name];
     const badge = hasMenu ? '<span class="restaurant-suggestion-badge">Menu</span>' : '';
     const emoji = restoEmoji(name);
+    const logoUrl = restoLogoUrl(name, 64);
+    const iconHtml = logoUrl
+      ? `<img src="${logoUrl}" alt="" class="restaurant-suggestion-logo" data-fallback-class="restaurant-suggestion-emoji" data-fallback-emoji="${escHtml(emoji)}" onerror="handleLogoErr(this)">`
+      : `<span class="restaurant-suggestion-emoji">${emoji}</span>`;
     const nameFontSize = name.length > 16 ? '10px' : name.length > 11 ? '11px' : '12px';
     return `<button class="restaurant-suggestion" onclick="onRestaurantSuggestionClick('${escHtml(name).replace(/'/g,"\\'")}')">
-      <span class="restaurant-suggestion-emoji">${emoji}</span>
+      ${iconHtml}
       <span class="restaurant-suggestion-name" style="font-size:${nameFontSize}">${escHtml(name)}</span>
       ${badge}
     </button>`;
@@ -7949,6 +8002,10 @@ function renderRestaurantLB() {
     const rankCls = rank === 1 ? 'r1' : rank === 2 ? 'r2' : rank === 3 ? 'r3' : 'rn';
     const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
     const emoji = restoEmoji(r.name);
+    const logoUrl = restoLogoUrl(r.name, 64);
+    const rightHtml = logoUrl
+      ? `<img src="${logoUrl}" alt="" class="resto-right-logo" data-fallback-class="resto-right" data-fallback-size="28px" data-fallback-emoji="${escHtml(emoji)}" onerror="handleLogoErr(this)">`
+      : `<div class="resto-right" style="font-size:28px;line-height:1">${emoji}</div>`;
     const playerList = [...r.playerNames].slice(0, 4).map(n => escHtml(n)).join(', ');
     const barPct = Math.min(100, Math.round((r.visits / sorted[0].visits) * 100));
     return `
@@ -7962,7 +8019,7 @@ function renderRestaurantLB() {
     </div>
     <div class="resto-bar-wrap"><div class="resto-bar-fill" style="width:${barPct}%"></div></div>
   </div>
-  <div class="resto-right" style="font-size:28px;line-height:1">${emoji}</div>
+  ${rightHtml}
 </div>`.trim();
   }).join('\n');
 
