@@ -1956,11 +1956,36 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 .pace-behind { background: rgba(248,113,113,0.12); color: #F87171; border: 1px solid rgba(248,113,113,0.25); }
 .pace-ontrack{ background: rgba(245,158,11,0.12); color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
 .pace-done   { background: rgba(34,197,94,0.12); color: #4ADE80; border: 1px solid rgba(34,197,94,0.25); }
-.pace-track-wrap {
-  height: 5px; background: rgba(255,255,255,0.07);
-  border-radius: 999px; overflow: hidden; margin-bottom: 8px;
+.pace-gauge-wrap { position:relative; height:12px; margin-bottom:8px; }
+.pace-gauge-track {
+  position:absolute; top:50%; left:0; right:0; transform:translateY(-50%);
+  height:7px; border-radius:999px; overflow:hidden;
+  background:linear-gradient(90deg,#ef4444 0%,#f59e0b 40%,#eab308 55%,#22c55e 100%);
+  box-shadow:inset 0 1px 2px rgba(0,0,0,0.25);
 }
-.pace-track-fill { height: 100%; border-radius: 999px; transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+.pace-gauge-track::before {
+  content:''; position:absolute; top:0; bottom:0; width:36%;
+  background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.55) 50%,transparent 100%);
+  animation:barShimmer 1.8s ease-in-out infinite;
+}
+.pace-gauge-mask {
+  position:absolute; top:0; bottom:0; left:0%; right:0;
+  background:rgba(226,232,240,0.95);
+  transition:left 0.6s cubic-bezier(0.34,1.56,0.64,1);
+}
+.pace-gauge-tick {
+  position:absolute; top:50%; width:2px; height:12px;
+  background:rgba(15,23,42,0.5); border-radius:1px;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+.pace-gauge-dot {
+  position:absolute; top:50%; width:10px; height:10px; border-radius:50%;
+  transform:translate(-50%,-50%);
+  border:1.5px solid var(--bg);
+  transition:left 0.6s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events:none;
+}
 .pace-projection {
   font-size: 11px; color: var(--muted2); text-align: center;
   padding: 5px 8px; background: rgba(255,255,255,0.03);
@@ -1994,7 +2019,6 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 .feed-comment-thread-inner { padding:12px 14px 14px; }
 .feed-comment-list { gap:10px;margin-bottom:11px; }
 .comment-text { font-size:13px;line-height:1.5; }
-.pace-track-wrap { background:rgba(30,110,170,0.10); }
 .pace-stat:not(:last-child) { border-right:1px solid rgba(30,110,170,0.10); }
 .pace-stats-row { border-top:1px solid rgba(30,110,170,0.10); }
 
@@ -2049,6 +2073,8 @@ body.july4-bg #log-modal-drag { background: rgba(255,255,255,0.15) !important; }
 body.july4-bg #log-modal-spiral { display: none !important; }
 /* Pace cards */
 body.july4-bg .pace-card { background: rgba(10,22,40,0.72) !important; border-color: rgba(255,255,255,0.10) !important; }
+body.july4-bg .pace-gauge-mask { background: rgba(10,22,40,0.85) !important; }
+body.july4-bg .pace-gauge-tick { background: rgba(232,244,253,0.6) !important; }
 body.july4-bg .pace-summary-card { background: rgba(10,22,40,0.72) !important; border-color: rgba(255,255,255,0.10) !important; }
 /* Receipt card */
 body.july4-bg .rcpt-card { background: rgba(5,15,35,0.90) !important; }
@@ -3567,7 +3593,7 @@ function ringAvatarHTML(p, size, emojiOverride=null) {
   const gap  = circ - dash;
   let innerContent, innerStyle;
   if (p.avatar) {
-    innerContent = `<img src="${p.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover" alt="${escHtml(p.name)}"/>`;
+    innerContent = `<img src="${p.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover" alt="${escHtml(p.name)}" loading="lazy"/>`;
     innerStyle = 'padding:0;overflow:hidden';
   } else if (emojiOverride) {
     innerContent = `<span style="font-size:${Math.round(size*0.44)}px;line-height:1">${emojiOverride}</span>`;
@@ -3590,7 +3616,7 @@ function ringAvatarHTML(p, size, emojiOverride=null) {
 function avatarHTML(p, size) {
   const cc = colorClass(p.colorIdx);
   if (p.avatar) {
-    return `<div class="${cc}" style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="${p.avatar}" style="width:100%;height:100%;object-fit:cover" alt="${escHtml(p.name)}"/></div>`;
+    return `<div class="${cc}" style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="${p.avatar}" style="width:100%;height:100%;object-fit:cover" alt="${escHtml(p.name)}" loading="lazy"/></div>`;
   }
   return `<div class="${cc}" style="width:${size}px;height:${size}px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.33)}px;font-weight:700;background:var(--av-bg);color:var(--av-text);flex-shrink:0;font-family:'Poppins',sans-serif">${initials(p.name)}</div>`;
 }
@@ -3598,7 +3624,7 @@ function avatarHTML(p, size) {
 function miniAvatarHTML(name, colorIdx, size, avatar='') {
   const cc = colorClass(colorIdx);
   if (avatar) {
-    return `<div class="${cc}" style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="${avatar}" style="width:100%;height:100%;object-fit:cover" alt="${escHtml(name)}"/></div>`;
+    return `<div class="${cc}" style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="${avatar}" style="width:100%;height:100%;object-fit:cover" alt="${escHtml(name)}" loading="lazy"/></div>`;
   }
   return `<div class="${cc}" style="width:${size}px;height:${size}px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.36)}px;font-weight:700;background:var(--av-bg);color:var(--av-text);flex-shrink:0;font-family:'Poppins',sans-serif">${initials(name)}</div>`;
 }
@@ -4347,10 +4373,12 @@ function render(){
   const sorted = _derivedState.sorted;
   countUp('stat-days', daysUntilLaborDay(), 500);
   countUp('stat-finished', players.reduce((sum,p)=>sum+(p.count||0),0), 500);
-  renderLeaderboard(sorted);
   renderHeaderTally();
-  renderPlayersList();
   renderDailyCard(players);
+  // Gated behind active-tab checks (like feed/list/pace below) — these are non-trivial
+  // renders (badge computation, list building) with no benefit when their tab is hidden.
+  if(document.getElementById('tab-leaderboard')?.classList.contains('active')) renderLeaderboard(sorted);
+  if(document.getElementById('tab-players')?.classList.contains('active')) renderPlayersList();
   if(document.getElementById('tab-feed')?.classList.contains('active')) renderUnifiedFeed();
   if(document.getElementById('tab-list')?.classList.contains('active')) renderBentoList();
   if(document.getElementById('tab-pace')?.classList.contains('active')) renderPaceTab();
@@ -4669,7 +4697,7 @@ function renderLeaderboard(sorted){
         onclick="openAlbum('${p.id}')">
       <div class="album-cover-rank">#${i+1}</div>
       <div class="album-cover-avatar" style="background:${color}22;color:${color};border:1.5px solid ${color}44;${p.avatar ? 'overflow:hidden;padding:0' : ''}">
-        ${p.avatar ? `<img src="${p.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="${escHtml(p.name)}"/>` : initials(p.name)}
+        ${p.avatar ? `<img src="${p.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="${escHtml(p.name)}" loading="lazy"/>` : initials(p.name)}
       </div>
       <div class="album-cover-info">
         <div class="album-cover-name">
@@ -4915,6 +4943,12 @@ function renderUnifiedFeed() {
         const avgStr = st.avgRating != null ? st.avgRating.toFixed(1) + '★' : '—';
         const spotStr = st.uniqueSpots != null ? st.uniqueSpots : '—';
         const favStr = st.favRestaurant ? escHtml(st.favRestaurant) : '—';
+        const favLogoUrl = st.favRestaurant ? restoLogoUrl(st.favRestaurant, 32) : null;
+        const favIconHtml = st.favRestaurant
+          ? (favLogoUrl
+              ? `<img src="${favLogoUrl}" alt="" style="width:13px;height:13px;border-radius:3px;object-fit:cover;flex-shrink:0" data-fallback-class="" data-fallback-size="12px" data-fallback-emoji="${escHtml(restoEmoji(st.favRestaurant))}" onerror="handleLogoErr(this)" loading="lazy">`
+              : `<span style="font-size:12px;flex-shrink:0">${restoEmoji(st.favRestaurant)}</span>`)
+          : '';
         const toppingStr = st.favTopping ? escHtml(st.favTopping) : '—';
         const singles = st.singles ?? 0;
         const doubles = st.doubles ?? 0;
@@ -4929,7 +4963,7 @@ function renderUnifiedFeed() {
         return `<div class="milestone-card" style="animation-delay:${_feedInitialRenderDone?'0s':Math.min(idx*0.04,0.6)+'s'}">
   <div class="mc-top-bar"></div>
   <div class="mc-header">
-    <div class="mc-avatar" style="background:${color}22;color:${color};border-color:${color}55;${_mAvatar ? 'overflow:hidden;padding:0' : ''}">${_mAvatar ? `<img src="${_mAvatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="avatar"/>` : ini}</div>
+    <div class="mc-avatar" style="background:${color}22;color:${color};border-color:${color}55;${_mAvatar ? 'overflow:hidden;padding:0' : ''}">${_mAvatar ? `<img src="${_mAvatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="avatar" loading="lazy"/>` : ini}</div>
     <div class="mc-header-info">
       <div class="mc-player-name">${escHtml(m.playerName||'?')}</div>
       <div class="mc-timestamp">${timeStr}</div>
@@ -4944,7 +4978,7 @@ function renderUnifiedFeed() {
   <div class="mc-stats">
     <div class="mc-stat"><div class="mc-stat-val">${avgStr}</div><div class="mc-stat-lbl">Avg Rating</div></div>
     <div class="mc-stat"><div class="mc-stat-val">${spotStr}</div><div class="mc-stat-lbl">Unique Spots</div></div>
-    <div class="mc-stat"><div class="mc-stat-val">${favStr}</div><div class="mc-stat-lbl">Fav Spot</div></div>
+    <div class="mc-stat"><div class="mc-stat-val" style="display:flex;align-items:center;justify-content:center;gap:4px">${favIconHtml}${favStr}</div><div class="mc-stat-lbl">Fav Spot</div></div>
   </div>
   <div class="mc-spots">
     <span>🍔 ${singles}× single</span>
@@ -4962,7 +4996,7 @@ function renderUnifiedFeed() {
       const msgTimeAgo = dateAgo(msgDate);
       const targetId = m.id;
       const imgHtml = m.imageBase64
-        ? `<div class="msg-img-wrap" onclick="openLightbox('${m.id}')"><img src="${escHtml(m.imageBase64)}" alt="photo"/></div>`
+        ? `<div class="msg-img-wrap" onclick="openLightbox('${m.id}')"><img src="${escHtml(m.imageBase64)}" alt="photo" loading="lazy"/></div>`
         : '';
       const textHtml = m.text ? `<div class="msg-text">${escHtml(m.text)}</div>` : '';
       const pillsHtml = buildReactionPills(m.reactions, targetId, 'message');
@@ -5054,15 +5088,15 @@ function renderUnifiedFeed() {
           </div>`
         : '';
       const avatarInner = item.player.avatar
-        ? `<img src="${item.player.avatar}" alt="avatar" style="width:100%;height:100%;object-fit:cover"/>`
+        ? `<img src="${item.player.avatar}" alt="avatar" style="width:100%;height:100%;object-fit:cover" loading="lazy"/>`
         : `<div class="${colorClass(item.player.colorIdx)}" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:var(--av-bg);color:var(--av-text);font-family:'Poppins',sans-serif">${ini}</div>`;
       const feedRestoEmoji = restoEmoji(item.restaurant);
       const feedRestoLogoUrl = restoLogoUrl(item.restaurant, 64);
       const fnphIconHtml = feedRestoLogoUrl
-        ? `<img src="${feedRestoLogoUrl}" alt="" class="fnph-logo" data-fallback-class="fnph-icon" data-fallback-emoji="${escHtml(feedRestoEmoji)}" onerror="handleLogoErr(this)">`
+        ? `<img src="${feedRestoLogoUrl}" alt="" class="fnph-logo" data-fallback-class="fnph-icon" data-fallback-emoji="${escHtml(feedRestoEmoji)}" onerror="handleLogoErr(this)" loading="lazy">`
         : `<div class="fnph-icon">${feedRestoEmoji}</div>`;
       const fpcRestoIconHtml = feedRestoLogoUrl
-        ? `<img src="${feedRestoLogoUrl}" alt="" class="fpc-restaurant-logo" data-fallback-emoji="📍" onerror="handleLogoErr(this)">`
+        ? `<img src="${feedRestoLogoUrl}" alt="" class="fpc-restaurant-logo" data-fallback-emoji="📍" onerror="handleLogoErr(this)" loading="lazy">`
         : '📍 ';
 
       if (item.photo) {
@@ -6371,7 +6405,7 @@ function renderRestaurantSuggestions(list) {
     const emoji = restoEmoji(name);
     const logoUrl = restoLogoUrl(name, 64);
     const iconHtml = logoUrl
-      ? `<img src="${logoUrl}" alt="" class="restaurant-suggestion-logo" data-fallback-class="restaurant-suggestion-emoji" data-fallback-emoji="${escHtml(emoji)}" onerror="handleLogoErr(this)">`
+      ? `<img src="${logoUrl}" alt="" class="restaurant-suggestion-logo" data-fallback-class="restaurant-suggestion-emoji" data-fallback-emoji="${escHtml(emoji)}" onerror="handleLogoErr(this)" loading="lazy">`
       : `<span class="restaurant-suggestion-emoji">${emoji}</span>`;
     const nameFontSize = name.length > 16 ? '10px' : name.length > 11 ? '11px' : '12px';
     return `<button class="restaurant-suggestion" onclick="onRestaurantSuggestionClick('${escHtml(name).replace(/'/g,"\\'")}')">
@@ -6625,7 +6659,19 @@ function initPlacesAutocomplete() {
   document.head.appendChild(s);
 })();
 
+// Guard against rapid double-taps on "Place Order" firing two Firestore writes
+// for what the user intended as a single burger log.
+let _confirmBurgerInFlight = false;
 window.confirmBurger = async function() {
+  if (_confirmBurgerInFlight) return;
+  _confirmBurgerInFlight = true;
+  try {
+    await _confirmBurgerImpl();
+  } finally {
+    _confirmBurgerInFlight = false;
+  }
+};
+async function _confirmBurgerImpl() {
   // Dismiss the log modal so the receipt can show cleanly on top
   closeLogModal();
   const count      = pendingPattyCount || 1;
@@ -6949,7 +6995,20 @@ window.repairMissingLogs = async function() {
   }
 };
 
+// Guard against overlapping writes (e.g. rapid double-taps on "Undo last burger")
+// racing each other and corrupting the logs array with a stale read.
+let _changeMyCountInFlight = false;
 async function changeMyCountWithDetails(delta, restaurant='', rating=0, gps=null, patties=1, toppings=[], menuItem='', menuEmoji='', photo='', customTs=null) {
+  if (_changeMyCountInFlight) return;
+  _changeMyCountInFlight = true;
+  try {
+    await _changeMyCountWithDetailsImpl(delta, restaurant, rating, gps, patties, toppings, menuItem, menuEmoji, photo, customTs);
+  } finally {
+    _changeMyCountInFlight = false;
+  }
+}
+
+async function _changeMyCountWithDetailsImpl(delta, restaurant='', rating=0, gps=null, patties=1, toppings=[], menuItem='', menuEmoji='', photo='', customTs=null) {
   const me=players.find(p=>p.id===myPlayerId);
   if(!me) return;
   const newCount=Math.max(0,Math.min(999,me.count+delta));
@@ -7480,7 +7539,7 @@ function renderBentoList() {
     const badgesHtml = (meBadge || doneBadge || tieBadge)
       ? `<div class="rank-badges">${meBadge}${doneBadge}${tieBadge}</div>` : '';
     const avatarInner = p.avatar
-      ? `<img src="${escHtml(p.avatar)}" alt="${escHtml(p.name)}">`
+      ? `<img src="${escHtml(p.avatar)}" alt="${escHtml(p.name)}" loading="lazy">`
       : escHtml((p.name || '?').slice(0, 2).toUpperCase());
     return `<div class="rank-row${medalClass}" data-pid="${escHtml(p.id)}" onclick="openCalModal('${escHtml(p.id)}')" title="View ${escHtml(p.name)}'s burger history">
       <div class="rank-num">${dr}</div>
@@ -7603,7 +7662,7 @@ function renderPaceTab() {
   if (!root) return;
   const now = new Date();
   if (!players.length) {
-    root.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📈</div><div class="empty-state-title">No Players Yet</div><div class="empty-state-sub">Join the challenge to see pace projections</div></div>`;
+    root.innerHTML = `<div class="empty-state"><div class="empty-state-icon"><i class="ti ti-chart-line" style="color:var(--amber)"></i></div><div class="empty-state-title">No Players Yet</div><div class="empty-state-sub">Join the challenge to see pace projections</div></div>`;
     return;
   }
 
@@ -7628,6 +7687,11 @@ function renderPaceTab() {
 
 
   // ── Player stat cards (compact) ───────────────────────────────────────────
+  // Pace target — same "where you should be today" line used by the Ranks tab gauge.
+  const _elapsedMs = Math.max(0, Date.now() - CHALLENGE_START);
+  const _totalMs = CHALLENGE_END - CHALLENGE_START;
+  const expectedPct = Math.min(100, Math.max(0, (_elapsedMs / _totalMs) * 100));
+
   const cardsHtml=sorted.map((p,i)=>{
     const color=RING_COLORS[p.colorIdx%RING_COLORS.length];
     const ini=initials(p.name);
@@ -7657,7 +7721,7 @@ function renderPaceTab() {
     return `<div class="pace-card${i===0?' pace-leader':''}" style="animation-delay:${Math.min(i*0.05,0.3)}s">
       <div class="pace-card-top">
         <div class="pace-avatar" style="background:${color}20;color:${color};border:1.5px solid ${color}55;box-shadow:0 0 10px ${color}44">
-          ${p.avatar?`<img src="${escHtml(p.avatar)}" style="width:100%;height:100%;object-fit:cover;border-radius:8px" alt="${escHtml(p.name)}"/>`:ini}
+          ${p.avatar?`<img src="${escHtml(p.avatar)}" style="width:100%;height:100%;object-fit:cover;border-radius:8px" alt="${escHtml(p.name)}" loading="lazy"/>`:ini}
         </div>
         <div>
           <div class="pace-name">${escHtml(p.name)}${isMe?' <span style="font-size:9px;background:rgba(30,110,170,0.12);color:var(--sky);border:1px solid rgba(30,110,170,0.25);padding:2px 6px;border-radius:999px;vertical-align:middle;font-weight:700">You</span>':''}</div>
@@ -7665,7 +7729,11 @@ function renderPaceTab() {
         </div>
         <div class="pace-status-badge ${badgeClass}">${badgeLabel}</div>
       </div>
-      <div class="pace-track-wrap"><div class="pace-track-fill" style="width:${pct}%;background:${color}"></div></div>
+      <div class="pace-gauge-wrap">
+        <div class="pace-gauge-track"><div class="pace-gauge-mask" style="left:${pct}%"></div></div>
+        <div class="pace-gauge-tick" style="left:${expectedPct}%" title="Pace target for today (${Math.round(expectedPct)}%)"></div>
+        <div class="pace-gauge-dot" style="left:${pct}%;background:${color};box-shadow:0 0 4px ${color}99;"></div>
+      </div>
       ${projHtml}
       <div class="pace-stats-row">
         <div class="pace-stat"><div class="pace-stat-val">${paceStr}</div><div class="pace-stat-lbl">Per week</div></div>
@@ -7891,7 +7959,7 @@ function renderRestaurantLB() {
     const emoji = restoEmoji(r.name);
     const logoUrl = restoLogoUrl(r.name, 64);
     const rightHtml = logoUrl
-      ? `<img src="${logoUrl}" alt="" class="resto-right-logo" data-fallback-class="resto-right" data-fallback-size="28px" data-fallback-emoji="${escHtml(emoji)}" onerror="handleLogoErr(this)">`
+      ? `<img src="${logoUrl}" alt="" class="resto-right-logo" data-fallback-class="resto-right" data-fallback-size="28px" data-fallback-emoji="${escHtml(emoji)}" onerror="handleLogoErr(this)" loading="lazy">`
       : `<div class="resto-right" style="font-size:28px;line-height:1">${emoji}</div>`;
     const playerList = [...r.playerNames].slice(0, 4).map(n => escHtml(n)).join(', ');
     const barPct = Math.min(100, Math.round((r.visits / sorted[0].visits) * 100));
@@ -8002,6 +8070,7 @@ window.switchToPlayers = function() {
   document.body.classList.remove('feed-active','map-active','pace-active','tally-active','leaderboard-active');
   const pill = document.getElementById('players-pill-btn');
   if(pill) pill.classList.add('active');
+  renderPlayersList();
 };
 
 document.getElementById('setup-name').addEventListener('keydown',e=>{if(e.key==='Enter') document.getElementById('setup-room').value?joinRoom():createRoom()});
@@ -8697,6 +8766,11 @@ function renderBurgerMap() {
       const lng = typeof entry === 'object' && entry.lng;
       if (!lat || !lng) return;
       const coord = [lat, lng];
+      const pinEmoji = restoEmoji(restaurant);
+      const pinLogoUrl = restoLogoUrl(restaurant, 32);
+      const pinBadgeHtml = pinLogoUrl
+        ? `<img src="${pinLogoUrl}" alt="" style="width:15px;height:15px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 1px rgba(255,255,255,0.7)" data-fallback-class="map-pin-emoji" data-fallback-size="13px" data-fallback-emoji="${escHtml(pinEmoji)}" onerror="handleLogoErr(this)" loading="lazy">`
+        : `<span class="map-pin-emoji" style="font-size:13px">${pinEmoji}</span>`;
       const icon = L.divIcon({
         className: '',
         html: `<div style="position:relative;width:30px;height:38px;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.7))">
@@ -8705,19 +8779,22 @@ function renderBurgerMap() {
             <path d="M15 2C7.82 2 2 7.82 2 15c0 8.4 13 20.5 13 20.5S28 23.4 28 15C28 7.82 22.18 2 15 2z" fill="rgba(255,255,255,0.14)"/>
             <circle cx="15" cy="15" r="9.5" fill="rgba(0,0,0,0.22)"/>
           </svg>
-          <span style="position:absolute;top:6px;left:50%;transform:translateX(-50%);font-size:13px;line-height:1;user-select:none">🍔</span>
+          <div style="position:absolute;top:5px;left:50%;transform:translateX(-50%);width:16px;height:16px;display:flex;align-items:center;justify-content:center;line-height:1;user-select:none">${pinBadgeHtml}</div>
         </div>`,
         iconSize: [30, 38],
         iconAnchor: [15, 38]
       });
       const ini = p.name.trim().split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
       const timeStr = ts ? formatTime(ts) : '';
+      const popupLogoHtml = pinLogoUrl
+        ? `<img src="${pinLogoUrl}" alt="" style="width:14px;height:14px;border-radius:3px;object-fit:cover;vertical-align:-2px;margin-right:4px" data-fallback-class="" data-fallback-size="13px" data-fallback-emoji="${escHtml(pinEmoji)}" onerror="handleLogoErr(this)" loading="lazy">`
+        : `<span style="margin-right:4px">${pinEmoji}</span>`;
       const popup = `<div class="map-popup">
         <div class="map-popup-header">
           <div style="width:36px;height:36px;border-radius:50%;background:${color}22;border:2px solid ${color};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:${color};flex-shrink:0">${ini}</div>
           <div class="map-popup-name">${escHtml(p.name)}</div>
         </div>
-        <div class="map-popup-restaurant">🍔 ${escHtml(restaurant)}</div>
+        <div class="map-popup-restaurant">${popupLogoHtml}${escHtml(restaurant)}</div>
         <div class="map-popup-stars">${starsHtml(rating)}</div>
         <div class="map-popup-time">🕐 ${timeStr}</div>
       </div>`;
@@ -8785,7 +8862,7 @@ function renderBurgerMap() {
 
   feedEl.innerHTML = feedItems.slice(0, 20).map((item, idx) => `
     <div class="map-feed-card" data-feed-idx="${idx}">
-      <div class="map-feed-avatar" style="background:${item.color}22;border:2px solid ${item.color};color:${item.color};${item.avatar ? 'overflow:hidden;padding:0' : ''}">${item.avatar ? `<img src="${item.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="avatar"/>` : item.ini}</div>
+      <div class="map-feed-avatar" style="background:${item.color}22;border:2px solid ${item.color};color:${item.color};${item.avatar ? 'overflow:hidden;padding:0' : ''}">${item.avatar ? `<img src="${item.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="avatar" loading="lazy"/>` : item.ini}</div>
       <div class="map-feed-body">
         <div class="map-feed-name" style="color:${item.color}">${escHtml(item.player.name)}</div>
         <div class="map-feed-restaurant">${escHtml(item.restaurant)}</div>
@@ -8795,7 +8872,7 @@ function renderBurgerMap() {
           <span class="map-feed-time">${feedTimeStr(item.ts)}</span>
         </div>
       </div>
-      ${item.photo ? `<img src="${item.photo}" style="width:44px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0;border:1.5px solid rgba(245,158,11,0.3)" alt="burger"/>` : `<div class="map-feed-arrow">›</div>`}
+      ${item.photo ? `<img src="${item.photo}" style="width:44px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0;border:1.5px solid rgba(245,158,11,0.3)" alt="burger" loading="lazy"/>` : `<div class="map-feed-arrow">›</div>`}
     </div>
   `).join('');
 
