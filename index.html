@@ -10,7 +10,8 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>🍔 100 Burger Challenge</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Bungee&family=Press+Start+2P&display=swap" rel="stylesheet">
+<script>try{if(localStorage.getItem('bc_theme')==='dark')document.documentElement.classList.add('theme-dark')}catch(e){}</script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Bungee&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -936,8 +937,9 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
   background:linear-gradient(90deg,var(--sky),var(--sky-light));
   border-bottom:none;
   padding:5px 10px;
-  font-family:'Press Start 2P',monospace;
-  font-size:6px;
+  font-family:'Courier New',monospace;
+  font-weight:700;
+  font-size:10px;
   color:#fff;
   letter-spacing:0.05em;
   display:flex;
@@ -963,14 +965,15 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
   display:flex;flex-direction:column;gap:3px;
 }
 .mc-toast-title{
-  font-family:'Press Start 2P',monospace;
-  font-size:6px;
+  font-family:'Courier New',monospace;
+  font-weight:700;
+  font-size:11px;
   color:var(--sky);
   line-height:1.4;
 }
 .mc-toast-desc{
-  font-family:'Press Start 2P',monospace;
-  font-size:5px;
+  font-family:'Courier New',monospace;
+  font-size:10px;
   color:var(--muted2);
   line-height:1.6;
 }
@@ -2797,11 +2800,113 @@ body.july4-bg::before {
 .detail-confirm-btn{background:#7C3A1E;border:3px double #5C2A0E;border-radius:10px;font-family:'Courier New',monospace;font-size:13px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#FFF8ED;padding:13px;margin-top:8px}
 .detail-confirm-btn:hover{opacity:0.88}
 .complete-strip{background:rgba(45,106,79,0.12);border-top:1px solid rgba(45,106,79,0.20);color:#1B4332}
+
+
+/* ── Header tally strip — rebuilt: token-driven, no mask hack ── */
+#header-tally-strip{display:none;width:100%;max-width:480px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 14px;box-shadow:var(--shadow-card)}
+.hts-row{display:flex;align-items:center;gap:10px}
+.hts-avatar{flex-shrink:0}
+.hts-main{flex:1;min-width:0}
+.hts-meta{display:flex;align-items:baseline;gap:6px;margin-bottom:5px}
+.hts-name{font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.hts-count{font-family:'Bungee',sans-serif;font-size:17px;line-height:1}
+.hts-of{font-size:11px;color:var(--muted)}
+.hts-bar-wrap{position:relative;height:14px;display:flex;align-items:center}
+.hts-track{position:absolute;inset:4px 0;background:rgba(11,53,80,0.12);border-radius:999px;overflow:hidden}
+html.theme-dark .hts-track{background:rgba(232,244,253,0.10)}
+.hts-fill{position:relative;overflow:hidden;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--amber),var(--amber-dark));transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1)}
+.hts-burger{position:absolute;font-size:13px;line-height:1;left:0;transform:translateX(-50%);transition:left 0.6s cubic-bezier(0.34,1.56,0.64,1);filter:drop-shadow(0 1px 2px rgba(0,0,0,0.4))}
+/* ── Map locate button — was inline styles ── */
+#map-locate-btn{position:absolute;bottom:12px;right:12px;z-index:1000;width:38px;height:38px;border-radius:10px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,0.35);transition:background 0.15s,transform 0.12s}
+#map-locate-btn:active{transform:scale(0.92)}
+
+/* ══════════ FINAL WEEK — ember countdown skin (last 7 days) ══════════ */
+.final-week-banner{display:none;justify-content:center;padding:2px 20px 6px}
+body.final-week .final-week-banner{display:flex}
+.final-week-inner{font-family:'Bungee',sans-serif;font-size:13px;color:#b91c1c;background:linear-gradient(135deg,rgba(255,237,213,0.9),rgba(254,215,170,0.75));border:1px solid rgba(234,88,12,0.35);padding:6px 16px;border-radius:999px;box-shadow:0 2px 12px rgba(234,88,12,0.25);animation:emberGlow 2.2s ease-in-out infinite}
+html.theme-dark .final-week-inner{color:#fdba74;background:linear-gradient(135deg,rgba(124,45,18,0.55),rgba(90,30,12,0.45));border-color:rgba(251,146,60,0.35)}
+@keyframes emberGlow{0%,100%{box-shadow:0 2px 12px rgba(234,88,12,0.25)}50%{box-shadow:0 2px 22px rgba(234,88,12,0.55)}}
+/* sunset horizon bleeds into the sky */
+body.final-week{background:linear-gradient(175deg,#f6b26b 0%,#f4c98a 14%,#a8d4ed 42%,#c2e3f4 70%,#d8eefd 100%)}
+html.theme-dark body.final-week{background:linear-gradient(175deg,#2a1020 0%,#1c1530 30%,#132a44 65%,#183350 100%)}
+/* days-left pill goes hot */
+.stat-pill.countdown-hot{border-color:rgba(220,38,38,0.45);animation:hotPulse 1.6s ease-in-out infinite}
+.stat-pill.countdown-hot .stat-num{color:#dc2626}
+html.theme-dark .stat-pill.countdown-hot .stat-num{color:#f87171}
+@keyframes hotPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,0.35)}50%{box-shadow:0 0 0 6px rgba(220,38,38,0)}}
+
+/* ── View Transitions: cross-tab morph timing ── */
+::view-transition-old(root){animation:vtOut 0.16s ease both}
+::view-transition-new(root){animation:vtIn 0.22s cubic-bezier(0.16,1,0.3,1) both}
+@keyframes vtOut{to{opacity:0;transform:translateY(-4px)}}
+@keyframes vtIn{from{opacity:0;transform:translateY(6px)}}
+/* header + tab bar snapshot separately, so they hold still while content morphs */
+.wrapper header{view-transition-name:bc-header}
+.wrapper .tabs{view-transition-name:bc-tabs}
+
+/* ══════════ SCROLL-DRIVEN HEADER COMPRESSION ══════════
+   Pure CSS (animation-timeline) — no JS scroll listener, so no feedback loop.
+   Total shrink (~60px) stays well under the 160px scroll range, so the layout
+   change can never re-cross its own trigger threshold. */
+@supports (animation-timeline: scroll()) {
+  header .burger-deco{
+    animation: wobble 1.6s ease-in-out infinite, hdrShrinkBurger linear both;
+    animation-timeline: auto, scroll(root);
+    animation-range: normal, 0 160px;
+  }
+  header h1{
+    animation: hdrShrinkTitle linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 160px;
+  }
+  #stat-pills-row{
+    animation: hdrFadePills linear both;
+    animation-timeline: scroll(root);
+    animation-range: 40px 200px;
+  }
+  @keyframes hdrShrinkBurger{to{font-size:44px}}
+  @keyframes hdrShrinkTitle{to{font-size:22px}}
+  @keyframes hdrFadePills{to{opacity:0.45}}
+}
+
+/* ══════════ DARK MODE — manual toggle, variable-driven ══════════ */
+.theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:999px;background:var(--surface2);border:1px solid var(--border2);color:var(--muted2);font-size:15px;cursor:pointer;transition:color 0.15s,border-color 0.15s,transform 0.12s;padding:0}
+.theme-toggle:hover{color:var(--text);border-color:var(--border3)}
+.theme-toggle:active{transform:scale(0.92)}
+.theme-toggle-setup{position:absolute;top:calc(16px + env(safe-area-inset-top));right:16px;z-index:5}
+html.theme-dark{
+  background:#0a1828;
+  --bg:#10263c; --bg2:#16304a;
+  --surface:rgba(15,36,58,0.62); --surface2:rgba(21,46,72,0.72); --surface3:rgba(27,54,82,0.80);
+  --border:rgba(148,200,246,0.15); --border2:rgba(148,200,246,0.13); --border3:rgba(148,200,246,0.30);
+  --text:#e8f4fd; --muted:rgba(232,244,253,0.34); --muted2:rgba(232,244,253,0.58);
+  --sky:#3baae2; --sky-light:#5cbcf0;
+  --shadow-card:0 4px 20px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.05);
+}
+html.theme-dark body{background:linear-gradient(175deg,#0a1828 0%,#0e2138 35%,#132a44 70%,#183350 100%)}
+/* moonlit clouds — same shapes, way dimmer */
+html.theme-dark body::before{background:
+  radial-gradient(ellipse 40% 16% at 12% 12%, rgba(148,200,246,0.10) 0%,transparent 70%),
+  radial-gradient(ellipse 55% 20% at 70% 9%,  rgba(148,200,246,0.08) 0%,transparent 70%),
+  radial-gradient(ellipse 30% 12% at 38% 20%, rgba(148,200,246,0.07) 0%,transparent 65%),
+  radial-gradient(ellipse 45% 17% at 88% 18%, rgba(148,200,246,0.06) 0%,transparent 65%),
+  radial-gradient(ellipse 38% 14% at 22% 34%, rgba(148,200,246,0.05) 0%,transparent 60%)}
+html.theme-dark .tabs{background:rgba(13,31,53,0.78);border-color:rgba(148,200,246,0.13);box-shadow:0 2px 16px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.05)}
+html.theme-dark .tab-btn.active{background:linear-gradient(145deg,rgba(59,170,226,0.22),rgba(59,170,226,0.10));color:var(--sky-light);border-color:rgba(59,170,226,0.35);box-shadow:0 1px 8px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.08)}
+html.theme-dark .setup-card input,html.theme-dark .add-form input,html.theme-dark .comment-input-row input{background:rgba(255,255,255,0.06);border-color:rgba(148,200,246,0.18);color:var(--text)}
+html.theme-dark .social-capsule{background:rgba(13,31,53,0.85);border-color:rgba(148,200,246,0.16)}
+html.theme-dark #log-modal-sheet{background:rgba(13,33,56,0.97);border-color:rgba(148,200,246,0.18);box-shadow:0 -8px 40px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.06)}
+html.theme-dark #mc-advancement-toast{background:rgba(13,33,56,0.97);border-color:rgba(148,200,246,0.18);box-shadow:0 8px 32px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.06)}
+html.theme-dark .skel-row,html.theme-dark .lb-skel-row{background:rgba(255,255,255,0.05)}
+html.theme-dark #bdg-tip{background:rgba(13,33,56,0.97);color:var(--text);border-color:rgba(148,200,246,0.2)}
+html.theme-dark .leaflet-container{background:#0a1828}
+html.theme-dark img.leaflet-tile{filter:brightness(0.9) saturate(0.85)}
 </style>
 </head>
 <body>
 <!-- SETUP SCREEN -->
 <div id="setup-screen">
+  <button class="theme-toggle theme-toggle-setup" onclick="toggleTheme()" title="Toggle dark mode" aria-label="Toggle dark mode"><i class="ti ti-moon"></i></button>
   <div class="burger-deco">🍔</div>
   <h1 style="margin-top:12px">100 Burger<br>Challenge</h1>
   <p class="subtitle">Real-time leaderboard · Every burger counts</p>
@@ -2832,6 +2937,7 @@ body.july4-bg::before {
         <div style="display:flex;flex-direction:column;align-items:flex-start;gap:5px">
           <div id="conn-status" class="offline-dot">connecting…</div>
           <button class="players-pill" id="players-pill-btn" onclick="switchToPlayers()">👥 Players</button>
+          <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode" aria-label="Toggle dark mode"><i class="ti ti-moon"></i></button>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
           <button class="leave-btn" onclick="leaveRoom()">Leave room</button>
@@ -2847,27 +2953,25 @@ body.july4-bg::before {
           <div class="july4-header-stars"><span>★</span><span>★</span><span>★</span></div>
         </div>
       </div>
+      <div class="final-week-banner" id="final-week-banner"></div>
       <div id="stat-pills-row">
         <div class="stat-pill"><i class="ti ti-calendar-event" style="font-size:14px;color:var(--sky)"></i> <span id="stat-days" class="stat-num">--</span><span class="stat-label">days left</span></div>
         <div class="stat-pill"><i class="ti ti-burger" style="font-size:14px;color:var(--amber)"></i> <span id="stat-finished" class="stat-num">0</span><span class="stat-label">total</span></div>
         <div class="stat-pill" id="daily-pill"><i class="ti ti-flame" style="font-size:14px;color:var(--red)"></i> <span id="daily-count" class="stat-num">0</span><span class="stat-label">today</span></div>
       </div>
       <!-- Compact personal progress strip -->
-      <div id="header-tally-strip" style="display:none;width:100%;max-width:480px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 14px;box-sizing:border-box;box-shadow:var(--shadow-card)">
-        <div style="display:flex;align-items:center;gap:10px">
-          <div id="header-ring-avatar" style="flex-shrink:0"></div>
-          <div style="flex:1;min-width:0">
-            <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:5px">
-              <span id="header-tally-name" style="font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px"></span>
-              <span id="header-tally-count" style="font-family:'Bungee',sans-serif;font-size:17px;letter-spacing:0;line-height:1"></span>
-              <span style="font-size:11px;color:var(--muted);font-family:'Poppins',sans-serif">/ 100</span>
+      <div id="header-tally-strip">
+        <div class="hts-row">
+          <div id="header-ring-avatar" class="hts-avatar"></div>
+          <div class="hts-main">
+            <div class="hts-meta">
+              <span id="header-tally-name" class="hts-name"></span>
+              <span id="header-tally-count" class="hts-count"></span>
+              <span class="hts-of">/ 100</span>
             </div>
-            <div style="position:relative;height:14px;display:flex;align-items:center">
-              <div style="position:absolute;inset:4px 0;background:linear-gradient(90deg,#ef4444 0%,#f59e0b 40%,#eab308 55%,#22c55e 100%);border-radius:999px;box-shadow:inset 0 1px 3px rgba(0,0,0,0.3)">
-                <div id="header-tally-bar" style="height:100%;border-radius:999px;background:transparent;transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 0 8px rgba(234,179,8,0.45);position:relative;overflow:hidden"></div>
-                <div id="header-tally-mask" style="position:absolute;top:0;bottom:0;left:0%;right:0;background:rgba(226,232,240,0.95);border-radius:0 999px 999px 0;transition:left 0.6s cubic-bezier(0.34,1.56,0.64,1)"></div>
-              </div>
-              <div id="header-tally-burger" style="position:absolute;font-size:13px;line-height:1;transition:left 0.6s cubic-bezier(0.34,1.56,0.64,1);transform:translateX(-50%);left:0%;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.5))">🍔</div>
+            <div class="hts-bar-wrap">
+              <div class="hts-track"><div id="header-tally-bar" class="hts-fill"></div></div>
+              <div id="header-tally-burger" class="hts-burger">🍔</div>
             </div>
           </div>
         </div>
@@ -2967,7 +3071,7 @@ body.july4-bg::before {
     <div class="tab-panel" id="tab-map">
       <div class="map-wrap">
         <div id="burger-map"></div>
-        <button id="map-locate-btn" onclick="flyToMyLocation()" title="My location" style="position:absolute;bottom:12px;right:12px;z-index:1000;width:38px;height:38px;border-radius:10px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,0.5);transition:background 0.15s,transform 0.12s">📍</button>
+        <button id="map-locate-btn" onclick="flyToMyLocation()" title="My location">📍</button>
       </div>
       <div class="map-section-label">Recent Burger Spots</div>
       <div id="map-feed" class="map-feed-wrap"></div>
@@ -4739,17 +4843,15 @@ function renderHeaderTally() {
   if (!document.body.classList.contains('list-active') && !document.getElementById('tab-list')?.classList.contains('active')) {
     strip.style.display = 'block';
   }
-  document.getElementById('header-ring-avatar').innerHTML = ringAvatarHTML(me, 36);
+  document.getElementById('header-ring-avatar').innerHTML = ringAvatarHTML(me, 44);
   const nameEl = document.getElementById('header-tally-name');
   const countEl = document.getElementById('header-tally-count');
   const barEl = document.getElementById('header-tally-bar');
-  const maskEl = document.getElementById('header-tally-mask');
   const burgerEl = document.getElementById('header-tally-burger');
   if (nameEl) nameEl.textContent = me.name;
   if (countEl) { countEl.textContent = me.count; countEl.style.color = c; }
   const pct = Math.min(100, me.count);
-  if (barEl) barEl.style.width = pct + '%';
-  if (maskEl) maskEl.style.left = pct + '%';
+  if (barEl) { barEl.style.width = pct + '%'; barEl.style.background = c; }
   if (burgerEl) burgerEl.style.left = pct + '%';
 }
 
@@ -8003,6 +8105,14 @@ function _movePillToBtn(btn) {
 }
 
 window.switchTab=function(name,btn){
+  // View Transitions API: snapshot old tab, morph to new (falls back to instant swap)
+  if (document.startViewTransition && !document.getElementById('tab-'+name)?.classList.contains('active')) {
+    document.startViewTransition(() => _switchTabCore(name, btn));
+  } else {
+    _switchTabCore(name, btn);
+  }
+};
+function _switchTabCore(name,btn){
   document.getElementById('badge-popup')?.remove();
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -8061,7 +8171,7 @@ window.switchTab=function(name,btn){
       c.classList.add('card-reveal');
     });
   });
-};
+}
 
 window.switchToPlayers = function() {
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
@@ -8735,7 +8845,7 @@ function renderBurgerMap() {
       minZoom: 3,
       preferCanvas: true,
     });
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    window._baseTileLayer = L.tileLayer(_isDarkTheme() ? MAP_TILES_DARK : MAP_TILES_LIGHT, {
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/">CARTO</a>',
       subdomains: 'abcd', maxZoom: 20
     }).addTo(burgerMap);
@@ -9004,6 +9114,36 @@ function initJuly4Stars() {
     }
   })(0);
 }
+
+
+// ── FINAL WEEK — ember countdown skin for the last 7 days ───────────────────
+(function initFinalWeek(){
+  const msLeft = CHALLENGE_END - new Date();
+  if (msLeft <= 0 || msLeft > 7 * 86400000) return;
+  document.body.classList.add('final-week');
+  const days = Math.ceil(msLeft / 86400000);
+  const b = document.getElementById('final-week-banner');
+  if (b) b.innerHTML = `<div class="final-week-inner">🔥 FINAL WEEK — ${days} day${days === 1 ? '' : 's'} left 🔥</div>`;
+  document.getElementById('stat-days')?.closest('.stat-pill')?.classList.add('countdown-hot');
+})();
+
+// ── DARK MODE — manual toggle, persisted per device ─────────────────────────
+const MAP_TILES_LIGHT = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+const MAP_TILES_DARK  = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+function _isDarkTheme(){ return document.documentElement.classList.contains('theme-dark'); }
+function applyTheme(dark){
+  document.documentElement.classList.toggle('theme-dark', dark);
+  document.querySelectorAll('.theme-toggle i').forEach(i => { i.className = 'ti ti-' + (dark ? 'sun' : 'moon'); });
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', dark ? '#0a1828' : '#7ec3e8');
+  if (window._baseTileLayer) window._baseTileLayer.setUrl(dark ? MAP_TILES_DARK : MAP_TILES_LIGHT);
+}
+window.toggleTheme = function(){
+  const dark = !_isDarkTheme();
+  applyTheme(dark);
+  try { localStorage.setItem('bc_theme', dark ? 'dark' : 'light'); } catch(e) {}
+};
+applyTheme(_isDarkTheme()); // sync icons/meta with the early <head> init
 
 initJuly4Stars();
 </script>
