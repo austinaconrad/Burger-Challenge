@@ -180,12 +180,12 @@ h1{font-family:'Bungee',sans-serif;font-size:clamp(20px,5.5vw,36px);font-weight:
 .skel-line.xshort{width:35%}
 
 /* ── Tab crossfade ────────────────────────────────────────────────────── */
-.tab-panel{display:none;opacity:0;transition:opacity 0.15s ease}
-.tab-panel.active{display:block;opacity:0;animation:tabFadeIn 0.15s ease forwards}
-@keyframes tabFadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.tab-panel{display:none;opacity:0;transform:translateY(4px);transition:opacity 0.18s ease,transform 0.18s ease}
+.tab-panel.active{display:block;opacity:1;transform:none}
+@starting-style{.tab-panel.active{opacity:0;transform:translateY(6px)}}
 
 /* ── Sliding tab pill indicator ───────────────────────────────────────── */
-.tabs{position:relative}
+.tabs{position:sticky;top:calc(env(safe-area-inset-top,0px) + 6px);z-index:400}
 .tab-pill-indicator{
   position:absolute;
   top:4px;bottom:4px;
@@ -295,7 +295,7 @@ h1{font-family:'Bungee',sans-serif;font-size:clamp(20px,5.5vw,36px);font-weight:
 .tab-btn.tab-map     { color: #16a34a !important; }
 .tab-btn.tab-badges  { color: #f97316 !important; }
 .tab-btn.tab-pace    { color: #eab308 !important; }
-.tab-btn.tab-receipt { color: #111111 !important; }
+.tab-btn.tab-receipt { color: #8b5cf6 !important; }
 
 /* ── 4. Bottom nav "you are here" dot ───────────────────────────────────────
    A small blinking green dot sits below whichever tab is currently active,
@@ -761,8 +761,9 @@ body.feed-active .feed-sub-tabs{display:none}
 .msg-img-wrap{margin-top:7px;border-radius:10px;overflow:hidden;border:1px solid rgba(0,0,0,0.06);box-shadow:0 1px 6px rgba(0,0,0,0.07);cursor:pointer;transition:opacity 0.2s}
 .msg-img-wrap:hover{opacity:0.92}
 .msg-img-wrap img{width:100%;display:block;max-height:180px;object-fit:cover}
-#lightbox{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.85);backdrop-filter:blur(16px);align-items:center;justify-content:center;cursor:zoom-out}
-#lightbox.open{display:flex}
+#lightbox{display:none;opacity:0;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.85);backdrop-filter:blur(16px);align-items:center;justify-content:center;cursor:zoom-out;transition:opacity 0.22s ease,display 0.22s allow-discrete}
+#lightbox.open{display:flex;opacity:1}
+@starting-style{#lightbox.open{opacity:0}}
 #lightbox img{max-width:92vw;max-height:88vh;border-radius:14px;box-shadow:0 8px 48px rgba(0,0,0,0.4)}
 .img-preview-bar{display:none;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-sm);margin-bottom:8px}
 .img-preview-bar.visible{display:flex}
@@ -827,10 +828,15 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
   background:rgba(0,0,0,0.65);
   backdrop-filter:blur(6px);
   -webkit-backdrop-filter:blur(6px);
-  display:none;
+  display:none;opacity:0;
   align-items:flex-end;justify-content:center;
+  transition:opacity 0.25s ease,display 0.25s allow-discrete;
 }
-#log-modal-overlay.open{display:flex}
+#log-modal-overlay.open{display:flex;opacity:1}
+@starting-style{#log-modal-overlay.open{opacity:0}}
+#log-modal-overlay:not(.open) #log-modal-sheet{transform:translateY(45%)}
+#log-modal-overlay.open #log-modal-sheet{transform:translateY(0)}
+@starting-style{#log-modal-overlay.open #log-modal-sheet{transform:translateY(60%)}}
 #log-modal-sheet{
   width:100%;max-width:540px;
   max-height:92vh;
@@ -841,7 +847,7 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
   border:1px solid rgba(255,255,255,0.78);border-bottom:none;
   box-shadow:0 -8px 40px rgba(30,100,160,0.18),inset 0 1px 0 rgba(255,255,255,0.90);
   display:flex;flex-direction:column;
-  animation:sheetUp 0.35s cubic-bezier(0.16,1,0.3,1);
+  transition:transform 0.4s cubic-bezier(0.16,1,0.3,1);
   overflow:hidden;
 }
 @keyframes sheetUp{
@@ -2820,6 +2826,26 @@ html.theme-dark .hts-track{background:rgba(232,244,253,0.10)}
 #map-locate-btn{position:absolute;bottom:12px;right:12px;z-index:1000;width:38px;height:38px;border-radius:10px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,0.35);transition:background 0.15s,transform 0.12s}
 #map-locate-btn:active{transform:scale(0.92)}
 
+/* ── Feed photos: consistent crop + blur-up + morph lightbox ── */
+.msg-img-wrap img{aspect-ratio:4/3;height:auto;max-height:none;object-fit:cover}
+img.bc-blur-up{filter:blur(14px) saturate(1.15);transform:scale(1.04);transition:filter 0.45s ease,transform 0.45s ease}
+img.bc-blur-up.bc-loaded{filter:none;transform:none}
+::view-transition-group(bc-photo){animation-duration:0.32s;animation-timing-function:cubic-bezier(0.22,1,0.36,1)}
+::view-transition-old(bc-photo),::view-transition-new(bc-photo){animation:none;mix-blend-mode:normal}
+#lightbox img{will-change:transform}
+
+/* ── Glass map clusters + popup polish ── */
+.bc-cluster-wrap{background:none!important;border:none!important}
+.bc-cluster{width:100%;height:100%;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;line-height:1;background:rgba(255,255,255,0.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:2px solid rgba(26,112,170,0.55);box-shadow:0 4px 16px rgba(26,112,170,0.35),inset 0 1px 0 rgba(255,255,255,0.9);transition:transform 0.15s ease}
+.bc-cluster:hover{transform:scale(1.08)}
+.bc-cluster-n{font-family:'Bungee',sans-serif;font-size:13px;color:var(--sky)}
+.bc-cluster-sub{font-size:9px;margin-top:1px}
+html.theme-dark .bc-cluster{background:rgba(13,33,56,0.80);border-color:rgba(92,188,240,0.5);box-shadow:0 4px 16px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.08)}
+html.theme-dark .bc-cluster-n{color:var(--sky-light)}
+.leaflet-popup-content-wrapper{backdrop-filter:var(--glass-blur)!important;-webkit-backdrop-filter:var(--glass-blur)!important}
+html.theme-dark .leaflet-popup-content-wrapper{box-shadow:0 4px 24px rgba(0,0,0,0.55)!important}
+html.theme-dark .leaflet-popup-tip{background:var(--surface2)!important}
+
 /* ══════════ FINAL WEEK — ember countdown skin (last 7 days) ══════════ */
 .final-week-banner{display:none;justify-content:center;padding:2px 20px 6px}
 body.final-week .final-week-banner{display:flex}
@@ -2836,8 +2862,8 @@ html.theme-dark .stat-pill.countdown-hot .stat-num{color:#f87171}
 @keyframes hotPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,0.35)}50%{box-shadow:0 0 0 6px rgba(220,38,38,0)}}
 
 /* ── View Transitions: cross-tab morph timing ── */
-::view-transition-old(root){animation:vtOut 0.16s ease both}
-::view-transition-new(root){animation:vtIn 0.22s cubic-bezier(0.16,1,0.3,1) both}
+html.vt-tab::view-transition-old(root){animation:vtOut 0.16s ease both}
+html.vt-tab::view-transition-new(root){animation:vtIn 0.22s cubic-bezier(0.16,1,0.3,1) both}
 @keyframes vtOut{to{opacity:0;transform:translateY(-4px)}}
 @keyframes vtIn{from{opacity:0;transform:translateY(6px)}}
 /* header + tab bar snapshot separately, so they hold still while content morphs */
@@ -2901,6 +2927,35 @@ html.theme-dark .skel-row,html.theme-dark .lb-skel-row{background:rgba(255,255,2
 html.theme-dark #bdg-tip{background:rgba(13,33,56,0.97);color:var(--text);border-color:rgba(148,200,246,0.2)}
 html.theme-dark .leaflet-container{background:#0a1828}
 html.theme-dark img.leaflet-tile{filter:brightness(0.9) saturate(0.85)}
+/* ── Dark sweep: components with hardcoded light backgrounds ── */
+/* Badges tab (sticker book) */
+html.theme-dark .sticker-album-page{background:rgba(10,26,44,0.60);border-top-color:rgba(148,200,246,0.20)}
+html.theme-dark .sticker-book-open{box-shadow:0 8px 40px rgba(0,0,0,0.45),inset 0 1px 0 rgba(255,255,255,0.05)}
+html.theme-dark .album-spine-dot{background:rgba(232,244,253,0.14)}
+/* Ranks tab */
+html.theme-dark .rank-row{background:rgba(15,36,58,0.62)}
+html.theme-dark .rank-row:active{background:rgba(255,255,255,0.06)}
+html.theme-dark .rank-gauge-mask,html.theme-dark .pace-gauge-mask{background:rgba(13,31,53,0.92)}
+html.theme-dark .ranks-sub-tab{background:rgba(255,255,255,0.05)}
+/* Sliding pill + sticky tab variants */
+html.theme-dark .tab-pill-indicator{background:linear-gradient(145deg,rgba(59,170,226,0.22),rgba(59,170,226,0.08));border-color:rgba(92,188,240,0.30);box-shadow:0 1px 8px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.06)}
+html.theme-dark body.pace-active .tabs,html.theme-dark body.leaderboard-active .tabs{background:rgba(13,31,53,0.88);box-shadow:0 4px 24px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05)}
+/* Floating log button */
+html.theme-dark #log-fab{background:#16304a;box-shadow:0 4px 20px rgba(0,0,0,0.5),0 0 0 1px rgba(148,200,246,0.25)}
+html.theme-dark #log-fab-plus{color:#e8f4fd}
+html.theme-dark #log-modal-close{background:rgba(255,255,255,0.08);color:var(--text)}
+/* Toasts, trays, tooltips */
+html.theme-dark #share-toast{background:rgba(13,33,56,0.95);border-color:rgba(148,200,246,0.20);box-shadow:0 4px 24px rgba(0,0,0,0.5)}
+html.theme-dark #reaction-tray{background:rgba(13,33,56,0.94);border-color:rgba(148,200,246,0.18);box-shadow:0 8px 32px rgba(0,0,0,0.5),0 2px 10px rgba(0,0,0,0.35)}
+/* Feed bits */
+html.theme-dark .feed-comment-thread-inner{background:rgba(255,255,255,0.05)}
+html.theme-dark .msg-img-wrap{border-color:rgba(255,255,255,0.08)}
+/* Log modal patty-builder buttons */
+html.theme-dark .pb-btn{background:rgba(255,255,255,0.06);border-color:rgba(148,200,246,0.18)}
+/* Milestone card stats */
+html.theme-dark .mc-stat{background:rgba(255,255,255,0.05)}
+/* Thin progress tracks */
+html.theme-dark .mini-bar-wrap{background:rgba(232,244,253,0.10)}
 </style>
 </head>
 <body>
@@ -5098,7 +5153,7 @@ function renderUnifiedFeed() {
       const msgTimeAgo = dateAgo(msgDate);
       const targetId = m.id;
       const imgHtml = m.imageBase64
-        ? `<div class="msg-img-wrap" onclick="openLightbox('${m.id}')"><img src="${escHtml(m.imageBase64)}" alt="photo" loading="lazy"/></div>`
+        ? `<div class="msg-img-wrap" onclick="openLightbox('${m.id}', this)"><img class="bc-blur-up" src="${escHtml(m.imageBase64)}" alt="photo" loading="lazy"/></div>`
         : '';
       const textHtml = m.text ? `<div class="msg-text">${escHtml(m.text)}</div>` : '';
       const pillsHtml = buildReactionPills(m.reactions, targetId, 'message');
@@ -5204,8 +5259,8 @@ function renderUnifiedFeed() {
       if (item.photo) {
         // ── PHOTO-FORWARD CARD ──
         return `<div class="feed-photo-card" data-player-id="${escHtml(item.player.id)}" data-burger-id="${escHtml(targetId)}" style="animation-delay:${_feedInitialRenderDone?'0s':Math.min(idx*0.04,0.6)+'s'}">
-          <div class="fpc-hero" onclick="openLightboxSrc(this.querySelector('img').src)">
-            <img src="${item.photo}" alt="burger photo" loading="lazy"/>
+          <div class="fpc-hero" onclick="openLightboxSrc(this.querySelector('img').src, this)">
+            <img class="bc-blur-up" src="${item.photo}" alt="burger photo" loading="lazy"/>
             <div class="fpc-grad"></div>
             <div class="fpc-top-row">
               <div class="fpc-player-chip">
@@ -5299,18 +5354,48 @@ function renderUnifiedFeed() {
 // Keep renderGrillFeed as an alias so existing call-sites still work
 function renderGrillFeed() { renderUnifiedFeed(); }
 
-window.openLightbox = function(msgId) {
+// Lightbox with photo morph: the tapped image and the fullscreen image share a
+// view-transition-name for one frame, so the browser animates between them.
+let _lbSrcImg = null;
+function _lbOpen(src, sourceEl) {
+  const lb = document.getElementById('lightbox');
+  const img = document.getElementById('lightbox-img');
+  const srcImg = sourceEl ? (sourceEl.tagName === 'IMG' ? sourceEl : sourceEl.querySelector('img')) : null;
+  const apply = () => { img.src = src; lb.classList.add('open'); };
+  if (document.startViewTransition && srcImg) {
+    _lbSrcImg = srcImg;
+    srcImg.style.viewTransitionName = 'bc-photo';
+    document.startViewTransition(() => {
+      srcImg.style.viewTransitionName = '';
+      img.style.viewTransitionName = 'bc-photo';
+      apply();
+    }).finished.catch(() => {});
+  } else apply();
+}
+window.openLightbox = function(msgId, el) {
   const src = window._msgImages?.[msgId];
-  if (!src) return;
-  document.getElementById('lightbox-img').src = src;
-  document.getElementById('lightbox').classList.add('open');
+  if (src) _lbOpen(src, el);
 };
-window.openLightboxSrc = function(src) {
-  if (!src) return;
-  document.getElementById('lightbox-img').src = src;
-  document.getElementById('lightbox').classList.add('open');
+window.openLightboxSrc = function(src, el) { if (src) _lbOpen(src, el); };
+window.closeLightbox = function() {
+  const lb = document.getElementById('lightbox');
+  const img = document.getElementById('lightbox-img');
+  const srcImg = _lbSrcImg;
+  const apply = () => lb.classList.remove('open');
+  if (document.startViewTransition && srcImg && document.contains(srcImg)) {
+    document.startViewTransition(() => {
+      img.style.viewTransitionName = '';
+      srcImg.style.viewTransitionName = 'bc-photo';
+      apply();
+    }).finished.finally(() => { srcImg.style.viewTransitionName = ''; });
+  } else { img.style.viewTransitionName = ''; apply(); }
+  _lbSrcImg = null;
 };
-window.closeLightbox = function() { document.getElementById('lightbox').classList.remove('open'); };
+// Blur-up reveal — capture-phase load listener covers every feed image
+document.addEventListener('load', (e) => {
+  const t = e.target;
+  if (t.tagName === 'IMG' && t.classList.contains('bc-blur-up')) t.classList.add('bc-loaded');
+}, true);
 
 // ── Tapback reactions ─────────────────────────────────────────────
 let _trayTargetId = null;
@@ -8107,7 +8192,9 @@ function _movePillToBtn(btn) {
 window.switchTab=function(name,btn){
   // View Transitions API: snapshot old tab, morph to new (falls back to instant swap)
   if (document.startViewTransition && !document.getElementById('tab-'+name)?.classList.contains('active')) {
-    document.startViewTransition(() => _switchTabCore(name, btn));
+    document.documentElement.classList.add('vt-tab');
+    document.startViewTransition(() => _switchTabCore(name, btn))
+      .finished.finally(() => document.documentElement.classList.remove('vt-tab'));
   } else {
     _switchTabCore(name, btn);
   }
@@ -8857,6 +8944,16 @@ function renderBurgerMap() {
     showCoverageOnHover: false,
     spiderfyOnMaxZoom: true,
     disableClusteringAtZoom: 16,
+    iconCreateFunction: (cluster) => {
+      const n = cluster.getChildCount();
+      const sz = n < 10 ? 40 : n < 25 ? 48 : 56;
+      return L.divIcon({
+        html: `<div class="bc-cluster"><span class="bc-cluster-n">${n}</span><span class="bc-cluster-sub">🍔</span></div>`,
+        className: 'bc-cluster-wrap',
+        iconSize: [sz, sz],
+        iconAnchor: [sz/2, sz/2]
+      });
+    },
   });
   const legend = document.getElementById('map-legend');
   if (legend) {
