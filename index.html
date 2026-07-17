@@ -508,12 +508,12 @@ body.leaderboard-active header #spectator-pill,
 body.feed-active header,
 body.map-active header,
 body.pace-active header,
-body.leaderboard-active header{padding:6px 0 10px!important;gap:0!important}
+body.leaderboard-active header{padding:calc(6px + env(safe-area-inset-top,0px)) 0 10px!important;gap:0!important}
 body.feed-active .tabs,
 body.map-active .tabs,
 body.pace-active .tabs,
 body.leaderboard-active .tabs{
-  position:sticky;top:0;z-index:20;
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:20;
   background:rgba(168,212,237,0.85);
   backdrop-filter:var(--glass-blur);
   -webkit-backdrop-filter:var(--glass-blur);
@@ -535,8 +535,8 @@ body.map-active #burger-map{
 /* Full-height scrollable feed */
 body.feed-active .social-wrap{height:auto;min-height:0}
 body.feed-active .social-feed{
-  /* 173px = compact header + tabs + sub-tab row; 80px = input bar + safe area */
-  height:calc(100dvh - 173px - 80px);
+  /* 173px = compact header + tabs + sub-tab row; 80px = input bar; plus notch */
+  height:calc(100dvh - 173px - 80px - env(safe-area-inset-top,0px));
   padding-bottom:16px;
   min-height:0;
 }
@@ -818,7 +818,7 @@ body.log-modal-open #log-fab{opacity:0;pointer-events:none;transform:scale(0.7)}
 /* ── Minecraft "Advancement Unlocked" toast ── */
 #mc-advancement-toast{
   position:fixed;
-  top:72px;
+  top:calc(72px + env(safe-area-inset-top,0px));
   right:16px;
   z-index:1000;
   width:260px;
