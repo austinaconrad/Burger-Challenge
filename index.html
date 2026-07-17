@@ -2855,6 +2855,13 @@ img.bc-blur-up.bc-loaded{filter:none;transform:none}
 ::view-transition-old(bc-photo),::view-transition-new(bc-photo){animation:none;mix-blend-mode:normal}
 #lightbox img{will-change:transform}
 
+/* ── Map pins: individual per-log teardrops ── */
+.bc-pin-wrap{background:none!important;border:none!important}
+.bc-pin{position:relative;width:28px;height:36px;filter:drop-shadow(0 3px 5px rgba(0,0,0,0.4));animation:pinDrop 0.35s cubic-bezier(0.34,1.56,0.64,1) both;transform-origin:bottom center;transition:transform 0.15s ease}
+.leaflet-marker-icon:hover .bc-pin{transform:scale(1.15)}
+.bc-pin-badge{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:16px;height:16px;display:flex;align-items:center;justify-content:center;line-height:1;user-select:none}
+@keyframes pinDrop{from{opacity:0;transform:translateY(-14px) scale(0.7)}to{opacity:1;transform:translateY(0) scale(1)}}
+
 /* ── Glass map clusters + popup polish ── */
 .bc-cluster-wrap{background:none!important;border:none!important}
 .bc-cluster{width:100%;height:100%;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;line-height:1;background:rgba(255,255,255,0.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:2px solid rgba(26,112,170,0.55);box-shadow:0 4px 16px rgba(26,112,170,0.35),inset 0 1px 0 rgba(255,255,255,0.9);transition:transform 0.15s ease}
@@ -3099,7 +3106,6 @@ html.theme-dark .mini-bar-wrap{background:rgba(232,244,253,0.10)}
     <div class="tab-panel" id="tab-feed">
       <div class="feed-sub-tabs" id="feed-sub-tabs">
         <button class="feed-sub-tab active" onclick="switchFeedTab('feed',this)"><i class="ti ti-bolt"></i> Feed</button>
-        <button class="feed-sub-tab" onclick="switchFeedTab('rated',this)"><i class="ti ti-star"></i> Top Rated</button>
         <button class="feed-sub-tab" onclick="switchFeedTab('photos',this)"><i class="ti ti-photo"></i> Photos</button>
       </div>
       <!-- Unified feed panel -->
@@ -3128,7 +3134,6 @@ html.theme-dark .mini-bar-wrap{background:rgba(232,244,253,0.10)}
         </div>
       </div>
       <!-- Top rated panel -->
-      <div class="top-rated-wrap" id="top-rated-wrap" style="display:none"></div>
       <div class="photo-wall-wrap" id="photo-wall-wrap" style="display:none"></div>
     </div>
 
@@ -5428,6 +5433,19 @@ document.addEventListener('load', (e) => {
   const t = e.target;
   if (t.tagName === 'IMG' && t.classList.contains('bc-blur-up')) t.classList.add('bc-loaded');
 }, true);
+// Failed loads also unblur (broken images shouldn't sit fuzzy forever)
+document.addEventListener('error', (e) => {
+  const t = e.target;
+  if (t.tagName === 'IMG' && t.classList.contains('bc-blur-up')) t.classList.add('bc-loaded');
+}, true);
+// Safety sweep: any image that finished before its load event was caught
+// (memory-cached images re-inserted by innerHTML re-renders) gets unblurred.
+function sweepBlurUpImages() {
+  document.querySelectorAll('img.bc-blur-up:not(.bc-loaded)').forEach(im => {
+    if (im.complete) im.classList.add('bc-loaded');
+  });
+}
+setInterval(sweepBlurUpImages, 1200);
 
 // ── Tapback reactions ─────────────────────────────────────────────
 let _trayTargetId = null;
@@ -8718,13 +8736,14 @@ window.switchFeedTab = function(tab, btn) {
   document.querySelectorAll('.feed-sub-tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   const unifiedEl = document.getElementById('unified-feed-panel');
-  const ratedEl = document.getElementById('top-rated-wrap');
   const wallEl = document.getElementById('photo-wall-wrap');
   if (unifiedEl) unifiedEl.style.display = 'none';
-  ratedEl.style.display = 'none';
   if (wallEl) wallEl.style.display = 'none';
   document.body.classList.remove('feed-active');
-  if (tab === 'feed') {
+  if (tab === 'photos') {
+    if (wallEl) wallEl.style.display = '';
+    renderPhotoWall();
+  } else {
     if (unifiedEl) unifiedEl.style.display = '';
     // Enter full-height feed mode
     document.body.classList.add('feed-active');
@@ -8732,12 +8751,6 @@ window.switchFeedTab = function(tab, btn) {
     const dot = document.getElementById('social-unread-dot');
     if (dot) dot.classList.remove('visible');
     renderUnifiedFeed();
-  } else if (tab === 'photos') {
-    if (wallEl) wallEl.style.display = '';
-    renderPhotoWall();
-  } else {
-    ratedEl.style.display = '';
-    renderTopRated();
   }
 };
 
@@ -8763,9 +8776,10 @@ function renderPhotoWall() {
     wrap.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📷</div><div class="empty-state-title">No Photos Yet</div><div class="empty-state-sub">Snap your next burger and it\'ll show up here!</div></div>`;
     return;
   }
+  requestAnimationFrame(() => { if (typeof sweepBlurUpImages === 'function') sweepBlurUpImages(); });
   wrap.innerHTML = `<div class="photo-wall">` + items.map(it => `
     <figure class="pw-tile" onclick="openLightboxSrc(this.querySelector('img').src, this)">
-      <img class="bc-blur-up" src="${escHtml(it.src)}" alt="burger photo" loading="lazy"/>
+      <img class="bc-blur-up" src="${escHtml(it.src)}" alt="burger photo" loading="lazy" onerror="this.closest('.pw-tile').style.display='none'"/>
       <figcaption class="pw-cap">
         <span class="pw-cap-name">${escHtml(it.name)}</span>
         ${it.caption ? `<span class="pw-cap-sub">${escHtml(it.caption)}</span>` : ''}
@@ -9012,10 +9026,10 @@ function renderBurgerMap() {
   mapMarkers = [];
   if (mapClusterGroup) { burgerMap.removeLayer(mapClusterGroup); }
   mapClusterGroup = L.markerClusterGroup({
-    maxClusterRadius: 50,
+    maxClusterRadius: 6,
     showCoverageOnHover: false,
     spiderfyOnMaxZoom: true,
-    disableClusteringAtZoom: 16,
+    spiderfyDistanceMultiplier: 1.4,
     iconCreateFunction: (cluster) => {
       const n = cluster.getChildCount();
       const sz = n < 10 ? 40 : n < 25 ? 48 : 56;
@@ -9051,17 +9065,17 @@ function renderBurgerMap() {
         ? `<img src="${pinLogoUrl}" alt="" style="width:15px;height:15px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 1px rgba(255,255,255,0.7)" data-fallback-class="map-pin-emoji" data-fallback-size="13px" data-fallback-emoji="${escHtml(pinEmoji)}" onerror="handleLogoErr(this)" loading="lazy">`
         : `<span class="map-pin-emoji" style="font-size:13px">${pinEmoji}</span>`;
       const icon = L.divIcon({
-        className: '',
-        html: `<div style="position:relative;width:30px;height:38px;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.7))">
-          <svg viewBox="0 0 30 38" width="30" height="38" xmlns="http://www.w3.org/2000/svg">
-            <path d="M15 0C6.716 0 0 6.716 0 15c0 9.5 15 23 15 23S30 24.5 30 15C30 6.716 23.284 0 15 0z" fill="${color}"/>
-            <path d="M15 2C7.82 2 2 7.82 2 15c0 8.4 13 20.5 13 20.5S28 23.4 28 15C28 7.82 22.18 2 15 2z" fill="rgba(255,255,255,0.14)"/>
-            <circle cx="15" cy="15" r="9.5" fill="rgba(0,0,0,0.22)"/>
+        className: 'bc-pin-wrap',
+        html: `<div class="bc-pin">
+          <svg viewBox="0 0 28 36" width="28" height="36" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 1C7.1 1 1.5 6.6 1.5 13.5c0 5.5 4.4 10.8 9 16.7l2 2.6a1.9 1.9 0 0 0 3 0l2-2.6c4.6-5.9 9-11.2 9-16.7C26.5 6.6 20.9 1 14 1z" fill="${color}" stroke="rgba(255,255,255,0.92)" stroke-width="1.6"/>
+            <circle cx="14" cy="13.5" r="8.2" fill="rgba(255,255,255,0.94)"/>
           </svg>
-          <div style="position:absolute;top:5px;left:50%;transform:translateX(-50%);width:16px;height:16px;display:flex;align-items:center;justify-content:center;line-height:1;user-select:none">${pinBadgeHtml}</div>
+          <div class="bc-pin-badge">${pinBadgeHtml}</div>
         </div>`,
-        iconSize: [30, 38],
-        iconAnchor: [15, 38]
+        iconSize: [28, 36],
+        iconAnchor: [14, 35],
+        popupAnchor: [0, -30]
       });
       const ini = p.name.trim().split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
       const timeStr = ts ? formatTime(ts) : '';
