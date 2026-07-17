@@ -2527,6 +2527,17 @@ html.theme-dark .msg-img-wrap{border-color:rgba(255,255,255,0.08)}
 html.theme-dark .pb-btn{background:rgba(255,255,255,0.06);border-color:rgba(148,200,246,0.18)}
 /* Milestone card stats */
 html.theme-dark .mc-stat{background:rgba(255,255,255,0.05)}
+
+/* ── Safe-area / Dynamic Island: <html> matches each theme's top gradient ── */
+html.tod-dawn:not(.theme-dark){background:#f5b98a}
+html.tod-golden:not(.theme-dark){background:#f0a75f}
+html.tod-dusk:not(.theme-dark){background:#5d7bb0}
+html.final-week:not(.theme-dark){background:#f6b26b}
+html.theme-dark.final-week{background:#2a1020}
+html.softball-mode:not(.theme-dark){background:#7ec3e8}
+html.theme-dark.softball-mode{background:#0a1828}
+html.season-over:not(.theme-dark){background:#f2c94c}
+html.theme-dark.season-over{background:#2b2413}
 </style>
 </head>
 <body>
@@ -8900,6 +8911,26 @@ function setupSeasonOver() {
     } catch (e) {}
   }, 4000);
 }
+// Mirror theme classes onto <html> + keep the theme-color meta (status bar /
+// Dynamic Island tint) in sync with whichever skin is topmost.
+function syncChromeColor() {
+  const d = document.documentElement, b = document.body;
+  ['final-week', 'softball-mode', 'last-call', 'season-over',
+   'tod-dawn', 'tod-golden', 'tod-dusk', 'rain-mode']
+    .forEach(c => d.classList.toggle(c, b.classList.contains(c)));
+  const dark = d.classList.contains('theme-dark');
+  let color = dark ? '#0a1828' : '#7ec3e8';
+  if (b.classList.contains('season-over')) color = dark ? '#2b2413' : '#f2c94c';
+  else if (b.classList.contains('softball-mode')) color = dark ? '#0a1828' : '#7ec3e8';
+  else if (b.classList.contains('final-week')) color = dark ? '#2a1020' : '#f6b26b';
+  else if (!dark) {
+    if (b.classList.contains('tod-dawn')) color = '#f5b98a';
+    else if (b.classList.contains('tod-golden')) color = '#f0a75f';
+    else if (b.classList.contains('tod-dusk')) color = '#5d7bb0';
+  }
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color);
+}
+
 const THEMES = [
   { flag: 'finalweek',  cls: 'final-week',    when: n => n >= new Date(2026, 8, 1) && n < new Date(2026, 8, 8), setup: setupFinalWeek },
   { flag: 'softball',   cls: 'softball-mode', when: n => n >= new Date(2026, 8, 4) && n < new Date(2026, 8, 8), setup: setupSoftball },
@@ -8911,6 +8942,7 @@ const THEMES = [
   const act = THEMES.filter(t => new RegExp('[?&]' + t.flag).test(location.search) || t.when(now));
   act.forEach(t => document.body.classList.add(t.cls));
   act.forEach(t => { try { t.setup(); } catch (e) { console.warn('[theme]', t.flag, e); } });
+  syncChromeColor();
 })();
 
 // ── TIME-OF-DAY SKY — ambient gradient follows the clock (light mode) ──────
@@ -8920,6 +8952,7 @@ function applyTimeOfDaySky() {
   if (h >= 5 && h < 9) document.body.classList.add('tod-dawn');
   else if (h >= 17 && h < 20) document.body.classList.add('tod-golden');
   else if (h >= 20 || h < 5) document.body.classList.add('tod-dusk');
+  if (typeof syncChromeColor === 'function') syncChromeColor();
 }
 applyTimeOfDaySky();
 setInterval(applyTimeOfDaySky, 10 * 60 * 1000);
@@ -8949,6 +8982,7 @@ async function initRainDelay() {
     }
     if (!rainy) return;
     document.body.classList.add('rain-mode');
+    syncChromeColor();
     const layer = document.createElement('div');
     layer.id = 'rain-layer';
     document.body.appendChild(layer);
@@ -9021,9 +9055,8 @@ function _isDarkTheme(){ return document.documentElement.classList.contains('the
 function applyTheme(dark){
   document.documentElement.classList.toggle('theme-dark', dark);
   document.querySelectorAll('.theme-toggle i').forEach(i => { i.className = 'ti ti-' + (dark ? 'sun' : 'moon'); });
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', dark ? '#0a1828' : '#7ec3e8');
   if (window._baseTileLayer) window._baseTileLayer.setUrl(dark ? MAP_TILES_DARK : MAP_TILES_LIGHT);
+  if (typeof syncChromeColor === 'function') syncChromeColor();
 }
 window.toggleTheme = function(){
   const dark = !_isDarkTheme();
