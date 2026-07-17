@@ -2338,6 +2338,44 @@ img.bc-blur-up.bc-loaded{filter:none;transform:none}
 html.theme-dark .leaflet-popup-content-wrapper{box-shadow:0 4px 24px rgba(0,0,0,0.55)!important}
 html.theme-dark .leaflet-popup-tip{background:var(--surface2)!important}
 
+/* ══════════ BURGER WRAPPED — season recap story ══════════ */
+#wrapped-overlay{display:none;position:fixed;inset:0;z-index:2000;background:linear-gradient(165deg,#1a0533 0%,#3b0764 35%,#831843 70%,#9a3412 100%);overflow:hidden}
+#wrapped-overlay.open{display:block}
+.wr-progress{position:absolute;top:calc(10px + env(safe-area-inset-top));left:12px;right:12px;display:flex;gap:4px;z-index:5}
+.wr-seg{flex:1;height:3px;border-radius:999px;background:rgba(255,255,255,0.25);overflow:hidden}
+.wr-seg-fill{display:block;height:100%;width:0;background:#fff;border-radius:999px}
+.wr-seg.done .wr-seg-fill{width:100%}
+.wr-seg.now .wr-seg-fill{animation:wrFill var(--wr-dur,6.5s) linear forwards}
+@keyframes wrFill{from{width:0}to{width:100%}}
+.wr-close{position:absolute;top:calc(24px + env(safe-area-inset-top));right:14px;z-index:6;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:16px;cursor:pointer}
+.wr-tap{position:absolute;top:0;bottom:0;z-index:4}
+.wr-tap-left{left:0;width:33%}
+.wr-tap-right{right:0;width:67%}
+.wr-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:60px 28px calc(40px + env(safe-area-inset-bottom));text-align:center;color:#fff}
+.wr-slide{max-width:420px;animation:wrIn 0.5s cubic-bezier(0.16,1,0.3,1) both}
+@keyframes wrIn{from{opacity:0;transform:translateY(18px) scale(0.96)}to{opacity:1;transform:none}}
+.wr-kicker{font-size:12px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:14px}
+.wr-big{font-family:'Bungee',sans-serif;font-size:clamp(56px,22vw,110px);line-height:1;color:#fbbf24;text-shadow:0 4px 30px rgba(251,191,36,0.4)}
+.wr-title{font-family:'Bungee',sans-serif;font-size:clamp(22px,7vw,34px);line-height:1.15;margin:10px 0}
+.wr-sub{font-size:15px;color:rgba(255,255,255,0.75);line-height:1.6;margin-top:10px}
+.wr-emoji{font-size:64px;line-height:1;margin-bottom:14px;display:block;animation:wrBounce 1.8s ease-in-out infinite}
+@keyframes wrBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.wr-photo{width:180px;height:180px;object-fit:cover;border-radius:18px;border:3px solid rgba(255,255,255,0.85);box-shadow:0 10px 40px rgba(0,0,0,0.5);margin:14px auto;display:block;transform:rotate(-2deg)}
+.wr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}
+.wr-grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;border:2px solid rgba(255,255,255,0.7)}
+.wr-grid img:nth-child(odd){transform:rotate(-2.5deg)}
+.wr-grid img:nth-child(even){transform:rotate(2deg)}
+.wr-podium{display:flex;align-items:flex-end;justify-content:center;gap:10px;margin:22px 0 8px}
+.wr-pod{display:flex;flex-direction:column;align-items:center;gap:6px}
+.wr-pod-bar{width:72px;border-radius:10px 10px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:8px;color:#1a0533;font-family:'Bungee',sans-serif}
+.wr-pod-1 .wr-pod-bar{height:120px;background:linear-gradient(180deg,#fde047,#f59e0b)}
+.wr-pod-2 .wr-pod-bar{height:88px;background:linear-gradient(180deg,#e2e8f0,#94a3b8)}
+.wr-pod-3 .wr-pod-bar{height:64px;background:linear-gradient(180deg,#fdba74,#b45309)}
+.wr-pod-name{font-size:12px;font-weight:700;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wr-pod-count{font-size:18px}
+.wr-crown{font-size:26px;line-height:1}
+.wrapped-cta{display:inline-flex;align-items:center;gap:7px;margin-top:8px;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;border:none;border-radius:999px;font-family:'Bungee',sans-serif;font-size:13px;padding:10px 20px;cursor:pointer;box-shadow:0 4px 18px rgba(124,58,237,0.45);animation:wrBounce 2.4s ease-in-out infinite}
+
 /* ── Time-of-day sky — ambient light-mode gradients ── */
 body.tod-dawn{background:linear-gradient(175deg,#f5b98a 0%,#f3d0a5 18%,#a8d4ed 52%,#d8eefd 100%)}
 body.tod-golden{background:linear-gradient(175deg,#f0a75f 0%,#f6d08b 20%,#a8d4ed 58%,#d8eefd 100%)}
@@ -2679,6 +2717,13 @@ html.theme-dark .mc-stat{background:rgba(255,255,255,0.05)}
 </div>
 
 <div id="bdg-tip"></div>
+<div id="wrapped-overlay" aria-hidden="true">
+  <div class="wr-progress" id="wr-progress"></div>
+  <button class="wr-close" onclick="closeWrapped()" aria-label="Close">✕</button>
+  <div class="wr-stage" id="wr-stage"></div>
+  <div class="wr-tap wr-tap-left" onclick="wrPrev()"></div>
+  <div class="wr-tap wr-tap-right" onclick="wrNext()"></div>
+</div>
 <div id="reaction-tray">
   <div class="tray-grid">
     <button class="tray-emoji-btn" data-emoji="🔥">🔥</button>
@@ -8688,6 +8733,116 @@ setInterval(presenceBeat, PRESENCE_BEAT_MS);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) presenceBeat(); });
 setTimeout(presenceBeat, 3000);
 
+
+// ══ BURGER WRAPPED — story-style season recap (season over, or ?wrapped) ══
+let _wrSlides = [], _wrIdx = 0, _wrTimer = null;
+const WR_SLIDE_MS = 6500;
+
+function _wrStats() {
+  const me = players.find(p => p.id === myPlayerId) || null;
+  const all = [...players].sort((a, b) => (b.count || 0) - (a.count || 0));
+  const groupTotal = players.reduce((t, p) => t + (p.count || 0), 0);
+  const logsOf = pl => (pl?.logs || []).filter(e => typeof e === 'object');
+  const myLogs = logsOf(me);
+  const weeks = Math.max(1, (CHALLENGE_END - CHALLENGE_START) / 604800000);
+  const restoCount = {};
+  myLogs.forEach(e => { if (e.restaurant) restoCount[e.restaurant] = (restoCount[e.restaurant] || 0) + 1; });
+  const topResto = Object.entries(restoCount).sort((a, b) => b[1] - a[1])[0] || null;
+  const best = myLogs.filter(e => e.rating > 0).sort((a, b) => b.rating - a.rating)[0] || null;
+  const dayCount = {};
+  myLogs.forEach(e => { const d = new Date(e.ts); if (!isNaN(d)) { const k = d.toDateString(); dayCount[k] = (dayCount[k] || 0) + 1; } });
+  const bigDay = Object.entries(dayCount).sort((a, b) => b[1] - a[1])[0] || null;
+  const cities = new Set(myLogs.map(e => e.locationCityState).filter(Boolean));
+  const photos = myLogs.filter(e => e.photo && !e.photo.startsWith('blob:')).map(e => e.photo);
+  const groupPhotos = players.flatMap(pl => logsOf(pl).filter(e => e.photo && !e.photo.startsWith('blob:')).map(e => e.photo));
+  return { me, all, groupTotal, myLogs, weeks, topResto, best, bigDay,
+           uniqueRestos: Object.keys(restoCount).length, cities, photos, groupPhotos };
+}
+
+function _wrBuildSlides() {
+  const st = _wrStats();
+  const sl = [];
+  const esc = escHtml;
+  sl.push(`<div class="wr-slide"><span class="wr-emoji">🍔</span>
+    <div class="wr-kicker">May 28 — Sept 7</div>
+    <div class="wr-title">Your 100 Burger Challenge Season</div>
+    <div class="wr-sub">One summer. ${st.all.length} competitors. ${st.groupTotal} burgers.<br>Let's look back.</div></div>`);
+  if (st.me) {
+    const perWeek = (st.me.count / st.weeks).toFixed(1);
+    sl.push(`<div class="wr-slide"><div class="wr-kicker">You logged</div>
+      <div class="wr-big">${st.me.count}</div>
+      <div class="wr-title">burgers</div>
+      <div class="wr-sub">That's ${perWeek} a week, every week, all summer.</div></div>`);
+    if (st.topResto) sl.push(`<div class="wr-slide"><span class="wr-emoji">${restoEmoji(st.topResto[0])}</span>
+      <div class="wr-kicker">Your spot</div>
+      <div class="wr-title">${esc(st.topResto[0])}</div>
+      <div class="wr-sub">${st.topResto[1]} visit${st.topResto[1] === 1 ? '' : 's'} — they should name a booth after you.<br>${st.uniqueRestos} different restaurants overall${st.cities.size > 1 ? `, across ${st.cities.size} cities` : ''}.</div></div>`);
+    if (st.best) sl.push(`<div class="wr-slide"><div class="wr-kicker">Best bite of the summer</div>
+      ${st.best.photo && !st.best.photo.startsWith('blob:') ? `<img class="wr-photo" src="${esc(st.best.photo)}" alt=""/>` : `<span class="wr-emoji">⭐</span>`}
+      <div class="wr-title">${esc(st.best.restaurant || 'Unknown Spot')}</div>
+      <div class="wr-sub">${'★'.repeat(Math.round(st.best.rating))} ${st.best.rating}/5${st.best.menuItem ? ` — ${esc(st.best.menuItem)}` : ''}</div></div>`);
+    if (st.bigDay && st.bigDay[1] > 1) sl.push(`<div class="wr-slide"><span class="wr-emoji">🔥</span>
+      <div class="wr-kicker">${esc(st.bigDay[0])}</div>
+      <div class="wr-big">${st.bigDay[1]}</div>
+      <div class="wr-title">burgers in one day</div>
+      <div class="wr-sub">We're not saying it was a cry for help. We're not <i>not</i> saying it.</div></div>`);
+  }
+  const gp = (st.photos.length ? st.photos : st.groupPhotos).slice(0, 6);
+  if (gp.length >= 3) sl.push(`<div class="wr-slide"><div class="wr-kicker">The evidence</div>
+    <div class="wr-grid">${gp.map(u => `<img src="${esc(u)}" alt="" loading="lazy"/>`).join('')}</div>
+    <div class="wr-sub">Every one of these was a good decision.</div></div>`);
+  const podium = st.all.slice(0, 3);
+  if (podium.length) sl.push(`<div class="wr-slide"><div class="wr-kicker">Final standings</div>
+    <div class="wr-podium">${[1, 0, 2].filter(i => podium[i]).map(i => `
+      <div class="wr-pod wr-pod-${i + 1}">
+        ${i === 0 ? '<span class="wr-crown">👑</span>' : ''}
+        <span class="wr-pod-name">${esc(podium[i].name)}</span>
+        <div class="wr-pod-bar"><span class="wr-pod-count">${podium[i].count}</span></div>
+      </div>`).join('')}</div>
+    <div class="wr-title">${esc(podium[0].name)} takes it</div></div>`);
+  sl.push(`<div class="wr-slide"><span class="wr-emoji">🫡</span>
+    <div class="wr-title">That's a wrap</div>
+    <div class="wr-sub">${st.groupTotal} burgers between friends.<br>See you next summer.</div></div>`);
+  return sl;
+}
+
+function _wrShow(i) {
+  _wrIdx = Math.max(0, Math.min(_wrSlides.length - 1, i));
+  document.getElementById('wr-stage').innerHTML = _wrSlides[_wrIdx];
+  const prog = document.getElementById('wr-progress');
+  prog.innerHTML = _wrSlides.map((_, k) =>
+    `<span class="wr-seg ${k < _wrIdx ? 'done' : k === _wrIdx ? 'now' : ''}"><span class="wr-seg-fill"></span></span>`).join('');
+  clearTimeout(_wrTimer);
+  if (_wrIdx < _wrSlides.length - 1) _wrTimer = setTimeout(() => _wrShow(_wrIdx + 1), WR_SLIDE_MS);
+  if (_wrIdx === _wrSlides.length - 2 && window.confetti) {
+    setTimeout(() => { try { confetti({ particleCount: 120, spread: 90, origin: { y: 0.35 }, zIndex: 2001 }); } catch (e) {} }, 600);
+  }
+}
+window.openWrapped = function() {
+  if (!players.length) { showToast('Season data still loading…'); return; }
+  _wrSlides = _wrBuildSlides();
+  document.getElementById('wrapped-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  _wrShow(0);
+};
+window.closeWrapped = function() {
+  clearTimeout(_wrTimer);
+  document.getElementById('wrapped-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+};
+window.wrNext = function() { _wrIdx >= _wrSlides.length - 1 ? closeWrapped() : _wrShow(_wrIdx + 1); };
+window.wrPrev = function() { _wrShow(_wrIdx - 1); };
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('wrapped-overlay')?.classList.contains('open')) return;
+  if (e.key === 'Escape') closeWrapped();
+  if (e.key === 'ArrowRight') wrNext();
+  if (e.key === 'ArrowLeft') wrPrev();
+});
+// ?wrapped preview: auto-open once player data lands
+if (/[?&]wrapped/.test(location.search)) {
+  const wait = setInterval(() => { if (players.length) { clearInterval(wait); openWrapped(); } }, 800);
+}
+
 // ══ THEME ENGINE — date-gated skins; preview any with ?<flag> in the URL ══
 const CHALLENGE_DEADLINE = new Date(2026, 8, 8); // end of Sept 7
 function _themeBanner(html) {
@@ -8730,7 +8885,10 @@ function setupSeasonOver() {
   const lbl = document.querySelector('#stat-days + .stat-label');
   if (num) num.textContent = '🏁';
   if (lbl) lbl.textContent = 'season over';
-  _themeBanner(`<div class="final-week-inner season-banner">🏆 SEASON OVER — FINAL STANDINGS 🏆</div>`);
+  _themeBanner(`<div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+    <div class="final-week-inner season-banner">🏆 SEASON OVER — FINAL STANDINGS 🏆</div>
+    <button class="wrapped-cta" onclick="openWrapped()">🎬 View Your Season</button>
+  </div>`);
   // Champion gets one confetti salute per device
   setTimeout(() => {
     try {
