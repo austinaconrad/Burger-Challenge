@@ -2384,6 +2384,18 @@ html.theme-dark .leaflet-popup-tip{background:var(--surface2)!important}
 .wr-crown{font-size:26px;line-height:1}
 .wrapped-cta{display:inline-flex;align-items:center;gap:7px;margin-top:8px;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;border:none;border-radius:999px;font-family:'Bungee',sans-serif;font-size:13px;padding:10px 20px;cursor:pointer;box-shadow:0 4px 18px rgba(124,58,237,0.45);animation:wrBounce 2.4s ease-in-out infinite}
 
+/* ── Claim picker — rejoin as an existing player ── */
+.claim-overlay{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px}
+.claim-card{max-height:80vh;display:flex;flex-direction:column}
+.claim-list{overflow-y:auto;margin:4px 0 6px;display:flex;flex-direction:column;gap:6px}
+.claim-row{display:flex;align-items:center;justify-content:space-between;background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-xs);padding:11px 14px;cursor:pointer;font-family:'Poppins',sans-serif;font-size:14px;color:var(--text);transition:border-color 0.15s,background 0.15s;text-align:left}
+.claim-row:hover{border-color:var(--border3)}
+.claim-row:active{transform:scale(0.98)}
+.claim-row-match{border-color:var(--amber);background:rgba(245,158,11,0.10);order:-1}
+.claim-name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.claim-count{font-size:12px;color:var(--muted2);flex-shrink:0;margin-left:10px}
+html.theme-dark .claim-row{background:rgba(21,46,72,0.75)}
+
 /* ── Time-of-day sky — ambient light-mode gradients ── */
 body.tod-dawn{background:linear-gradient(175deg,#f5b98a 0%,#f3d0a5 18%,#a8d4ed 52%,#d8eefd 100%)}
 body.tod-golden{background:linear-gradient(175deg,#f0a75f 0%,#f6d08b 20%,#a8d4ed 58%,#d8eefd 100%)}
@@ -3636,14 +3648,70 @@ window.joinRoom = async function() {
   try {
     const snap = await getDoc(doc(db,'rooms',code));
     if (!snap.exists()){ alert('Room not found.'); btn.disabled=false; btn.textContent='Join Challenge →'; return; }
-    roomId=code; myPlayerId=uid(); myName=name;
     const {getDocs}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const pSnap=await getDocs(collection(db,'rooms',roomId,'players'));
-    const usedColors=new Set(pSnap.docs.map(d=>d.data().colorIdx));
-    const colorIdx=Array.from({length:COLORS.length},(_,i)=>i).find(i=>!usedColors.has(i))??pSnap.size%COLORS.length;
-    await setDoc(doc(db,'rooms',roomId,'players',myPlayerId),{name,count:0,colorIdx,joinedAt:serverTimestamp(),logs:[]});
-    saveSession(); startApp();
+    const pSnap=await getDocs(collection(db,'rooms',code,'players'));
+    const existing = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    btn.disabled=false; btn.textContent='Join Challenge →';
+    if (existing.length) {
+      // Room already has players — claim yourself instead of duplicating
+      showClaimPicker(code, name, existing);
+    } else {
+      await _createNewPlayer(code, name, existing);
+    }
   } catch(e){ alert('Error: '+e.message); btn.disabled=false; btn.textContent='Join Challenge →'; }
+};
+
+// Create a brand-new player doc (original join behavior)
+async function _createNewPlayer(code, name, existing) {
+  roomId = code; myPlayerId = uid(); myName = name; spectatorMode = false;
+  const usedColors = new Set(existing.map(p => p.colorIdx));
+  const colorIdx = Array.from({length: COLORS.length}, (_, i) => i).find(i => !usedColors.has(i)) ?? existing.length % COLORS.length;
+  await setDoc(doc(db, 'rooms', roomId, 'players', myPlayerId), { name, count: 0, colorIdx, joinedAt: serverTimestamp(), logs: [] });
+  saveSession(); startApp();
+}
+
+// ── CLAIM PICKER — reconnect this device to an existing player ──────────────
+// (Sessions live in local storage; the installed PWA gets a separate store
+//  from Safari, so returning players must reclaim themselves once.)
+function showClaimPicker(code, typedName, existing) {
+  window._claimCtx = { code, typedName, existing };
+  const sorted = [...existing].sort((a, b) => (b.count || 0) - (a.count || 0));
+  const match = typedName.toLowerCase();
+  const rows = sorted.map(p => `
+    <button class="claim-row${p.name.trim().toLowerCase() === match ? ' claim-row-match' : ''}" onclick="claimPlayer('${escHtml(p.id)}')">
+      <span class="claim-name">${escHtml(p.name)}</span>
+      <span class="claim-count">${p.count || 0} 🍔</span>
+    </button>`).join('');
+  const ov = document.createElement('div');
+  ov.className = 'claim-overlay';
+  ov.id = 'claim-overlay';
+  ov.innerHTML = `<div class="setup-card claim-card" role="dialog" aria-modal="true" aria-label="Choose your player">
+    <h2>Who are you?</h2>
+    <p>This room already has players. Pick yourself to keep your burger count — only make a new player if you're actually new.</p>
+    <div class="claim-list">${rows}</div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="closeClaimPicker()">Cancel</button>
+      <button class="btn-primary" onclick="claimCreateNew()">I'm new here +</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+}
+window.closeClaimPicker = function() { document.getElementById('claim-overlay')?.remove(); };
+window.claimPlayer = function(pid) {
+  const ctx = window._claimCtx;
+  const p = ctx?.existing.find(x => x.id === pid);
+  if (!ctx || !p) return;
+  roomId = ctx.code; myPlayerId = p.id; myName = p.name; spectatorMode = false;
+  closeClaimPicker();
+  saveSession(); startApp();
+  showToast(`🍔 Welcome back, ${p.name}!`);
+};
+window.claimCreateNew = async function() {
+  const ctx = window._claimCtx;
+  if (!ctx) return;
+  closeClaimPicker();
+  try { await _createNewPlayer(ctx.code, ctx.typedName, ctx.existing); }
+  catch (e) { alert('Error: ' + e.message); }
 };
 
 function saveSession(){ try{localStorage.setItem('bc_session',JSON.stringify({roomId,myPlayerId,myName,spectatorMode}))}catch(e){} }
