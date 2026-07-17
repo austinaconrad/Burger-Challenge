@@ -2831,9 +2831,9 @@ html.theme-dark .online-badge{color:#4ade80}
 
 /* ── Photo wall — masonry grid ── */
 .photo-wall-wrap{padding:4px 0 24px}
-.photo-wall{columns:2;column-gap:8px}
-@media (min-width:520px){.photo-wall{columns:3}}
-.pw-tile{break-inside:avoid;margin:0 0 8px;border-radius:12px;overflow:hidden;position:relative;cursor:zoom-in;background:var(--surface);border:1px solid var(--border2);box-shadow:var(--shadow-card);transition:transform 0.15s ease}
+.photo-wall{display:flex;gap:8px;align-items:flex-start}
+.photo-wall-col{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.pw-tile{margin:0;border-radius:12px;overflow:hidden;position:relative;cursor:zoom-in;background:var(--surface);border:1px solid var(--border2);box-shadow:var(--shadow-card);transition:transform 0.15s ease}
 .pw-tile:hover{transform:scale(1.015)}
 .pw-tile img{width:100%;display:block}
 .pw-cap{position:absolute;left:0;right:0;bottom:0;padding:18px 10px 8px;background:linear-gradient(180deg,transparent,rgba(0,0,0,0.62));display:flex;flex-direction:column;gap:1px;pointer-events:none}
@@ -8758,22 +8758,44 @@ function renderPhotoWall() {
       items.push({ src: m.imageBase64, name: m.name || '', caption: (m.text || '').slice(0, 40), rating: 0, ts: m.createdAt?.toDate?.()?.toISOString() || '' });
     }
   });
-  items.sort((a, b) => (b.ts || '').localeCompare(a.ts || ''));
+  // Sort by real date (handles any legacy ts format), newest first
+  items.forEach(it => { const d = new Date(it.ts); it._t = isNaN(d) ? 0 : d.getTime(); });
+  items.sort((a, b) => b._t - a._t);
   if (!items.length) {
     wrap.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📷</div><div class="empty-state-title">No Photos Yet</div><div class="empty-state-sub">Snap your next burger and it\'ll show up here!</div></div>`;
     return;
   }
-  requestAnimationFrame(() => { if (typeof sweepBlurUpImages === 'function') sweepBlurUpImages(); });
-  wrap.innerHTML = `<div class="photo-wall">` + items.map(it => `
+  // Row-major columns: newest reads left→right across the top.
+  // (CSS multicol was column-major AND broke iOS lazy-loading in column 2.)
+  const nCols = (wrap.clientWidth || 360) >= 520 ? 3 : 2;
+  const cols = Array.from({ length: nCols }, () => []);
+  items.forEach((it, i) => cols[i % nCols].push(it));
+  const tile = (it, idx) => `
     <figure class="pw-tile" onclick="openLightboxSrc(this.querySelector('img').src, this)">
-      <img class="bc-blur-up" src="${escHtml(it.src)}" alt="burger photo" loading="lazy" onerror="this.closest('.pw-tile').style.display='none'"/>
+      <img class="bc-blur-up" src="${escHtml(it.src)}" alt="burger photo"
+        ${idx < 3 ? '' : 'loading="lazy"'} decoding="async"
+        onerror="pwImgError(this)"/>
       <figcaption class="pw-cap">
         <span class="pw-cap-name">${escHtml(it.name)}</span>
         ${it.caption ? `<span class="pw-cap-sub">${escHtml(it.caption)}</span>` : ''}
         ${it.rating > 0 ? `<span class="pw-cap-stars">${'★'.repeat(Math.round(it.rating))}</span>` : ''}
       </figcaption>
-    </figure>`).join('') + `</div>`;
+    </figure>`;
+  wrap.innerHTML = `<div class="photo-wall">` + cols.map(col =>
+    `<div class="photo-wall-col">` + col.map(tile).join('') + `</div>`).join('') + `</div>`;
+  requestAnimationFrame(() => { if (typeof sweepBlurUpImages === 'function') sweepBlurUpImages(); });
 }
+
+// Broken wall photo: retry once with a cache-buster, then hide the tile
+window.pwImgError = function(img) {
+  if (!img.dataset.retried && /^https?:/.test(img.src)) {
+    img.dataset.retried = '1';
+    img.src = img.src + (img.src.includes('?') ? '&' : '?') + 'r=' + Date.now();
+    return;
+  }
+  const t = img.closest('.pw-tile');
+  if (t) t.style.display = 'none';
+};
 
 
 function buildBurgerPreview(pattyCount, toppings) {
