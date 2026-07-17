@@ -2826,6 +2826,27 @@ html.theme-dark .hts-track{background:rgba(232,244,253,0.10)}
 #map-locate-btn{position:absolute;bottom:12px;right:12px;z-index:1000;width:38px;height:38px;border-radius:10px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,0.35);transition:background 0.15s,transform 0.12s}
 #map-locate-btn:active{transform:scale(0.92)}
 
+/* ── Live presence ── */
+.rank-avatar-wrap{position:relative;flex-shrink:0}
+.presence-dot{position:absolute;bottom:0;right:0;width:26%;height:26%;min-width:9px;min-height:9px;border-radius:50%;background:#22c55e;border:2px solid var(--bg2);box-shadow:0 0 6px rgba(34,197,94,0.7);animation:presencePulse 2.4s ease-in-out infinite;z-index:2}
+html.theme-dark .presence-dot{border-color:#132a44}
+@keyframes presencePulse{0%,100%{box-shadow:0 0 4px rgba(34,197,94,0.55)}50%{box-shadow:0 0 10px rgba(34,197,94,0.95)}}
+.online-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;color:var(--streak-dark);background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.35);border-radius:999px;padding:1px 7px;margin-left:4px;vertical-align:1px}
+html.theme-dark .online-badge{color:#4ade80}
+.online-badge-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;animation:presencePulse 2.4s ease-in-out infinite}
+
+/* ── Photo wall — masonry grid ── */
+.photo-wall-wrap{padding:4px 0 24px}
+.photo-wall{columns:2;column-gap:8px}
+@media (min-width:520px){.photo-wall{columns:3}}
+.pw-tile{break-inside:avoid;margin:0 0 8px;border-radius:12px;overflow:hidden;position:relative;cursor:zoom-in;background:var(--surface);border:1px solid var(--border2);box-shadow:var(--shadow-card);transition:transform 0.15s ease}
+.pw-tile:hover{transform:scale(1.015)}
+.pw-tile img{width:100%;display:block}
+.pw-cap{position:absolute;left:0;right:0;bottom:0;padding:18px 10px 8px;background:linear-gradient(180deg,transparent,rgba(0,0,0,0.62));display:flex;flex-direction:column;gap:1px;pointer-events:none}
+.pw-cap-name{font-size:11px;font-weight:700;color:#fff;line-height:1.2}
+.pw-cap-sub{font-size:10px;color:rgba(255,255,255,0.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pw-cap-stars{font-size:9px;color:#FACC15;letter-spacing:1px}
+
 /* ── Feed photos: consistent crop + blur-up + morph lightbox ── */
 .msg-img-wrap img{aspect-ratio:4/3;height:auto;max-height:none;object-fit:cover}
 img.bc-blur-up{filter:blur(14px) saturate(1.15);transform:scale(1.04);transition:filter 0.45s ease,transform 0.45s ease}
@@ -3079,6 +3100,7 @@ html.theme-dark .mini-bar-wrap{background:rgba(232,244,253,0.10)}
       <div class="feed-sub-tabs" id="feed-sub-tabs">
         <button class="feed-sub-tab active" onclick="switchFeedTab('feed',this)"><i class="ti ti-bolt"></i> Feed</button>
         <button class="feed-sub-tab" onclick="switchFeedTab('rated',this)"><i class="ti ti-star"></i> Top Rated</button>
+        <button class="feed-sub-tab" onclick="switchFeedTab('photos',this)"><i class="ti ti-photo"></i> Photos</button>
       </div>
       <!-- Unified feed panel -->
       <div id="unified-feed-panel">
@@ -3107,6 +3129,7 @@ html.theme-dark .mini-bar-wrap{background:rgba(232,244,253,0.10)}
       </div>
       <!-- Top rated panel -->
       <div class="top-rated-wrap" id="top-rated-wrap" style="display:none"></div>
+      <div class="photo-wall-wrap" id="photo-wall-wrap" style="display:none"></div>
     </div>
 
     <!-- PLAYERS TAB -->
@@ -3761,6 +3784,7 @@ function ringAvatarHTML(p, size, emojiOverride=null) {
     innerContent = initials(p.name);
     innerStyle = `font-size:${Math.round(size*0.28)}px;font-weight:700`;
   }
+  const online = (typeof isOnline === 'function' && p.id) ? isOnline(p) : false;
   return `<div class="ring-avatar ${cc}" style="width:${size}px;height:${size}px">
     <svg viewBox="0 0 ${size} ${size}">
       <circle class="ring-track" cx="${size/2}" cy="${size/2}" r="${r}"/>
@@ -3769,6 +3793,7 @@ function ringAvatarHTML(p, size, emojiOverride=null) {
         stroke-dashoffset="0"/>
     </svg>
     <div class="ring-inner" style="${innerStyle}">${innerContent}</div>
+    ${online ? '<span class="presence-dot" title="Online now"></span>' : ''}
   </div>`;
 }
 
@@ -4538,12 +4563,19 @@ function render(){
   // renders (badge computation, list building) with no benefit when their tab is hidden.
   if(document.getElementById('tab-leaderboard')?.classList.contains('active')) renderLeaderboard(sorted);
   if(document.getElementById('tab-players')?.classList.contains('active')) renderPlayersList();
-  if(document.getElementById('tab-feed')?.classList.contains('active')) renderUnifiedFeed();
+  if(document.getElementById('tab-feed')?.classList.contains('active')) {
+    renderUnifiedFeed();
+    if (document.getElementById('photo-wall-wrap')?.style.display !== 'none') renderPhotoWall();
+  }
   if(document.getElementById('tab-list')?.classList.contains('active')) renderBentoList();
   if(document.getElementById('tab-pace')?.classList.contains('active')) renderPaceTab();
-  // Update players pill count
+  // Update players pill count + live online badge
   const pill = document.getElementById('players-pill-btn');
-  if(pill) pill.textContent = `👥 Players (${players.length})`;
+  if (pill) {
+    const onlineN = players.filter(isOnline).length;
+    pill.innerHTML = `👥 Players (${players.length})` +
+      (onlineN > 0 ? ` <span class="online-badge" title="${onlineN} online now"><span class="online-badge-dot"></span>${onlineN}</span>` : '');
+  }
 }
 
 function getThisMonday() {
@@ -7730,7 +7762,10 @@ function renderBentoList() {
       : escHtml((p.name || '?').slice(0, 2).toUpperCase());
     return `<div class="rank-row${medalClass}" data-pid="${escHtml(p.id)}" onclick="openCalModal('${escHtml(p.id)}')" title="View ${escHtml(p.name)}'s burger history">
       <div class="rank-num">${dr}</div>
-      <div class="rank-avatar" style="background:${c};">${avatarInner}</div>
+      <div class="rank-avatar-wrap">
+        <div class="rank-avatar" style="background:${c};">${avatarInner}</div>
+        ${(typeof isOnline === 'function' && isOnline(p)) ? '<span class="presence-dot" title="Online now"></span>' : ''}
+      </div>
       <div class="rank-info">
         <div class="rank-name">${escHtml(p.name)}</div>
         <div class="rank-gauge-wrap">
@@ -8684,23 +8719,60 @@ window.switchFeedTab = function(tab, btn) {
   btn.classList.add('active');
   const unifiedEl = document.getElementById('unified-feed-panel');
   const ratedEl = document.getElementById('top-rated-wrap');
+  const wallEl = document.getElementById('photo-wall-wrap');
+  if (unifiedEl) unifiedEl.style.display = 'none';
+  ratedEl.style.display = 'none';
+  if (wallEl) wallEl.style.display = 'none';
+  document.body.classList.remove('feed-active');
   if (tab === 'feed') {
     if (unifiedEl) unifiedEl.style.display = '';
-    ratedEl.style.display = 'none';
     // Enter full-height feed mode
     document.body.classList.add('feed-active');
     seenMessageCount = messages.length;
     const dot = document.getElementById('social-unread-dot');
     if (dot) dot.classList.remove('visible');
     renderUnifiedFeed();
+  } else if (tab === 'photos') {
+    if (wallEl) wallEl.style.display = '';
+    renderPhotoWall();
   } else {
-    if (unifiedEl) unifiedEl.style.display = 'none';
     ratedEl.style.display = '';
-    // Leave full-height mode when on top-rated
-    document.body.classList.remove('feed-active');
     renderTopRated();
   }
 };
+
+// ── PHOTO WALL — masonry grid of every photo in the room ────────────────────
+function renderPhotoWall() {
+  const wrap = document.getElementById('photo-wall-wrap');
+  if (!wrap) return;
+  const items = [];
+  players.forEach(p => {
+    (p.logs || []).forEach(entry => {
+      if (typeof entry === 'object' && entry.photo) {
+        items.push({ src: entry.photo, name: p.name, caption: entry.restaurant || '', rating: entry.rating || 0, ts: entry.ts || '' });
+      }
+    });
+  });
+  messages.forEach(m => {
+    if (m.imageBase64) {
+      items.push({ src: m.imageBase64, name: m.name || '', caption: (m.text || '').slice(0, 40), rating: 0, ts: m.createdAt?.toDate?.()?.toISOString() || '' });
+    }
+  });
+  items.sort((a, b) => (b.ts || '').localeCompare(a.ts || ''));
+  if (!items.length) {
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📷</div><div class="empty-state-title">No Photos Yet</div><div class="empty-state-sub">Snap your next burger and it\'ll show up here!</div></div>`;
+    return;
+  }
+  wrap.innerHTML = `<div class="photo-wall">` + items.map(it => `
+    <figure class="pw-tile" onclick="openLightboxSrc(this.querySelector('img').src, this)">
+      <img class="bc-blur-up" src="${escHtml(it.src)}" alt="burger photo" loading="lazy"/>
+      <figcaption class="pw-cap">
+        <span class="pw-cap-name">${escHtml(it.name)}</span>
+        ${it.caption ? `<span class="pw-cap-sub">${escHtml(it.caption)}</span>` : ''}
+        ${it.rating > 0 ? `<span class="pw-cap-stars">${'★'.repeat(Math.round(it.rating))}</span>` : ''}
+      </figcaption>
+    </figure>`).join('') + `</div>`;
+}
 
 
 function buildBurgerPreview(pattyCount, toppings) {
@@ -9212,6 +9284,22 @@ function initJuly4Stars() {
   })(0);
 }
 
+
+// ── LIVE PRESENCE — heartbeat + online indicators ───────────────────────────
+const PRESENCE_BEAT_MS = 45000;   // how often we write our own heartbeat
+const PRESENCE_TTL_MS  = 90000;   // how stale a heartbeat can be and still count
+function isOnline(p) {
+  if (p.id === myPlayerId && !spectatorMode) return true;
+  const t = p.lastSeen?.toDate ? p.lastSeen.toDate().getTime() : 0;
+  return (Date.now() - t) < PRESENCE_TTL_MS;
+}
+function presenceBeat() {
+  if (!roomId || !myPlayerId || spectatorMode || document.hidden) return;
+  updateDoc(doc(db, 'rooms', roomId, 'players', myPlayerId), { lastSeen: serverTimestamp() }).catch(() => {});
+}
+setInterval(presenceBeat, PRESENCE_BEAT_MS);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) presenceBeat(); });
+setTimeout(presenceBeat, 3000);
 
 // ── FINAL WEEK — ember countdown skin for the last 7 days ───────────────────
 (function initFinalWeek(){
