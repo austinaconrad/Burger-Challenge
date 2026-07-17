@@ -2520,7 +2520,6 @@ body.july4-bg::before {
 .mc-stat-lbl{font-size:8px;color:var(--muted2);font-weight:600;text-transform:uppercase;letter-spacing:0.07em;margin-top:3px}
 .mc-spots{padding:10px 16px 12px;font-size:11px;color:var(--muted2);display:flex;gap:14px;flex-wrap:wrap}
 .mc-spots span{display:flex;align-items:center;gap:4px}
-.top-rated-wrap{display:flex;flex-direction:column;gap:8px;padding:4px 0 24px}
 .tr-card{background:var(--surface);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-card);animation:slideIn 0.25s ease both}
 .tr-rank{font-family:'Bungee',sans-serif;font-size:14px;font-weight:900;color:var(--text);min-width:28px;text-align:center;flex-shrink:0}
 .tr-rank.gold{color:#F59E0B;text-shadow:0 0 10px rgba(245,158,11,0.4)}
@@ -2861,9 +2860,16 @@ img.bc-blur-up.bc-loaded{filter:none;transform:none}
 html.theme-dark .leaflet-popup-content-wrapper{box-shadow:0 4px 24px rgba(0,0,0,0.55)!important}
 html.theme-dark .leaflet-popup-tip{background:var(--surface2)!important}
 
+/* ── Time-of-day sky — ambient light-mode gradients ── */
+body.tod-dawn{background:linear-gradient(175deg,#f5b98a 0%,#f3d0a5 18%,#a8d4ed 52%,#d8eefd 100%)}
+body.tod-golden{background:linear-gradient(175deg,#f0a75f 0%,#f6d08b 20%,#a8d4ed 58%,#d8eefd 100%)}
+body.tod-dusk{background:linear-gradient(175deg,#5d7bb0 0%,#8aa5cc 30%,#b8d3ea 68%,#d8eefd 100%)}
+
 /* ══════════ FINAL WEEK — ember countdown skin (last 7 days) ══════════ */
 .final-week-banner{display:none;justify-content:center;padding:2px 20px 6px}
-body.final-week .final-week-banner{display:flex}
+body.final-week .final-week-banner,body.softball-mode .final-week-banner,
+body.last-call .final-week-banner,body.season-over .final-week-banner,
+body.rain-mode .final-week-banner{display:flex}
 .final-week-inner{font-family:'Bungee',sans-serif;font-size:13px;color:#b91c1c;background:linear-gradient(135deg,rgba(255,237,213,0.9),rgba(254,215,170,0.75));border:1px solid rgba(234,88,12,0.35);padding:6px 16px;border-radius:999px;box-shadow:0 2px 12px rgba(234,88,12,0.25);animation:emberGlow 2.2s ease-in-out infinite}
 html.theme-dark .final-week-inner{color:#fdba74;background:linear-gradient(135deg,rgba(124,45,18,0.55),rgba(90,30,12,0.45));border-color:rgba(251,146,60,0.35)}
 @keyframes emberGlow{0%,100%{box-shadow:0 2px 12px rgba(234,88,12,0.25)}50%{box-shadow:0 2px 22px rgba(234,88,12,0.55)}}
@@ -2875,6 +2881,18 @@ html.theme-dark body.final-week{background:linear-gradient(175deg,#2a1020 0%,#1c
 .stat-pill.countdown-hot .stat-num{color:#dc2626}
 html.theme-dark .stat-pill.countdown-hot .stat-num{color:#f87171}
 @keyframes hotPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,0.35)}50%{box-shadow:0 0 0 6px rgba(220,38,38,0)}}
+
+/* ── Season over + rain delay ── */
+body.season-over{background:linear-gradient(175deg,#f2c94c 0%,#f6e3a1 16%,#a8d4ed 52%,#d8eefd 100%)}
+html.theme-dark body.season-over{background:linear-gradient(175deg,#2b2413 0%,#1a2438 45%,#132a44 100%)}
+body.season-over #log-fab{display:none}
+.final-week-inner.season-banner{color:#7c5e0a;background:linear-gradient(135deg,rgba(255,246,205,0.95),rgba(250,225,150,0.85));border-color:rgba(202,138,4,0.45);animation:none}
+html.theme-dark .final-week-inner.season-banner{color:#fde68a;background:linear-gradient(135deg,rgba(90,70,10,0.55),rgba(60,48,10,0.5));border-color:rgba(250,204,21,0.35)}
+.final-week-inner.rain-banner{color:#1e4966;background:linear-gradient(135deg,rgba(219,234,254,0.92),rgba(186,215,240,0.8));border-color:rgba(30,110,170,0.35);animation:none}
+html.theme-dark .final-week-inner.rain-banner{color:#bfdbfe;background:linear-gradient(135deg,rgba(23,52,84,0.6),rgba(16,40,66,0.5));border-color:rgba(96,165,250,0.3)}
+#rain-layer{position:fixed;inset:-60px 0 0;z-index:0;pointer-events:none;opacity:0.45;background:repeating-linear-gradient(78deg,transparent 0 44px,rgba(160,200,235,0.4) 44px 46px);animation:rainFall 0.7s linear infinite}
+html.theme-dark #rain-layer{background:repeating-linear-gradient(78deg,transparent 0 44px,rgba(148,200,246,0.2) 44px 46px)}
+@keyframes rainFall{from{transform:translate(10px,-46px)}to{transform:translate(0,0)}}
 
 /* ══════════ SOFTBALL WEEKEND — Labor Day tournament takeover (Sept 4–7) ══════════ */
 body.softball-mode{background:linear-gradient(175deg,#7ec3e8 0%,#a8d4ed 26%,#8fbf6e 55%,#6fa653 74%,#b08a5f 100%)}
@@ -7087,9 +7105,10 @@ async function _confirmBurgerImpl() {
         _receiptShareData._photoBlobUrl = false;
       }
     } catch (e) {
-      console.warn('[photo upload] Firebase Storage failed, falling back to compressed base64:', e);
-      // Graceful fallback: use the compressed base64 so the burger still logs
-      photoToSave = snapshotPhoto;
+      console.warn('[photo upload] Firebase Storage failed, falling back to small thumbnail:', e);
+      // Graceful fallback: small thumbnail keeps the player doc far from the 1MB limit
+      try { photoToSave = await compressImage(snapshotPhotoFile, 480, 0.55); }
+      catch (e2) { photoToSave = snapshotPhoto; }
     }
   }
   await changeMyCountWithDetails(1, restaurant, snapshotRating, snapshotGPS, snapshotCount, snapshotToppings, snapshotMenuItemName, snapshotMenuEmoji, photoToSave, snapshotCustomTs);
@@ -8864,73 +8883,6 @@ window.toggleTrDrawer = function(idx) {
   if (chevron) chevron.classList.toggle('open', isOpen);
 };
 
-function renderTopRated() {
-  const el = document.getElementById('top-rated-wrap');
-  if (!el) return;
-
-  // Collect all rated log entries across all players
-  const entries = [];
-  players.forEach(p => {
-    (p.logs || []).forEach(entry => {
-      const ts = logTs(entry);
-      if (!ts) return;
-      const rating = (typeof entry === 'object' && entry.rating) || 0;
-      if (!rating) return;
-      entries.push({
-        player:     p,
-        ts,
-        restaurant: (typeof entry === 'object' && entry.restaurant) || 'Unknown Spot',
-        rating,
-        patties:    (typeof entry === 'object' && entry.patties > 0) ? entry.patties : 1,
-        toppings:   (typeof entry === 'object' && entry.toppings)    || [],
-      });
-    });
-  });
-
-  if (!entries.length) {
-    el.innerHTML = `<div class="grill-feed-empty"><span class="gfe-icon"><i class="ti ti-star"></i></span><div class="gfe-title">NO RATINGS YET</div>Log a burger and rate it to see rankings!</div>`;
-    return;
-  }
-
-  // Sort by rating desc, then restaurant alpha for ties
-  entries.sort((a, b) => b.rating - a.rating || a.restaurant.localeCompare(b.restaurant));
-
-  const pattyLabel = ['','Single','Double','Triple'];
-  const rankCls = (i) => i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
-
-  el.innerHTML = entries.map((item, i) => {
-    const c = RING_COLORS[item.player.colorIdx % RING_COLORS.length];
-    const d = safeDate(item.ts);
-    const dateStr = d ? `${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)}` : '';
-    let stars = '';
-    for (let s = 1; s <= 5; s++) {
-      if (item.rating >= s)          stars += starIcon(true);
-      else if (item.rating >= s-0.5) stars += starIcon(true);
-      else                           stars += starIcon(false, 0.15);
-    }
-    return `<div class="tr-item">
-      <div class="tr-card" style="animation-delay:${Math.min(i*0.04,0.5)}s" onclick="toggleTrDrawer(${i})">
-        <div class="tr-rank ${rankCls(i)}">#${i+1}</div>
-        <div class="tr-info">
-          <div class="tr-restaurant">${escHtml(item.restaurant)}</div>
-          <div class="tr-meta">
-            <span class="tr-player-chip" style="background:${c}18;color:${c};border:1px solid ${c}44">${escHtml(item.player.name)}</span>
-            <span class="tr-patty">${pattyLabel[Math.min(item.patties,3)] || 'Single'}</span>
-            <span class="tr-date">${dateStr}</span>
-          </div>
-        </div>
-        <div class="tr-right">
-          <div class="tr-stars">${stars}</div>
-          <div class="tr-score">${item.rating}/5</div>
-        </div>
-        <div class="tr-chevron" id="tr-chev-${i}">▾</div>
-      </div>
-      <div class="tr-drawer" id="tr-drawer-${i}">
-        <div class="tr-drawer-inner">${buildBurgerPreview(item.patties, item.toppings)}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
 
 function ratingToFlames(rating) {
   if (!rating || rating <= 0) return '<span style="color:var(--muted);font-size:12px">— unrated</span>';
@@ -9331,35 +9283,7 @@ function initJuly4Stars() {
 }
 
 
-// ── SOFTBALL WEEKEND — Labor Day tournament takeover (Sept 4–7) ─────────────
-// Preview any time with ?softball in the URL.
-function isSoftballWeekend() {
-  if (/[?&]softball/.test(location.search)) return true;
-  const now = new Date();
-  return now >= new Date(2026, 8, 4) && now < new Date(2026, 8, 8);
-}
-(function initSoftballMode(){
-  if (!isSoftballWeekend()) return;
-  document.body.classList.add('softball-mode');
-  // Language swaps
-  const daysLbl = document.querySelector('#stat-days + .stat-label');
-  if (daysLbl) daysLbl.textContent = 'innings left';
-  const fabPlus = document.getElementById('log-fab-plus');
-  if (fabPlus) fabPlus.textContent = 'AT BAT';
-  // Banner takes the softball look (overrides the final-week fill)
-  const b = document.getElementById('final-week-banner');
-  if (b) {
-    const days = Math.max(0, Math.ceil((CHALLENGE_END - new Date()) / 86400000));
-    b.innerHTML = `<div class="final-week-inner softball-banner">🥎 FINAL INNING — ${days} day${days === 1 ? '' : 's'} to the plate 🍔</div>`;
-    document.body.classList.add('final-week');
-  }
-  // Softball-colored confetti everywhere (optic yellow, grass, chalk, seam red)
-  if (window.confetti) {
-    const orig = window.confetti;
-    const wrapped = (opts = {}) => orig({ ...opts, colors: opts.colors || ['#f7ec3f', '#7cb342', '#ffffff', '#dc2626'] });
-    window.confetti = Object.assign(wrapped, orig);
-  }
-})();
+// ── SOFTBALL WEEKEND helpers (activation lives in the theme engine below) ──
 
 // Base-running diamond: home→1st→2nd→3rd→home at 0/25/50/75/100 burgers
 const _SBD_PATH = [[50, 63.7], [87, 35.7], [50, 9.1], [13, 35.7], [50, 63.7]];
@@ -9430,17 +9354,173 @@ setInterval(presenceBeat, PRESENCE_BEAT_MS);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) presenceBeat(); });
 setTimeout(presenceBeat, 3000);
 
-// ── FINAL WEEK — ember countdown skin for the last 7 days ───────────────────
-(function initFinalWeek(){
-  const msLeft = CHALLENGE_END - new Date();
-  const forced = /[?&]finalweek/.test(location.search);
-  if (!forced && (msLeft <= 0 || msLeft > 7 * 86400000)) return;
-  document.body.classList.add('final-week');
-  const days = Math.ceil(msLeft / 86400000);
+// ══ THEME ENGINE — date-gated skins; preview any with ?<flag> in the URL ══
+const CHALLENGE_DEADLINE = new Date(2026, 8, 8); // end of Sept 7
+function _themeBanner(html) {
   const b = document.getElementById('final-week-banner');
-  if (b) b.innerHTML = `<div class="final-week-inner">🔥 FINAL WEEK — ${days} day${days === 1 ? '' : 's'} left 🔥</div>`;
+  if (b) b.innerHTML = html;
+}
+function setupFinalWeek() {
+  const days = Math.max(0, Math.ceil((CHALLENGE_END - new Date()) / 86400000));
+  _themeBanner(`<div class="final-week-inner">🔥 FINAL WEEK — ${days} day${days === 1 ? '' : 's'} left 🔥</div>`);
   document.getElementById('stat-days')?.closest('.stat-pill')?.classList.add('countdown-hot');
+}
+function setupSoftball() {
+  const daysLbl = document.querySelector('#stat-days + .stat-label');
+  if (daysLbl) daysLbl.textContent = 'innings left';
+  const fabPlus = document.getElementById('log-fab-plus');
+  if (fabPlus) fabPlus.textContent = 'AT BAT';
+  const days = Math.max(0, Math.ceil((CHALLENGE_END - new Date()) / 86400000));
+  _themeBanner(`<div class="final-week-inner softball-banner">🥎 FINAL INNING — ${days} day${days === 1 ? '' : 's'} to the plate 🍔</div>`);
+  if (window.confetti) {
+    const orig = window.confetti;
+    const wrapped = (opts = {}) => orig({ ...opts, colors: opts.colors || ['#f7ec3f', '#7cb342', '#ffffff', '#dc2626'] });
+    window.confetti = Object.assign(wrapped, orig);
+  }
+}
+function setupLastCall() {
+  const num = document.getElementById('stat-days');
+  const lbl = document.querySelector('#stat-days + .stat-label');
+  const tick = () => {
+    const ms = Math.max(0, CHALLENGE_DEADLINE - Date.now());
+    const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000);
+    if (num) num.textContent = h + 'h';
+    if (lbl) lbl.textContent = 'last call';
+    _themeBanner(`<div class="final-week-inner softball-banner">⏰ LAST CALL — ${h}h ${m}m to the plate 🍔</div>`);
+  };
+  tick();
+  setInterval(tick, 30000);
+}
+function setupSeasonOver() {
+  const num = document.getElementById('stat-days');
+  const lbl = document.querySelector('#stat-days + .stat-label');
+  if (num) num.textContent = '🏁';
+  if (lbl) lbl.textContent = 'season over';
+  _themeBanner(`<div class="final-week-inner season-banner">🏆 SEASON OVER — FINAL STANDINGS 🏆</div>`);
+  // Champion gets one confetti salute per device
+  setTimeout(() => {
+    try {
+      const w = [...players].sort((a, b) => (b.count || 0) - (a.count || 0))[0];
+      if (w && w.id === myPlayerId && !localStorage.getItem('bc_champ_confetti')) {
+        localStorage.setItem('bc_champ_confetti', '1');
+        confetti({ particleCount: 160, spread: 100, origin: { y: 0.3 } });
+      }
+    } catch (e) {}
+  }, 4000);
+}
+const THEMES = [
+  { flag: 'finalweek',  cls: 'final-week',    when: n => n >= new Date(2026, 8, 1) && n < new Date(2026, 8, 8), setup: setupFinalWeek },
+  { flag: 'softball',   cls: 'softball-mode', when: n => n >= new Date(2026, 8, 4) && n < new Date(2026, 8, 8), setup: setupSoftball },
+  { flag: 'lastcall',   cls: 'last-call',     when: n => n >= new Date(2026, 8, 7) && n < new Date(2026, 8, 8), setup: setupLastCall },
+  { flag: 'seasonover', cls: 'season-over',   when: n => n >= new Date(2026, 8, 8),                              setup: setupSeasonOver },
+];
+(function initThemes(){
+  const now = new Date();
+  const act = THEMES.filter(t => new RegExp('[?&]' + t.flag).test(location.search) || t.when(now));
+  act.forEach(t => document.body.classList.add(t.cls));
+  act.forEach(t => { try { t.setup(); } catch (e) { console.warn('[theme]', t.flag, e); } });
 })();
+
+// ── TIME-OF-DAY SKY — ambient gradient follows the clock (light mode) ──────
+function applyTimeOfDaySky() {
+  const h = new Date().getHours();
+  document.body.classList.remove('tod-dawn', 'tod-golden', 'tod-dusk');
+  if (h >= 5 && h < 9) document.body.classList.add('tod-dawn');
+  else if (h >= 17 && h < 20) document.body.classList.add('tod-golden');
+  else if (h >= 20 || h < 5) document.body.classList.add('tod-dusk');
+}
+applyTimeOfDaySky();
+setInterval(applyTimeOfDaySky, 10 * 60 * 1000);
+
+// ── RAIN DELAY — rain streaks when it's raining at the user's location ─────
+// Only runs if geolocation was already granted (never prompts). Preview: ?rain
+async function initRainDelay() {
+  try {
+    const forced = /[?&]rain/.test(location.search);
+    if (document.body.classList.contains('season-over')) return;
+    if (!forced) {
+      if (!navigator.permissions || !navigator.geolocation) return;
+      const perm = await navigator.permissions.query({ name: 'geolocation' });
+      if (perm.state !== 'granted') return;
+    }
+    let lat = 39.14, lng = -84.5;
+    if (!forced) {
+      const pos = await new Promise((res, rej) =>
+        navigator.geolocation.getCurrentPosition(res, rej, { timeout: 8000, maximumAge: 600000 }));
+      lat = pos.coords.latitude; lng = pos.coords.longitude;
+    }
+    let rainy = forced;
+    if (!forced) {
+      const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true`);
+      const code = (await r.json())?.current_weather?.weathercode ?? 0;
+      rainy = (code >= 51 && code <= 67) || (code >= 80 && code <= 99);
+    }
+    if (!rainy) return;
+    document.body.classList.add('rain-mode');
+    const layer = document.createElement('div');
+    layer.id = 'rain-layer';
+    document.body.appendChild(layer);
+    const b = document.getElementById('final-week-banner');
+    if (b && !b.innerHTML) _themeBanner(`<div class="final-week-inner rain-banner">🌧️ RAIN DELAY — grill anyway 🍔</div>`);
+  } catch (e) {}
+}
+setTimeout(initRainDelay, 2500);
+
+// ── PHOTO MIGRATION — move inline base64 log photos to Storage ─────────────
+// Base64 photos bloat the player doc toward Firestore's 1MB limit; once there,
+// every future log write fails. This quietly uploads them and swaps in URLs.
+// Safe against concurrent logging:
+//   1. Uploads happen first (the slow part) with NO doc writes.
+//   2. Skips entirely while a log write is in flight (shares its mutex).
+//   3. Before writing, re-reads the doc fresh from the server and patches
+//      matching entries by ts — burgers logged mid-migration are preserved.
+//   4. Failures retry on the next interval; finished uploads are cached so
+//      retries never duplicate Storage objects.
+let _photoMigrationDone = false;
+let _photoMigrationBusy = false;
+const _migratedUrls = {};   // entry ts → Storage URL (survives retries)
+async function migrateInlinePhotos() {
+  if (_photoMigrationDone || _photoMigrationBusy || !storage || !roomId || !myPlayerId || spectatorMode) return;
+  if (_changeMyCountInFlight) return;                       // a log is being written — wait
+  const me = players.find(p => p.id === myPlayerId);
+  if (!me) return;
+  const inline = (me.logs || []).filter(e => typeof e === 'object' && e.ts && e.photo && e.photo.startsWith('data:'));
+  if (!inline.length) { _photoMigrationDone = true; return; }
+  _photoMigrationBusy = true;
+  try {
+    // 1. Upload every inline photo (no doc writes yet; cached across retries)
+    for (const e of inline) {
+      if (_migratedUrls[e.ts]) continue;
+      const blob = await (await fetch(e.photo)).blob();
+      const path = `burgerPhotos/${roomId}/${myPlayerId}/migrated_${Date.now()}_${uid()}.jpg`;
+      const ref2 = storageRef(storage, path);
+      await uploadBytes(ref2, blob, { contentType: blob.type || 'image/jpeg' });
+      _migratedUrls[e.ts] = await getDownloadURL(ref2);
+    }
+    // 2. Write window: bail if a log started while we were uploading
+    if (_changeMyCountInFlight) throw new Error('log write in flight');
+    // 3. Fresh server read → patch by ts → write. Entries added or changed
+    //    meanwhile pass through untouched.
+    const snap = await getDoc(doc(db, 'rooms', roomId, 'players', myPlayerId));
+    const freshLogs = snap.data()?.logs || [];
+    let patched = 0;
+    const updated = freshLogs.map(e => {
+      if (typeof e === 'object' && e.ts && _migratedUrls[e.ts] && e.photo && e.photo.startsWith('data:')) {
+        patched++;
+        return { ...e, photo: _migratedUrls[e.ts] };
+      }
+      return e;
+    });
+    if (patched) await updateDoc(doc(db, 'rooms', roomId, 'players', myPlayerId), { logs: updated });
+    _photoMigrationDone = true;
+    console.log('[photo migration] moved', patched, 'inline photo(s) to Storage');
+  } catch (err) {
+    console.warn('[photo migration] will retry:', err?.message || err);
+  } finally {
+    _photoMigrationBusy = false;
+  }
+}
+setInterval(migrateInlinePhotos, 8000);
 
 // ── DARK MODE — manual toggle, persisted per device ─────────────────────────
 const MAP_TILES_LIGHT = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
