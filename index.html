@@ -6,10 +6,16 @@
 <meta name="theme-color" content="#7ec3e8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <title>🍔 100 Burger Challenge</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍔</text></svg>">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta property="og:title" content="100 Burger Challenge">
+<meta property="og:description" content="One summer. 100 burgers. No mercy. Follow the race.">
+<meta property="og:image" content="https://austinaconrad.github.io/Burger-Challenge/og-image.png">
+<meta property="og:url" content="https://austinaconrad.github.io/Burger-Challenge/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
 <script>try{if(localStorage.getItem('bc_theme')==='dark')document.documentElement.classList.add('theme-dark')}catch(e){}</script>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Bungee&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
@@ -659,6 +665,8 @@ body.feed-active .feed-sub-tabs{margin-bottom:10px}
 #lightbox.open{display:flex;opacity:1}
 @starting-style{#lightbox.open{opacity:0}}
 #lightbox img{max-width:92vw;max-height:88vh;border-radius:14px;box-shadow:0 8px 48px rgba(0,0,0,0.4)}
+#lightbox-count{position:absolute;bottom:calc(20px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);font-size:12px;font-weight:600;color:rgba(255,255,255,0.85);background:rgba(0,0,0,0.45);padding:4px 14px;border-radius:999px;pointer-events:none;display:none}
+#lightbox-count.on{display:block}
 .img-preview-bar{display:none;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-sm);margin-bottom:8px}
 .img-preview-bar.visible{display:flex}
 .img-preview-thumb{width:42px;height:42px;border-radius:10px;object-fit:cover;border:1px solid var(--border2)}
@@ -2677,13 +2685,13 @@ html.theme-dark.season-over{background:#2b2413}
             <div class="img-preview-bar" id="img-preview-bar">
               <img class="img-preview-thumb" id="img-preview-thumb" src="" alt=""/>
               <span class="img-preview-name" id="img-preview-name"></span>
-              <button class="img-preview-remove" onclick="clearPendingImage()" title="Remove">✕</button>
+              <button class="img-preview-remove" onclick="clearPendingImage()" title="Remove" aria-label="Remove photo">✕</button>
             </div>
             <div class="social-capsule">
-              <button class="social-capsule-cam" id="photo-btn" onclick="document.getElementById('photo-input').click()" title="Add photo">📷</button>
+              <button class="social-capsule-cam" id="photo-btn" onclick="document.getElementById('photo-input').click()" title="Add photo" aria-label="Add photo">📷</button>
               <input type="file" id="photo-input" accept="image/*" onchange="handleImageSelect(event)"/>
               <textarea id="social-text" placeholder="Share a burger update…" rows="1" onkeydown="socialKeydown(event)" oninput="autoResize(this)"></textarea>
-              <button class="send-btn" id="send-btn" onclick="sendSocialPost()" title="Send">➤</button>
+              <button class="send-btn" id="send-btn" onclick="sendSocialPost()" title="Send" aria-label="Send message">➤</button>
             </div>
           </div>
         </div>
@@ -2709,7 +2717,7 @@ html.theme-dark.season-over{background:#2b2413}
     <div class="tab-panel" id="tab-map">
       <div class="map-wrap">
         <div id="burger-map"></div>
-        <button id="map-locate-btn" onclick="flyToMyLocation()" title="My location">📍</button>
+        <button id="map-locate-btn" onclick="flyToMyLocation()" title="My location" aria-label="Go to my location">📍</button>
       </div>
       <div class="map-section-label">Recent Burger Spots</div>
       <div id="map-feed" class="map-feed-wrap"></div>
@@ -2728,34 +2736,34 @@ html.theme-dark.season-over{background:#2b2413}
 </div>
 
 <div id="bdg-tip"></div>
-<div id="wrapped-overlay" aria-hidden="true">
+<div id="wrapped-overlay" role="dialog" aria-modal="true" aria-label="Season recap">
   <div class="wr-progress" id="wr-progress"></div>
   <button class="wr-close" onclick="closeWrapped()" aria-label="Close">✕</button>
   <div class="wr-stage" id="wr-stage"></div>
   <div class="wr-tap wr-tap-left" onclick="wrPrev()"></div>
   <div class="wr-tap wr-tap-right" onclick="wrNext()"></div>
 </div>
-<div id="reaction-tray">
+<div id="reaction-tray" role="menu" aria-label="Reactions">
   <div class="tray-grid">
-    <button class="tray-emoji-btn" data-emoji="🔥">🔥</button>
-    <button class="tray-emoji-btn" data-emoji="😍">😍</button>
-    <button class="tray-emoji-btn" data-emoji="🤌">🤌</button>
-    <button class="tray-emoji-btn" data-emoji="💀">💀</button>
-    <button class="tray-emoji-btn" data-emoji="🍔">🍔</button>
-    <button class="tray-emoji-btn" data-emoji="🏆">🏆</button>
-    <button class="tray-emoji-btn" data-emoji="👑">👑</button>
-    <button class="tray-emoji-btn" data-emoji="⚡">⚡</button>
-    <button class="tray-emoji-btn" data-emoji="😭">😭</button>
-    <button class="tray-emoji-btn" data-emoji="🥵">🥵</button>
-    <button class="tray-emoji-btn" data-emoji="😂">😂</button>
-    <button class="tray-emoji-btn" data-emoji="🫡">🫡</button>
-    <button class="tray-emoji-btn" data-emoji="💯">💯</button>
-    <button class="tray-emoji-btn" data-emoji="🥇">🥇</button>
-    <button class="tray-emoji-btn" data-emoji="👎">👎</button>
-    <button class="tray-emoji-btn" data-emoji="❤️">❤️</button>
+    <button class="tray-emoji-btn" data-emoji="🔥" aria-label="React with 🔥">🔥</button>
+    <button class="tray-emoji-btn" data-emoji="😍" aria-label="React with 😍">😍</button>
+    <button class="tray-emoji-btn" data-emoji="🤌" aria-label="React with 🤌">🤌</button>
+    <button class="tray-emoji-btn" data-emoji="💀" aria-label="React with 💀">💀</button>
+    <button class="tray-emoji-btn" data-emoji="🍔" aria-label="React with 🍔">🍔</button>
+    <button class="tray-emoji-btn" data-emoji="🏆" aria-label="React with 🏆">🏆</button>
+    <button class="tray-emoji-btn" data-emoji="👑" aria-label="React with 👑">👑</button>
+    <button class="tray-emoji-btn" data-emoji="⚡" aria-label="React with ⚡">⚡</button>
+    <button class="tray-emoji-btn" data-emoji="😭" aria-label="React with 😭">😭</button>
+    <button class="tray-emoji-btn" data-emoji="🥵" aria-label="React with 🥵">🥵</button>
+    <button class="tray-emoji-btn" data-emoji="😂" aria-label="React with 😂">😂</button>
+    <button class="tray-emoji-btn" data-emoji="🫡" aria-label="React with 🫡">🫡</button>
+    <button class="tray-emoji-btn" data-emoji="💯" aria-label="React with 💯">💯</button>
+    <button class="tray-emoji-btn" data-emoji="🥇" aria-label="React with 🥇">🥇</button>
+    <button class="tray-emoji-btn" data-emoji="👎" aria-label="React with 👎">👎</button>
+    <button class="tray-emoji-btn" data-emoji="❤️" aria-label="React with ❤️">❤️</button>
   </div>
 </div>
-<div id="lightbox" onclick="closeLightbox()"><img id="lightbox-img" src="" alt=""/></div>
+<div id="lightbox" onclick="closeLightbox()" role="dialog" aria-modal="true" aria-label="Photo viewer"><img id="lightbox-img" src="" alt="Burger photo"/><div id="lightbox-count"></div></div>
 
 <!-- FLOATING LOG BUTTON -->
 <button id="log-fab" onclick="openFABLog()" aria-label="Log a burger" style="display:none">
@@ -3753,6 +3761,9 @@ window.openFABLog = function() {
   }, 350);
 };
 
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('log-modal-overlay')?.classList.contains('open')) closeLogModal();
+});
 window.closeLogModal = function() {
   const overlay = document.getElementById('log-modal-overlay');
   if (overlay) overlay.classList.remove('open');
@@ -4916,6 +4927,24 @@ function renderGrillFeed() { renderUnifiedFeed(); }
 // Lightbox with photo morph: the tapped image and the fullscreen image share a
 // view-transition-name for one frame, so the browser animates between them.
 let _lbSrcImg = null;
+let _lbGallery = null, _lbIdx = -1;
+function _lbSetCounter() {
+  const c = document.getElementById('lightbox-count');
+  if (!c) return;
+  const on = _lbGallery && _lbGallery.length > 1;
+  c.classList.toggle('on', !!on);
+  if (on) c.textContent = (_lbIdx + 1) + ' / ' + _lbGallery.length;
+}
+function _lbNav(dir) {
+  if (!_lbGallery) return;
+  const n = _lbIdx + dir;
+  if (n < 0 || n >= _lbGallery.length) return;
+  _lbIdx = n;
+  const img = document.getElementById('lightbox-img');
+  img.style.viewTransitionName = '';
+  img.src = _lbGallery[n];
+  _lbSetCounter();
+}
 function _lbOpen(src, sourceEl) {
   const lb = document.getElementById('lightbox');
   const img = document.getElementById('lightbox-img');
@@ -4933,9 +4962,21 @@ function _lbOpen(src, sourceEl) {
 }
 window.openLightbox = function(msgId, el) {
   const src = window._msgImages?.[msgId];
-  if (src) _lbOpen(src, el);
+  if (!src) return;
+  _lbGallery = null; _lbIdx = -1;
+  _lbOpen(src, el);
+  _lbSetCounter();
 };
-window.openLightboxSrc = function(src, el) { if (src) _lbOpen(src, el); };
+window.openLightboxSrc = function(src, el) {
+  if (!src) return;
+  // Opened from the photo wall → whole wall becomes a swipeable gallery
+  if (el && el.closest && el.closest('#photo-wall-wrap') && window._pwGallery) {
+    _lbGallery = window._pwGallery;
+    _lbIdx = _lbGallery.indexOf(src);
+  } else { _lbGallery = null; _lbIdx = -1; }
+  _lbOpen(src, el);
+  _lbSetCounter();
+};
 window.closeLightbox = function() {
   const lb = document.getElementById('lightbox');
   const img = document.getElementById('lightbox-img');
@@ -4950,6 +4991,24 @@ window.closeLightbox = function() {
   } else { img.style.viewTransitionName = ''; apply(); }
   _lbSrcImg = null;
 };
+// Lightbox gallery: swipe left/right + arrow keys + Escape
+(function initLightboxNav() {
+  const lb = document.getElementById('lightbox');
+  if (!lb) return;
+  let sx = 0, sy = 0;
+  lb.addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+  lb.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+    if (Math.abs(dx) > 50 && Math.abs(dy) < 70) { e.stopPropagation(); _lbNav(dx < 0 ? 1 : -1); }
+  }, { passive: true });
+  document.addEventListener('keydown', (e) => {
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowRight') _lbNav(1);
+    if (e.key === 'ArrowLeft') _lbNav(-1);
+  });
+})();
+
 // Blur-up reveal — capture-phase load listener covers every feed image
 document.addEventListener('load', (e) => {
   const t = e.target;
@@ -8270,6 +8329,7 @@ function renderPhotoWall() {
         ${it.rating > 0 ? `<span class="pw-cap-stars">${'★'.repeat(Math.round(it.rating))}</span>` : ''}
       </figcaption>
     </figure>`;
+  window._pwGallery = items.map(it => it.src);
   wrap.innerHTML = `<div class="photo-wall">` + cols.map(col =>
     `<div class="photo-wall-col">` + col.map(tile).join('') + `</div>`).join('') + `</div>`;
   requestAnimationFrame(() => { if (typeof sweepBlurUpImages === 'function') sweepBlurUpImages(); });
@@ -8595,10 +8655,8 @@ const _prevRanks  = {};
 
 // ── July 4th animated starfield ───────────────────────────────────────────
 function initJuly4Stars() {
-  const d = new Date();
-  if (d.getMonth() !== 6 || d.getDate() !== 4) return;
-
-  document.body.classList.add('july4-bg');
+  // Date gating + body class now handled by the theme engine (THEMES config).
+  if (!document.body.classList.contains('july4-bg')) return;
 
   const canvas = document.createElement('canvas');
   canvas.id = 'stars-canvas';
@@ -8727,6 +8785,31 @@ function softballCelebrate() {
   }).length;
   if (n === 4) showToast('🥎 GRAND SLAM! 4 burgers today!');
 }
+
+// ── SWIPEABLE TABS — horizontal swipe moves between main tabs ───────────────
+(function initTabSwipe() {
+  const ORDER = ['list', 'feed', 'map', 'leaderboard', 'pace', 'receipt'];
+  const BTN = { list: '.tab-ranks', feed: '.tab-feed', map: '.tab-map',
+                leaderboard: '.tab-badges', pace: '.tab-pace', receipt: '.tab-receipt' };
+  let sx = 0, sy = 0, ok = false;
+  document.addEventListener('touchstart', (e) => {
+    ok = false;
+    if (e.touches.length !== 1) return;
+    if (e.target.closest('#burger-map,#lightbox,#log-modal-overlay,#wrapped-overlay,#reaction-tray,.social-capsule,.cal-modal-overlay,input,textarea,.rcpt-toggle')) return;
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY; ok = true;
+  }, { passive: true });
+  document.addEventListener('touchend', (e) => {
+    if (!ok) return;
+    const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+    if (Math.abs(dx) < 70 || Math.abs(dy) > 50) return;
+    const cur = ORDER.findIndex(n => document.getElementById('tab-' + n)?.classList.contains('active'));
+    if (cur < 0) return;
+    const next = cur + (dx < 0 ? 1 : -1);
+    if (next < 0 || next >= ORDER.length) return;
+    const btn = document.querySelector(BTN[ORDER[next]]);
+    if (btn) switchTab(ORDER[next], btn);
+  }, { passive: true });
+})();
 
 // ── LIVE PRESENCE — heartbeat + online indicators ───────────────────────────
 const PRESENCE_BEAT_MS = 45000;   // how often we write our own heartbeat
@@ -8932,6 +9015,7 @@ function syncChromeColor() {
 }
 
 const THEMES = [
+  { flag: 'july4',      cls: 'july4-bg',      when: n => n.getMonth() === 6 && n.getDate() === 4,             setup: () => initJuly4Stars() },
   { flag: 'finalweek',  cls: 'final-week',    when: n => n >= new Date(2026, 8, 1) && n < new Date(2026, 8, 8), setup: setupFinalWeek },
   { flag: 'softball',   cls: 'softball-mode', when: n => n >= new Date(2026, 8, 4) && n < new Date(2026, 8, 8), setup: setupSoftball },
   { flag: 'lastcall',   cls: 'last-call',     when: n => n >= new Date(2026, 8, 7) && n < new Date(2026, 8, 8), setup: setupLastCall },
@@ -9065,7 +9149,9 @@ window.toggleTheme = function(){
 };
 applyTheme(_isDarkTheme()); // sync icons/meta with the early <head> init
 
-initJuly4Stars();
+// ── PWA — service worker (network-first shell, cached CDN assets) ──
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
+
 </script>
 </body>
 </html>
