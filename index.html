@@ -634,8 +634,8 @@ body.map-active #burger-map{
 /* Full-height scrollable feed */
 body.feed-active .social-wrap{height:auto;min-height:0}
 body.feed-active .social-feed{
-  /* 130px = compact header + tabs; 80px = input bar + safe area — feed never reaches the input bar */
-  height:calc(100dvh - 130px - 80px);
+  /* 173px = compact header + tabs + sub-tab row; 80px = input bar + safe area */
+  height:calc(100dvh - 173px - 80px);
   padding-bottom:16px;
   min-height:0;
 }
@@ -681,8 +681,8 @@ body.feed-active .social-input-area{
 .comment-send-btn{background:linear-gradient(135deg,var(--sky),var(--sky-light));color:#fff;border:none;width:30px;height:30px;border-radius:50%;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity 0.15s,transform 0.1s}
 .comment-send-btn:hover{opacity:0.9;transform:scale(1.05)}
 .comment-send-btn:active{transform:scale(0.92)}
-/* Feed sub-tabs: hide when in full-height feed mode (feed sub-tab active) */
-body.feed-active .feed-sub-tabs{display:none}
+/* Feed sub-tabs stay visible in full-height feed mode (slightly tighter) */
+body.feed-active .feed-sub-tabs{margin-bottom:10px}
 .msg-mine-tag{font-size:9px;font-weight:700;background:rgba(217,119,6,0.10);color:var(--amber);border:1px solid rgba(217,119,6,0.22);padding:2px 7px;border-radius:999px;white-space:nowrap;flex-shrink:0;text-transform:uppercase;letter-spacing:0.04em}
 /* ── Tapback reaction trigger ── */
 .msg-react-btn{
