@@ -9362,7 +9362,7 @@ function isSoftballWeekend() {
 })();
 
 // Base-running diamond: home→1st→2nd→3rd→home at 0/25/50/75/100 burgers
-const _SBD_PATH = [[50, 91], [87, 51], [50, 13], [13, 51], [50, 91]];
+const _SBD_PATH = [[50, 63.7], [87, 35.7], [50, 9.1], [13, 35.7], [50, 63.7]];
 function _sbdPos(count) {
   const p = Math.max(0, Math.min(100, count));
   const seg = Math.min(3, Math.floor(p / 25));
@@ -9394,7 +9394,7 @@ function renderSoftballDiamond() {
     let [x, y] = _sbdPos(p.count);
     const k = Math.round(x / 6) + '_' + Math.round(y / 6);
     const bump = (seen[k] = (seen[k] || 0) + 1) - 1;
-    x += bump * 5; y -= bump * 3;
+    x += bump * 5; y -= bump * 2.2;
     const inner = p.avatar ? `<img src="${p.avatar}" alt=""/>` : initials(p.name);
     return `<div class="sbd-runner" style="left:${x}%;top:${(y / 70) * 100}%;background:${c}" title="${escHtml(p.name)} — ${p.count}/100">${inner}</div>`;
   }).join('');
