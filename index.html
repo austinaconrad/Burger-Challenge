@@ -9,7 +9,6 @@
 <title>🍔 100 Burger Challenge</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍔</text></svg>">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="manifest" href="manifest.webmanifest">
 <meta property="og:title" content="100 Burger Challenge">
 <meta property="og:description" content="One summer. 100 burgers. No mercy. Follow the race.">
 <meta property="og:image" content="https://austinaconrad.github.io/Burger-Challenge/og-image.png">
@@ -2384,6 +2383,22 @@ html.theme-dark .leaflet-popup-tip{background:var(--surface2)!important}
 .wr-crown{font-size:26px;line-height:1}
 .wrapped-cta{display:inline-flex;align-items:center;gap:7px;margin-top:8px;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;border:none;border-radius:999px;font-family:'Bungee',sans-serif;font-size:13px;padding:10px 20px;cursor:pointer;box-shadow:0 4px 18px rgba(124,58,237,0.45);animation:wrBounce 2.4s ease-in-out infinite}
 
+/* ── BurgerReal — dual-shot camera (rear burger + corner selfie) ── */
+#bcam-overlay{display:none;position:fixed;inset:0;z-index:1500;background:#000;flex-direction:column}
+#bcam-overlay.open{display:flex}
+.bcam-top{position:absolute;top:calc(14px + env(safe-area-inset-top));left:16px;right:16px;display:flex;justify-content:space-between;align-items:center;z-index:3}
+.bcam-step{font-family:'Bungee',sans-serif;font-size:15px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.7);background:rgba(0,0,0,0.35);padding:6px 14px;border-radius:999px}
+.bcam-close{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.45);border:none;color:#fff;font-size:16px;cursor:pointer}
+#bcam-video{flex:1;width:100%;object-fit:cover;background:#000}
+#bcam-video.bcam-mirror{transform:scaleX(-1)}
+.bcam-count{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Bungee',sans-serif;font-size:110px;color:#fff;text-shadow:0 4px 30px rgba(0,0,0,0.8);pointer-events:none;z-index:2}
+.bcam-bottom{position:absolute;bottom:calc(26px + env(safe-area-inset-bottom));left:0;right:0;display:flex;justify-content:center;z-index:3}
+.bcam-shutter{width:74px;height:74px;border-radius:50%;background:#fff;border:5px solid rgba(255,255,255,0.35);background-clip:padding-box;cursor:pointer;transition:transform 0.1s}
+.bcam-shutter:active{transform:scale(0.9)}
+.bcam-shutter:disabled{opacity:0.4}
+.burger-photo-btn-real{border-color:rgba(124,58,237,0.5)!important;color:#8b5cf6!important}
+html.theme-dark .burger-photo-btn-real{color:#a78bfa!important}
+
 /* ── Claim picker — rejoin as an existing player ── */
 .claim-overlay{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px}
 .claim-card{max-height:80vh;display:flex;flex-direction:column}
@@ -2775,6 +2790,17 @@ html.theme-dark.season-over{background:#2b2413}
     <button class="tray-emoji-btn" data-emoji="❤️" aria-label="React with ❤️">❤️</button>
   </div>
 </div>
+<div id="bcam-overlay" role="dialog" aria-modal="true" aria-label="BurgerReal camera">
+  <div class="bcam-top">
+    <span class="bcam-step" id="bcam-step">📸 Burger first</span>
+    <button class="bcam-close" onclick="closeBurgerReal()" aria-label="Cancel">✕</button>
+  </div>
+  <video id="bcam-video" autoplay playsinline muted></video>
+  <div class="bcam-count" id="bcam-count"></div>
+  <div class="bcam-bottom">
+    <button class="bcam-shutter" id="bcam-shutter" onclick="bcamShutter()" aria-label="Take photo"></button>
+  </div>
+</div>
 <div id="lightbox" onclick="closeLightbox()" role="dialog" aria-modal="true" aria-label="Photo viewer"><img id="lightbox-img" src="" alt="Burger photo"/><div id="lightbox-count"></div></div>
 
 <!-- FLOATING LOG BUTTON -->
@@ -2922,7 +2948,8 @@ html.theme-dark.season-over{background:#2b2413}
         <!-- Burger photo -->
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <div id="burger-photo-btns" style="display:flex;gap:8px">
-            <button class="burger-photo-btn" id="burger-photo-btn-camera" onclick="document.getElementById('burger-photo-input-camera').click()">📸 Take Photo</button>
+            <button class="burger-photo-btn burger-photo-btn-real" id="burger-photo-btn-real" onclick="openBurgerReal()">📸 BurgerReal</button>
+            <button class="burger-photo-btn" id="burger-photo-btn-camera" onclick="document.getElementById('burger-photo-input-camera').click()">📷 Photo</button>
             <button class="burger-photo-btn" id="burger-photo-btn-upload" onclick="document.getElementById('burger-photo-input-upload').click()">🖼️ Upload</button>
           </div>
           <div id="burger-photo-has" style="display:none;align-items:center;gap:8px">
@@ -6051,24 +6078,125 @@ async function uploadBurgerPhoto(file) {
   return await getDownloadURL(photoRef);
 }
 
+// Store the raw File for upload + a compressed preview for the thumbnail
+async function _setPendingBurgerPhoto(file) {
+  pendingPhotoFile = file;
+  pendingPhoto = await compressBurgerPhoto(file);
+  const thumb = document.getElementById('burger-photo-thumb');
+  const btns  = document.getElementById('burger-photo-btns');
+  const has   = document.getElementById('burger-photo-has');
+  if (thumb) thumb.src = pendingPhoto;
+  if (btns) btns.style.display = 'none';
+  if (has)  has.style.display  = 'flex';
+}
 window.onBurgerPhotoSelected = async function(input) {
   const file = input.files[0];
   if (!file) return;
   try {
     showToast('📷 Loading photo…');
-    // Store the raw File for high-quality upload at submit time
-    pendingPhotoFile = file;
-    // Generate a small preview for the thumbnail (same compressed preview as before)
-    pendingPhoto = await compressBurgerPhoto(file);
-    const thumb = document.getElementById('burger-photo-thumb');
-    const btns  = document.getElementById('burger-photo-btns');
-    const has   = document.getElementById('burger-photo-has');
-    if (thumb) thumb.src = pendingPhoto;
-    if (btns) btns.style.display = 'none';
-    if (has)  has.style.display  = 'flex';
+    await _setPendingBurgerPhoto(file);
   } catch (e) { console.warn('Photo load failed', e); showToast('⚠️ Could not load image'); }
   input.value = '';
 };
+
+// ── BURGERREAL — BeReal-style dual shot ─────────────────────────────────────
+// Web apps can't run both cameras at once (native-only on iPhone), so it's
+// sequential: rear burger shot → auto-flip → 3-2-1 → selfie → composited
+// into the corner with a white border, then fed into the normal photo flow.
+let _bcamStream = null, _bcamStage = 0, _bcamBurgerShot = null, _bcamBusy = false;
+
+async function _bcamStart(facing) {
+  _bcamStop();
+  _bcamStream = await navigator.mediaDevices.getUserMedia({
+    video: { facingMode: facing, width: { ideal: 1440 }, height: { ideal: 1440 } },
+    audio: false
+  });
+  const v = document.getElementById('bcam-video');
+  v.classList.toggle('bcam-mirror', facing === 'user');
+  v.srcObject = _bcamStream;
+  await v.play();
+}
+function _bcamStop() {
+  if (_bcamStream) { _bcamStream.getTracks().forEach(t => t.stop()); _bcamStream = null; }
+}
+function _bcamGrab(mirror) {
+  const v = document.getElementById('bcam-video');
+  const c = document.createElement('canvas');
+  c.width = v.videoWidth || 720; c.height = v.videoHeight || 960;
+  const ctx = c.getContext('2d');
+  if (mirror) { ctx.translate(c.width, 0); ctx.scale(-1, 1); }
+  ctx.drawImage(v, 0, 0);
+  return c;
+}
+window.openBurgerReal = async function() {
+  if (!navigator.mediaDevices?.getUserMedia) {
+    showToast('📷 Live camera unavailable — using regular photo');
+    document.getElementById('burger-photo-input-camera')?.click();
+    return;
+  }
+  _bcamStage = 0; _bcamBurgerShot = null; _bcamBusy = false;
+  document.getElementById('bcam-step').textContent = '📸 Burger first';
+  document.getElementById('bcam-count').textContent = '';
+  document.getElementById('bcam-shutter').disabled = false;
+  document.getElementById('bcam-overlay').classList.add('open');
+  try { await _bcamStart('environment'); }
+  catch (e) {
+    closeBurgerReal();
+    showToast('📷 Camera blocked — using regular photo');
+    document.getElementById('burger-photo-input-camera')?.click();
+  }
+};
+window.closeBurgerReal = function() {
+  _bcamStop();
+  document.getElementById('bcam-overlay').classList.remove('open');
+};
+window.bcamShutter = async function() {
+  if (_bcamBusy || _bcamStage !== 0) return;
+  _bcamBusy = true;
+  _bcamBurgerShot = _bcamGrab(false);
+  _bcamStage = 1;
+  document.getElementById('bcam-step').textContent = '🤳 Now you!';
+  document.getElementById('bcam-shutter').disabled = true;
+  let selfie = null;
+  try {
+    await _bcamStart('user');
+    const cd = document.getElementById('bcam-count');
+    for (const n of [3, 2, 1]) { cd.textContent = n; await new Promise(r => setTimeout(r, 800)); }
+    cd.textContent = '';
+    selfie = _bcamGrab(true);
+  } catch (e) { /* no selfie cam — burger-only shot */ }
+  await _bcamFinish(selfie);
+};
+async function _bcamFinish(selfieCanvas) {
+  const burger = _bcamBurgerShot;
+  const c = document.createElement('canvas');
+  c.width = burger.width; c.height = burger.height;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(burger, 0, 0);
+  if (selfieCanvas) {
+    const sw = Math.round(c.width * 0.30), sh = Math.round(sw * 1.33);
+    const m = Math.round(c.width * 0.035), r = Math.round(sw * 0.14);
+    const srcRatio = selfieCanvas.width / selfieCanvas.height, dstRatio = sw / sh;
+    let cw = selfieCanvas.width, ch = selfieCanvas.height, sx = 0, sy = 0;
+    if (srcRatio > dstRatio) { cw = ch * dstRatio; sx = (selfieCanvas.width - cw) / 2; }
+    else { ch = cw / dstRatio; sy = (selfieCanvas.height - ch) / 2; }
+    const rr = (x, y, w, h, rad) => { ctx.beginPath();
+      ctx.moveTo(x + rad, y); ctx.arcTo(x + w, y, x + w, y + h, rad); ctx.arcTo(x + w, y + h, x, y + h, rad);
+      ctx.arcTo(x, y + h, x, y, rad); ctx.arcTo(x, y, x + w, y, rad); ctx.closePath(); };
+    ctx.save(); rr(m, m, sw, sh, r); ctx.clip();
+    ctx.drawImage(selfieCanvas, sx, sy, cw, ch, m, m, sw, sh);
+    ctx.restore();
+    rr(m, m, sw, sh, r);
+    ctx.lineWidth = Math.max(3, c.width * 0.008); ctx.strokeStyle = '#fff'; ctx.stroke();
+  }
+  closeBurgerReal();
+  try {
+    const blob = await new Promise(res => c.toBlob(res, 'image/jpeg', 0.9));
+    const file = new File([blob], `burgereal_${Date.now()}.jpg`, { type: 'image/jpeg' });
+    await _setPendingBurgerPhoto(file);
+    showToast(selfieCanvas ? '📸 BurgerReal captured!' : '📸 Burger captured (selfie cam unavailable)');
+  } catch (e) { showToast('⚠️ Could not save photo'); }
+}
 
 window.clearBurgerPhoto = function() {
   pendingPhoto = '';
@@ -9217,8 +9345,14 @@ window.toggleTheme = function(){
 };
 applyTheme(_isDarkTheme()); // sync icons/meta with the early <head> init
 
-// ── PWA — service worker (network-first shell, cached CDN assets) ──
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
+// ── PWA removed — clean up any previously installed service worker so no
+//    player gets stuck on a stale cached version.
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations()
+    .then(rs => rs.forEach(r => r.unregister()))
+    .catch(() => {});
+  if (window.caches) caches.keys().then(ks => ks.forEach(k => caches.delete(k))).catch(() => {});
+}
 
 </script>
 </body>
