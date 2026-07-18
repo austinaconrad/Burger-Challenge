@@ -6108,7 +6108,7 @@ let _bcamStream = null, _bcamStage = 0, _bcamBurgerShot = null, _bcamBusy = fals
 async function _bcamStart(facing) {
   _bcamStop();
   _bcamStream = await navigator.mediaDevices.getUserMedia({
-    video: { facingMode: facing, width: { ideal: 1440 }, height: { ideal: 1440 } },
+    video: { facingMode: facing, width: { ideal: 1920 }, height: { ideal: 1920 } },
     audio: false
   });
   const v = document.getElementById('bcam-video');
@@ -6169,10 +6169,15 @@ window.bcamShutter = async function() {
 };
 async function _bcamFinish(selfieCanvas) {
   const burger = _bcamBurgerShot;
+  // Portrait 3:4 cover-crop — matches how normal phone burger photos come out
+  const AR = 3 / 4;
+  let bw = burger.width, bh = burger.height, bx = 0, by = 0;
+  if (bw / bh > AR) { bw = bh * AR; bx = (burger.width - bw) / 2; }
+  else { bh = bw / AR; by = (burger.height - bh) / 2; }
   const c = document.createElement('canvas');
-  c.width = burger.width; c.height = burger.height;
+  c.width = Math.round(bw); c.height = Math.round(bh);
   const ctx = c.getContext('2d');
-  ctx.drawImage(burger, 0, 0);
+  ctx.drawImage(burger, bx, by, bw, bh, 0, 0, c.width, c.height);
   if (selfieCanvas) {
     const sw = Math.round(c.width * 0.30), sh = Math.round(sw * 1.33);
     const m = Math.round(c.width * 0.035), r = Math.round(sw * 0.14);
