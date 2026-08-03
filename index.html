@@ -23,7 +23,7 @@
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 <style>
 :root {
-  --amber:#F59E0B; --amber-dark:#D97706; --amber-mid:#F59E0B; --patty:#1C0A00;
+  --amber:#F59E0B; --amber-dark:#D97706;
   --bg:#a8d4ed; --bg2:#c2e3f4;
   --surface:rgba(255,255,255,0.55); --surface2:rgba(255,255,255,0.65); --surface3:rgba(255,255,255,0.75);
   --border:rgba(255,255,255,0.78); --border2:rgba(30,110,170,0.20); --border3:rgba(30,110,170,0.36);
@@ -31,16 +31,9 @@
   --green:#16a34a; --red:#dc2626;
   --streak:#22c55e; --streak-dark:#15803d; --streak-glow:rgba(34,197,94,0.22);
   --sky:#1a70aa; --sky-light:#3baae2;
-  --cheese:#F59E0B; --bun-top:#D97706; --bun-mid:#F59E0B; --sesame:#EAB308;
   --radius:16px; --radius-sm:12px; --radius-xs:8px;
   --glass-blur:blur(20px);
   --shadow-card:0 4px 20px rgba(30,100,160,0.14),inset 0 1px 0 rgba(255,255,255,0.90);
-  /* ── Fluid spacing tokens ── */
-  --space-xs:clamp(4px,0.75vw,6px);
-  --space-sm:clamp(8px,1.5vw,12px);
-  --space-md:clamp(14px,2.5vw,20px);
-  --space-lg:clamp(20px,4vw,32px);
-  --space-xl:clamp(32px,6vw,48px);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}/* ── Global typographic meta-label token ── */
 .stat-lbl,
@@ -340,7 +333,6 @@ button:active{transform:scale(0.97)}
 .ring-track{fill:none;stroke:rgba(245,158,11,0.10);stroke-width:3}
 .ring-fill{fill:none;stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset 0.7s cubic-bezier(0.34,1.56,0.64,1);filter:drop-shadow(0 0 3px currentColor)}
 .ring-inner{position:absolute;top:5px;left:5px;right:5px;bottom:5px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:none;font-family:'Poppins',sans-serif}
-.rank-badge{font-size:20px;width:28px;text-align:center;flex-shrink:0;line-height:1}
 .player-name{font-size:16px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;font-family:'Poppins',sans-serif}
 .mc{width:100%;aspect-ratio:1;border-radius:1.5px;transition:opacity 0.2s}
 .mc.filled{opacity:1}
@@ -422,9 +414,6 @@ button:active{transform:scale(0.97)}
 .ctrl-btn{background:none;border:none;color:var(--muted2);font-size:24px;cursor:pointer;padding:14px;transition:color 0.15s,background 0.15s;display:flex;align-items:center;justify-content:center}
 .ctrl-btn:hover{background:rgba(255,255,255,0.06);color:var(--text)}
 .ctrl-btn:active{transform:scale(0.9)}
-.ate-btn{background:none;border:none;border-left:1px solid var(--border);border-right:1px solid var(--border);font-family:'Bungee',sans-serif;font-size:16px;font-weight:700;cursor:pointer;padding:14px;display:flex;align-items:center;justify-content:center;gap:8px;transition:background 0.15s}
-.ate-btn:hover{background:rgba(245,158,11,0.08)}
-.ate-btn:active{background:rgba(245,158,11,0.15);transform:scale(0.97)}
 .complete-strip{padding:10px 16px;background:rgba(34,197,94,0.10);color:var(--green);font-size:13px;font-weight:600;text-align:center;border-top:1px solid rgba(34,197,94,0.15);display:none}
 .players-list{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
 .player-row{background:var(--surface);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;gap:12px;animation:slideIn 0.25s ease both;transition:transform 0.2s ease;box-shadow:var(--shadow-card)}
@@ -3320,46 +3309,14 @@ function laborDay(year) {
   return new Date(year, 8, 1 + (dow===0?1:dow===1?0:8-dow));
 }
 
-const JOKES = [
-  { q: "Why did the burger go to therapy?", a: "It had too many layers to deal with." },
-  { q: "What do you call a burger that tells jokes?", a: "A ham-comedian." },
-  { q: "Why don't burgers ever get lost?", a: "They always know which way the patty is." },
-  { q: "What did the burger say to the hotdog?", a: "You're on a roll, but I'm on a bun." },
-  { q: "Why did the burger break up with the fries?", a: "It felt smothered." },
-  { q: "What do you call a sleeping burger?", a: "A slumber patty." },
-  { q: "Why did the burger go to school?", a: "To get a little more well-done." },
-  { q: "What do you call a burger that won't stop talking?", a: "A blabber-patty." },
-  { q: "Why was the burger so popular?", a: "It really knew how to stack up." },
-  { q: "What do you call a burger at a concert?", a: "A mosh-room Swiss melt." },
-  { q: "Why did the burger win at poker?", a: "It had the best all-in patty face." },
-  { q: "What do you call a burger that sings opera?", a: "Pava-patty." },
-  { q: "Why did the burger become a politician?", a: "It was great at flipping positions." },
-  { q: "What do you call a burger on a diet?", a: "A wishful patty." },
-  { q: "Why was the cheeseburger embarrassed?", a: "It saw the salad dressing." },
-  { q: "What do you call a tiny burger?", a: "A mini-moo." },
-  { q: "Why did the burger go to space?", a: "To find the Milky Whey sauce." },
-  { q: "What do you call a burger that knows karate?", a: "A chop-patty." },
-  { q: "Why did the burger get a tattoo?", a: "It wanted to show its grill marks." },
-  { q: "What's a burger's favorite sport?", a: "Sizzle-ball." },
-  { q: "Why did the burger get an umbrella?", a: "It heard there was a chance of meatballs." },
-  { q: "What do you call a burger that's also a lawyer?", a: "A legal tender patty." },
-  { q: "Why did the burger go to Vegas?", a: "It was feeling saucy." },
-  { q: "What do you call a married burger?", a: "A wedded patty." },
-  { q: "Why was the burger always tired?", a: "It was grilled every single day." },
-  { q: "What do you call a confused burger?", a: "A muddled meat." },
-  { q: "Why did the burger get lost in the mall?", a: "It couldn't find the exit bun." },
-  { q: "What do you call a burger who writes poetry?", a: "A tender bard." },
-  { q: "Why did the burger stay up all night?", a: "It was on the night grill." },
-  { q: "What do you call a burger that's really into fitness?", a: "A lean mean grilling machine." },
-];
 
 
 // ── Daily burger counter ──────────────────────────────────────────
-function getTodayKey() {
-  // Returns "YYYY-MM-DD" in the user's local timezone — consistent for everyone
-  const d = new Date();
+// "YYYY-MM-DD" in the user's local timezone — consistent for everyone.
+function dateKey(d) {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
+function getTodayKey() { return dateKey(new Date()); }
 
 function getDailyBurgerCount(allPlayers) {
   const todayKey = getTodayKey();
@@ -3370,8 +3327,7 @@ function getDailyBurgerCount(allPlayers) {
       if (!ts) return;
       const dObj = safeDate(ts);
       if (!dObj) return;
-      const key = `${dObj.getFullYear()}-${String(dObj.getMonth()+1).padStart(2,'0')}-${String(dObj.getDate()).padStart(2,'0')}`;
-      if (key === todayKey) total++;
+      if (dateKey(dObj) === todayKey) total++;
     });
   });
   return total;
@@ -3614,14 +3570,8 @@ function computeAchievements(p, allPlayers) {
   logs.forEach(ts => {
     const d = safeDate(ts);
     if (!d) return;
-    const dow = d.getDay();
-    if (dow === 0 || dow === 5 || dow === 6) {
-      const fri = new Date(d);
-      if (dow === 0) fri.setDate(d.getDate() - 2);
-      else if (dow === 6) fri.setDate(d.getDate() - 1);
-      const key = `${fri.getFullYear()}-${String(fri.getMonth()).padStart(2,'0')}-${String(fri.getDate()).padStart(2,'0')}`;
-      weekendCounts[key] = (weekendCounts[key] || 0) + 1;
-    }
+    const key = weekendKey(d);
+    if (key) weekendCounts[key] = (weekendCounts[key] || 0) + 1;
   });
   if (Object.values(weekendCounts).some(v => v >= 6)) earned.push('weekend_warrior');
 
@@ -3862,7 +3812,6 @@ function initLogModal() {
   // Show default restaurant suggestions
   renderRestaurantSuggestions(OHIO_SPOTS.slice(0, 6));
   // Wire Places autocomplete if API key is configured
-  if (GOOGLE_PLACES_KEY) setTimeout(initPlacesAutocomplete, 80);
 }
 
 window.openFABLog = function() {
@@ -4199,6 +4148,16 @@ function patchCommentCounts() {
 // string sort within the same year is safe, and it matches getMonth() output).
 // Cached in a Map so repeated calls on identical ts strings cost one Map lookup.
 const _dateKeyCache = new Map();
+// Fri–Sun window key: which weekend a log belongs to. Deliberately 0-indexed
+// month — it is an internal grouping key, never displayed.
+function weekendKey(d) {
+  const dow = d.getDay();
+  if (dow !== 0 && dow !== 5 && dow !== 6) return null;
+  const fri = new Date(d);
+  if (dow === 0) fri.setDate(d.getDate() - 2);
+  else if (dow === 6) fri.setDate(d.getDate() - 1);
+  return `${fri.getFullYear()}-${String(fri.getMonth()).padStart(2,'0')}-${String(fri.getDate()).padStart(2,'0')}`;
+}
 function tsToDateKey(ts) {
   if (!ts) return null;
   if (_dateKeyCache.has(ts)) return _dateKeyCache.get(ts);
@@ -4453,14 +4412,9 @@ function computeBadgeProgress(p) {
   const maxInDay = Math.max(0, ...Object.values(byDay), 0);
   const weekendCounts = {};
   objLogs.forEach(e => {
-    const d = safeDate(e.ts); if (!d) return; const dow = d.getDay();
-    if (dow===0||dow===5||dow===6) {
-      const fri = new Date(d);
-      if (dow===0) fri.setDate(d.getDate()-2);
-      else if (dow===6) fri.setDate(d.getDate()-1);
-      const key = `${fri.getFullYear()}-${String(fri.getMonth()).padStart(2,'0')}-${String(fri.getDate()).padStart(2,'0')}`;
-      weekendCounts[key] = (weekendCounts[key]||0)+1;
-    }
+    const d = safeDate(e.ts); if (!d) return;
+    const key = weekendKey(d);
+    if (key) weekendCounts[key] = (weekendCounts[key]||0)+1;
   });
   const maxWeekend = Math.max(0, ...Object.values(weekendCounts), 0);
   return {
@@ -5520,6 +5474,9 @@ function restoLogoUrl(name, size) {
 }
 
 // Swaps a broken/missing logo image back to its emoji fallback (keeps layout stable).
+// Exposed on window: it is invoked from inline onerror="" attributes, which
+// resolve against the global scope, not this module's scope.
+window.handleLogoErr = handleLogoErr;
 function handleLogoErr(img) {
   const span = document.createElement('span');
   span.className = img.dataset.fallbackClass || '';
@@ -5531,7 +5488,6 @@ function handleLogoErr(img) {
 // Google Places API key — paste yours here to enable live autocomplete for any restaurant.
 // Get one free at console.cloud.google.com → enable "Places API".
 // Without a key the picker still works for the spots listed in BURGER_MENUS.
-const GOOGLE_PLACES_KEY = '';
 
 const BURGER_MENUS = {
   "Bickerdyke's": { emoji:"🔥", items:[
@@ -6418,8 +6374,6 @@ window.selectPatties = function(n) {
   }
 };
 
-// Keep openBurgerDetail as a no-op (called by changeMyCount +1 path)
-window.openBurgerDetail = function() {};
 
 window.setRating = function(val) {
   pendingRating = val;
@@ -6713,37 +6667,6 @@ window.showBuildOwn = function() {
   if (customRow) customRow.style.display = 'flex';
 };
 
-function initPlacesAutocomplete() {
-  if (!GOOGLE_PLACES_KEY || !window.google?.maps?.places) return;
-  const inp = document.getElementById('detail-restaurant');
-  if (!inp || inp._placesAC) return;
-  const ac = new google.maps.places.Autocomplete(inp, {
-    types: ['restaurant'],
-    fields: ['name'],
-  });
-  ac.addListener('place_changed', () => {
-    const place = ac.getPlace();
-    const name = place?.name || inp.value.trim();
-    if (!name) return;
-    document.getElementById('restaurant-suggestions').innerHTML = '';
-    if (BURGER_MENUS[name]) {
-      lockRestaurantAndShowMenu(name);
-    } else {
-      lockRestaurant(name, '📍');
-    }
-  });
-  inp._placesAC = ac;
-}
-
-// Load Google Maps JS API lazily when key is set
-(function() {
-  if (!GOOGLE_PLACES_KEY) return;
-  const s = document.createElement('script');
-  s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_PLACES_KEY}&libraries=places&callback=_initPlacesACCallback`;
-  s.async = true; s.defer = true;
-  window._initPlacesACCallback = initPlacesAutocomplete;
-  document.head.appendChild(s);
-})();
 
 // Guard against rapid double-taps on "Place Order" firing two Firestore writes
 // for what the user intended as a single burger log.
@@ -6993,7 +6916,7 @@ async function backfillLocationNames() {
         ? { ...e, locationCityState: patches[e.ts] }
         : e
     );
-    updateDoc(doc(db, 'rooms', roomId, 'players', myPlayerId), { logs: freshLogs }).catch(() => {});
+    updateDoc(doc(db, 'rooms', roomId, 'players', myPlayerId), { logs: freshLogs }).catch(warnWrite('logs'));
   }
 }
 
@@ -7042,7 +6965,7 @@ async function backfillWeatherStamps() {
         ? { ...e, weatherStamp: patches[e.ts] }
         : e
     );
-    updateDoc(doc(db, 'rooms', roomId, 'players', myPlayerId), { logs: freshLogs }).catch(() => {});
+    updateDoc(doc(db, 'rooms', roomId, 'players', myPlayerId), { logs: freshLogs }).catch(warnWrite('logs'));
   }
 }
 
@@ -7135,7 +7058,7 @@ async function _changeMyCountWithDetailsImpl(delta, restaurant='', rating=0, gps
           // Only write if the entry was actually found. If not found, the Firestore
           // snapshot hasn't arrived yet — writing stale logs would erase the new entry.
           if (patched) {
-            updateDoc(doc(db,'rooms',roomId,'players',myPlayerId), {logs: updatedLogs}).catch(()=>{});
+            updateDoc(doc(db,'rooms',roomId,'players',myPlayerId), {logs: updatedLogs}).catch(warnWrite('log patch'));
           } else if (attempt === 1) {
             // Retry once after 3s so the snapshot has time to land
             setTimeout(() => _patchLocation(2), 3000);
@@ -7164,7 +7087,7 @@ async function _changeMyCountWithDetailsImpl(delta, restaurant='', rating=0, gps
               return e;
             });
             if (patched) {
-              updateDoc(doc(db,'rooms',roomId,'players',myPlayerId), {logs: updatedLogs}).catch(()=>{});
+              updateDoc(doc(db,'rooms',roomId,'players',myPlayerId), {logs: updatedLogs}).catch(warnWrite('log patch'));
             } else if (attempt === 1) {
               setTimeout(() => _patchWeather(2), 3000);
             }
@@ -7238,7 +7161,7 @@ async function _changeMyCountWithDetailsImpl(delta, restaurant='', rating=0, gps
 }
 
 window.changeMyCount = async function(delta){
-  if(delta > 0){ openBurgerDetail(); return; }
+  if(delta > 0){ return; }   // +1 goes through the log modal, not this path
   await changeMyCountWithDetails(delta);
 };
 
@@ -8225,15 +8148,6 @@ function positionBdgTip(el) {
 }
 document.addEventListener('mouseover', e => { const b = e.target.closest('.ach-badge[data-tip]'); if (b) showBdgTip(b); });
 document.addEventListener('mouseout', e => { if (e.target.closest('.ach-badge[data-tip]')) hideBdgTip(); });
-window.toggleTip = function(el) {
-  const isOpen = el.classList.contains('tip-open');
-  document.querySelectorAll('.ach-badge.tip-open').forEach(b => b.classList.remove('tip-open'));
-  hideBdgTip(); clearTimeout(bdgTipTimer);
-  if (!isOpen) {
-    el.classList.add('tip-open'); showBdgTip(el);
-    bdgTipTimer = setTimeout(() => { el.classList.remove('tip-open'); hideBdgTip(); }, 2500);
-  }
-};
 document.addEventListener('click', e => {
   if (!e.target.closest('.ach-badge')) {
     document.querySelectorAll('.ach-badge.tip-open').forEach(b => b.classList.remove('tip-open'));
@@ -8635,34 +8549,10 @@ window.pwImgError = function(img) {
 
 
 
-window.toggleTrDrawer = function(idx) {
-  const drawer = document.getElementById('tr-drawer-' + idx);
-  const chevron = document.getElementById('tr-chev-' + idx);
-  if (!drawer) return;
-  const isOpen = drawer.classList.toggle('open');
-  if (chevron) chevron.classList.toggle('open', isOpen);
-};
 
 
 
 
-window.panMapToSpot = function(lat, lng) {
-  // Switch to map tab
-  const mapBtn = [...document.querySelectorAll('.tab-btn')].find(b => b.getAttribute('onclick')?.includes("'map'"));
-  if (mapBtn) switchTab('map', mapBtn);
-  // Fly to pin after a short delay to allow tab render & map init
-  setTimeout(() => {
-    renderMapForMode();
-    burgerMap.flyTo([lat, lng], 16, {animate:true, duration:0.9});
-    setTimeout(() => {
-      const hit = mapMarkers.find(m => {
-        const ll = m.getLatLng();
-        return Math.abs(ll.lat - lat) < 0.0001 && Math.abs(ll.lng - lng) < 0.0001;
-      });
-      if (hit) hit.openPopup();
-    }, 950);
-  }, 100);
-};
 
 let burgerMap = null;
 let mapMarkers = [];
@@ -9034,7 +8924,17 @@ function renderTerritoryFeed() {
   }).join('');
 }
 
-// Shared with the log-mode feed; defined at module scope here so both can use it
+// Shared by the log-mode feed and the territory feed — hoisted out of
+// renderBurgerMap so they are not rebuilt on every render.
+function feedStars(n) {
+  if (!n) return '<span style="color:var(--muted);font-size:10px">No rating</span>';
+  const full = Math.floor(n), half = (n % 1) >= 0.5;
+  return Array.from({length:5}, (_,i) => {
+    if (i < full) return `<span style="color:var(--amber);font-size:11px">★</span>`;
+    if (i === full && half) return `<span style="background:linear-gradient(90deg,var(--amber) 50%,#444 50%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:11px">★</span>`;
+    return `<span style="color:#3A3A3A;font-size:11px">★</span>`;
+  }).join('') + `<span style="font-size:9px;color:var(--muted2);margin-left:3px">${n}</span>`;
+}
 function feedTimeStr(ts) {
   if (!ts) return '';
   const d = safeDate(ts); if (!d) return '';
@@ -9246,27 +9146,7 @@ function renderBurgerMap() {
     return;
   }
 
-  function feedTimeStr(ts) {
-    if (!ts) return '';
-    const d = safeDate(ts);
-    if (!d) return '';
-    const now = new Date();
-    const isToday = d.toDateString() === now.toDateString();
-    const time = d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', hour12:true});
-    if (isToday) return 'Today at ' + time;
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    return months[d.getMonth()] + ' ' + d.getDate() + ' at ' + time;
-  }
-
-  function feedStars(n) {
-    if (!n) return '<span style="color:var(--muted);font-size:10px">No rating</span>';
-    const full = Math.floor(n), half = (n % 1) >= 0.5;
-    return Array.from({length:5}, (_,i) => {
-      if (i < full) return `<span style="color:var(--amber);font-size:11px">★</span>`;
-      if (i === full && half) return `<span style="background:linear-gradient(90deg,var(--amber) 50%,#444 50%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:11px">★</span>`;
-      return `<span style="color:#3A3A3A;font-size:11px">★</span>`;
-    }).join('') + `<span style="font-size:9px;color:var(--muted2);margin-left:3px">${n}</span>`;
-  }
+  // feedTimeStr is defined at module scope (shared with the territory feed).
 
   feedEl.innerHTML = feedItems.slice(0, 20).map((item, idx) => `
     <div class="map-feed-card" data-feed-idx="${idx}">
@@ -9500,6 +9380,9 @@ function isOnline(p) {
   const t = p.lastSeen?.toDate ? p.lastSeen.toDate().getTime() : 0;
   return (Date.now() - t) < PRESENCE_TTL_MS;
 }
+// Writes were silently swallowed with .catch(()=>{}). Still non-fatal, but a
+// failed log write is now visible in the console instead of vanishing.
+const warnWrite = label => err => console.warn('[write failed]', label, err?.code || err);
 function presenceBeat() {
   if (!roomId || !myPlayerId || spectatorMode || document.hidden) return;
   updateDoc(doc(db, 'rooms', roomId, 'players', myPlayerId), { lastSeen: serverTimestamp() }).catch(() => {});
@@ -9794,7 +9677,10 @@ async function migrateInlinePhotos() {
     _photoMigrationBusy = false;
   }
 }
-setInterval(migrateInlinePhotos, 8000);
+const _photoMigrationTimer = setInterval(() => {
+  if (_photoMigrationDone) { clearInterval(_photoMigrationTimer); return; }
+  migrateInlinePhotos();
+}, 8000);
 
 // ── DARK MODE — manual toggle, persisted per device ─────────────────────────
 const MAP_TILES_LIGHT = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
