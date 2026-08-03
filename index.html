@@ -2411,10 +2411,6 @@ html.theme-dark .burger-photo-btn-real{color:#a78bfa!important}
 .claim-count{font-size:12px;color:var(--muted2);flex-shrink:0;margin-left:10px}
 html.theme-dark .claim-row{background:rgba(21,46,72,0.75)}
 
-/* ── Time-of-day sky — ambient light-mode gradients ── */
-body.tod-dawn{background:linear-gradient(175deg,#f5b98a 0%,#f3d0a5 18%,#a8d4ed 52%,#d8eefd 100%)}
-body.tod-golden{background:linear-gradient(175deg,#f0a75f 0%,#f6d08b 20%,#a8d4ed 58%,#d8eefd 100%)}
-body.tod-dusk{background:linear-gradient(175deg,#5d7bb0 0%,#8aa5cc 30%,#b8d3ea 68%,#d8eefd 100%)}
 
 /* ══════════ FINAL WEEK — ember countdown skin (last 7 days) ══════════ */
 .final-week-banner{display:none;justify-content:center;padding:2px 20px 6px}
@@ -2564,15 +2560,95 @@ html.theme-dark .pb-btn{background:rgba(255,255,255,0.06);border-color:rgba(148,
 html.theme-dark .mc-stat{background:rgba(255,255,255,0.05)}
 
 /* ── Safe-area / Dynamic Island: <html> matches each theme's top gradient ── */
-html.tod-dawn:not(.theme-dark){background:#f5b98a}
-html.tod-golden:not(.theme-dark){background:#f0a75f}
-html.tod-dusk:not(.theme-dark){background:#5d7bb0}
 html.final-week:not(.theme-dark){background:#f6b26b}
 html.theme-dark.final-week{background:#2a1020}
 html.softball-mode:not(.theme-dark){background:#7ec3e8}
 html.theme-dark.softball-mode{background:#0a1828}
 html.season-over:not(.theme-dark){background:#f2c94c}
 html.theme-dark.season-over{background:#2b2413}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TERRITORY — flag-planting layer on the Map tab
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Map sub-tabs — own class (NOT .ranks-sub-tab, which switchRanksTab clears globally) */
+.map-sub-tabs{display:flex;gap:6px;margin-bottom:10px}
+.map-sub-tab{flex:1;background:rgba(255,255,255,0.40);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--muted2);font-family:'Poppins',sans-serif;font-size:12px;font-weight:600;padding:8px 12px;cursor:pointer;transition:all 0.2s;letter-spacing:0.01em}
+.map-sub-tab.active{background:rgba(30,110,170,0.12);border-color:rgba(30,110,170,0.38);color:var(--sky)}
+.map-sub-tab:active{transform:scale(0.96)}
+html.theme-dark .map-sub-tab{background:rgba(255,255,255,0.05)}
+
+/* Legend strip above the map — ties color ↔ initials ↔ name so color is never alone */
+.terr-legend{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.terr-leg{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;background:var(--surface);border:1px solid var(--border2);border-radius:999px;padding:5px 10px;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur)}
+.terr-leg-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.terr-leg b{font-variant-numeric:tabular-nums;margin-left:1px}
+
+/* Flag pin */
+.terr-pin-wrap{background:none!important;border:none!important}
+.terr-pin{position:relative;filter:drop-shadow(0 3px 5px rgba(0,0,0,0.38));animation:pinDrop 0.35s cubic-bezier(0.34,1.56,0.64,1) both;transform-origin:bottom left;transition:transform 0.15s ease}
+.leaflet-marker-icon:hover .terr-pin{transform:scale(1.12)}
+.terr-cloth{transform-origin:left center;animation:terrWave 3.4s ease-in-out infinite}
+@keyframes terrWave{0%,100%{transform:skewY(0deg) scaleY(1)}50%{transform:skewY(-2.5deg) scaleY(0.97)}}
+.terr-pin.flipping .terr-cloth{animation:terrFlip 0.75s cubic-bezier(0.65,0,0.35,1) both}
+@keyframes terrFlip{0%{transform:scaleX(1)}45%,55%{transform:scaleX(0.03)}100%{transform:scaleX(1)}}
+
+/* Contested ring sits on the ground anchor */
+.terr-ring{background:none!important;border:none!important}
+.terr-ring-i{width:38px;height:38px;border-radius:50%;border:2px dashed var(--amber);animation:terrPulse 2s ease-in-out infinite}
+@keyframes terrPulse{0%,100%{opacity:0.85;transform:scale(1)}50%{opacity:0.32;transform:scale(1.22)}}
+
+/* Popup */
+.terr-pop{padding:14px 16px;min-width:216px}
+.terr-pop-head{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.terr-pop-mark{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:19px;background:var(--surface2);border:1px solid var(--border2);flex-shrink:0;overflow:hidden}
+.terr-pop-mark img{width:26px;height:26px;object-fit:contain;border-radius:4px;background:#fff}
+.terr-pop-name{font-family:'Bungee',sans-serif;font-size:12.5px;line-height:1.25;color:var(--text)}
+.terr-pop-sub{font-size:10.5px;color:var(--muted2);margin-top:2px;font-weight:500}
+.terr-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;padding:3px 8px;border-radius:999px;margin-bottom:9px}
+.terr-b-held{background:rgba(22,163,74,0.15);color:#15803d;border:1px solid rgba(22,163,74,0.34)}
+.terr-b-cont{background:rgba(245,158,11,0.17);color:var(--amber-dark);border:1px solid rgba(245,158,11,0.42)}
+.terr-b-fort{background:rgba(124,58,237,0.15);color:#6d28d9;border:1px solid rgba(124,58,237,0.34)}
+html.theme-dark .terr-b-held{color:#4ade80}
+html.theme-dark .terr-b-fort{color:#c4b5fd}
+.terr-row{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:10px;background:var(--surface2);border:1px solid var(--border2);margin-bottom:6px}
+.terr-row.chal{background:transparent;border-style:dashed}
+.terr-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden}
+.terr-av img{width:100%;height:100%;object-fit:cover}
+.terr-row-body{flex:1;min-width:0}
+.terr-row-lbl{font-size:8.5px;font-weight:800;letter-spacing:0.09em;text-transform:uppercase;color:var(--muted)}
+.terr-row-name{font-size:12px;font-weight:700;color:var(--text);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.terr-row-n{font-size:13px;font-weight:800;color:var(--text);flex-shrink:0;font-variant-numeric:tabular-nums}
+.terr-row-n small{font-size:9px;font-weight:500;color:var(--muted)}
+.terr-note{font-size:10.5px;font-weight:600;color:var(--muted2);margin-top:7px;padding:7px 9px;border-radius:9px;background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.26);line-height:1.4}
+.terr-tl{margin-top:10px}
+.terr-tl-lbl{font-size:8.5px;font-weight:800;letter-spacing:0.09em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.terr-tl-track{display:flex;gap:2px}
+.terr-tl-seg{height:7px;border-radius:2px;min-width:8px}
+
+/* Standings strip under the map */
+.terr-stand{padding:12px 14px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--shadow-card);margin-bottom:6px}
+.terr-srow{display:flex;align-items:center;gap:9px;padding:5px 0}
+.terr-sav{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden}
+.terr-sav img{width:100%;height:100%;object-fit:cover}
+.terr-sname{font-size:12px;font-weight:700;flex:0 1 92px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+.terr-strack{flex:1;height:13px;background:rgba(30,110,170,0.09);border-radius:4px;overflow:hidden}
+html.theme-dark .terr-strack{background:rgba(255,255,255,0.07)}
+.terr-sbar{height:100%;border-radius:0 4px 4px 0;transition:width 0.55s cubic-bezier(0.34,1.4,0.64,1)}
+.terr-sval{font-size:12px;font-weight:700;width:66px;text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums;color:var(--text);line-height:1.25}
+.terr-sval small{font-weight:500;color:var(--muted);font-size:10px}
+.terr-srisk{font-size:9.5px;color:var(--amber-dark);font-weight:700}
+
+/* Holder line inside the existing restaurant leaderboard card */
+.resto-holder{font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px;margin-top:3px;color:var(--muted2);flex-wrap:wrap}
+.resto-holder-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.resto-holder b{color:var(--text);font-weight:700}
+.resto-holder .rh-risk{color:var(--amber-dark);font-weight:700}
+
+@media (prefers-reduced-motion: reduce){
+  .terr-cloth,.terr-ring-i,.terr-pin{animation:none!important}
+  .terr-sbar{transition:none}
+}
 </style>
 </head>
 <body>
@@ -2742,11 +2818,17 @@ html.theme-dark.season-over{background:#2b2413}
     <!-- HIGHWAY TAB -->
     <!-- MAP TAB -->
     <div class="tab-panel" id="tab-map">
+      <div class="map-sub-tabs" id="map-sub-tabs">
+        <button class="map-sub-tab active" onclick="switchMapMode('logs',this)"><i class="ti ti-map-pin" style="font-size:14px;vertical-align:-2px;margin-right:4px"></i>All logs</button>
+        <button class="map-sub-tab" onclick="switchMapMode('territory',this)"><i class="ti ti-flag" style="font-size:14px;vertical-align:-2px;margin-right:4px"></i>Territory</button>
+      </div>
+      <div class="terr-legend" id="terr-legend" style="display:none"></div>
       <div class="map-wrap">
         <div id="burger-map"></div>
         <button id="map-locate-btn" onclick="flyToMyLocation()" title="My location" aria-label="Go to my location">📍</button>
       </div>
-      <div class="map-section-label">Recent Burger Spots</div>
+      <div class="terr-stand" id="terr-standings" style="display:none;margin-top:12px"></div>
+      <div class="map-section-label" id="map-section-label">Recent Burger Spots</div>
       <div id="map-feed" class="map-feed-wrap"></div>
     </div>
 
@@ -4193,6 +4275,7 @@ function computeDerivedState() {
   });
 
   _derivedState = { sorted, playerStats, restoLeaderboard, weekLogs, computedAt: Date.now() };
+  _derivedState.territories = computeTerritories(playerStats);
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -4215,6 +4298,7 @@ function render(){
   if(document.getElementById('tab-list')?.classList.contains('active')) renderBentoList();
   if(document.getElementById('tab-pace')?.classList.contains('active')) renderPaceTab();
   // Update players pill count + live online badge
+  terrWatch();
   const pill = document.getElementById('players-pill-btn');
   if (pill) {
     const onlineN = players.filter(isOnline).length;
@@ -7141,7 +7225,7 @@ async function _changeMyCountWithDetailsImpl(delta, restaurant='', rating=0, gps
         else showToast('🍔 Burger #'+newCount+' at '+restaurant+' logged!');
       }
     }
-    renderBurgerMap();
+    renderMapForMode();
   }catch(e){
     console.error('[burger log] Firestore write failed:', e);
     const msg = (e?.message || '').toLowerCase();
@@ -7926,6 +8010,7 @@ function renderRestaurantLB() {
 
   const visible = sorted.slice(0, _lbRestoLimit);
   const hasMoreResto = sorted.length > _lbRestoLimit;
+  const _terrIndex = terrByName();   // restaurant name → territories at that name
 
   // restoEmoji is defined at top level — used here and in renderRestaurantSuggestions
   const cardsHtml = visible.map((r, i) => {
@@ -7948,6 +8033,7 @@ function renderRestaurantLB() {
       <span class="resto-visits">🍔 ${r.visits} visit${r.visits !== 1 ? 's' : ''}</span>
       <span style="font-size:10px;color:var(--muted2)">· ${playerList}</span>
     </div>
+    ${restoHolderHtml(r.name, _terrIndex)}
     <div class="resto-bar-wrap"><div class="resto-bar-fill" style="width:${barPct}%"></div></div>
   </div>
   ${rightHtml}
@@ -8021,7 +8107,7 @@ function _switchTabCore(name,btn){
     });
   }
   if(name==='map') setTimeout(() => {
-    renderBurgerMap();
+    renderMapForMode();
     if(burgerMap) burgerMap.invalidateSize();
   }, 80);
   if(name==='list') {
@@ -8566,7 +8652,7 @@ window.panMapToSpot = function(lat, lng) {
   if (mapBtn) switchTab('map', mapBtn);
   // Fly to pin after a short delay to allow tab render & map init
   setTimeout(() => {
-    renderBurgerMap();
+    renderMapForMode();
     burgerMap.flyTo([lat, lng], 16, {animate:true, duration:0.9});
     setTimeout(() => {
       const hit = mapMarkers.find(m => {
@@ -8590,7 +8676,7 @@ window.flyToMyLocation = function() {
   navigator.geolocation.getCurrentPosition(
     pos => {
       const { latitude: lat, longitude: lng } = pos.coords;
-      if (!burgerMap) renderBurgerMap();
+      if (!burgerMap) renderMapForMode();
       burgerMap.flyTo([lat, lng], 14, { animate: true, duration: 0.9 });
       if (myLocationMarker) myLocationMarker.remove();
       myLocationMarker = L.circleMarker([lat, lng], {
@@ -8648,6 +8734,400 @@ function starsHtml(n) {
     if (i === full && half) return `<span style="background:linear-gradient(90deg,var(--amber) 50%,#444 50%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:14px">★</span>`;
     return `<span style="color:#444;font-size:14px">★</span>`;
   }).join('');
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════
+//  TERRITORY — flag-planting layer
+//  Pure derived state: nothing new is written to Firestore. A territory is a
+//  physical spot (GPS rounded to ~110m). Whoever has the most logs there holds
+//  the flag; ties fall to the founder (first to ever log it).
+// ══════════════════════════════════════════════════════════════════════════
+
+// Map-tier palette. Index-aligned to RING_COLORS so a player keeps their slot,
+// but deepened: RING_COLORS sit at L≈0.8 and drop to ~1.4:1 contrast on the
+// Carto light basemap. Validated for CVD separation + 3:1 contrast in both
+// themes. Every flag also carries the holder's initials, so identity never
+// rests on hue alone.
+const MAP_COLORS = ['#DC2626','#0891B2','#D97706','#7C3AED','#16A34A','#DB2777','#2563EB','#C2410C','#0D9488','#9333EA','#65A30D','#E11D48','#0284C7','#A16207','#4F46E5','#B45309','#0369A1','#BE185D'];
+const mapColor = p => MAP_COLORS[(p?.colorIdx || 0) % MAP_COLORS.length];
+
+let _mapMode      = 'logs';   // 'logs' | 'territory'
+let _terrLayer    = null;
+let _terrSeen     = null;     // key → holderId, for flip notifications
+let _terrPopupKey = null;
+
+// ── Aggregate logs into territories ────────────────────────────────────────
+function computeTerritories(playerStats) {
+  const spots = {};
+  players.forEach(p => {
+    const logs = (playerStats && playerStats[p.id]?.normalized) || normalizeLogs(p.logs || []);
+    logs.forEach(e => {
+      if (typeof e.lat !== 'number' || typeof e.lng !== 'number') return;
+      const name = (e.restaurant || '').trim();
+      if (!name || name.toLowerCase() === 'unknown spot') return;
+      // ~110m cells — same restaurant logged from the parking lot vs the booth
+      // still lands in one territory.
+      const key = e.lat.toFixed(3) + ',' + e.lng.toFixed(3);
+      if (!spots[key]) spots[key] = { key, names: {}, latSum: 0, lngSum: 0, n: 0, logs: [], city: '' };
+      const s = spots[key];
+      s.names[name] = (s.names[name] || 0) + 1;
+      s.latSum += e.lat; s.lngSum += e.lng; s.n++;
+      if (!s.city && e.locationCityState) s.city = e.locationCityState;
+      s.logs.push({ pid: p.id, ts: e.ts });
+    });
+  });
+
+  return Object.values(spots).map(s => {
+    s.lat = s.latSum / s.n;
+    s.lng = s.lngSum / s.n;
+    s.name = Object.entries(s.names).sort((a, b) => b[1] - a[1])[0][0];
+    s.logs.sort((a, b) => (safeDate(a.ts) || 0) - (safeDate(b.ts) || 0));
+
+    s.founder   = s.logs[0].pid;
+    s.foundedTs = s.logs[0].ts;
+
+    // Replay chronologically so we get both the current holder and the flip history
+    const counts = {}, firstAt = {}, flips = [];
+    let holder = null;
+    s.logs.forEach(l => {
+      counts[l.pid] = (counts[l.pid] || 0) + 1;
+      if (!firstAt[l.pid]) firstAt[l.pid] = l.ts;
+      const h = _terrRank(counts, s.founder, firstAt)[0][0];
+      if (h !== holder) {
+        if (holder) flips.push({ from: holder, to: h, ts: l.ts });
+        holder = h;
+      }
+    });
+
+    const rank = _terrRank(counts, s.founder, firstAt);
+    s.counts = counts;
+    s.flips  = flips;
+    s.holder = rank[0][0]; s.hc = rank[0][1];
+    s.chal   = rank[1] ? rank[1][0] : null;
+    s.cc     = rank[1] ? rank[1][1] : 0;
+    s.lead   = s.hc - s.cc;
+    s.total  = s.logs.length;
+    s.kind   = s.lead >= 3 ? 'fortress' : (s.chal && s.lead <= 1 ? 'contested' : 'held');
+    return s;
+  }).sort((a, b) => b.total - a.total);
+}
+
+// Most logs wins · tie → founder · then whoever got there first
+function _terrRank(counts, founder, firstAt) {
+  return Object.entries(counts).sort((a, b) => {
+    if (b[1] !== a[1]) return b[1] - a[1];
+    if (a[0] === founder) return -1;
+    if (b[0] === founder) return 1;
+    return (safeDate(firstAt[a[0]]) || 0) - (safeDate(firstAt[b[0]]) || 0);
+  });
+}
+
+const territories   = () => _derivedState.territories || [];
+const flagsHeldBy   = pid => territories().filter(t => t.holder === pid).length;
+const flagsAtRisk   = pid => territories().filter(t => t.holder === pid && t.kind === 'contested').length;
+const _pById        = id => players.find(p => p.id === id);
+
+// ── Flag pin ───────────────────────────────────────────────────────────────
+function terrFlagIcon(t) {
+  const p     = _pById(t.holder);
+  const color = mapColor(p);
+  const ini   = p ? initials(p.name) : '??';
+  // Emoji rather than a logo image: at 13px a logo is unreadable, and it keeps
+  // the pin free of network-dependent markup.
+  const cloth = `<span style="font-size:11px;line-height:1">${restoEmoji(t.name)}</span>`;
+  const fort = t.kind === 'fortress'
+    ? `<div style="position:absolute;left:27px;top:15px;width:14px;height:14px;border-radius:50%;background:#fff;border:1.5px solid ${color};display:flex;align-items:center;justify-content:center;font-size:8px;line-height:1">🛡️</div>` : '';
+  return L.divIcon({
+    className: 'terr-pin-wrap',
+    html: `<div class="terr-pin" style="width:46px;height:52px;position:relative">
+      <div style="position:absolute;left:5px;top:2px;bottom:2px;width:2.6px;background:#7a5c3e;border-radius:2px"></div>
+      <div style="position:absolute;left:3.2px;top:0;width:7px;height:7px;border-radius:50%;background:${color};border:1.2px solid rgba(255,255,255,0.95)"></div>
+      <div class="terr-cloth" style="position:absolute;left:7px;top:3px">
+        <div style="width:26px;height:17px;background:${color};border:1.6px solid rgba(255,255,255,0.95);border-radius:2px;clip-path:polygon(0 0,100% 0,82% 50%,100% 100%,0 100%);display:flex;align-items:center;padding-left:3px">${cloth}</div>
+      </div>
+      ${fort}
+      <div style="position:absolute;left:-4px;top:27px;display:flex;align-items:center;gap:2px;background:${color};border:1.4px solid rgba(255,255,255,0.95);border-radius:999px;padding:1px 6px;box-shadow:0 1px 3px rgba(0,0,0,0.3)">
+        <span style="font-size:8.5px;font-weight:700;color:#fff;font-family:'Poppins',sans-serif;letter-spacing:0.02em">${escHtml(ini)}</span>
+        <span style="font-size:9px;font-weight:800;color:#fff;font-family:'Poppins',sans-serif">${t.hc}</span>
+      </div>
+    </div>`,
+    iconSize: [46, 52], iconAnchor: [6, 50], popupAnchor: [6, -46]
+  });
+}
+
+function terrPopupHtml(t) {
+  const h = _pById(t.holder), c = t.chal ? _pById(t.chal) : null;
+  if (!h) return '';
+  const hCol = mapColor(h), cCol = c ? mapColor(c) : '';
+  const emoji = restoEmoji(t.name);
+  const badge = { held:['terr-b-held','🚩 Held'], contested:['terr-b-cont','⚔️ Contested'], fortress:['terr-b-fort','🛡️ Fortress'] }[t.kind];
+  const mine  = t.holder === myPlayerId;
+  const myN   = t.counts[myPlayerId] || 0;
+
+  const av = (p, col, size) => p.avatar
+    ? `<div class="terr-av" style="background:${col}"><img src="${p.avatar}" alt="" loading="lazy"></div>`
+    : `<div class="terr-av" style="background:${col};width:${size}px;height:${size}px">${escHtml(initials(p.name))}</div>`;
+
+  let note = '';
+  if (mine && t.kind === 'contested') {
+    note = `<div class="terr-note">🛡️ ${escHtml(c.name)} is ${t.lead === 0 ? 'level with you' : 'one behind'} — one more burger and this flag flips.</div>`;
+  } else if (!mine && !spectatorMode && myPlayerId) {
+    const need = t.hc - myN + 1;
+    note = `<div class="terr-note">⚔️ You're on ${myN} here. ${need} more take${need === 1 ? 's' : ''} the flag${t.founder === t.holder ? ` — ${escHtml(h.name)} founded it, so ties stay theirs` : ''}.</div>`;
+  } else if (mine) {
+    note = `<div class="terr-note">🛡️ Clear by ${t.lead}. Nobody's close.</div>`;
+  }
+
+  // Ownership timeline — one segment per reign
+  let tl = '';
+  if (t.flips.length) {
+    const reigns = [];
+    let cur = t.founder, start = safeDate(t.foundedTs) || new Date();
+    t.flips.forEach(f => { const d = safeDate(f.ts) || start; reigns.push([cur, Math.max(1, d - start)]); cur = f.to; start = d; });
+    reigns.push([cur, Math.max(1, (new Date()) - start)]);
+    tl = `<div class="terr-tl"><div class="terr-tl-lbl">Who's held it · ${t.flips.length} flip${t.flips.length === 1 ? '' : 's'}</div>
+      <div class="terr-tl-track">${reigns.map(([pid, w]) => `<div class="terr-tl-seg" style="flex:${w};background:${mapColor(_pById(pid))}"></div>`).join('')}</div></div>`;
+  }
+
+  return `<div class="terr-pop">
+    <div class="terr-pop-head">
+      <div class="terr-pop-mark">${emoji}</div>
+      <div style="min-width:0">
+        <div class="terr-pop-name">${escHtml(t.name)}</div>
+        <div class="terr-pop-sub">${t.city ? escHtml(t.city) + ' · ' : ''}${t.total} log${t.total === 1 ? '' : 's'} all-time</div>
+      </div>
+    </div>
+    <span class="terr-badge ${badge[0]}">${badge[1]}</span>
+    <div class="terr-row">
+      ${av(h, hCol, 28)}
+      <div class="terr-row-body">
+        <div class="terr-row-lbl">${t.kind === 'fortress' ? 'Fortress holder' : 'Flag holder'}${t.holder === t.founder ? ' · founder' : ''}</div>
+        <div class="terr-row-name">${escHtml(h.name)}${mine ? ' (you)' : ''}</div>
+      </div>
+      <div class="terr-row-n">${t.hc}<small> logs</small></div>
+    </div>
+    ${c ? `<div class="terr-row chal">
+      ${av(c, cCol, 28)}
+      <div class="terr-row-body">
+        <div class="terr-row-lbl">Challenger</div>
+        <div class="terr-row-name">${escHtml(c.name)}${t.chal === myPlayerId ? ' (you)' : ''}</div>
+      </div>
+      <div class="terr-row-n">${t.cc}<small> logs</small></div>
+    </div>` : ''}
+    ${note}${tl}
+  </div>`;
+}
+
+// ── Render the territory layer ─────────────────────────────────────────────
+function renderTerritoryMap() {
+  if (!burgerMap) {
+    burgerMap = L.map('burger-map', { center: [40.4173, -82.9071], zoom: 7, minZoom: 3, preferCanvas: true });
+    window._baseTileLayer = L.tileLayer(_isDarkTheme() ? MAP_TILES_DARK : MAP_TILES_LIGHT, {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/">CARTO</a>',
+      subdomains: 'abcd', maxZoom: 20
+    }).addTo(burgerMap);
+  }
+  if (mapClusterGroup) { burgerMap.removeLayer(mapClusterGroup); mapClusterGroup = null; }
+  if (_terrLayer) burgerMap.removeLayer(_terrLayer);
+  _terrLayer = L.layerGroup();
+  mapMarkers = [];
+
+  const terrs = territories();
+
+  terrs.forEach(t => {
+    const color = mapColor(_pById(t.holder));
+    // zone of control — scales with how locked-down the spot is
+    _terrLayer.addLayer(L.circle([t.lat, t.lng], {
+      radius: 120 + t.hc * 55, color, weight: 1, opacity: 0.35,
+      fillColor: color, fillOpacity: 0.10, interactive: false
+    }));
+    if (t.kind === 'contested') {
+      _terrLayer.addLayer(L.marker([t.lat, t.lng], {
+        icon: L.divIcon({ className: 'terr-ring', html: '<div class="terr-ring-i"></div>', iconSize: [38, 38], iconAnchor: [19, 19] }),
+        interactive: false, keyboard: false
+      }));
+    }
+    const m = L.marker([t.lat, t.lng], { icon: terrFlagIcon(t), keyboard: true,
+      alt: `${t.name} — held by ${_pById(t.holder)?.name || '?'}, ${t.hc} logs` });
+    m.bindPopup(terrPopupHtml(t), { maxWidth: 280 });
+    m._terrKey = t.key;
+    _terrLayer.addLayer(m);
+    mapMarkers.push(m);
+  });
+
+  burgerMap.addLayer(_terrLayer);
+  burgerMap.invalidateSize();
+
+  renderTerritoryLegend();
+  renderTerritoryStandings();
+  renderTerritoryFeed();
+}
+
+function renderTerritoryLegend() {
+  const el = document.getElementById('terr-legend');
+  if (!el) return;
+  const ranked = [...players].sort((a, b) => flagsHeldBy(b.id) - flagsHeldBy(a.id)).filter(p => flagsHeldBy(p.id) > 0);
+  el.innerHTML = ranked.map(p =>
+    `<div class="terr-leg"><span class="terr-leg-dot" style="background:${mapColor(p)}"></span>${escHtml(initials(p.name))} · ${escHtml(p.name)}${p.id === myPlayerId ? ' (you)' : ''} <b>${flagsHeldBy(p.id)}</b></div>`
+  ).join('') || `<div class="terr-leg" style="opacity:0.75">No flags planted yet — log a burger with location on</div>`;
+}
+
+function renderTerritoryStandings() {
+  const el = document.getElementById('terr-standings');
+  if (!el) return;
+  const rows = players.map(p => ({ p, flags: flagsHeldBy(p.id), risk: flagsAtRisk(p.id) }))
+                      .sort((a, b) => b.flags - a.flags);
+  const max = Math.max(1, ...rows.map(r => r.flags));
+  if (!rows.some(r => r.flags)) { el.innerHTML = ''; el.style.display = 'none'; return; }
+  el.style.display = '';
+  el.innerHTML = rows.map(r => {
+    const col = mapColor(r.p);
+    const av = r.p.avatar
+      ? `<div class="terr-sav" style="background:${col}"><img src="${r.p.avatar}" alt="" loading="lazy"></div>`
+      : `<div class="terr-sav" style="background:${col}">${escHtml(initials(r.p.name))}</div>`;
+    return `<div class="terr-srow">
+      ${av}
+      <div class="terr-sname">${escHtml(r.p.name)}</div>
+      <div class="terr-strack"><div class="terr-sbar" style="width:${(r.flags / max) * 100}%;background:${col}"></div></div>
+      <div class="terr-sval">${r.flags} <small>flag${r.flags === 1 ? '' : 's'}</small>${r.risk ? `<div class="terr-srisk">⚔️ ${r.risk} at risk</div>` : ''}</div>
+    </div>`;
+  }).join('');
+}
+
+// Recently flipped — same card shape as the existing "Recent Burger Spots" feed
+function renderTerritoryFeed() {
+  const el = document.getElementById('map-feed');
+  if (!el) return;
+  const events = [];
+  territories().forEach(t => {
+    t.flips.forEach(f => events.push({ t, ts: f.ts, from: f.from, to: f.to, type: 'flip' }));
+    events.push({ t, ts: t.foundedTs, to: t.founder, type: 'found' });
+  });
+  events.sort((a, b) => (safeDate(b.ts) || 0) - (safeDate(a.ts) || 0));
+
+  if (!events.length) {
+    el.innerHTML = '<div class="empty-state" style="padding:32px 16px"><div class="empty-state-icon">🚩</div><div class="empty-state-title">No Flags Yet</div><div class="empty-state-sub">Log a burger with location enabled to claim your first spot</div></div>';
+    return;
+  }
+  el.innerHTML = events.slice(0, 20).map(ev => {
+    const p = _pById(ev.to); if (!p) return '';
+    const col = mapColor(p);
+    const from = ev.from ? _pById(ev.from) : null;
+    const av = p.avatar
+      ? `<img src="${p.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" alt="" loading="lazy"/>`
+      : escHtml(initials(p.name));
+    const line = ev.type === 'found'
+      ? `founded this spot`
+      : `took it from ${escHtml(from ? from.name : '?')}`;
+    return `<div class="map-feed-card">
+      <div class="map-feed-avatar" style="background:${col}22;border:2px solid ${col};color:${col};${p.avatar ? 'overflow:hidden;padding:0' : ''}">${av}</div>
+      <div class="map-feed-body">
+        <div class="map-feed-name" style="color:${col}">${escHtml(p.name)} ${ev.type === 'found' ? '🚩' : '⚔️'}</div>
+        <div class="map-feed-restaurant">${escHtml(ev.t.name)}</div>
+        <div class="map-feed-meta">
+          <span class="map-feed-time">${line} · ${feedTimeStr(ev.ts)}</span>
+        </div>
+      </div>
+      <div class="map-feed-arrow">›</div>
+    </div>`;
+  }).join('');
+}
+
+// Shared with the log-mode feed; defined at module scope here so both can use it
+function feedTimeStr(ts) {
+  if (!ts) return '';
+  const d = safeDate(ts); if (!d) return '';
+  const now = new Date();
+  const time = d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: true });
+  if (d.toDateString() === now.toDateString()) return 'Today at ' + time;
+  const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return M[d.getMonth()] + ' ' + d.getDate() + ' at ' + time;
+}
+
+// ── Mode switch ────────────────────────────────────────────────────────────
+function renderMapForMode() {
+  if (_mapMode === 'territory') renderTerritoryMap();
+  else {
+    if (_terrLayer && burgerMap) { burgerMap.removeLayer(_terrLayer); _terrLayer = null; }
+    renderBurgerMap();
+  }
+}
+
+window.switchMapMode = function(mode, btn) {
+  _mapMode = mode;
+  document.querySelectorAll('.map-sub-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const isTerr = mode === 'territory';
+  document.getElementById('terr-legend').style.display    = isTerr ? '' : 'none';
+  document.getElementById('terr-standings').style.display = isTerr ? '' : 'none';
+  document.getElementById('map-section-label').textContent = isTerr ? 'Recently Flipped' : 'Recent Burger Spots';
+  renderMapForMode();
+};
+
+// ── Flip notifications ─────────────────────────────────────────────────────
+// Runs on every snapshot, so you hear about it whether you took a spot or lost
+// one while your phone was in your pocket.
+function terrWatch() {
+  const terrs = territories();
+  if (!terrs.length || !myPlayerId) return;
+  const now = {};
+  terrs.forEach(t => now[t.key] = t.holder);
+  if (_terrSeen === null) { _terrSeen = now; return; }   // first pass: just prime
+
+  // One toast per snapshot — showMcAdvancement replaces its own content, so a
+  // burst would leave only the last one visible anyway.
+  const news = [];
+  terrs.forEach(t => {
+    const was = _terrSeen[t.key];
+    if (was === t.holder) return;
+    if (was === undefined && t.holder === myPlayerId) {
+      news.push(['🚩', 'Flag planted', `You founded ${t.name} — ties here go to you.`]);
+    } else if (was && was !== myPlayerId && t.holder === myPlayerId) {
+      news.push(['⚔️', 'Territory taken', `You took ${t.name} from ${_pById(was)?.name || 'someone'}.`]);
+    } else if (was === myPlayerId && t.holder !== myPlayerId) {
+      news.push(['🏳️', 'Territory lost', `${_pById(t.holder)?.name || 'Someone'} took ${t.name} from you.`]);
+    }
+  });
+  if (news.length === 1) showMcAdvancement(...news[0]);
+  else if (news.length > 1) showMcAdvancement('🚩', 'Map shifted', `${news.length} territories changed hands.`);
+  _terrSeen = now;
+
+  if (_mapMode === 'territory' && document.getElementById('tab-map')?.classList.contains('active')) {
+    renderTerritoryMap();
+  }
+}
+
+// ── Per-restaurant summary for the Ranks → Restaurants leaderboard ─────────
+// Territories are per-location; that tab lists by name, so a chain with three
+// branches collapses to "Austin holds 2 of 3".
+const _restoKey = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+function terrByName() {
+  const byName = {};
+  territories().forEach(t => {
+    const k = _restoKey(t.name);
+    (byName[k] = byName[k] || []).push(t);
+  });
+  return byName;
+}
+function restoHolderHtml(restoName, nameIndex) {
+  const list = nameIndex[_restoKey(restoName)];
+  if (!list || !list.length) return '';
+  if (list.length === 1) {
+    const t = list[0], p = _pById(t.holder);
+    if (!p) return '';
+    const risk = t.kind === 'contested' && t.chal
+      ? `<span class="rh-risk">⚔️ ${escHtml(_pById(t.chal)?.name || '')} ${t.lead === 0 ? 'is level' : 'is 1 behind'}</span>` : '';
+    return `<div class="resto-holder"><span class="resto-holder-dot" style="background:${mapColor(p)}"></span>
+      🚩 <b>${escHtml(p.name)}</b> holds it · ${t.hc} log${t.hc === 1 ? '' : 's'} ${risk}</div>`;
+  }
+  const tally = {};
+  list.forEach(t => tally[t.holder] = (tally[t.holder] || 0) + 1);
+  const top = Object.entries(tally).sort((a, b) => b[1] - a[1])[0];
+  const p = _pById(top[0]);
+  if (!p) return '';
+  return `<div class="resto-holder"><span class="resto-holder-dot" style="background:${mapColor(p)}"></span>
+    🚩 <b>${escHtml(p.name)}</b> holds ${top[1]} of ${list.length} locations</div>`;
 }
 
 function renderBurgerMap() {
@@ -9199,19 +9679,13 @@ function setupSeasonOver() {
 // Dynamic Island tint) in sync with whichever skin is topmost.
 function syncChromeColor() {
   const d = document.documentElement, b = document.body;
-  ['final-week', 'softball-mode', 'last-call', 'season-over',
-   'tod-dawn', 'tod-golden', 'tod-dusk', 'rain-mode']
+  ['final-week', 'softball-mode', 'last-call', 'season-over', 'rain-mode']
     .forEach(c => d.classList.toggle(c, b.classList.contains(c)));
   const dark = d.classList.contains('theme-dark');
   let color = dark ? '#0a1828' : '#7ec3e8';
   if (b.classList.contains('season-over')) color = dark ? '#2b2413' : '#f2c94c';
   else if (b.classList.contains('softball-mode')) color = dark ? '#0a1828' : '#7ec3e8';
   else if (b.classList.contains('final-week')) color = dark ? '#2a1020' : '#f6b26b';
-  else if (!dark) {
-    if (b.classList.contains('tod-dawn')) color = '#f5b98a';
-    else if (b.classList.contains('tod-golden')) color = '#f0a75f';
-    else if (b.classList.contains('tod-dusk')) color = '#5d7bb0';
-  }
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color);
 }
 
@@ -9230,17 +9704,6 @@ const THEMES = [
   syncChromeColor();
 })();
 
-// ── TIME-OF-DAY SKY — ambient gradient follows the clock (light mode) ──────
-function applyTimeOfDaySky() {
-  const h = new Date().getHours();
-  document.body.classList.remove('tod-dawn', 'tod-golden', 'tod-dusk');
-  if (h >= 5 && h < 9) document.body.classList.add('tod-dawn');
-  else if (h >= 17 && h < 20) document.body.classList.add('tod-golden');
-  else if (h >= 20 || h < 5) document.body.classList.add('tod-dusk');
-  if (typeof syncChromeColor === 'function') syncChromeColor();
-}
-applyTimeOfDaySky();
-setInterval(applyTimeOfDaySky, 10 * 60 * 1000);
 
 // ── RAIN DELAY — rain streaks when it's raining at the user's location ─────
 // Only runs if geolocation was already granted (never prompts). Preview: ?rain
