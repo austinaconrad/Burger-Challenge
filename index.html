@@ -3355,15 +3355,11 @@ const ACHIEVEMENTS = {
   rain_or_shine:   { label:'Rain or Shine',         tip:'Ate a burger in rain or a thunderstorm', color:'rgba(80,150,230,0.7)',  glow:'rgba(80,150,230,0.2)', size:14, emoji:'⛈️' },
   heat_wave:       { label:'Heat Wave',             tip:'Logged a burger in 90°F+ heat',          color:'rgba(255,100,30,0.7)',  glow:'rgba(255,100,30,0.2)', size:14, emoji:'🥵' },
   clownin_around:  { label:"Clownin' Around",       tip:"Logged 3 burgers from McDonald's",       color:'rgba(220,50,50,0.7)',   glow:'rgba(220,50,50,0.2)',  size:14, emoji:'🤡' },
-  all_the_way:     { label:'All The Way',            tip:'Log a Five Guys burger with all 10 toppings: Ketchup, Mustard, Mayo, Cheese, Lettuce, Pickles, Tomatoes, Onions, Mushrooms & Green Peppers', color:'rgba(245,158,11,0.8)', glow:'rgba(245,158,11,0.3)', size:14, emoji:'🏆🍔' },
   iron_stomach:    { label:'Iron Stomach',            tip:'Log 3 burgers in a single day',          color:'rgba(239,68,68,0.8)',  glow:'rgba(239,68,68,0.3)',  size:14, emoji:'🏋🏼‍♂️🫃🏽' },
   ooh_baby_triple: { label:'Ooh Baby A Triple',      tip:'Log a triple burger (3 patties) to unlock', color:'rgba(59,130,246,0.8)', glow:'rgba(59,130,246,0.3)', size:null, emoji:`<span style="display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1"><span style="font-size:16px">🍔</span><span style="display:flex;gap:2px;font-size:16px"><span>🍔</span><span>🍔</span></span></span>` },
-  // ── Labor Day Classic (Sept 4–7) — only shown during the weekend, or after
-  //    you've earned one, so they don't sit in everyone's book all season ──
-  doubleheader:    { label:'Doubleheader',           tip:'2 burgers in one day of the Labor Day weekend', weekendOnly:true, color:'rgba(124,179,66,0.8)', glow:'rgba(124,179,66,0.3)', size:14, emoji:'🥎🥎' },
-  grand_slam:      { label:'Grand Slam',             tip:'4 burgers in a single day of the Labor Day weekend', weekendOnly:true, color:'rgba(251,191,36,0.9)', glow:'rgba(251,191,36,0.35)', size:14, emoji:'🥎💥' },
+  // ── Labor Day Classic (Sept 4–7) — only shown during the weekend, or once
+  //    earned, so it doesn't sit in everyone's book all season ──
   walk_off:        { label:'Walk-Off',               tip:'Hit 100 burgers during the Labor Day weekend', weekendOnly:true, color:'rgba(208,52,44,0.85)', glow:'rgba(208,52,44,0.3)', size:14, emoji:'🏟️' },
-  perfect_game:    { label:'Perfect Game',           tip:'Log a burger on all four days: Sept 4, 5, 6 and 7', weekendOnly:true, color:'rgba(255,255,255,0.85)', glow:'rgba(200,255,200,0.3)', size:14, emoji:'⚾✨' },
 };
 
 // ── Labor Day Classic window. Declared here (not down with the softball
@@ -3774,31 +3770,10 @@ function computeAchievements(p, allPlayers) {
   ).length;
   if (mcdCount >= 3) earned.push('clownin_around');
 
-  // All The Way — Five Guys burger with all 9 toppings
-  const REQUIRED_TOPPINGS = ['Ketchup','Mustard','Mayo','Cheese','Lettuce','Pickles','Tomatoes','Onions','Mushrooms','Green Peppers'];
-  const hasAllTheWay = (p.logs || []).some(entry => {
-    if (typeof entry !== 'object') return false;
-    if (!/five\s*guy'?s/i.test(entry.restaurant || '')) return false;
-    const t = entry.toppings || [];
-    return REQUIRED_TOPPINGS.every(req => t.includes(req));
-  });
-  if (hasAllTheWay) earned.push('all_the_way');
-
   // Ooh Baby A Triple — logged at least one triple (3+ patties)
   if ((p.logs || []).some(entry => typeof entry === 'object' && entry.patties >= 3)) earned.push('ooh_baby_triple');
 
   // ── Labor Day Classic (Sept 4–7) ──
-  const sbByDay = {};
-  logs.forEach(ts => {
-    const d = safeDate(ts);
-    if (!d || d < SB_START || d >= SB_END) return;
-    const k = _sbDayKey(d);
-    sbByDay[k] = (sbByDay[k] || 0) + 1;
-  });
-  const sbDayCounts = Object.values(sbByDay);
-  if (sbDayCounts.some(v => v >= 2)) earned.push('doubleheader');
-  if (sbDayCounts.some(v => v >= 4)) earned.push('grand_slam');
-  if (Object.keys(sbByDay).length >= 4) earned.push('perfect_game');
   // Walk-off: the 100th burger itself landed inside the window
   if ((p.count || 0) >= 100) {
     const inWindow = logs
@@ -4597,15 +4572,6 @@ function computeBadgeProgress(p) {
     if (key) weekendCounts[key] = (weekendCounts[key]||0)+1;
   });
   const maxWeekend = Math.max(0, ...Object.values(weekendCounts), 0);
-  // Labor Day Classic progress
-  const sbByDay = {};
-  objLogs.forEach(e => {
-    const d = safeDate(e.ts);
-    if (!d || d < SB_START || d >= SB_END) return;
-    const k = _sbDayKey(d);
-    sbByDay[k] = (sbByDay[k] || 0) + 1;
-  });
-  const sbMaxDay = Math.max(0, ...Object.values(sbByDay), 0);
   return {
     clownin_around:   { current: mcdCount,        max: 3   },
     centennial_club:  { current: p.count || 0,    max: 100 },
@@ -4614,10 +4580,7 @@ function computeBadgeProgress(p) {
     double_down:      { current: maxInDay,         max: 2   },
     iron_stomach:     { current: maxInDay,         max: 3   },
     weekend_warrior:  { current: maxWeekend,       max: 6   },
-    doubleheader:     { current: sbMaxDay,                  max: 2   },
-    grand_slam:       { current: sbMaxDay,                  max: 4   },
-    perfect_game:     { current: Object.keys(sbByDay).length, max: 4 },
-    walk_off:         { current: p.count || 0,              max: 100 },
+    walk_off:         { current: p.count || 0,    max: 100 },
   };
 }
 
@@ -4661,9 +4624,6 @@ function renderStickerPage(p) {
       double_down:      (c,m)=>`${c} / ${m} Burgers In One Day`,
       iron_stomach:     (c,m)=>`${c} / ${m} Burgers In One Day`,
       weekend_warrior:  (c,m)=>`${c} / ${m} Weekend Burgers`,
-      doubleheader:     (c,m)=>`${c} / ${m} In A Day This Weekend`,
-      grand_slam:       (c,m)=>`${c} / ${m} In A Day This Weekend`,
-      perfect_game:     (c,m)=>`${c} / ${m} Days Of The Weekend`,
       walk_off:         (c,m)=>`${c} / ${m} Burgers Logged`,
     };
     const prog = progress[k];
