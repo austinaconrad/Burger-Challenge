@@ -8384,59 +8384,267 @@ document.addEventListener('click', e => {
 
 if(IS_CONFIGURED && loadSession()){initFirebase();startApp();}
 
-// ── EASTER EGG: Triple-tap burger fireworks ──────────────────────
+// ── EASTER EGG: tap the big burger → New Life Blue fireworks show ──
+// Real shell-and-burst fireworks on a canvas (not confetti cones), in navy,
+// sky blue and white, under a night-sky dim, with a waving flag.
 (function() {
-  let tapCount = 0, lastTap = 0, eggActive = false;
+  let eggActive = false;
 
-  function launchFireworks() {
-    if (typeof confetti !== 'function') return;
-    eggActive = true;
-    const colors = ['#FF0000','#FFFFFF','#0000FF','#FF4444','#AAAAFF'];
-    const end = Date.now() + 5000;
+  const NLB_LOGO = 'data:image/png;base64,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';
 
-    const positions = [
-      {x:0.1,angle:70},{x:0.5,angle:90},{x:0.9,angle:110},
-      {x:0.25,angle:80},{x:0.75,angle:100},
-    ];
+  const PALETTE = [
+    [ 38, 100, 214],   // navy
+    [ 24,  70, 168],   // deep navy
+    [ 92, 188, 240],   // sky blue
+    [143, 212, 245],   // light sky
+    [255, 255, 255],   // white
+    [255, 255, 255],   // white (weighted — reads as the sparkle core)
+  ];
+  const pick = a => a[Math.floor(Math.random() * a.length)];
 
-    const loop = setInterval(() => {
-      if (Date.now() > end) {
-        clearInterval(loop);
-        eggActive = false;
-        return;
-      }
-      // Pick 2 random launch positions each tick
-      const picks = [...positions].sort(()=>Math.random()-0.5).slice(0,2);
-      picks.forEach(p => {
-        confetti({
-          particleCount: 40 + Math.floor(Math.random()*30),
-          spread: 55 + Math.random()*30,
-          angle: p.angle + (Math.random()-0.5)*20,
-          origin: {x: p.x, y: 0.5 + Math.random()*0.2},
-          colors,
-          scalar: 1.1 + Math.random()*0.4,
-          startVelocity: 42 + Math.random()*18,
-          gravity: 0.9,
-          shapes: ['circle','square'],
-          zIndex: 9999,
-        });
-      });
-    }, 180);
+  function eggStyles() {
+    if (document.getElementById('egg-style')) return;
+    const s = document.createElement('style');
+    s.id = 'egg-style';
+    s.textContent = `
+      #egg-night{position:fixed;inset:0;z-index:9996;pointer-events:none;opacity:0;
+        transition:opacity 0.6s ease;
+        background:radial-gradient(ellipse 120% 80% at 50% 118%,#10305e 0%,#081633 45%,#04091c 100%)}
+      #egg-night.on{opacity:0.90}
+      #egg-canvas{position:fixed;inset:0;z-index:9997;pointer-events:none;opacity:0;
+        transition:opacity 0.5s ease}
+      #egg-canvas.on{opacity:1}
+      #egg-flag{position:fixed;z-index:9999;pointer-events:none;
+        left:50%;top:16%;width:min(84vw,460px);
+        transform:translate(-50%,0) scale(0.72);opacity:0;
+        transition:opacity 0.5s ease,transform 0.7s cubic-bezier(0.34,1.4,0.64,1)}
+      #egg-flag.on{opacity:1;transform:translate(-50%,0) scale(1)}
+      #egg-flag svg{width:100%;height:auto;display:block;
+        filter:drop-shadow(0 10px 26px rgba(0,0,0,0.55));
+        transform-origin:6px 50%;animation:eggFlagSwing 3.4s ease-in-out infinite}
+      @keyframes eggFlagSwing{
+        0%,100%{transform:rotate(-1.4deg) translateY(0)}
+        50%    {transform:rotate(1.4deg) translateY(-5px)}}
+      @media (prefers-reduced-motion:reduce){
+        #egg-flag svg{animation:none}}
+    `;
+    document.head.appendChild(s);
   }
 
-  function onBurgerTap(e) {
+  function buildFlag() {
+    const wrap = document.createElement('div');
+    wrap.id = 'egg-flag';
+    wrap.setAttribute('aria-hidden', 'true');
+    wrap.innerHTML = `
+      <svg viewBox="0 0 340 210" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="eggWaveF" x="-25%" y="-25%" width="150%" height="150%">
+            <feTurbulence id="eggTurb" type="fractalNoise" baseFrequency="0.009 0.020"
+                          numOctaves="2" seed="7" result="t"/>
+            <feDisplacementMap id="eggDisp" in="SourceGraphic" in2="t" scale="14"
+                               xChannelSelector="R" yChannelSelector="G"/>
+          </filter>
+          <linearGradient id="eggFlagGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0"    stop-color="#0b2f6b"/>
+            <stop offset="0.55" stop-color="#164a91"/>
+            <stop offset="1"    stop-color="#4aa9e0"/>
+          </linearGradient>
+          <clipPath id="eggLogoClip"><circle cx="74" cy="105" r="43"/></clipPath>
+        </defs>
+        <rect x="5" y="2" width="9" height="208" rx="4.5" fill="#d5dde8"/>
+        <circle cx="9.5" cy="6" r="7.5" fill="#eef3f9"/>
+        <g filter="url(#eggWaveF)">
+          <rect x="14" y="20" width="316" height="170" rx="3" fill="url(#eggFlagGrad)"/>
+          <rect x="14" y="20" width="316" height="170" rx="3" fill="none"
+                stroke="#ffffff" stroke-opacity="0.32" stroke-width="2"/>
+          <circle cx="74" cy="105" r="47" fill="#ffffff"/>
+          <circle cx="74" cy="105" r="47" fill="none" stroke="#0b2f6b" stroke-opacity="0.25" stroke-width="2"/>
+          <image href="${NLB_LOGO}" xlink:href="${NLB_LOGO}"
+                 x="30" y="61" width="88" height="88" clip-path="url(#eggLogoClip)"/>
+          <text x="132" y="98" fill="#ffffff" font-family="Bungee,Poppins,sans-serif"
+                font-size="30" letter-spacing="0.5"
+                textLength="186" lengthAdjust="spacingAndGlyphs">GO NEW LIFE</text>
+          <text x="132" y="140" fill="#a5dcf7" font-family="Bungee,Poppins,sans-serif"
+                font-size="36" letter-spacing="0.5"
+                textLength="140" lengthAdjust="spacingAndGlyphs">BLUE!</text>
+        </g>
+      </svg>`;
+    return wrap;
+  }
+
+  // ── the show ──────────────────────────────────────────────────────────────
+  function launchFireworks() {
+    eggStyles();
+    eggActive = true;
+
+    const night  = document.createElement('div'); night.id = 'egg-night';
+    const canvas = document.createElement('canvas'); canvas.id = 'egg-canvas';
+    const flag   = buildFlag();
+    document.body.append(night, canvas, flag);
+
+    const ctx = canvas.getContext('2d');
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let W = 0, H = 0;
+    const size = () => {
+      W = window.innerWidth; H = window.innerHeight;
+      canvas.width = W * dpr; canvas.height = H * dpr;
+      canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    size();
+    window.addEventListener('resize', size);
+
+    requestAnimationFrame(() => {
+      night.classList.add('on'); canvas.classList.add('on'); flag.classList.add('on');
+    });
+
+    const small   = W < 520;
+    const MAX_P   = small ? 1400 : 2600;
+    const GRAV    = 0.22;          // shell gravity, px/frame^2
+    const P_GRAV  = 0.055;         // spark gravity
+    const shells  = [];
+    const sparks  = [];
+
+    function addShell(x, targetFrac) {
+      const rise = H * (targetFrac || (0.42 + Math.random() * 0.42));
+      shells.push({
+        x: x != null ? x : W * (0.07 + Math.random() * 0.86),
+        y: H + 8,
+        vx: (Math.random() - 0.5) * 1.4,
+        vy: -Math.sqrt(2 * GRAV * rise),
+        col: pick(PALETTE),
+        type: Math.random() < 0.20 ? 'willow' : Math.random() < 0.16 ? 'ring' : 'peony',
+      });
+    }
+
+    function burst(s) {
+      const base = small ? 58 : 88;
+      const n = s.type === 'willow' ? base + 20 : base + Math.floor(Math.random() * 34);
+      const power = s.type === 'willow' ? 3.2 : 4.4 + Math.random() * 2.6;
+      const twoTone = Math.random() < 0.45 ? pick(PALETTE) : null;
+      for (let i = 0; i < n; i++) {
+        if (sparks.length > MAX_P) break;
+        const a = s.type === 'ring'
+          ? (i / n) * Math.PI * 2 + (Math.random() - 0.5) * 0.09
+          : Math.random() * Math.PI * 2;
+        // sqrt keeps a peony's sphere evenly filled instead of clumping at the core
+        const r = s.type === 'ring'
+          ? power * (0.86 + Math.random() * 0.26)
+          : power * Math.sqrt(Math.random());
+        const col = twoTone && i % 2 ? twoTone : s.col;
+        sparks.push({
+          x: s.x, y: s.y,
+          vx: Math.cos(a) * r + s.vx * 0.3,
+          vy: Math.sin(a) * r * (s.type === 'willow' ? 0.75 : 1),
+          col,
+          life: 1,
+          decay: s.type === 'willow' ? 0.0075 + Math.random() * 0.005
+                                     : 0.013  + Math.random() * 0.011,
+          drag: s.type === 'willow' ? 0.975 : 0.968,
+          sz: s.type === 'willow' ? 1.7 : 2.1 + Math.random(),
+          twinkle: Math.random() < 0.3,
+        });
+      }
+      // bright flash core
+      for (let i = 0; i < 12; i++) {
+        sparks.push({ x: s.x, y: s.y,
+          vx: (Math.random() - 0.5) * 2, vy: (Math.random() - 0.5) * 2,
+          col: [255, 255, 255], life: 1, decay: 0.06, drag: 0.9, sz: 3.4, twinkle: false });
+      }
+    }
+
+    const START = performance.now();
+    const LAUNCH_MS = 7200;
+    let nextShell = 0, finale = false, raf = 0;
+
+    function frame(now) {
+      const t = now - START;
+
+      // trails: erase a little of the previous frame instead of clearing it
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fillStyle = 'rgba(0,0,0,0.17)';
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalCompositeOperation = 'lighter';
+
+      if (t < LAUNCH_MS && now > nextShell) {
+        addShell();
+        if (Math.random() < 0.55) addShell();          // doubles and triples
+        if (Math.random() < 0.30) addShell();
+        nextShell = now + 80 + Math.random() * 110;
+      }
+      // finale volley
+      if (!finale && t > LAUNCH_MS - 1500) {
+        finale = true;
+        for (let i = 0; i < 9; i++) {
+          setTimeout(() => eggActive && addShell(W * (0.1 + i * 0.1), 0.62 + Math.random() * 0.2), i * 90);
+        }
+      }
+
+      for (let i = shells.length - 1; i >= 0; i--) {
+        const s = shells[i];
+        s.x += s.vx; s.y += s.vy; s.vy += GRAV;
+        ctx.fillStyle = `rgba(${s.col[0]},${s.col[1]},${s.col[2]},0.85)`;
+        ctx.fillRect(s.x - 1.3, s.y - 1.3, 2.6, 2.6);
+        if (s.vy >= -0.6) { burst(s); shells.splice(i, 1); }
+      }
+
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const p = sparks[i];
+        p.x += p.vx; p.y += p.vy;
+        p.vx *= p.drag; p.vy = p.vy * p.drag + P_GRAV;
+        p.life -= p.decay;
+        if (p.life <= 0 || p.y > H + 40) { sparks.splice(i, 1); continue; }
+        const a = p.twinkle && p.life < 0.55 ? p.life * (Math.random() < 0.5 ? 0.25 : 1) : p.life;
+        ctx.fillStyle = `rgba(${p.col[0]},${p.col[1]},${p.col[2]},${a})`;
+        ctx.fillRect(p.x - p.sz / 2, p.y - p.sz / 2, p.sz, p.sz);
+      }
+
+      if (t > LAUNCH_MS + 2600 && !sparks.length && !shells.length) { finish(); return; }
+      if (t > LAUNCH_MS + 5000) { finish(); return; }
+      raf = requestAnimationFrame(frame);
+    }
+
+    // Cloth ripple. Jumping to a fresh random seed each tick reads as jitter,
+    // not cloth — easing the noise frequency and the displacement depth through
+    // two out-of-phase sines gives a smooth travelling ripple, and running it
+    // at ~30fps keeps the turbulence re-render off the critical path on phones.
+    const turb = flag.querySelector('#eggTurb');
+    const disp = flag.querySelector('#eggDisp');
+    let wavePhase = 0;
+    const waveTimer = setInterval(() => {
+      wavePhase += 0.13;
+      if (turb) turb.setAttribute('baseFrequency',
+        (0.0090 + Math.sin(wavePhase) * 0.0022).toFixed(5) + ' ' +
+        (0.0200 + Math.cos(wavePhase * 0.7) * 0.0040).toFixed(5));
+      if (disp) disp.setAttribute('scale', (13 + Math.sin(wavePhase * 1.3) * 4).toFixed(1));
+    }, 33);
+
+    function finish() {
+      cancelAnimationFrame(raf);
+      clearInterval(waveTimer);
+      window.removeEventListener('resize', size);
+      night.classList.remove('on');
+      canvas.classList.remove('on');
+      flag.classList.remove('on');
+      setTimeout(() => { night.remove(); canvas.remove(); flag.remove(); eggActive = false; }, 800);
+    }
+
+    raf = requestAnimationFrame(frame);
+    // hold the flag a beat past the last shell, then everything fades together
+    setTimeout(() => { if (eggActive) flag.classList.remove('on'); }, LAUNCH_MS + 1800);
+  }
+
+  function onBurgerTap() {
     if (eggActive) return;
-    // Pop animation on all burger decos
     document.querySelectorAll('.burger-deco').forEach(el => {
       el.classList.remove('egg-pop');
       void el.offsetWidth;
       el.classList.add('egg-pop');
       setTimeout(() => el.classList.remove('egg-pop'), 400);
     });
-    setTimeout(launchFireworks, 50);
+    setTimeout(launchFireworks, 60);
   }
 
-  // Attach to both setup and app burger decos (live delegation)
   document.addEventListener('click', e => {
     if (e.target.closest('.burger-deco')) onBurgerTap(e);
   });
