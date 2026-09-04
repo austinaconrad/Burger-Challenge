@@ -2567,6 +2567,9 @@ body.softball-mode #softball-diamond-wrap{display:block}
 #sbd-runs .sbd-runs-faces span,#sbd-bench .sbd-runs-faces span{width:13px;height:13px;border-radius:50%;
   border:1.5px solid var(--sb-board);margin-left:-4px;background-size:cover;background-position:center}
 #sbd-runs .sbd-runs-faces span:first-child,#sbd-bench .sbd-runs-faces span:first-child{margin-left:0}
+/* crowded field: shrink the markers rather than let the tags collide */
+#softball-diamond.sbd-compact .sbd-dot{width:18px;height:18px;font-size:7px;border-width:1.5px}
+#softball-diamond.sbd-compact .sbd-tag{font-size:6.5px;max-width:36px;padding:0 2px}
 /* nothing logged yet — the field says so instead of just sitting empty */
 .sbd-nobody{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);
   font-family:'Bungee',sans-serif;font-size:8px;letter-spacing:0.09em;white-space:nowrap;
@@ -9332,11 +9335,13 @@ function initJuly4Stars() {
 // (SB_START / SB_END / SB_INNINGS are declared up with ACHIEVEMENTS, since the
 //  badge logic near the top of the file needs the same window.)
 
-// Where we are in the game. A ?softball preview outside the window clamps to
-// the 1st/9th so the banner still reads sensibly instead of going negative.
+// Where we are in the game. The nine innings span the WHOLE challenge, not
+// just the weekend — Memorial Day is the first pitch and Labor Day is the last
+// out, which puts this weekend in the bottom of the 9th where it belongs. A
+// ?softball preview outside the window clamps instead of going negative.
 function sbInning(now = new Date()) {
-  const span = SB_END - SB_START;
-  const t    = Math.min(Math.max(now - SB_START, 0), span - 1);
+  const span = SB_END - CHALLENGE_START;
+  const t    = Math.min(Math.max(now - CHALLENGE_START, 0), span - 1);
   const frac = t / span;
   const idx  = Math.floor(frac * SB_INNINGS);        // 0..8
   const into = frac * SB_INNINGS - idx;              // 0..1 within the inning
@@ -9383,26 +9388,46 @@ function sbWeekendStats(p) {
   return { weekend, today, days: days.size, runs: Math.floor(weekend / 4), base: weekend % 4 };
 }
 
-// Explicit slots in the SVG's 100x70 space, three per base. Each base's group
-// hugs its own base and runs along the edge it sits on — a generic row/column
-// fan-out pushed the corner bases' overflow into the middle of the infield,
-// which read as a grid of avatars floating over the diamond.
-const _SB_SLOTS = [
-  [[57, 56], [40, 56], [73, 56]],   // at the plate (came all the way around)
-  [[85, 34], [85, 47], [85, 21]],   // first  — column down the right edge
-  [[50, 12], [33, 12], [67, 12]],   // second — row along the top
-  [[15, 36], [15, 49], [15, 23]],   // third  — column down the left edge
-];
-// Where the "+N" marker parks once a base is over capacity: just off its own
-// base, along that base's path — never in the middle of the infield, and clear
-// of the runs and dugout chips in the corners.
-const _SB_MORE_SLOT = [[24, 56], [74, 46], [16, 11], [28, 45]];
-function _sbSlot(base, k) {
-  const slots = _SB_SLOTS[base];
-  const p = k < slots.length ? slots[k] : _SB_MORE_SLOT[base];
-  return [Math.min(92, Math.max(8, p[0])), Math.min(59, Math.max(6, p[1]))];
+// The basepath in the SVG's 100x70 space. A player's SEASON count places them
+// on it: 0 at the plate, 25 on first, 50 on second, 75 on third, 100 back
+// across. Someone at 90 really is rounding third and heading home.
+// Note the two different home-plate points: a player just starting out stands
+// in the right-hand batter's box, a player sliding in on 99 comes down the
+// third-base line. Both are "at home", but sharing one point piled the leaders
+// on top of the people who'd barely started.
+const _SBD_PATH = [[61, 60], [87, 35.7], [50, 9.1], [13, 35.7], [41, 63.5]];
+function _sbdSeg(count) {
+  const p = Math.max(0, Math.min(100, count));
+  const seg = Math.min(3, Math.floor(p / 25));
+  return [seg, (p - seg * 25) / 25];
 }
-const _sbdPrev = {};   // pid -> last known {weekend, runs}
+function _sbdPos(count) {
+  const [seg, t] = _sbdSeg(count);
+  const a = _SBD_PATH[seg], b = _SBD_PATH[seg + 1];
+  return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+}
+// Players on similar counts land on the same spot, so pack them into a tight
+// plus-shape around it: [across the path, along the path]. Fanning them all
+// out to one side in a straight line walked the tail of a big group off into
+// the middle of the infield.
+const _SBD_CLUSTER = 14;   // units apart before two runners count as stacked
+const _SBD_FAN = [[0, 0], [1, 0], [-1, 0], [1, 1], [-1, -1], [0, 1], [0, -1]];
+function _sbdOffset(count, k) {
+  const [x, y] = _sbdPos(count);
+  const f = _SBD_FAN[Math.min(k, _SBD_FAN.length - 1)];
+  if (!f[0] && !f[1]) return [x, y];
+  const [seg] = _sbdSeg(count);
+  const a = _SBD_PATH[seg], b = _SBD_PATH[seg + 1];
+  const dx = b[0] - a[0], dy = b[1] - a[1];
+  const len = Math.hypot(dx, dy) || 1;
+  const ux = dx / len, uy = dy / len;    // along the path
+  const ACROSS = 9.5, ALONG = 13;
+  return [
+    Math.min(92, Math.max(8,  x + (-uy) * ACROSS * f[0] + ux * ALONG * f[1])),
+    Math.min(59, Math.max(6,  y + ( ux) * ACROSS * f[0] + uy * ALONG * f[1])),
+  ];
+}
+const _sbdPrev = {};   // pid -> last known {count, done}
 
 function renderSoftballDiamond() {
   const el = document.getElementById('softball-diamond');
@@ -9442,61 +9467,76 @@ function renderSoftballDiamond() {
   const runsEl  = document.getElementById('sbd-runs');
   if (!runners) return;
 
-  // Only players who have actually logged this weekend stand on the field.
-  // Everyone else waits in the dugout — otherwise, before anyone logs, all
-  // sixteen stack into a grid in the middle of the diamond.
-  const stats  = new Map(players.map(p => [p.id, sbWeekendStats(p)]));
-  const sorted = [...players].sort((a, b) => (stats.get(a.id).weekend - stats.get(b.id).weekend));
-  const onField = sorted.filter(p => stats.get(p.id).weekend > 0);
-  const benched = sorted.filter(p => stats.get(p.id).weekend === 0);
+  // Everyone with a burger is on the basepath, placed by season count.
+  // Finishers have crossed the plate, so they move to the scored chip instead
+  // of standing on home plate where a player at zero would also be; anyone
+  // still on zero waits in the dugout.
+  const sorted  = [...players].sort((a, b) => (a.count || 0) - (b.count || 0));
+  const done    = sorted.filter(p => (p.count || 0) >= 100);
+  const onField = sorted.filter(p => (p.count || 0) > 0 && (p.count || 0) < 100);
+  const benched = sorted.filter(p => !(p.count || 0));
   const justScored = [];
 
   sorted.forEach(p => {
-    const s = stats.get(p.id);
     const prev = _sbdPrev[p.id];
-    if (prev && s.runs > prev.runs) justScored.push(p.id);
-    _sbdPrev[p.id] = { weekend: s.weekend, runs: s.runs, advanced: !!(prev && s.weekend > prev.weekend) };
+    const isDone = (p.count || 0) >= 100;
+    if (prev && isDone && !prev.done) justScored.push(p.id);
+    _sbdPrev[p.id] = { count: p.count || 0, done: isDone,
+                       advanced: !!(prev && (p.count || 0) > prev.count) };
   });
 
-  // Bucket by base, then cap each base at two rows and roll the rest into a
-  // "+N" marker, so a crowded base never spills across the diamond.
-  const BASE_CAP = 3;
-  const byBase = [[], [], [], []];
-  onField.forEach(p => byBase[stats.get(p.id).base].push(p));
+  // Group runners standing on the same stretch of basepath, so a tie packs
+  // abreast and anything past the fourth collapses into one "+N" instead of
+  // fanning further and further off the line.
+  const CLUSTER_CAP = 5;
+  const clusters = [];
+  onField.forEach(p => {
+    const [bx, by] = _sbdPos(p.count);
+    // Plain distance, so 24 and 26 pack together on first the way they should.
+    // Home is the one place two counts can be adjacent in space but opposite in
+    // meaning, and the path's two separate home points keep those apart.
+    const hit = clusters.find(c => Math.hypot(c.x - bx, c.y - by) < _SBD_CLUSTER);
+    if (hit) hit.members.push(p);
+    else clusters.push({ x: bx, y: by, members: [p] });
+  });
 
-  if (!onField.length) {
+  // A big group bunched on one leg of the path needs smaller markers to stay
+  // readable — most of a 16-player room sits well behind the leaders.
+  el.classList.toggle('sbd-compact', onField.length > 10);
+
+  if (!onField.length && !done.length) {
     runners.innerHTML = `<div class="sbd-nobody">PLAY BALL · NOBODY ON BASE</div>`;
-  } else
-  runners.innerHTML = byBase.map((list, base) => {
-    const shown = list.slice(0, BASE_CAP);
-    let html = shown.map((p, k) => {
-      const s = stats.get(p.id);
-      const c = RING_COLORS[p.colorIdx % RING_COLORS.length];
-      const [x, y] = _sbSlot(base, k);
-      const inner = p.avatar
-        ? `<img src="${escHtml(p.avatar)}" alt=""/>`
-        : escHtml(initials(p.name));
-      const first = (p.name || '').trim().split(/\s+/)[0] || '?';
-      const cls = `sbd-runner${p.id === myPlayerId ? ' sbd-me' : ''}${_sbdPrev[p.id].advanced ? ' sbd-scoring' : ''}`;
-      return `<div class="${cls}" data-pid="${escHtml(p.id)}"
-          style="left:${x}%;top:${(y / 70) * 100}%"
-          title="${escHtml(p.name)} — ${s.weekend} this weekend · ${p.count || 0}/100 overall">
-        <div class="sbd-dot" style="background:${c}">${inner}</div>
-        <div class="sbd-tag">${escHtml(first)}</div>
-      </div>`;
+  } else {
+    runners.innerHTML = clusters.map(cl => {
+      let html = cl.members.slice(0, CLUSTER_CAP).map((p, k) => {
+        const c = RING_COLORS[p.colorIdx % RING_COLORS.length];
+        const [x, y] = _sbdOffset(p.count, k);
+        const inner = p.avatar
+          ? `<img src="${escHtml(p.avatar)}" alt=""/>`
+          : escHtml(initials(p.name));
+        const first = (p.name || '').trim().split(/\s+/)[0] || '?';
+        const cls = `sbd-runner${p.id === myPlayerId ? ' sbd-me' : ''}${_sbdPrev[p.id].advanced ? ' sbd-scoring' : ''}`;
+        return `<div class="${cls}" data-pid="${escHtml(p.id)}"
+            style="left:${x}%;top:${(y / 70) * 100}%"
+            title="${escHtml(p.name)} — ${p.count || 0}/100">
+          <div class="sbd-dot" style="background:${c}">${inner}</div>
+          <div class="sbd-tag">${escHtml(first)}</div>
+        </div>`;
+      }).join('');
+      const extra = cl.members.slice(CLUSTER_CAP);
+      if (extra.length) {
+        const [x, y] = _sbdOffset(cl.members[0].count, CLUSTER_CAP);
+        const names = extra.map(q => `${q.name} (${q.count || 0})`).join(', ');
+        html += `<div class="sbd-runner sbd-more"
+            style="left:${x}%;top:${(y / 70) * 100}%" title="${escHtml(names)}">
+          <div class="sbd-dot">+${extra.length}</div>
+        </div>`;
+      }
+      return html;
     }).join('');
-    if (list.length > BASE_CAP) {
-      const [x, y] = _sbSlot(base, BASE_CAP);
-      const names = list.slice(BASE_CAP).map(p => p.name).join(', ');
-      html += `<div class="sbd-runner sbd-more" style="left:${x}%;top:${(y / 70) * 100}%"
-          title="${escHtml(names)}">
-        <div class="sbd-dot">+${list.length - BASE_CAP}</div>
-      </div>`;
-    }
-    return html;
-  }).join('');
+  }
 
-  // Dugout: everyone who hasn't logged since the first pitch.
+  // Dugout: anyone yet to log their first burger.
   const benchEl = document.getElementById('sbd-bench');
   if (benchEl) {
     if (!benched.length) {
@@ -9515,23 +9555,21 @@ function renderSoftballDiamond() {
     }
   }
 
-  // Runs chip: how many times the group has crossed the plate this weekend.
+  // Scored chip: everyone who has rounded all four bases (hit 100).
   if (runsEl) {
-    const scorers = sorted.filter(p => stats.get(p.id).runs > 0)
-      .sort((a, b) => stats.get(b.id).runs - stats.get(a.id).runs);
-    const totalRuns = sorted.reduce((t, p) => t + stats.get(p.id).runs, 0);
-    if (!totalRuns) {
+    if (!done.length) {
       runsEl.className = 'sbd-empty';
       runsEl.innerHTML = '';
     } else {
-      const faces = scorers.slice(0, 4).map(p => {
+      const faces = done.slice(0, 4).map(p => {
         const c = RING_COLORS[p.colorIdx % RING_COLORS.length];
         return p.avatar
           ? `<span style="background-image:url('${escHtml(p.avatar)}')"></span>`
           : `<span style="background:${c}"></span>`;
       }).join('');
       runsEl.className = '';
-      runsEl.innerHTML = `<span class="sbd-runs-faces">${faces}</span><span>${totalRuns} R</span>`;
+      runsEl.title = done.map(p => p.name).join(', ');
+      runsEl.innerHTML = `<span class="sbd-runs-faces">${faces}</span><span>${done.length} R</span>`;
     }
   }
 
