@@ -9351,11 +9351,13 @@ function sbWeekendStats(p) {
 // The basepath in the SVG's 100x70 space. A player's SEASON count places them
 // on it: 0 at the plate, 25 on first, 50 on second, 75 on third, 100 back
 // across. Someone at 90 really is rounding third and heading home.
-// Note the two different home-plate points: a player just starting out stands
-// in the right-hand batter's box, a player sliding in on 99 comes down the
-// third-base line. Both are "at home", but sharing one point piled the leaders
-// on top of the people who'd barely started.
-const _SBD_PATH = [[61, 60], [87, 35.7], [50, 9.1], [13, 35.7], [41, 63.5]];
+// Every point sits ON the chalk baseline the SVG draws, so runners string out
+// along the lines between the bags instead of floating beside them. The two
+// home points differ on purpose: a player just starting out is a short way up
+// the first-base line, a player sliding in on 99 is coming down the third-base
+// line. Both are "at home", but sharing one point piled the leaders on top of
+// the people who'd barely started.
+const _SBD_PATH = [[60.4, 55.9], [87, 35.7], [50, 9.1], [13, 35.7], [42.6, 58.1]];
 function _sbdSeg(count) {
   const p = Math.max(0, Math.min(100, count));
   const seg = Math.min(3, Math.floor(p / 25));
@@ -9366,12 +9368,15 @@ function _sbdPos(count) {
   const a = _SBD_PATH[seg], b = _SBD_PATH[seg + 1];
   return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
 }
-// Players on similar counts land on the same spot, so pack them into a tight
-// plus-shape around it: [across the path, along the path]. Fanning them all
-// out to one side in a straight line walked the tail of a big group off into
-// the middle of the infield.
+// Players on similar counts land on the same spot, so spread them ALONG the
+// baseline first — [across the path, along the path] — with only a small
+// across-nudge to keep the dots from touching. Leading with the across offset
+// pushed a crowd out into the grass on either side of the line.
 const _SBD_CLUSTER = 14;   // units apart before two runners count as stacked
-const _SBD_FAN = [[0, 0], [1, 0], [-1, 0], [1, 1], [-1, -1], [0, 1], [0, -1]];
+// Pure along-the-line for the first five, so a group queues up on the baseline
+// the way runners actually would. Each step moves both across and down the
+// screen (every leg is diagonal), which separates the name tags too.
+const _SBD_FAN = [[0, 0], [0, 1], [0, -1], [0, 2], [0, -2], [1, 1], [-1, -1]];
 function _sbdOffset(count, k) {
   const [x, y] = _sbdPos(count);
   const f = _SBD_FAN[Math.min(k, _SBD_FAN.length - 1)];
@@ -9381,7 +9386,7 @@ function _sbdOffset(count, k) {
   const dx = b[0] - a[0], dy = b[1] - a[1];
   const len = Math.hypot(dx, dy) || 1;
   const ux = dx / len, uy = dy / len;    // along the path
-  const ACROSS = 9.5, ALONG = 13;
+  const ACROSS = 5.5, ALONG = 10;
   return [
     Math.min(92, Math.max(8,  x + (-uy) * ACROSS * f[0] + ux * ALONG * f[1])),
     Math.min(59, Math.max(6,  y + ( ux) * ACROSS * f[0] + uy * ALONG * f[1])),
