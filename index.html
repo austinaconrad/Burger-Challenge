@@ -2516,6 +2516,7 @@ body.softball-mode .burger-deco::after{content:'🥎';position:absolute;right:-0
 html.theme-dark .final-week-inner.softball-banner{color:var(--sb-bulb);background:linear-gradient(180deg,#0a3122 0%,#051d13 100%);border-color:rgba(251,191,36,0.38)}
 .sb-inn-half{display:inline-block;transform:translateY(-1px);margin-right:4px}
 /* the final-week ember pulse must not ride along under the softball skin */
+body.softball-mode #stat-days{font-size:14px;letter-spacing:-0.01em;white-space:nowrap}
 body.softball-mode .stat-pill.countdown-hot{border-color:rgba(251,191,36,0.5)!important;animation:sbInningPulse 2s ease-in-out infinite!important}
 body.softball-mode .stat-pill.countdown-hot .stat-num{color:#15803d!important}
 html.theme-dark body.softball-mode .stat-pill.countdown-hot .stat-num{color:#86efac!important}
@@ -2546,7 +2547,7 @@ body.softball-mode #softball-diamond-wrap{display:block}
 .sbd-dot img{width:100%;height:100%;object-fit:cover}
 .sbd-tag{font-family:'Poppins',sans-serif;font-size:7.5px;font-weight:700;letter-spacing:0.02em;
   color:#fff;background:rgba(6,36,24,0.80);border-radius:3px;padding:0 3px;line-height:1.45;
-  white-space:nowrap;max-width:46px;overflow:hidden;text-overflow:ellipsis;pointer-events:none;
+  white-space:nowrap;max-width:42px;overflow:hidden;text-overflow:ellipsis;pointer-events:none;
   text-shadow:0 1px 2px rgba(0,0,0,0.6);box-shadow:0 1px 3px rgba(0,0,0,0.35)}
 .sbd-runner.sbd-me .sbd-dot{border-color:var(--sb-bulb);box-shadow:0 0 0 2px var(--sb-bulb-soft),0 2px 6px rgba(0,0,0,0.4)}
 .sbd-runner.sbd-scoring{animation:sbdScore 0.9s ease-out}
@@ -2556,11 +2557,24 @@ body.softball-mode #softball-diamond-wrap{display:block}
   font-family:'Bungee',sans-serif;font-size:9px;letter-spacing:0.08em;color:var(--sb-bulb);
   background:linear-gradient(180deg,var(--sb-board),var(--sb-board-dk));border:1.5px solid rgba(251,191,36,0.42);
   border-radius:5px;padding:2px 6px;text-shadow:0 0 8px var(--sb-bulb-soft);z-index:3}
-#sbd-runs.sbd-empty{display:none}
-#sbd-runs .sbd-runs-faces{display:flex}
-#sbd-runs .sbd-runs-faces span{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--sb-board);
-  margin-left:-4px;background-size:cover;background-position:center}
-#sbd-runs .sbd-runs-faces span:first-child{margin-left:0}
+/* dugout chip: the bench, opposite the runs chip */
+#sbd-bench{position:absolute;left:2px;bottom:2px;display:flex;align-items:center;gap:4px;
+  font-family:'Bungee',sans-serif;font-size:8.5px;letter-spacing:0.08em;color:rgba(253,246,221,0.82);
+  background:linear-gradient(180deg,rgba(8,46,30,0.92),rgba(4,26,17,0.94));
+  border:1.5px solid rgba(253,246,221,0.25);border-radius:5px;padding:2px 6px;z-index:3}
+#sbd-runs.sbd-empty,#sbd-bench.sbd-empty{display:none}
+#sbd-runs .sbd-runs-faces,#sbd-bench .sbd-runs-faces{display:flex}
+#sbd-runs .sbd-runs-faces span,#sbd-bench .sbd-runs-faces span{width:13px;height:13px;border-radius:50%;
+  border:1.5px solid var(--sb-board);margin-left:-4px;background-size:cover;background-position:center}
+#sbd-runs .sbd-runs-faces span:first-child,#sbd-bench .sbd-runs-faces span:first-child{margin-left:0}
+/* nothing logged yet — the field says so instead of just sitting empty */
+.sbd-nobody{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);
+  font-family:'Bungee',sans-serif;font-size:8px;letter-spacing:0.09em;white-space:nowrap;
+  color:rgba(255,255,255,0.82);background:rgba(6,36,24,0.55);border-radius:5px;padding:3px 10px;
+  text-shadow:0 1px 3px rgba(0,0,0,0.5)}
+/* overflow marker when a base is over capacity */
+.sbd-more .sbd-dot{background:rgba(6,36,24,0.88);border-color:rgba(253,246,221,0.6);
+  font-family:'Bungee',sans-serif;font-size:8px}
 
 /* ── OUTFIELD SCOREBOARD — the Ranks tab ── */
 body.softball-mode #bento-list{
@@ -2580,11 +2594,6 @@ body.softball-mode .sb-board-head{
   text-align:center;text-shadow:0 0 10px var(--sb-bulb-soft);margin-top:4px}
 .sb-board-sub{font-family:'Bungee',sans-serif;font-size:8.5px;letter-spacing:0.16em;
   color:rgba(251,191,36,0.55);text-align:center;margin-top:2px}
-/* right padding lines the column labels up with the .sb-box cells below:
-   board padding (10) + row border+padding (13) + .rank-count (44) + gap (10) */
-.sb-board-cols{display:flex;justify-content:flex-end;gap:0;margin-top:7px;padding-right:65px}
-.sb-board-cols span{width:34px;text-align:center;font-family:'Bungee',sans-serif;font-size:8px;
-  letter-spacing:0.10em;color:rgba(251,191,36,0.60)}
 body.softball-mode .rank-list{gap:5px}
 body.softball-mode .rank-row{
   background:linear-gradient(180deg,rgba(255,255,255,0.045),rgba(0,0,0,0.16))!important;
@@ -2609,12 +2618,6 @@ body.softball-mode .jw-tie-badge{color:var(--sb-bulb)!important;background:rgba(
 body.softball-mode .done-badge{color:#bbf7d0!important;background:rgba(34,197,94,0.18)!important;border-color:rgba(34,197,94,0.45)!important}
 body.softball-mode .presence-dot{box-shadow:0 0 0 2px var(--sb-board)!important}
 body.softball-mode #bento-list .empty,body.softball-mode #bento-list .empty p{color:rgba(253,246,221,0.62)!important}
-/* box score: TDY / WKND / STRK columns */
-.sb-box{display:flex;justify-content:flex-end;gap:0;margin-top:5px}
-.sb-box-cell{width:34px;text-align:center;font-family:'Bungee',sans-serif;font-size:12px;line-height:1.1;
-  color:rgba(253,246,221,0.88)}
-.sb-box-cell.sb-zero{color:rgba(253,246,221,0.28)}
-.sb-box-cell.sb-hot{color:var(--sb-bulb);text-shadow:0 0 8px var(--sb-bulb-soft)}
 body.softball-mode .rank-info{display:flex;flex-direction:column}
 
 /* ── Component sweep: everything the tokens can't reach ── */
@@ -7736,27 +7739,12 @@ function renderBentoList() {
     _prevRanks[p.id]  = rankMap[i];
   });
 
-  // Softball weekend: the Ranks tab becomes an outfield scoreboard, and each
-  // row carries a box-score line (today / weekend / day streak) instead of
-  // just being the same list in different colors.
+  // Softball weekend: the Ranks tab becomes an outfield scoreboard.
   const sbOn = document.body.classList.contains('softball-mode');
-  const sbStats = sbOn ? new Map(sorted.map(p => [p.id, sbWeekendStats(p)])) : null;
-  const sbStreak = p => {
-    const keys = new Set();
-    (p.logs || []).forEach(e => { const d = safeDate(logTs(e)); if (d) keys.add(_sbDayKey(d)); });
-    let n = 0;
-    for (let i = 0; i < 400; i++) {
-      const d = new Date(Date.now() - i * 86400000);
-      if (keys.has(_sbDayKey(d))) n++;
-      else if (i > 0) break;              // today not yet logged doesn't break it
-    }
-    return n;
-  };
   const sbHead = sbOn ? `<div class="sb-board-head">
       <div class="sb-board-bulbs"></div>
       <div class="sb-board-title">🥎 STANDINGS</div>
       <div class="sb-board-sub">${sbInningLabel(sbInning())} · LABOR DAY CLASSIC</div>
-      <div class="sb-board-cols"><span>TDY</span><span>WKND</span><span>STRK</span></div>
     </div>` : '';
 
   const rows = sorted.map((p, i) => {
@@ -7788,12 +7776,6 @@ function renderBentoList() {
           <div class="rank-gauge-tick" style="left:${expectedPct}%" title="Pace target for today (${Math.round(expectedPct)}%)"></div>
           <div class="rank-gauge-dot" style="left:${pct}%;background:${c};box-shadow:0 0 4px ${c}99;"></div>
         </div>
-        ${sbOn ? (() => {
-          const s = sbStats.get(p.id);
-          const st = sbStreak(p);
-          const cell = (v, hot) => `<div class="sb-box-cell${v ? (hot ? ' sb-hot' : '') : ' sb-zero'}">${v}</div>`;
-          return `<div class="sb-box">${cell(s.today, s.today >= 2)}${cell(s.weekend, s.weekend >= 4)}${cell(st, st >= 5)}</div>`;
-        })() : ''}
         ${badgesHtml}
       </div>
       <div class="rank-count" style="color:${c};">${p.count}</div>
@@ -9374,6 +9356,13 @@ function sbTimeLeft(ms) {
   if (h > 0) return `${h}h ${m}m`;
   return `${m}m`;
 }
+// Full days/hours/minutes for the countdown pill.
+function sbTimeLeftExact(ms) {
+  const d = Math.floor(ms / SB_DAY_MS);
+  const h = Math.floor((ms % SB_DAY_MS) / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  return d > 0 ? `${d}d ${h}h ${m}m` : `${h}h ${m}m`;
+}
 
 // Per-player weekend line. The diamond runs off the WEEKEND count, not the
 // season total — over a four-day event nobody moves on a 0–100 mapping.
@@ -9394,24 +9383,24 @@ function sbWeekendStats(p) {
   return { weekend, today, days: days.size, runs: Math.floor(weekend / 4), base: weekend % 4 };
 }
 
-// Stacking anchors in the SVG's 100x70 space: at-bat, 1st, 2nd, 3rd.
-// cx/cy are the per-column and per-row offsets a crowd fans out along —
-// symmetric at home and second, one-sided at the corners so nobody gets
-// pushed off the field the way the old unclamped bump did.
-const _SB_STACK = [
-  { x: 57, y: 57, cx:  18, cy: -13 },  // batter's box — the queue heads back to the on-deck circle
-  { x: 86, y: 34, cx: -17, cy:  13 },  // first
-  { x: 50, y: 12, cx:  18, cy:  13 },  // second
-  { x: 14, y: 34, cx:  17, cy:  13 },  // third
+// Explicit slots in the SVG's 100x70 space, three per base. Each base's group
+// hugs its own base and runs along the edge it sits on — a generic row/column
+// fan-out pushed the corner bases' overflow into the middle of the infield,
+// which read as a grid of avatars floating over the diamond.
+const _SB_SLOTS = [
+  [[57, 56], [40, 56], [73, 56]],   // at the plate (came all the way around)
+  [[85, 34], [85, 47], [85, 21]],   // first  — column down the right edge
+  [[50, 12], [33, 12], [67, 12]],   // second — row along the top
+  [[15, 36], [15, 49], [15, 23]],   // third  — column down the left edge
 ];
+// Where the "+N" marker parks once a base is over capacity: just off its own
+// base, along that base's path — never in the middle of the infield, and clear
+// of the runs and dugout chips in the corners.
+const _SB_MORE_SLOT = [[24, 56], [74, 46], [16, 11], [28, 45]];
 function _sbSlot(base, k) {
-  const s = _SB_STACK[base];
-  const col = k % 3, row = Math.floor(k / 3);
-  const c = (base === 0 || base === 2) ? col - 1 : col;
-  return [
-    Math.min(92, Math.max(8, s.x + c * s.cx)),
-    Math.min(59, Math.max(6, s.y + row * s.cy)),
-  ];
+  const slots = _SB_SLOTS[base];
+  const p = k < slots.length ? slots[k] : _SB_MORE_SLOT[base];
+  return [Math.min(92, Math.max(8, p[0])), Math.min(59, Math.max(6, p[1]))];
 }
 const _sbdPrev = {};   // pid -> last known {weekend, runs}
 
@@ -9447,42 +9436,86 @@ function renderSoftballDiamond() {
       <rect x="40.5" y="59.5" width="5.5" height="8" fill="none" stroke="#ffffff" stroke-opacity="0.7" stroke-width="0.55"/>
       <rect x="54" y="59.5" width="5.5" height="8" fill="none" stroke="#ffffff" stroke-opacity="0.7" stroke-width="0.55"/>
       <path d="M47 61 h6 v2.2 l-3 2.4 l-3 -2.4 Z" fill="#fff"/>
-    </svg><div id="sbd-runners"></div><div id="sbd-runs" class="sbd-empty"></div>`;
+    </svg><div id="sbd-runners"></div><div id="sbd-runs" class="sbd-empty"></div><div id="sbd-bench" class="sbd-empty"></div>`;
   }
   const runners = document.getElementById('sbd-runners');
   const runsEl  = document.getElementById('sbd-runs');
   if (!runners) return;
 
-  // Everyone appears — a player at zero stands in the batter's box rather than
-  // vanishing, which is most of the group on the first morning.
+  // Only players who have actually logged this weekend stand on the field.
+  // Everyone else waits in the dugout — otherwise, before anyone logs, all
+  // sixteen stack into a grid in the middle of the diamond.
   const stats  = new Map(players.map(p => [p.id, sbWeekendStats(p)]));
   const sorted = [...players].sort((a, b) => (stats.get(a.id).weekend - stats.get(b.id).weekend));
-  const perBase = [0, 0, 0, 0];
+  const onField = sorted.filter(p => stats.get(p.id).weekend > 0);
+  const benched = sorted.filter(p => stats.get(p.id).weekend === 0);
   const justScored = [];
 
-  runners.innerHTML = sorted.map(p => {
+  sorted.forEach(p => {
     const s = stats.get(p.id);
-    const c = RING_COLORS[p.colorIdx % RING_COLORS.length];
     const prev = _sbdPrev[p.id];
     if (prev && s.runs > prev.runs) justScored.push(p.id);
-    const advanced = prev && s.weekend > prev.weekend;
-    _sbdPrev[p.id] = { weekend: s.weekend, runs: s.runs };
+    _sbdPrev[p.id] = { weekend: s.weekend, runs: s.runs, advanced: !!(prev && s.weekend > prev.weekend) };
+  });
 
-    const [x, y] = _sbSlot(s.base, perBase[s.base]++);
-    const inner = p.avatar
-      ? `<img src="${escHtml(p.avatar)}" alt=""/>`
-      : escHtml(initials(p.name));
-    const first = (p.name || '').trim().split(/\s+/)[0] || '?';
-    const cls = `sbd-runner${p.id === myPlayerId ? ' sbd-me' : ''}${advanced ? ' sbd-scoring' : ''}`;
-    return `<div class="${cls}" data-pid="${escHtml(p.id)}"
-        style="left:${x}%;top:${(y / 70) * 100}%"
-        title="${escHtml(p.name)} — ${s.weekend} this weekend · ${p.count || 0}/100 overall">
-      <div class="sbd-dot" style="background:${c}">${inner}</div>
-      <div class="sbd-tag">${escHtml(first)}</div>
-    </div>`;
+  // Bucket by base, then cap each base at two rows and roll the rest into a
+  // "+N" marker, so a crowded base never spills across the diamond.
+  const BASE_CAP = 3;
+  const byBase = [[], [], [], []];
+  onField.forEach(p => byBase[stats.get(p.id).base].push(p));
+
+  if (!onField.length) {
+    runners.innerHTML = `<div class="sbd-nobody">PLAY BALL · NOBODY ON BASE</div>`;
+  } else
+  runners.innerHTML = byBase.map((list, base) => {
+    const shown = list.slice(0, BASE_CAP);
+    let html = shown.map((p, k) => {
+      const s = stats.get(p.id);
+      const c = RING_COLORS[p.colorIdx % RING_COLORS.length];
+      const [x, y] = _sbSlot(base, k);
+      const inner = p.avatar
+        ? `<img src="${escHtml(p.avatar)}" alt=""/>`
+        : escHtml(initials(p.name));
+      const first = (p.name || '').trim().split(/\s+/)[0] || '?';
+      const cls = `sbd-runner${p.id === myPlayerId ? ' sbd-me' : ''}${_sbdPrev[p.id].advanced ? ' sbd-scoring' : ''}`;
+      return `<div class="${cls}" data-pid="${escHtml(p.id)}"
+          style="left:${x}%;top:${(y / 70) * 100}%"
+          title="${escHtml(p.name)} — ${s.weekend} this weekend · ${p.count || 0}/100 overall">
+        <div class="sbd-dot" style="background:${c}">${inner}</div>
+        <div class="sbd-tag">${escHtml(first)}</div>
+      </div>`;
+    }).join('');
+    if (list.length > BASE_CAP) {
+      const [x, y] = _sbSlot(base, BASE_CAP);
+      const names = list.slice(BASE_CAP).map(p => p.name).join(', ');
+      html += `<div class="sbd-runner sbd-more" style="left:${x}%;top:${(y / 70) * 100}%"
+          title="${escHtml(names)}">
+        <div class="sbd-dot">+${list.length - BASE_CAP}</div>
+      </div>`;
+    }
+    return html;
   }).join('');
 
-  // Dugout chip: total runs the group has crossed the plate with this weekend.
+  // Dugout: everyone who hasn't logged since the first pitch.
+  const benchEl = document.getElementById('sbd-bench');
+  if (benchEl) {
+    if (!benched.length) {
+      benchEl.className = 'sbd-empty';
+      benchEl.innerHTML = '';
+    } else {
+      const faces = benched.slice(0, 4).map(p => {
+        const c = RING_COLORS[p.colorIdx % RING_COLORS.length];
+        return p.avatar
+          ? `<span style="background-image:url('${escHtml(p.avatar)}')"></span>`
+          : `<span style="background:${c}"></span>`;
+      }).join('');
+      benchEl.className = '';
+      benchEl.title = benched.map(p => p.name).join(', ');
+      benchEl.innerHTML = `<span class="sbd-runs-faces">${faces}</span><span>DUGOUT ${benched.length}</span>`;
+    }
+  }
+
+  // Runs chip: how many times the group has crossed the plate this weekend.
   if (runsEl) {
     const scorers = sorted.filter(p => stats.get(p.id).runs > 0)
       .sort((a, b) => stats.get(b.id).runs - stats.get(a.id).runs);
@@ -9752,7 +9785,7 @@ function setupFinalWeek() {
 }
 function setupSoftball() {
   const daysLbl = document.querySelector('#stat-days + .stat-label');
-  if (daysLbl) daysLbl.textContent = 'innings left';
+  if (daysLbl) daysLbl.textContent = 'left';
   const fabPlus = document.getElementById('log-fab-plus');
   if (fabPlus) fabPlus.textContent = 'AT BAT';
 
@@ -9784,12 +9817,15 @@ function setupSoftball() {
     if (document.body.classList.contains('last-call') ||
         document.body.classList.contains('season-over')) return;
     const inn = sbInning();
-    _themeBanner(`<div class="final-week-inner softball-banner">${sbInningLabel(inn)} · ${sbTimeLeft(inn.msLeft)} TO THE FINAL OUT</div>`);
+    _themeBanner(`<div class="final-week-inner softball-banner">${sbInningLabel(inn)} · LABOR DAY CLASSIC</div>`);
     const num = document.getElementById('stat-days');
-    if (num) { num.textContent = inn.n; _countUpPrev['stat-days'] = inn.n; }
+    if (num) {
+      num.textContent = sbTimeLeftExact(inn.msLeft);
+      _countUpPrev['stat-days'] = num.textContent;
+    }
   };
   tick();
-  setInterval(tick, 60000);
+  setInterval(tick, 30000);
   _statDaysLocked = true;
 
   if (window.confetti) {
