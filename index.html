@@ -2430,29 +2430,243 @@ html.theme-dark .final-week-inner.rain-banner{color:#bfdbfe;background:linear-gr
 html.theme-dark #rain-layer{background:repeating-linear-gradient(78deg,transparent 0 44px,rgba(148,200,246,0.2) 44px 46px)}
 @keyframes rainFall{from{transform:translate(10px,-46px)}to{transform:translate(0,0)}}
 
-/* ══════════ SOFTBALL WEEKEND — Labor Day tournament takeover (Sept 4–7) ══════════ */
-body.softball-mode{background:linear-gradient(175deg,#7ec3e8 0%,#a8d4ed 26%,#8fbf6e 55%,#6fa653 74%,#b08a5f 100%)}
-html.theme-dark body.softball-mode{background:linear-gradient(175deg,#0a1828 0%,#0e2138 30%,#14331f 65%,#3a2a18 100%)}
-/* softball buddy for the header burger */
-body.softball-mode .burger-deco::after{content:'🥎';position:absolute;right:-28px;bottom:0;font-size:30px;animation:wobble 1.6s ease-in-out infinite reverse}
-/* banner variant */
-.final-week-inner.softball-banner{color:#14532d;background:linear-gradient(135deg,rgba(240,253,214,0.92),rgba(200,236,160,0.8));border-color:rgba(77,124,15,0.4);box-shadow:0 2px 12px rgba(77,124,15,0.3);animation:none}
-html.theme-dark .final-week-inner.softball-banner{color:#d9f99d;background:linear-gradient(135deg,rgba(30,64,32,0.6),rgba(20,50,24,0.5));border-color:rgba(163,230,53,0.35)}
+/* ══════════ SOFTBALL WEEKEND — Labor Day tournament takeover (Sept 4–7) ══════════
+   Light mode = day game at the park. Dark mode = night game under the lights.
+   Everything below is driven off the --sb-* palette so the whole app moves
+   together; the Ranks tab is a real outfield scoreboard in both modes, so its
+   dark green reads as an object in the scene instead of a stray dark card. */
+body.softball-mode{
+  /* ballpark palette */
+  --sb-sky:#7ec3e8;
+  --sb-grass:#5f9440; --sb-grass-dk:#48752f; --sb-grass-lt:#7fb35f;
+  --sb-clay:#c4945a; --sb-clay-dk:#9d6f3d;
+  --sb-chalk:#fffdf5;
+  --sb-board:#0b3a26; --sb-board-dk:#062418; --sb-board-lip:#082e1e;
+  --sb-bulb:#fbbf24; --sb-bulb-soft:rgba(251,191,36,0.55); --sb-bulb-dim:rgba(251,191,36,0.22);
+  --sb-seam:#d0342c;
+  --sb-line:rgba(255,255,255,0.88);
+  /* day-game token sweep — warm chalk cards on grass, not cool glass on sky */
+  --text:#17331f; --muted:rgba(23,51,31,0.40); --muted2:rgba(23,51,31,0.62);
+  --surface:rgba(255,253,245,0.80); --surface2:rgba(255,253,245,0.90); --surface3:rgba(255,253,245,0.96);
+  --border:rgba(255,255,255,0.88); --border2:rgba(103,79,44,0.22); --border3:rgba(103,79,44,0.42);
+  --bg:#e7f0dc; --bg2:#f7f3e6;
+  --sky:#2f6b3f; --sky-light:#4e9a5c;
+  --shadow-card:0 4px 18px rgba(52,40,18,0.16),inset 0 1px 0 rgba(255,255,255,0.92);
+  /* mowed-outfield stripes ride over the sky→grass→warning-track gradient;
+     kept low-contrast so they read as texture on grass and near-nothing on sky */
+  background:
+    repeating-linear-gradient(102deg,rgba(255,255,255,0.055) 0 34px,rgba(0,0,0,0.045) 34px 68px),
+    linear-gradient(175deg,#7ec3e8 0%,#a8d4ed 24%,#bcdba6 40%,var(--sb-grass-lt) 54%,var(--sb-grass) 76%,var(--sb-clay) 100%);
+}
+html.theme-dark body.softball-mode{
+  --sb-chalk:#dff2d6;
+  --text:#e9f6e4; --muted:rgba(233,246,228,0.34); --muted2:rgba(233,246,228,0.60);
+  --surface:rgba(10,38,26,0.62); --surface2:rgba(14,48,32,0.74); --surface3:rgba(18,58,40,0.82);
+  --border:rgba(176,224,176,0.15); --border2:rgba(176,224,176,0.13); --border3:rgba(176,224,176,0.32);
+  --bg:#0e2a1c; --bg2:#123522;
+  --sky:#6cc07a; --sky-light:#8ad694;
+  --shadow-card:0 4px 20px rgba(0,0,0,0.42),inset 0 1px 0 rgba(255,255,255,0.05);
+  background:
+    repeating-linear-gradient(102deg,rgba(0,0,0,0.12) 0 34px,rgba(255,255,255,0.028) 34px 68px),
+    linear-gradient(175deg,#071626 0%,#0a2032 26%,#0f2c1c 56%,#14331f 76%,#2c2114 100%);
+}
+/* Warning-track dirt + faint field grain, under the content, over the gradient */
+#sb-layer{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 40% at 50% -8%, rgba(255,255,255,0.42) 0%, transparent 70%),
+    radial-gradient(ellipse 32% 26% at 8% 2%,  rgba(255,255,255,0.35) 0%, transparent 72%),
+    radial-gradient(ellipse 32% 26% at 92% 2%, rgba(255,255,255,0.35) 0%, transparent 72%);
+  mix-blend-mode:soft-light;opacity:0.9}
+html.theme-dark #sb-layer{
+  /* stadium light banks bloom from the top corners on a night game */
+  background:
+    radial-gradient(ellipse 26% 30% at 10% -4%, rgba(226,255,214,0.30) 0%, transparent 68%),
+    radial-gradient(ellipse 26% 30% at 90% -4%, rgba(226,255,214,0.30) 0%, transparent 68%),
+    radial-gradient(ellipse 60% 22% at 50% -6%, rgba(226,255,214,0.16) 0%, transparent 72%);
+  mix-blend-mode:screen;opacity:1;animation:sbLights 7s ease-in-out infinite}
+@keyframes sbLights{0%,100%{opacity:0.85}50%{opacity:1}}
+/* Bunting swag across the very top of the field */
+#sb-bunting{position:fixed;top:0;left:0;right:0;height:20px;z-index:1;pointer-events:none;
+  background:repeating-linear-gradient(90deg,var(--sb-seam) 0 26px,var(--sb-chalk) 26px 52px,#1e4b8f 52px 78px,var(--sb-chalk) 78px 104px);
+  -webkit-mask-image:radial-gradient(13px 20px at 13px 0,#000 96%,transparent 100%);
+  mask-image:radial-gradient(13px 20px at 13px 0,#000 96%,transparent 100%);
+  -webkit-mask-size:26px 20px;mask-size:26px 20px;mask-repeat:repeat-x;-webkit-mask-repeat:repeat-x;
+  opacity:0.55;animation:sbBunting 5.5s ease-in-out infinite}
+@keyframes sbBunting{0%,100%{transform:translateX(0)}50%{transform:translateX(6px)}}
+
+/* softball buddy for the header burger — sized in em so it tracks the
+   scroll-compression shrink instead of ballooning as the burger gets smaller */
+body.softball-mode .burger-deco::after{content:'🥎';position:absolute;right:-0.36em;bottom:0;font-size:0.38em;animation:wobble 1.6s ease-in-out infinite reverse}
+
+/* ── Banner: a scoreboard strip, not a pill ── */
+.final-week-inner.softball-banner{
+  color:var(--sb-bulb);background:linear-gradient(180deg,var(--sb-board) 0%,var(--sb-board-dk) 100%);
+  border:2px solid rgba(251,191,36,0.42);border-radius:8px;padding:7px 18px;
+  font-family:'Bungee',sans-serif;font-size:12px;letter-spacing:0.10em;
+  text-shadow:0 0 10px var(--sb-bulb-soft);
+  box-shadow:0 3px 14px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.10);
+  animation:none;position:relative}
+.final-week-inner.softball-banner::before,
+.final-week-inner.softball-banner::after{
+  content:'';position:absolute;left:8px;right:8px;height:3px;
+  background:radial-gradient(circle,var(--sb-bulb-soft) 0 1.2px,transparent 1.4px) repeat-x;
+  background-size:9px 3px;opacity:0.75}
+.final-week-inner.softball-banner::before{top:3px}
+.final-week-inner.softball-banner::after{bottom:3px}
+html.theme-dark .final-week-inner.softball-banner{color:var(--sb-bulb);background:linear-gradient(180deg,#0a3122 0%,#051d13 100%);border-color:rgba(251,191,36,0.38)}
+.sb-inn-half{display:inline-block;transform:translateY(-1px);margin-right:4px}
+/* the final-week ember pulse must not ride along under the softball skin */
+body.softball-mode .stat-pill.countdown-hot{border-color:rgba(251,191,36,0.5)!important;animation:sbInningPulse 2s ease-in-out infinite!important}
+body.softball-mode .stat-pill.countdown-hot .stat-num{color:#15803d!important}
+html.theme-dark body.softball-mode .stat-pill.countdown-hot .stat-num{color:#86efac!important}
+@keyframes sbInningPulse{0%,100%{box-shadow:0 0 0 0 rgba(251,191,36,0.40)}50%{box-shadow:0 0 0 6px rgba(251,191,36,0)}}
+
 /* red seam stitching on progress fills */
-body.softball-mode .hts-fill::after{content:'';position:absolute;inset:0;border-radius:999px;background:repeating-linear-gradient(100deg,transparent 0 7px,rgba(220,38,38,0.45) 7px 9px)}
+/* the personal progress bar becomes the ball: cream leather, red seams */
+body.softball-mode .hts-track{background:rgba(11,53,80,0.20)}
+html.theme-dark body.softball-mode .hts-track{background:rgba(0,0,0,0.35)}
+body.softball-mode .hts-fill{background:linear-gradient(180deg,#fffdf5,#efe6cd)!important;
+  box-shadow:inset 0 -2px 4px rgba(0,0,0,0.10)}
+body.softball-mode .hts-fill::after{content:'';position:absolute;inset:0;border-radius:999px;background:
+  repeating-linear-gradient(118deg,transparent 0 12px,var(--sb-seam) 12px 13.4px,transparent 13.4px 14px);
+  opacity:0.75}
+body.softball-mode .hts-count{color:var(--sb-seam)!important}
+
 /* ── Base-running diamond ── */
-#softball-diamond{display:none;position:relative;width:100%;max-width:300px;aspect-ratio:10/7;margin:2px auto 0}
-body.softball-mode #softball-diamond{display:block}
+#softball-diamond-wrap{display:none;width:100%;max-width:300px;margin:4px auto 0;overflow:hidden}
+body.softball-mode #softball-diamond-wrap{display:block}
+#softball-diamond{position:relative;width:100%;aspect-ratio:10/7}
 #softball-diamond svg{position:absolute;inset:0;width:100%;height:100%}
-.sbd-runner{position:absolute;width:22px;height:22px;border-radius:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;border:2px solid rgba(255,255,255,0.92);box-shadow:0 2px 6px rgba(0,0,0,0.35);overflow:hidden;transition:left 0.8s cubic-bezier(0.34,1.56,0.64,1),top 0.8s cubic-bezier(0.34,1.56,0.64,1);z-index:2}
-.sbd-runner img{width:100%;height:100%;object-fit:cover}
-/* ── Ballpark scoreboard: Ranks tab ── */
-body.softball-mode #bento-list::before{content:'🥎 FINAL INNING — STANDINGS';display:block;text-align:center;font-family:'Courier New',monospace;font-weight:700;font-size:13px;letter-spacing:0.14em;color:#fbbf24;background:#0e3d26;border:2px solid rgba(251,191,36,0.4);border-radius:10px;padding:8px 6px;margin-bottom:10px;text-shadow:0 0 8px rgba(251,191,36,0.6)}
-body.softball-mode .rank-row{background:rgba(14,61,38,0.92)!important;border-color:rgba(251,191,36,0.25)!important}
-body.softball-mode .rank-name{color:#fef3c7!important;font-family:'Courier New',monospace!important;font-weight:700!important}
-body.softball-mode .rank-count{font-family:'Courier New',monospace!important;color:#fbbf24!important;text-shadow:0 0 8px rgba(251,191,36,0.55)}
-body.softball-mode .rank-num{color:rgba(254,243,199,0.5)!important}
-body.softball-mode .rank-gauge-mask{background:rgba(10,42,26,0.9)!important}
+#sbd-runners{position:absolute;inset:0}
+.sbd-runner{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:1px;
+  transition:left 0.9s cubic-bezier(0.34,1.56,0.64,1),top 0.9s cubic-bezier(0.34,1.56,0.64,1);z-index:2}
+.sbd-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:8px;font-weight:700;color:#fff;border:2px solid rgba(255,255,255,0.92);
+  box-shadow:0 2px 6px rgba(0,0,0,0.40);overflow:hidden}
+.sbd-dot img{width:100%;height:100%;object-fit:cover}
+.sbd-tag{font-family:'Poppins',sans-serif;font-size:7.5px;font-weight:700;letter-spacing:0.02em;
+  color:#fff;background:rgba(6,36,24,0.80);border-radius:3px;padding:0 3px;line-height:1.45;
+  white-space:nowrap;max-width:46px;overflow:hidden;text-overflow:ellipsis;pointer-events:none;
+  text-shadow:0 1px 2px rgba(0,0,0,0.6);box-shadow:0 1px 3px rgba(0,0,0,0.35)}
+.sbd-runner.sbd-me .sbd-dot{border-color:var(--sb-bulb);box-shadow:0 0 0 2px var(--sb-bulb-soft),0 2px 6px rgba(0,0,0,0.4)}
+.sbd-runner.sbd-scoring{animation:sbdScore 0.9s ease-out}
+@keyframes sbdScore{0%{filter:none}30%{filter:drop-shadow(0 0 8px var(--sb-bulb))}100%{filter:none}}
+/* dugout scoreboard chip: who's already crossed the plate */
+#sbd-runs{position:absolute;right:2px;top:2px;display:flex;align-items:center;gap:4px;
+  font-family:'Bungee',sans-serif;font-size:9px;letter-spacing:0.08em;color:var(--sb-bulb);
+  background:linear-gradient(180deg,var(--sb-board),var(--sb-board-dk));border:1.5px solid rgba(251,191,36,0.42);
+  border-radius:5px;padding:2px 6px;text-shadow:0 0 8px var(--sb-bulb-soft);z-index:3}
+#sbd-runs.sbd-empty{display:none}
+#sbd-runs .sbd-runs-faces{display:flex}
+#sbd-runs .sbd-runs-faces span{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--sb-board);
+  margin-left:-4px;background-size:cover;background-position:center}
+#sbd-runs .sbd-runs-faces span:first-child{margin-left:0}
+
+/* ── OUTFIELD SCOREBOARD — the Ranks tab ── */
+body.softball-mode #bento-list{
+  background:linear-gradient(180deg,var(--sb-board) 0%,var(--sb-board-dk) 100%);
+  border:3px solid var(--sb-board-lip);border-radius:14px;padding:0 10px 12px;
+  box-shadow:0 12px 34px rgba(0,0,0,0.42),inset 0 0 0 1px rgba(251,191,36,0.18),inset 0 2px 0 rgba(255,255,255,0.06)}
+.sb-board-head{display:none}
+body.softball-mode .sb-board-head{
+  display:block;margin:0 -10px 10px;padding:9px 12px 8px;position:relative;
+  background:linear-gradient(180deg,rgba(251,191,36,0.10),transparent);
+  border-bottom:2px solid rgba(251,191,36,0.28)}
+.sb-board-bulbs{position:absolute;left:10px;right:10px;top:3px;height:4px;
+  background:radial-gradient(circle,var(--sb-bulb) 0 1.5px,transparent 1.7px) repeat-x;background-size:11px 4px;
+  filter:drop-shadow(0 0 3px var(--sb-bulb-soft));opacity:0.85;animation:sbBulbs 3.2s ease-in-out infinite}
+@keyframes sbBulbs{0%,100%{opacity:0.55}50%{opacity:0.95}}
+.sb-board-title{font-family:'Bungee',sans-serif;font-size:13px;letter-spacing:0.13em;color:var(--sb-bulb);
+  text-align:center;text-shadow:0 0 10px var(--sb-bulb-soft);margin-top:4px}
+.sb-board-sub{font-family:'Bungee',sans-serif;font-size:8.5px;letter-spacing:0.16em;
+  color:rgba(251,191,36,0.55);text-align:center;margin-top:2px}
+/* right padding lines the column labels up with the .sb-box cells below:
+   board padding (10) + row border+padding (13) + .rank-count (44) + gap (10) */
+.sb-board-cols{display:flex;justify-content:flex-end;gap:0;margin-top:7px;padding-right:65px}
+.sb-board-cols span{width:34px;text-align:center;font-family:'Bungee',sans-serif;font-size:8px;
+  letter-spacing:0.10em;color:rgba(251,191,36,0.60)}
+body.softball-mode .rank-list{gap:5px}
+body.softball-mode .rank-row{
+  background:linear-gradient(180deg,rgba(255,255,255,0.045),rgba(0,0,0,0.16))!important;
+  border:1px solid rgba(251,191,36,0.16)!important;border-radius:8px!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.05)!important;padding:9px 12px!important;gap:10px!important}
+body.softball-mode .rank-row:active{background:rgba(251,191,36,0.10)!important}
+body.softball-mode .rank-row.rank-gold{border-color:rgba(251,191,36,0.55)!important;box-shadow:inset 0 0 0 1px rgba(251,191,36,0.18),0 0 16px rgba(251,191,36,0.14)!important}
+body.softball-mode .rank-name{color:#fdf6dd!important;font-weight:600!important}
+body.softball-mode .rank-count{font-family:'Bungee',sans-serif!important;color:var(--sb-bulb)!important;
+  font-size:24px!important;text-shadow:0 0 12px var(--sb-bulb-soft)!important;width:44px;text-align:right}
+body.softball-mode .rank-num{color:rgba(253,246,221,0.55)!important;background:transparent!important}
+body.softball-mode .rank-row.rank-gold .rank-num{background:var(--sb-bulb)!important;color:var(--sb-board)!important}
+body.softball-mode .rank-row.rank-silver .rank-num{background:rgba(226,232,240,0.85)!important;color:var(--sb-board)!important}
+body.softball-mode .rank-row.rank-bronze .rank-num{background:var(--sb-clay)!important;color:#2b1a08!important}
+body.softball-mode .rank-gauge-mask{background:rgba(4,22,14,0.92)!important}
+/* contrast repairs the old partial override left behind */
+body.softball-mode .rank-gauge-tick{background:rgba(253,246,221,0.75)!important;box-shadow:0 0 3px rgba(0,0,0,0.5)}
+body.softball-mode .rank-gauge-dot{border-color:var(--sb-board)!important}
+body.softball-mode .jw-me-badge{color:var(--sb-board)!important;background:var(--sb-bulb)!important;border-color:var(--sb-bulb)!important}
+body.softball-mode .jw-tie-badge{color:var(--sb-bulb)!important;background:rgba(251,191,36,0.12)!important;border-color:rgba(251,191,36,0.40)!important}
+body.softball-mode .done-badge{color:#bbf7d0!important;background:rgba(34,197,94,0.18)!important;border-color:rgba(34,197,94,0.45)!important}
+body.softball-mode .presence-dot{box-shadow:0 0 0 2px var(--sb-board)!important}
+body.softball-mode #bento-list .empty,body.softball-mode #bento-list .empty p{color:rgba(253,246,221,0.62)!important}
+/* box score: TDY / WKND / STRK columns */
+.sb-box{display:flex;justify-content:flex-end;gap:0;margin-top:5px}
+.sb-box-cell{width:34px;text-align:center;font-family:'Bungee',sans-serif;font-size:12px;line-height:1.1;
+  color:rgba(253,246,221,0.88)}
+.sb-box-cell.sb-zero{color:rgba(253,246,221,0.28)}
+.sb-box-cell.sb-hot{color:var(--sb-bulb);text-shadow:0 0 8px var(--sb-bulb-soft)}
+body.softball-mode .rank-info{display:flex;flex-direction:column}
+
+/* ── Component sweep: everything the tokens can't reach ── */
+body.softball-mode .tabs{background:rgba(255,253,245,0.72);border-color:rgba(255,255,255,0.85);
+  box-shadow:0 2px 16px rgba(52,40,18,0.18),inset 0 1px 0 rgba(255,255,255,0.9)}
+html.theme-dark body.softball-mode .tabs{background:rgba(8,32,22,0.82);border-color:rgba(176,224,176,0.14);box-shadow:0 2px 16px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05)}
+body.softball-mode .tab-btn.active{background:linear-gradient(145deg,rgba(47,107,63,0.20),rgba(47,107,63,0.08));color:#1f5330;border-color:rgba(47,107,63,0.35)}
+html.theme-dark body.softball-mode .tab-btn.active{background:linear-gradient(145deg,rgba(108,192,122,0.22),rgba(108,192,122,0.08));color:#bff0c6;border-color:rgba(108,192,122,0.35)}
+body.softball-mode .tab-pill-indicator{background:linear-gradient(145deg,rgba(47,107,63,0.18),rgba(47,107,63,0.06));border-color:rgba(47,107,63,0.30)}
+html.theme-dark body.softball-mode .tab-pill-indicator{background:linear-gradient(145deg,rgba(108,192,122,0.20),rgba(108,192,122,0.06));border-color:rgba(108,192,122,0.30)}
+body.softball-mode .setup-card input,body.softball-mode .add-form input,body.softball-mode .comment-input-row input{background:rgba(255,253,245,0.75);border-color:rgba(103,79,44,0.24)}
+html.theme-dark body.softball-mode .setup-card input,html.theme-dark body.softball-mode .add-form input,html.theme-dark body.softball-mode .comment-input-row input{background:rgba(255,255,255,0.06);border-color:rgba(176,224,176,0.20)}
+body.softball-mode .setup-card h2{color:var(--sb-grass-dk)}
+html.theme-dark body.softball-mode .setup-card h2{color:#9be2a6}
+body.softball-mode .rcpt-card{background:#FBF6E7}
+html.theme-dark body.softball-mode .rcpt-card{background:#0b2418}
+body.softball-mode .pace-gauge-mask{background:rgba(231,240,220,0.94)}
+html.theme-dark body.softball-mode .pace-gauge-mask{background:rgba(10,38,26,0.94)}
+body.softball-mode .pace-gauge-tick{background:rgba(23,51,31,0.55)}
+html.theme-dark body.softball-mode .pace-gauge-tick{background:rgba(233,246,228,0.6)}
+html.theme-dark body.softball-mode #log-modal-sheet,
+html.theme-dark body.softball-mode #log-modal-header,
+html.theme-dark body.softball-mode #log-modal-scroll{background:#0b2719;border-color:rgba(176,224,176,0.18)}
+html.theme-dark body.softball-mode .sticker-album-page{background:rgba(8,32,22,0.60);border-top-color:rgba(176,224,176,0.20)}
+html.theme-dark body.softball-mode .rank-row{background:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(0,0,0,0.18))!important}
+html.theme-dark body.softball-mode #share-toast,
+html.theme-dark body.softball-mode #reaction-tray,
+html.theme-dark body.softball-mode #bdg-tip,
+html.theme-dark body.softball-mode #mc-advancement-toast{background:rgba(9,36,24,0.96);border-color:rgba(176,224,176,0.20)}
+/* the log button becomes the ball */
+body.softball-mode #log-fab{background:
+  radial-gradient(circle at 50% 12%, rgba(0,0,0,0) 0 55%, rgba(0,0,0,0.06) 100%),#fffdf5;
+  border-color:#e2dcc8;
+  box-shadow:0 4px 20px rgba(52,40,18,0.28),0 2px 8px rgba(0,0,0,0.12),inset 0 -6px 14px rgba(0,0,0,0.05)}
+body.softball-mode #log-fab::before,body.softball-mode #log-fab::after{
+  content:'';position:absolute;top:9px;bottom:9px;width:20px;border:2px dashed var(--sb-seam);
+  border-radius:50%;opacity:0.8;pointer-events:none}
+body.softball-mode #log-fab::before{left:4px;border-right-color:transparent;border-top-color:transparent;border-bottom-color:transparent}
+body.softball-mode #log-fab::after{right:4px;border-left-color:transparent;border-top-color:transparent;border-bottom-color:transparent}
+/* the field dims for a night game */
+html.theme-dark body.softball-mode #softball-diamond{filter:brightness(0.82) saturate(1.02);
+  box-shadow:0 0 26px rgba(226,255,214,0.10)}
+html.theme-dark body.softball-mode .sbd-tag{background:rgba(2,20,12,0.85)}
+html.theme-dark body.softball-mode #log-fab{background:#f4f1e4;border-color:#cfc9b4}
+body.softball-mode #log-fab-plus{color:#0b3a26;letter-spacing:0.02em;white-space:nowrap;font-size:9px}
+html.theme-dark body.softball-mode #log-fab-plus{color:#0b3a26}
+body.softball-mode .section-label{color:rgba(23,51,31,0.55)}
+html.theme-dark body.softball-mode .section-label{color:rgba(233,246,228,0.48)}
+body.softball-mode .btn-primary,body.softball-mode .detail-confirm-btn{background:linear-gradient(135deg,var(--sb-grass-lt),var(--sb-grass-dk));box-shadow:0 4px 12px rgba(72,117,47,0.35)}
+/* weekend badge stickers get scoreboard gold */
+body.softball-mode .sb-badge-new .sticker-label{color:var(--sb-grass-dk)}
+html.theme-dark body.softball-mode .sb-badge-new .sticker-label{color:#9be2a6}
 
 /* ── View Transitions: cross-tab morph timing ── */
 html.vt-tab::view-transition-old(root){animation:vtOut 0.16s ease both}
@@ -2483,10 +2697,20 @@ html.vt-tab::view-transition-new(root){animation:vtIn 0.22s cubic-bezier(0.16,1,
     animation-timeline: scroll(root);
     animation-range: 40px 200px;
   }
+  /* the diamond collapses with the rest of the header instead of holding
+     ~200px of vertical space hostage the whole time you're scrolling */
+  body.softball-mode #softball-diamond-wrap{
+    animation: hdrCollapseDiamond linear both;
+    animation-timeline: scroll(root);
+    animation-range: 30px 190px;
+  }
   @keyframes hdrShrinkBurger{to{font-size:44px}}
   @keyframes hdrShrinkTitle{to{font-size:22px}}
   @keyframes hdrFadePills{to{opacity:0.45}}
+  @keyframes hdrCollapseDiamond{to{max-height:0;opacity:0;margin-top:0}}
 }
+/* max-height needs a start value for the collapse to interpolate from */
+body.softball-mode #softball-diamond-wrap{max-height:260px}
 
 /* ══════════ DARK MODE — manual toggle, variable-driven ══════════ */
 .theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:999px;background:var(--surface2);border:1px solid var(--border2);color:var(--muted2);font-size:15px;cursor:pointer;transition:color 0.15s,border-color 0.15s,transform 0.12s;padding:0}
@@ -2631,7 +2855,7 @@ html.theme-dark.season-over{background:#2b2413}
           </div>
         </div>
       </div>
-      <div id="softball-diamond"></div>
+      <div id="softball-diamond-wrap"><div id="softball-diamond"></div></div>
       <div id="spectator-pill" style="display:none;font-size:11px;font-weight:600;color:var(--muted2);background:rgba(255,255,255,0.05);border:1px solid var(--border2);padding:3px 12px;border-radius:999px;letter-spacing:0.04em">👁 Spectating</div>
     </header>
 
@@ -3128,7 +3352,20 @@ const ACHIEVEMENTS = {
   all_the_way:     { label:'All The Way',            tip:'Log a Five Guys burger with all 10 toppings: Ketchup, Mustard, Mayo, Cheese, Lettuce, Pickles, Tomatoes, Onions, Mushrooms & Green Peppers', color:'rgba(245,158,11,0.8)', glow:'rgba(245,158,11,0.3)', size:14, emoji:'🏆🍔' },
   iron_stomach:    { label:'Iron Stomach',            tip:'Log 3 burgers in a single day',          color:'rgba(239,68,68,0.8)',  glow:'rgba(239,68,68,0.3)',  size:14, emoji:'🏋🏼‍♂️🫃🏽' },
   ooh_baby_triple: { label:'Ooh Baby A Triple',      tip:'Log a triple burger (3 patties) to unlock', color:'rgba(59,130,246,0.8)', glow:'rgba(59,130,246,0.3)', size:null, emoji:`<span style="display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1"><span style="font-size:16px">🍔</span><span style="display:flex;gap:2px;font-size:16px"><span>🍔</span><span>🍔</span></span></span>` },
+  // ── Labor Day Classic (Sept 4–7) — only shown during the weekend, or after
+  //    you've earned one, so they don't sit in everyone's book all season ──
+  doubleheader:    { label:'Doubleheader',           tip:'2 burgers in one day of the Labor Day weekend', weekendOnly:true, color:'rgba(124,179,66,0.8)', glow:'rgba(124,179,66,0.3)', size:14, emoji:'🥎🥎' },
+  grand_slam:      { label:'Grand Slam',             tip:'4 burgers in a single day of the Labor Day weekend', weekendOnly:true, color:'rgba(251,191,36,0.9)', glow:'rgba(251,191,36,0.35)', size:14, emoji:'🥎💥' },
+  walk_off:        { label:'Walk-Off',               tip:'Hit 100 burgers during the Labor Day weekend', weekendOnly:true, color:'rgba(208,52,44,0.85)', glow:'rgba(208,52,44,0.3)', size:14, emoji:'🏟️' },
+  perfect_game:    { label:'Perfect Game',           tip:'Log a burger on all four days: Sept 4, 5, 6 and 7', weekendOnly:true, color:'rgba(255,255,255,0.85)', glow:'rgba(200,255,200,0.3)', size:14, emoji:'⚾✨' },
 };
+
+// ── Labor Day Classic window. Declared here (not down with the softball
+//    helpers) because the badge logic above/below needs the same bounds. ──
+const SB_START   = new Date(2026, 8, 4);  // Sept 4, 00:00 local
+const SB_END     = new Date(2026, 8, 8);  // Sept 8, 00:00 local (exclusive)
+const SB_INNINGS = 9;
+const SB_DAY_MS  = 86400000;
 
 let app, db, storage, unsubscribe, unsubMessages, unsubComments, unsubBurgerReactions;
 let myPlayerId = null, myName = '', roomId = '', spectatorMode = false;
@@ -3543,6 +3780,27 @@ function computeAchievements(p, allPlayers) {
 
   // Ooh Baby A Triple — logged at least one triple (3+ patties)
   if ((p.logs || []).some(entry => typeof entry === 'object' && entry.patties >= 3)) earned.push('ooh_baby_triple');
+
+  // ── Labor Day Classic (Sept 4–7) ──
+  const sbByDay = {};
+  logs.forEach(ts => {
+    const d = safeDate(ts);
+    if (!d || d < SB_START || d >= SB_END) return;
+    const k = _sbDayKey(d);
+    sbByDay[k] = (sbByDay[k] || 0) + 1;
+  });
+  const sbDayCounts = Object.values(sbByDay);
+  if (sbDayCounts.some(v => v >= 2)) earned.push('doubleheader');
+  if (sbDayCounts.some(v => v >= 4)) earned.push('grand_slam');
+  if (Object.keys(sbByDay).length >= 4) earned.push('perfect_game');
+  // Walk-off: the 100th burger itself landed inside the window
+  if ((p.count || 0) >= 100) {
+    const inWindow = logs
+      .map(ts => safeDate(ts))
+      .filter(Boolean)
+      .sort((a, b) => a - b)[Math.min(99, logs.length - 1)];
+    if (inWindow && inWindow >= SB_START && inWindow < SB_END) earned.push('walk_off');
+  }
 
   return earned;
 }
@@ -4158,7 +4416,7 @@ function computeDerivedState() {
 function render(){
   computeDerivedState();
   const sorted = _derivedState.sorted;
-  countUp('stat-days', daysUntilLaborDay(), 500);
+  if (!_statDaysLocked) countUp('stat-days', daysUntilLaborDay(), 500);
   countUp('stat-finished', players.reduce((sum,p)=>sum+(p.count||0),0), 500);
   renderHeaderTally();
   renderSoftballDiamond();
@@ -4333,6 +4591,15 @@ function computeBadgeProgress(p) {
     if (key) weekendCounts[key] = (weekendCounts[key]||0)+1;
   });
   const maxWeekend = Math.max(0, ...Object.values(weekendCounts), 0);
+  // Labor Day Classic progress
+  const sbByDay = {};
+  objLogs.forEach(e => {
+    const d = safeDate(e.ts);
+    if (!d || d < SB_START || d >= SB_END) return;
+    const k = _sbDayKey(d);
+    sbByDay[k] = (sbByDay[k] || 0) + 1;
+  });
+  const sbMaxDay = Math.max(0, ...Object.values(sbByDay), 0);
   return {
     clownin_around:   { current: mcdCount,        max: 3   },
     centennial_club:  { current: p.count || 0,    max: 100 },
@@ -4341,6 +4608,10 @@ function computeBadgeProgress(p) {
     double_down:      { current: maxInDay,         max: 2   },
     iron_stomach:     { current: maxInDay,         max: 3   },
     weekend_warrior:  { current: maxWeekend,       max: 6   },
+    doubleheader:     { current: sbMaxDay,                  max: 2   },
+    grand_slam:       { current: sbMaxDay,                  max: 4   },
+    perfect_game:     { current: Object.keys(sbByDay).length, max: 4 },
+    walk_off:         { current: p.count || 0,              max: 100 },
   };
 }
 
@@ -4358,13 +4629,18 @@ function progressRingSvg(pct, colorStr) {
 
 function renderStickerPage(p) {
   const achievements = computeAchievements(p, players);
-  const total = Object.keys(ACHIEVEMENTS).length;
+  // Weekend-only badges show up during the Labor Day Classic, or permanently
+  // once earned — otherwise everyone carries four dead slots for 11 months.
+  const sbOn = document.body.classList.contains('softball-mode');
+  const visible = Object.entries(ACHIEVEMENTS)
+    .filter(([k, a]) => !a.weekendOnly || sbOn || achievements.includes(k));
+  const total = visible.length;
   const earned = achievements.length;
   const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
   const skews = [-3,-1.5,2,1,-2,3,-1,2.5,-2.5,1.5,-3,2,-1,3,1.5];
   const progress = computeBadgeProgress(p);
 
-  const badgesHtml = Object.entries(ACHIEVEMENTS).map(([k, a], i) => {
+  const badgesHtml = visible.map(([k, a], i) => {
     const isEarned = achievements.includes(k);
     const skew = skews[i % skews.length];
     const isSvg = typeof a.emoji === 'string' && a.emoji.includes('<svg');
@@ -4379,6 +4655,10 @@ function renderStickerPage(p) {
       double_down:      (c,m)=>`${c} / ${m} Burgers In One Day`,
       iron_stomach:     (c,m)=>`${c} / ${m} Burgers In One Day`,
       weekend_warrior:  (c,m)=>`${c} / ${m} Weekend Burgers`,
+      doubleheader:     (c,m)=>`${c} / ${m} In A Day This Weekend`,
+      grand_slam:       (c,m)=>`${c} / ${m} In A Day This Weekend`,
+      perfect_game:     (c,m)=>`${c} / ${m} Days Of The Weekend`,
+      walk_off:         (c,m)=>`${c} / ${m} Burgers Logged`,
     };
     const prog = progress[k];
     const progStat = (!isEarned && prog && prog.current > 0 && PROG_LABELS[k])
@@ -4388,7 +4668,7 @@ function renderStickerPage(p) {
 
     if (isEarned) {
       const glowStyle = `box-shadow:inset 0 1px 0 rgba(255,255,255,0.90),inset 0 0 0 1px rgba(30,110,170,0.14),0 3px 10px rgba(30,100,160,0.16),0 0 0 2.5px ${a.color},0 0 20px ${a.glow};background:rgba(255,255,255,0.88)`;
-      return `<div class="sticker-cell" onclick="showBadgePopup('${k}')" style="cursor:pointer">
+      return `<div class="sticker-cell${a.weekendOnly ? ' sb-badge-new' : ''}" onclick="showBadgePopup('${k}')" style="cursor:pointer">
         <div class="badge-sticker unlocked" style="--skew:${skew}deg">
           <div class="sticker-emoji" style="${emojiSize}display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;${glowStyle}">${a.emoji}</div>
         </div>
@@ -4400,7 +4680,7 @@ function renderStickerPage(p) {
       const ring = (prog && pct > 0) ? progressRingSvg(pct, a.color) : '';
       const lockedBorderColor = a.color.replace(/[\d.]+\)$/, '0.35)');
       const lockedInnerStyle = `${emojiSize}display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;opacity:0.22;filter:grayscale(1)`;
-      return `<div class="sticker-cell" onclick="showBadgePopup('${k}')" style="cursor:pointer">
+      return `<div class="sticker-cell${a.weekendOnly ? ' sb-badge-new' : ''}" onclick="showBadgePopup('${k}')" style="cursor:pointer">
         <div style="position:relative;display:inline-flex;align-items:center;justify-content:center">
           ${ring}
           <div class="badge-sticker locked" style="border:2px dashed ${lockedBorderColor};background:rgba(30,100,160,0.04);border-radius:50%;width:64px;height:64px;display:flex;align-items:center;justify-content:center">
@@ -4454,7 +4734,11 @@ function renderLeaderboard(sorted){
     _openAlbumId = me ? me.id : (sorted[0]?.id || null);
   }
 
-  const totalBadges = Object.keys(ACHIEVEMENTS).length;
+  // Match the sticker book: weekend-only badges are slots only while the
+  // Labor Day Classic skin is up, so the spine doesn't grow four dead dots.
+  const _sbBadgesOn = document.body.classList.contains('softball-mode');
+  const totalBadges = Object.entries(ACHIEVEMENTS)
+    .filter(([, a]) => !a.weekendOnly || _sbBadgesOn).length;
 
   lb.innerHTML = sorted.map((p, i) => {
     const color = RING_COLORS[p.colorIdx % RING_COLORS.length];
@@ -7452,6 +7736,29 @@ function renderBentoList() {
     _prevRanks[p.id]  = rankMap[i];
   });
 
+  // Softball weekend: the Ranks tab becomes an outfield scoreboard, and each
+  // row carries a box-score line (today / weekend / day streak) instead of
+  // just being the same list in different colors.
+  const sbOn = document.body.classList.contains('softball-mode');
+  const sbStats = sbOn ? new Map(sorted.map(p => [p.id, sbWeekendStats(p)])) : null;
+  const sbStreak = p => {
+    const keys = new Set();
+    (p.logs || []).forEach(e => { const d = safeDate(logTs(e)); if (d) keys.add(_sbDayKey(d)); });
+    let n = 0;
+    for (let i = 0; i < 400; i++) {
+      const d = new Date(Date.now() - i * 86400000);
+      if (keys.has(_sbDayKey(d))) n++;
+      else if (i > 0) break;              // today not yet logged doesn't break it
+    }
+    return n;
+  };
+  const sbHead = sbOn ? `<div class="sb-board-head">
+      <div class="sb-board-bulbs"></div>
+      <div class="sb-board-title">🥎 STANDINGS</div>
+      <div class="sb-board-sub">${sbInningLabel(sbInning())} · LABOR DAY CLASSIC</div>
+      <div class="sb-board-cols"><span>TDY</span><span>WKND</span><span>STRK</span></div>
+    </div>` : '';
+
   const rows = sorted.map((p, i) => {
     const c = colorFor(p);
     const dr = rankMap[i];
@@ -7481,13 +7788,19 @@ function renderBentoList() {
           <div class="rank-gauge-tick" style="left:${expectedPct}%" title="Pace target for today (${Math.round(expectedPct)}%)"></div>
           <div class="rank-gauge-dot" style="left:${pct}%;background:${c};box-shadow:0 0 4px ${c}99;"></div>
         </div>
+        ${sbOn ? (() => {
+          const s = sbStats.get(p.id);
+          const st = sbStreak(p);
+          const cell = (v, hot) => `<div class="sb-box-cell${v ? (hot ? ' sb-hot' : '') : ' sb-zero'}">${v}</div>`;
+          return `<div class="sb-box">${cell(s.today, s.today >= 2)}${cell(s.weekend, s.weekend >= 4)}${cell(st, st >= 5)}</div>`;
+        })() : ''}
         ${badgesHtml}
       </div>
       <div class="rank-count" style="color:${c};">${p.count}</div>
     </div>`;
   }).join('');
 
-  el.innerHTML = `<div class="rank-list">${rows}</div>`;
+  el.innerHTML = `${sbHead}<div class="rank-list">${rows}</div>`;
 
   requestAnimationFrame(() => {
     _pulsePids.forEach(pid => {
@@ -8826,57 +9139,239 @@ function initJuly4Stars() {
 
 // ── SOFTBALL WEEKEND helpers (activation lives in the theme engine below) ──
 
-// Base-running diamond: home→1st→2nd→3rd→home at 0/25/50/75/100 burgers
-const _SBD_PATH = [[50, 63.7], [87, 35.7], [50, 9.1], [13, 35.7], [50, 63.7]];
-function _sbdPos(count) {
-  const p = Math.max(0, Math.min(100, count));
-  const seg = Math.min(3, Math.floor(p / 25));
-  const t = (p - seg * 25) / 25;
-  const a = _SBD_PATH[seg], b = _SBD_PATH[seg + 1];
-  return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+// (SB_START / SB_END / SB_INNINGS are declared up with ACHIEVEMENTS, since the
+//  badge logic near the top of the file needs the same window.)
+
+// Where we are in the game. A ?softball preview outside the window clamps to
+// the 1st/9th so the banner still reads sensibly instead of going negative.
+function sbInning(now = new Date()) {
+  const span = SB_END - SB_START;
+  const t    = Math.min(Math.max(now - SB_START, 0), span - 1);
+  const frac = t / span;
+  const idx  = Math.floor(frac * SB_INNINGS);        // 0..8
+  const into = frac * SB_INNINGS - idx;              // 0..1 within the inning
+  return { n: idx + 1, half: into < 0.5 ? 'top' : 'bottom', msLeft: Math.max(0, SB_END - now) };
 }
+const _SB_ORD = ['1ST','2ND','3RD','4TH','5TH','6TH','7TH','8TH','9TH'];
+function sbInningLabel(inn) {
+  const arrow = inn.half === 'top' ? '▲' : '▼';
+  const word  = inn.half === 'top' ? 'TOP' : 'BOT';
+  return `<span class="sb-inn-half">${arrow}</span>${word} ${_SB_ORD[inn.n - 1]}`;
+}
+function sbTimeLeft(ms) {
+  const d = Math.floor(ms / SB_DAY_MS);
+  const h = Math.floor((ms % SB_DAY_MS) / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  if (d > 0) return `${d}d ${h}h`;
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+// Per-player weekend line. The diamond runs off the WEEKEND count, not the
+// season total — over a four-day event nobody moves on a 0–100 mapping.
+function _sbDayKey(d) { return `${d.getMonth()}-${d.getDate()}`; }
+function sbWeekendStats(p) {
+  const todayK = _sbDayKey(new Date());
+  let weekend = 0, today = 0;
+  const days = new Set();
+  (p.logs || []).forEach(e => {
+    const d = safeDate(logTs(e));
+    if (!d) return;
+    const k = _sbDayKey(d);
+    if (k === todayK) today++;
+    if (d >= SB_START && d < SB_END) { weekend++; days.add(k); }
+  });
+  // runs = completed trips around the bases (4 burgers = 1 run), base = where
+  // they're standing right now: 0 at bat, 1 on first, 2 on second, 3 on third.
+  return { weekend, today, days: days.size, runs: Math.floor(weekend / 4), base: weekend % 4 };
+}
+
+// Stacking anchors in the SVG's 100x70 space: at-bat, 1st, 2nd, 3rd.
+// cx/cy are the per-column and per-row offsets a crowd fans out along —
+// symmetric at home and second, one-sided at the corners so nobody gets
+// pushed off the field the way the old unclamped bump did.
+const _SB_STACK = [
+  { x: 57, y: 57, cx:  18, cy: -13 },  // batter's box — the queue heads back to the on-deck circle
+  { x: 86, y: 34, cx: -17, cy:  13 },  // first
+  { x: 50, y: 12, cx:  18, cy:  13 },  // second
+  { x: 14, y: 34, cx:  17, cy:  13 },  // third
+];
+function _sbSlot(base, k) {
+  const s = _SB_STACK[base];
+  const col = k % 3, row = Math.floor(k / 3);
+  const c = (base === 0 || base === 2) ? col - 1 : col;
+  return [
+    Math.min(92, Math.max(8, s.x + c * s.cx)),
+    Math.min(59, Math.max(6, s.y + row * s.cy)),
+  ];
+}
+const _sbdPrev = {};   // pid -> last known {weekend, runs}
+
 function renderSoftballDiamond() {
   const el = document.getElementById('softball-diamond');
   if (!el || !document.body.classList.contains('softball-mode')) return;
   if (!el.dataset.built) {
     el.dataset.built = '1';
     el.innerHTML = `<svg viewBox="0 0 100 70" preserveAspectRatio="none" aria-hidden="true">
-      <rect x="0" y="0" width="100" height="70" rx="7" fill="rgba(88,140,70,0.85)"/>
-      <path d="M50 63.7 L87 35.7 L50 9.1 L13 35.7 Z" fill="rgba(196,148,90,0.9)" stroke="rgba(255,255,255,0.85)" stroke-width="1.1"/>
-      <circle cx="50" cy="36" r="5.5" fill="rgba(176,128,74,0.95)"/>
+      <defs>
+        <linearGradient id="sbdGrass" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#74ab53"/><stop offset="1" stop-color="#4c7d34"/>
+        </linearGradient>
+        <pattern id="sbdMow" width="10" height="70" patternUnits="userSpaceOnUse" patternTransform="rotate(14)">
+          <rect width="5" height="70" fill="#ffffff" fill-opacity="0.07"/>
+        </pattern>
+        <radialGradient id="sbdClay" cx="50%" cy="52%" r="62%">
+          <stop offset="0" stop-color="#d8a871"/><stop offset="1" stop-color="#ac7a45"/>
+        </radialGradient>
+      </defs>
+      <rect x="0" y="0" width="100" height="70" rx="7" fill="url(#sbdGrass)"/>
+      <rect x="0" y="0" width="100" height="70" rx="7" fill="url(#sbdMow)"/>
+      <path d="M2 68 Q50 -18 98 68 Z" fill="#c4945a" fill-opacity="0.18"/>
+      <path d="M50 67 L91 35.7 L50 5 L9 35.7 Z" fill="url(#sbdClay)"/>
+      <path d="M50 60.5 L81.5 35.9 L50 12.4 L18.5 35.9 Z" fill="#6ea44e" fill-opacity="0.88"/>
+      <path d="M50 63.7 L94 30.5 M50 63.7 L6 30.5" stroke="#ffffff" stroke-opacity="0.9" stroke-width="0.85" stroke-linecap="round" fill="none"/>
+      <path d="M50 63.7 L87 35.7 L50 9.1 L13 35.7 Z" fill="none" stroke="#ffffff" stroke-opacity="0.5" stroke-width="0.7" stroke-dasharray="2.2 2.2"/>
+      <circle cx="50" cy="37.5" r="5.6" fill="#c08f57"/>
+      <circle cx="50" cy="37.5" r="1.9" fill="#e2c096"/>
       <rect x="84" y="33.5" width="5" height="4.4" fill="#fff" transform="rotate(45 86.5 35.7)"/>
       <rect x="47.5" y="6.9" width="5" height="4.4" fill="#fff" transform="rotate(45 50 9.1)"/>
       <rect x="11" y="33.5" width="5" height="4.4" fill="#fff" transform="rotate(45 13.5 35.7)"/>
+      <rect x="40.5" y="59.5" width="5.5" height="8" fill="none" stroke="#ffffff" stroke-opacity="0.7" stroke-width="0.55"/>
+      <rect x="54" y="59.5" width="5.5" height="8" fill="none" stroke="#ffffff" stroke-opacity="0.7" stroke-width="0.55"/>
       <path d="M47 61 h6 v2.2 l-3 2.4 l-3 -2.4 Z" fill="#fff"/>
-    </svg><div id="sbd-runners"></div>`;
+    </svg><div id="sbd-runners"></div><div id="sbd-runs" class="sbd-empty"></div>`;
   }
   const runners = document.getElementById('sbd-runners');
+  const runsEl  = document.getElementById('sbd-runs');
   if (!runners) return;
-  const sorted = [...players].filter(p => (p.count || 0) > 0).sort((a, b) => a.count - b.count);
-  const seen = {};
+
+  // Everyone appears — a player at zero stands in the batter's box rather than
+  // vanishing, which is most of the group on the first morning.
+  const stats  = new Map(players.map(p => [p.id, sbWeekendStats(p)]));
+  const sorted = [...players].sort((a, b) => (stats.get(a.id).weekend - stats.get(b.id).weekend));
+  const perBase = [0, 0, 0, 0];
+  const justScored = [];
+
   runners.innerHTML = sorted.map(p => {
+    const s = stats.get(p.id);
     const c = RING_COLORS[p.colorIdx % RING_COLORS.length];
-    let [x, y] = _sbdPos(p.count);
-    const k = Math.round(x / 6) + '_' + Math.round(y / 6);
-    const bump = (seen[k] = (seen[k] || 0) + 1) - 1;
-    x += bump * 5; y -= bump * 2.2;
-    const inner = p.avatar ? `<img src="${p.avatar}" alt=""/>` : initials(p.name);
-    return `<div class="sbd-runner" style="left:${x}%;top:${(y / 70) * 100}%;background:${c}" title="${escHtml(p.name)} — ${p.count}/100">${inner}</div>`;
+    const prev = _sbdPrev[p.id];
+    if (prev && s.runs > prev.runs) justScored.push(p.id);
+    const advanced = prev && s.weekend > prev.weekend;
+    _sbdPrev[p.id] = { weekend: s.weekend, runs: s.runs };
+
+    const [x, y] = _sbSlot(s.base, perBase[s.base]++);
+    const inner = p.avatar
+      ? `<img src="${escHtml(p.avatar)}" alt=""/>`
+      : escHtml(initials(p.name));
+    const first = (p.name || '').trim().split(/\s+/)[0] || '?';
+    const cls = `sbd-runner${p.id === myPlayerId ? ' sbd-me' : ''}${advanced ? ' sbd-scoring' : ''}`;
+    return `<div class="${cls}" data-pid="${escHtml(p.id)}"
+        style="left:${x}%;top:${(y / 70) * 100}%"
+        title="${escHtml(p.name)} — ${s.weekend} this weekend · ${p.count || 0}/100 overall">
+      <div class="sbd-dot" style="background:${c}">${inner}</div>
+      <div class="sbd-tag">${escHtml(first)}</div>
+    </div>`;
   }).join('');
+
+  // Dugout chip: total runs the group has crossed the plate with this weekend.
+  if (runsEl) {
+    const scorers = sorted.filter(p => stats.get(p.id).runs > 0)
+      .sort((a, b) => stats.get(b.id).runs - stats.get(a.id).runs);
+    const totalRuns = sorted.reduce((t, p) => t + stats.get(p.id).runs, 0);
+    if (!totalRuns) {
+      runsEl.className = 'sbd-empty';
+      runsEl.innerHTML = '';
+    } else {
+      const faces = scorers.slice(0, 4).map(p => {
+        const c = RING_COLORS[p.colorIdx % RING_COLORS.length];
+        return p.avatar
+          ? `<span style="background-image:url('${escHtml(p.avatar)}')"></span>`
+          : `<span style="background:${c}"></span>`;
+      }).join('');
+      runsEl.className = '';
+      runsEl.innerHTML = `<span class="sbd-runs-faces">${faces}</span><span>${totalRuns} R</span>`;
+    }
+  }
+
+  if (justScored.length && window.confetti) {
+    try {
+      confetti({ particleCount: 60, spread: 70, startVelocity: 26, origin: { y: 0.28 },
+                 colors: ['#fbbf24', '#ffffff', '#d0342c', '#7cb342'] });
+    } catch (e) {}
+  }
 }
 
-// Post-log celebrations: GRAND SLAM (4 today) and WALK-OFF (finished)
+// ── Bat crack: synthesized, so there's no megabyte of base64 audio to ship ──
+let _sbAudioCtx = null;
+function sbBatCrack(vol = 0.5) {
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    _sbAudioCtx = _sbAudioCtx || new AC();
+    const ctx = _sbAudioCtx;
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+    const t = ctx.currentTime;
+
+    // sharp noise transient = the contact
+    const len = Math.floor(ctx.sampleRate * 0.09);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 5);
+    const noise = ctx.createBufferSource(); noise.buffer = buf;
+    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2100; bp.Q.value = 1.1;
+    const ng = ctx.createGain(); ng.gain.setValueAtTime(vol, t); ng.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+    noise.connect(bp).connect(ng).connect(ctx.destination);
+
+    // short woody resonance underneath = the bat
+    const osc = ctx.createOscillator(); osc.type = 'triangle';
+    osc.frequency.setValueAtTime(420, t); osc.frequency.exponentialRampToValueAtTime(150, t + 0.11);
+    const og = ctx.createGain(); og.gain.setValueAtTime(vol * 0.55, t);
+    og.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+    osc.connect(og).connect(ctx.destination);
+
+    noise.start(t); noise.stop(t + 0.1);
+    osc.start(t);   osc.stop(t + 0.13);
+  } catch (e) {}
+}
+function sbBuzz(pattern) { try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) {} }
+
+// Post-log celebrations: GRAND SLAM (4+ in a day) and WALK-OFF (finished).
+// Both are once-per-day / once-ever per device so a fifth burger or two writes
+// landing together can't skip or re-fire them.
+function _sbOnce(key) {
+  try {
+    if (localStorage.getItem(key)) return false;
+    localStorage.setItem(key, '1');
+    return true;
+  } catch (e) { return true; }
+}
 function softballCelebrate() {
   if (!document.body.classList.contains('softball-mode')) return;
   const me = players.find(p => p.id === myPlayerId);
   if (!me) return;
-  if (me.count >= 100) { showToast('🥎 WALK-OFF! You finished the challenge!'); return; }
-  const today = new Date().toDateString();
-  const n = (me.logs || []).filter(e => {
-    const d = new Date(typeof e === 'object' ? e.ts : e);
-    return !isNaN(d) && d.toDateString() === today;
-  }).length;
-  if (n === 4) showToast('🥎 GRAND SLAM! 4 burgers today!');
+
+  if ((me.count || 0) >= 100 && _sbOnce('bc_sb_walkoff')) {
+    showToast('🥎 WALK-OFF! You finished the challenge!');
+    sbBatCrack(0.6); sbBuzz([90, 50, 90, 50, 160]);
+    if (window.confetti) {
+      try { confetti({ particleCount: 180, spread: 100, origin: { y: 0.3 } }); } catch (e) {}
+    }
+    return;
+  }
+
+  const s = sbWeekendStats(me);
+  const dayKey = _sbDayKey(new Date());
+  if (s.today >= 4 && _sbOnce(`bc_sb_slam_${dayKey}`)) {
+    showToast(`🥎 GRAND SLAM! ${s.today} burgers today!`);
+    sbBatCrack(0.5); sbBuzz([70, 40, 110]);
+    if (window.confetti) {
+      try { confetti({ particleCount: 120, spread: 85, origin: { y: 0.32 } }); } catch (e) {}
+    }
+  } else if (s.today >= 2 && _sbOnce(`bc_sb_dbl_${dayKey}`)) {
+    showToast('🥎 Doubleheader — two in a day.');
+    sbBuzz([60, 30, 60]);
+  }
 }
 
 // ── SWIPEABLE TABS — horizontal swipe moves between main tabs ───────────────
@@ -9039,6 +9534,9 @@ function _themeBanner(html) {
   const b = document.getElementById('final-week-banner');
   if (b) b.innerHTML = html;
 }
+// Set by any skin that owns the days-left pill (innings, last call, season
+// over). render()'s countUp used to stomp those every Firestore snapshot.
+var _statDaysLocked = false;  // var: render() reads this from higher up the file
 function setupFinalWeek() {
   const days = Math.max(0, Math.ceil((CHALLENGE_END - new Date()) / 86400000));
   _themeBanner(`<div class="final-week-inner">🔥 FINAL WEEK — ${days} day${days === 1 ? '' : 's'} left 🔥</div>`);
@@ -9049,8 +9547,43 @@ function setupSoftball() {
   if (daysLbl) daysLbl.textContent = 'innings left';
   const fabPlus = document.getElementById('log-fab-plus');
   if (fabPlus) fabPlus.textContent = 'AT BAT';
-  const days = Math.max(0, Math.ceil((CHALLENGE_END - new Date()) / 86400000));
-  _themeBanner(`<div class="final-week-inner softball-banner">🥎 FINAL INNING — ${days} day${days === 1 ? '' : 's'} to the plate 🍔</div>`);
+
+  // Ambient field: light bloom / warning-track haze + bunting across the top.
+  if (!document.getElementById('sb-layer')) {
+    const layer = document.createElement('div');
+    layer.id = 'sb-layer';
+    document.body.prepend(layer);
+    const bunting = document.createElement('div');
+    bunting.id = 'sb-bunting';
+    document.body.prepend(bunting);
+  }
+
+  // Prime WebAudio on the first tap — the bat crack fires ~1.2s after a log,
+  // by which point iOS no longer counts it as gesture-initiated.
+  const prime = () => {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      _sbAudioCtx = _sbAudioCtx || new AC();
+      if (_sbAudioCtx.state === 'suspended') _sbAudioCtx.resume().catch(() => {});
+    } catch (e) {}
+  };
+  ['pointerdown', 'touchstart', 'keydown'].forEach(ev =>
+    document.addEventListener(ev, prime, { once: true, passive: true }));
+
+  // The countdown is now told in innings, which is the theme's own unit.
+  const tick = () => {
+    if (document.body.classList.contains('last-call') ||
+        document.body.classList.contains('season-over')) return;
+    const inn = sbInning();
+    _themeBanner(`<div class="final-week-inner softball-banner">${sbInningLabel(inn)} · ${sbTimeLeft(inn.msLeft)} TO THE FINAL OUT</div>`);
+    const num = document.getElementById('stat-days');
+    if (num) { num.textContent = inn.n; _countUpPrev['stat-days'] = inn.n; }
+  };
+  tick();
+  setInterval(tick, 60000);
+  _statDaysLocked = true;
+
   if (window.confetti) {
     const orig = window.confetti;
     const wrapped = (opts = {}) => orig({ ...opts, colors: opts.colors || ['#f7ec3f', '#7cb342', '#ffffff', '#dc2626'] });
@@ -9060,12 +9593,13 @@ function setupSoftball() {
 function setupLastCall() {
   const num = document.getElementById('stat-days');
   const lbl = document.querySelector('#stat-days + .stat-label');
+  _statDaysLocked = true;
   const tick = () => {
     const ms = Math.max(0, CHALLENGE_DEADLINE - Date.now());
     const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000);
     if (num) num.textContent = h + 'h';
     if (lbl) lbl.textContent = 'last call';
-    _themeBanner(`<div class="final-week-inner softball-banner">⏰ LAST CALL — ${h}h ${m}m to the plate 🍔</div>`);
+    _themeBanner(`<div class="final-week-inner softball-banner"><span class="sb-inn-half">▼</span>BOT 9TH — ${h}h ${m}m TO THE FINAL OUT</div>`);
   };
   tick();
   setInterval(tick, 30000);
@@ -9073,6 +9607,7 @@ function setupLastCall() {
 function setupSeasonOver() {
   const num = document.getElementById('stat-days');
   const lbl = document.querySelector('#stat-days + .stat-label');
+  _statDaysLocked = true;
   if (num) num.textContent = '🏁';
   if (lbl) lbl.textContent = 'season over';
   _themeBanner(`<div style="display:flex;flex-direction:column;align-items:center;gap:2px">
